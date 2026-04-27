@@ -16,19 +16,19 @@ services:
       - .env
     expose:
       - "3000"
-        #depends_on:
-        #- postgresql
+    depends_on:
+        - postgresql
     networks:
       - ft_transcendence
 
-  #postgresql:
-  #image: postgres:15
-  #env_file:
-  #- .env
-  #volumes:
-  #- pgdata:/var/lib/postgresql/data
-  #networks:
-  #- ft_transcendence
+  postgresql:
+    build: ./db
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - ft_transcendence
 
 networks:
   ft_transcendence:
