@@ -1,0 +1,8 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "srcs/server.js",
+  "scripts": {
+    "start": "node srcs/server.js"
+  }
+}
