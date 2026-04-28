@@ -1,22 +1,161 @@
-<form id="loginForm">
-  <input name="username" placeholder="username" />
-  <input name="password" placeholder="password" />
-  <button>Login</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
 
-<script>
-document.getElementById('loginForm').onsubmit = async (e) => {
-  e.preventDefault();
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, Arial;
+    }
 
-  const data = {
-    username: e.target.username.value,
-    password: e.target.password.value,
-  };
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at top, #1e293b, #0f172a);
+      color: white;
+    }
 
-  await fetch('http://localhost:3000/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-};
-</script>
+    .card {
+      width: 340px;
+      padding: 30px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    h1 {
+      margin: 0 0 20px;
+      font-size: 22px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      color: white;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus {
+      border-color: #3b82f6;
+      background: rgba(59,130,246,0.1);
+    }
+
+    button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(59,130,246,0.3);
+    }
+
+    .msg {
+      margin-top: 12px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .error {
+      color: #f87171;
+    }
+
+    .link {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 13px;
+      color: #93c5fd;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Login</h1>
+
+    <form id="loginForm">
+      <input name="email" placeholder="Email" type="email" required />
+      <input name="password" type="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+
+    <div id="msg" class="msg"></div>
+
+    <a href="/register.html" class="link">Create account</a>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const msg = document.getElementById('msg');
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+
+      msg.textContent = "";
+      msg.className = "msg";
+
+      const data = {
+        email: form.email.value,
+        password: form.password.value,
+      };
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          msg.textContent = result.message || "Invalid credentials";
+          msg.classList.add("error");
+          return;
+        }
+
+        // later you'll store JWT here
+        // localStorage.setItem('token', result.token);
+
+        msg.textContent = "Login successful ✓ Redirecting...";
+
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 700);
+
+      } catch (err) {
+        msg.textContent = "Network error";
+        msg.classList.add("error");
+      }
+    };
+  </script>
+</body>
+</html>
