@@ -2,9 +2,13 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY srcs/package.json ./
+COPY package.json package-lock.json ./
 RUN npm install
 
-COPY srcs/ ./
+COPY . .
 
-CMD ["npm", "start"]
+RUN npm run build
+
+EXPOSE 3000
+
+CMD ["npm", "run", "start:prod"]

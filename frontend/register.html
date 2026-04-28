@@ -1,0 +1,34 @@
+<form id="registerForm">
+	<input name="email" placeholder="email" />
+	<input name="username" placeholder="username" />
+	<input name="password" type="password" placeholder="password" />
+	<button>Register</button>
+</form>
+
+<script>
+document.getElementById('registerForm').onsubmit = async (e) => {
+  e.preventDefault();
+
+  const data = {
+    email: e.target.email.value,
+    username: e.target.username.value,
+    password: e.target.password.value,
+  };
+
+  try {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+
+    console.log('STATUS:', res.status);
+    console.log('RESPONSE:', result);
+
+  } catch (err) {
+    console.error('FETCH ERROR:', err);
+  }
+};
+</script>
