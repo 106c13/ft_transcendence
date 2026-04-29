@@ -15,6 +15,7 @@ export class UsersService {
       email: 'test@test.com',
       username: 'admin',
       password: '123',
+	  avatar: 'default.jpg',
     });
 
     return this.usersRepo.save(user);
