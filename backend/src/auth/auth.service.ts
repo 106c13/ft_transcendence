@@ -7,6 +7,24 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
 	constructor(private readonly usersService: UsersService) {}
 
+	async test() {
+		const email = "admin@admin.com";
+		const username = "admin";
+		const password = "123";
+
+		const existingUser = await this.usersService.findByEmail(email);
+
+		if (existingUser) {
+			throw new BadRequestException('User already exits');
+		}
+		const hashedPassword = await bcrypt.hash(password, 10);
+		return this.usersService.create({
+			email,
+			username,
+			password: hashedPassword,
+		});
+	}
+
 	async register({ email, username, password }) {
 		if (password.length < 8) {
 			throw new BadRequestException('Password must be at least 8 characters long');
@@ -24,6 +42,13 @@ export class AuthService {
 
 		email = email.trim().toLowerCase();
 		username = username.trim().toLowerCase();
+
+		const isDublicateEmail = await this.usersService.findByEmail(email);
+		const isDublicateUsername = await this.usersService.findByUsername(username);
+
+		if (isDublicateEmail || isDublicateUsername) {
+			throw new BadRequestException('User already exits');
+		}
 
 		return this.usersService.create({
 			email,

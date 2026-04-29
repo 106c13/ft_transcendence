@@ -16,8 +16,4 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get('test-db')
-  testDB() {
-    return this.usersService.createTestUser();
-  }
 }
