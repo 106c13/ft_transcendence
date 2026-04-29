@@ -5,34 +5,40 @@ import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User)
-    private usersRepo: Repository<User>,
-  ) {}
+	constructor(
+		@InjectRepository(User)
+		private usersRepo: Repository<User>,
+	) {}
 
-  async createTestUser() {
-    const user = this.usersRepo.create({
-      email: 'test@test.com',
-      username: 'admin',
-      password: '123',
-	  avatar: 'default.jpg',
-    });
+	async createTestUser() {
+		const user = this.usersRepo.create({
+			email: 'test@test.com',
+			username: 'admin',
+			password: '123',
+			avatar: 'default.jpg',
+		});
 
-    return this.usersRepo.save(user);
-  }
-  async create(data: { email: string; username: string; password: string }) {
-  	const user = this.usersRepo.create(data);
-  	return this.usersRepo.save(user);
+		return this.usersRepo.save(user);
 	}
 
-  async findByUsername(username: string) {
-  	return this.usersRepo.findOne({
-    	where: { username },
-  	});
-  }
+	async create(data: { email: string; username: string; password: string }) {
+		const user = this.usersRepo.create(data);
+		return this.usersRepo.save(user);
+	}
 
-  async findByEmail(email: string) {
-	  return this.usersRepo.findOne({
-		  where: { email },
-	  });}
+	async findById(id: number) {
+		return this.usersRepo.findOne({ where: { id } });
+	}
+
+	async findByUsername(username: string) {
+		return this.usersRepo.findOne({
+			where: { username },
+		});
+	}
+
+	async findByEmail(email: string) {
+		return this.usersRepo.findOne({
+			where: { email },
+		});
+	}
 }
