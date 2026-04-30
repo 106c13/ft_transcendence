@@ -29,9 +29,13 @@ export class AuthService {
 		});
 	}
 
-	async register({ email, username, password }) {
+	async register({ email, username, password, repassword }) {
 		if (password.length < 8) {
 			throw new BadRequestException('Password must be at least 8 characters long');
+		}
+
+		if (password != repassword) {
+			throw new BadRequestException('Passwords doesn\'t match');
 		}
 
 		const hasLetter = /[a-zA-Z]/.test(password);

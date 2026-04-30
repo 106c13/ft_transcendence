@@ -118,8 +118,12 @@
 				`;
 
 			} catch (err) {
-				document.getElementById('container').innerHTML =
-					'<div class="error">Network error</div>';
+				if (token) {
+					localStorage.removeItem('token');
+				}
+				
+				window.location.href = '/login.html';
+				return;
 			}
 		}
 

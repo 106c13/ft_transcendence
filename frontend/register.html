@@ -95,6 +95,7 @@
       <input name="email" placeholder="Email" required />
       <input name="username" placeholder="Username" required />
       <input name="password" type="password" placeholder="Password" required />
+      <input name="repassword" type="password" placeholder="Confirm password" required />
       <button type="submit">Register</button>
     </form>
 
@@ -115,6 +116,7 @@
         email: form.email.value,
         username: form.username.value,
         password: form.password.value,
+		repassword: form.repassword.value,
       };
 
       try {

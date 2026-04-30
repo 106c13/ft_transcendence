@@ -30,8 +30,6 @@ down:
 stop:
 	@$(COMPOSE) stop
 
-re: down start
-
 logs:
 	@$(COMPOSE) logs -f
 
@@ -40,6 +38,8 @@ clean:
 	@docker system prune -af
 
 fclean: down clean
+
+re: fclean start
 
 help:
 	@echo "$(GREEN)Available commands:$(RESET)"
