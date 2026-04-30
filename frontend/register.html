@@ -84,6 +84,21 @@
     .success {
       color: #4ade80;
     }
+		.link
+		{
+			display: block;
+			text-align: center;
+			margin-top: 10px;
+			font-size: 13px;
+			color: #93c5fd;
+			cursor: pointer;
+			text-decoration: none;
+		}
+
+		.link:hover
+		{
+			text-decoration: underline;
+		}
   </style>
 </head>
 
@@ -98,6 +113,7 @@
       <input name="repassword" type="password" placeholder="Confirm password" required />
       <button type="submit">Register</button>
     </form>
+	<a href="/login.html" class="link">Sign in</a>
 
     <div id="msg" class="msg"></div>
   </div>
