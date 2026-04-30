@@ -1,0 +1,48 @@
+.profile-card {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	background: #1e293b;
+	padding: 25px 30px;
+	border-radius: 12px;
+	box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+	min-width: 300px;
+}
+
+.avatar {
+	width: 90px;
+	height: 90px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid #3b82f6;
+}
+
+.info {
+	display: flex;
+	flex-direction: column;
+}
+
+.username {
+	font-size: 22px;
+	font-weight: bold;
+}
+
+.email {
+	font-size: 14px;
+	color: #94a3b8;
+	margin-top: 5px;
+}
+
+.logout-btn {
+	margin-top: 20px;
+	padding: 10px 15px;
+	border: none;
+	border-radius: 8px;
+	background: #ef4444;
+	color: white;
+	cursor: pointer;
+}
+
+.logout-btn:hover {
+	background: #dc2626;
+}
