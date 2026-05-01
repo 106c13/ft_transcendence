@@ -33,6 +33,12 @@
 	margin-top: 5px;
 }
 
+.bio {
+	font-size: 14px;
+	color: #94a3b8;
+	margin-top: 5px;
+}
+
 .logout-btn {
 	margin-top: 20px;
 	padding: 10px 15px;
@@ -45,4 +51,18 @@
 
 .logout-btn:hover {
 	background: #dc2626;
+}
+.settings-btn {
+	margin-top: 10px;
+	padding: 10px 15px;
+	border: none;
+	border-radius: 8px;
+	background: #3b82f6;
+	color: white;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.settings-btn:hover {
+	background: #2563eb;
 }

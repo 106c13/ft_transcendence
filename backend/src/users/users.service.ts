@@ -41,4 +41,9 @@ export class UsersService {
 			where: { email },
 		});
 	}
+
+	async updateUser(id: number, data: Partial<User>) {
+		await this.usersRepo.update(id, data)
+		return this.findById(id)
+	}
 }

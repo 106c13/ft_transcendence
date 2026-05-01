@@ -6,6 +6,7 @@ type User = {
 	username: string
 	email: string
 	avatar?: string
+	bio?: string
 }
 
 function Profile() {
@@ -85,6 +86,18 @@ function Profile() {
 				<div className="info">
 					<div className="username">{user.username}</div>
 					<div className="email">{user.email}</div>
+
+					<div className="bio">
+						<p>Bio</p>
+						{user.bio} 
+					</div>	
+
+					<button
+						className="settings-btn"
+						onClick={() => navigate('/profile/settings')}
+					>
+						⚙️ Settings
+					</button>
 
 					<button className="logout-btn" onClick={logout}>
 						Logout

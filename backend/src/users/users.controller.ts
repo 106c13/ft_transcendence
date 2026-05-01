@@ -1,27 +1,23 @@
-import { Controller, Get, Headers } from '@nestjs/common';
-import { UsersService } from './users.service';
-import * as jwt from 'jsonwebtoken';
+import { Controller, Get, Patch, Body, Req, UseGuards } from '@nestjs/common'
+import { UsersService } from './users.service'
+import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 
 @Controller('users')
 export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
 
 	@Get('me')
-	async getMe(@Headers('authorization') auth: string) {
-		const token = auth?.replace('Bearer ', '');
+	@UseGuards(JwtAuthGuard)
+	getMe(@Req() req) {
+		return this.usersService.findById(req.user.userId)
+	}
 
-		if (!token) {
-			return { message: 'No token provided' };
-		}
-
-		const decoded = jwt.decode(token) as any;
-
-		if (!decoded?.sub) {
-			return { message: 'Invalid token' };
-		}
-
-		const user = await this.usersService.findById(decoded.sub);
-
-		return user;
+	@Patch('me')
+	@UseGuards(JwtAuthGuard)
+	updateMe(
+		@Req() req,
+		@Body() body: { username?: string; email?: string; bio?: string },
+	) {
+		return this.usersService.updateUser(req.user.userId, body)
 	}
 }
