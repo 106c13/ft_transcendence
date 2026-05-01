@@ -8,6 +8,7 @@ function Settings() {
 	const [oldPassword, setOldPassword] = useState('')
 	const [newPassword, setNewPassword] = useState('')
 	const [confirmPassword, setConfirmPassword] = useState('')
+	const [avatar, setAvatar] = useState<File | null>(null)
 	const [bio, setBio] = useState('')
 	const [msg, setMsg] = useState('')
 	const [error, setError] = useState(false)
@@ -81,17 +82,22 @@ function Settings() {
 
 		const token = localStorage.getItem('token')
 
+		const formData = new FormData()
+
+		formData.append('username', username)
+		formData.append('email', email)
+		formData.append('bio', bio)
+
+		if (avatar) {
+			formData.append('file', avatar)
+		}
+
 		const res = await fetch('/api/users/me', {
 			method: 'PATCH',
 			headers: {
-				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`,
 			},
-			body: JSON.stringify({
-				username,
-				email,
-				bio,
-			}),
+			body: formData,
 		})
 
 		const result = await res.json()
@@ -130,12 +136,22 @@ function Settings() {
 						placeholder="Bio"
 					/>
 
+					<input
+						type="file"
+						accept="image/*"
+						onChange={e => {
+							if (e.target.files?.[0]) {
+								setAvatar(e.target.files[0])
+							}
+						}}
+					/>
+
+
 					<button type="submit">Save</button>
 				</form>
 
 				<h1 style={{ marginTop: '30px' }}>Change password</h1>
 				<form onSubmit={handlePasswordChange}>
-
 					<input
 						type="password"
 						placeholder="Old password"

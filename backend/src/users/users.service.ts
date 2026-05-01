@@ -82,6 +82,8 @@ export class UsersService {
 		if (data.username) user.username = data.username
 		if (data.email) user.email = data.email
 		if (data.bio !== undefined) user.bio = data.bio
+		
+		Object.assign(user, data)
 
 		return this.usersRepo.save(user)
 	}

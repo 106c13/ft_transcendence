@@ -1,6 +1,19 @@
-import { Controller, Get, Patch, Body, Req, UseGuards } from '@nestjs/common'
-import { UsersService } from './users.service'
+import {
+	Controller,
+	Get,
+	Patch,
+	Body,
+	Req,
+	UseGuards,
+	UseInterceptors,
+	UploadedFile,
+} from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { diskStorage } from 'multer'
+import { extname } from 'path'
+import type { Express } from 'express'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
+import { UsersService } from './users.service'
 
 @Controller('users')
 export class UsersController {
@@ -14,11 +27,37 @@ export class UsersController {
 
 	@Patch('me')
 	@UseGuards(JwtAuthGuard)
-	updateMe(
+	@UseInterceptors(
+		FileInterceptor('file', {
+			storage: diskStorage({
+				destination: './uploads',
+				filename: (req, file, cb) => {
+					const uniqueName =
+						Date.now() + '-' + Math.round(Math.random() * 1e9)
+
+					cb(null, uniqueName + extname(file.originalname))
+				},
+			}),
+		}),
+	)
+	async updateMe(
 		@Req() req,
-		@Body() body: { username?: string; email?: string; bio?: string },
+		@UploadedFile() file: Express.Multer.File,
+		@Body() body: any,
 	) {
-		return this.usersService.updateUser(req.user.userId, body)
+		const userId = req.user.userId
+
+		const updateData: any = {
+			username: body.username,
+			email: body.email,
+			bio: body.bio,
+		}
+
+		if (file) {
+			updateData.avatar = file.filename
+		}
+
+		return this.usersService.updateUser(userId, updateData)
 	}
 
 	@Patch('password')

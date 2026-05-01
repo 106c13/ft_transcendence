@@ -79,7 +79,7 @@ function Profile() {
 			<div className="profile-card">
 				<img
 					className="avatar"
-					src={`/assets/${user.avatar || 'default.jpg'}`}
+					src={`/uploads/${user.avatar || 'default.jpg'}`}
 					alt="avatar"
 				/>
 
