@@ -7,6 +7,7 @@ function Settings() {
 	const [email, setEmail] = useState('')
 	const [bio, setBio] = useState('')
 	const [msg, setMsg] = useState('')
+	const [error, setError] = useState(false)
 	const navigate = useNavigate()
 
 	useEffect(() => {
@@ -48,11 +49,15 @@ function Settings() {
 			}),
 		})
 
+		const result = await res.json()
+
 		if (!res.ok) {
-			setMsg('Update failed')
+			setMsg(result.message || 'Update failed')
+			setError(true)
 			return
 		}
 
+		setError(false)
 		setMsg('Saved ✓')
 	}
 
@@ -81,9 +86,27 @@ function Settings() {
 					/>
 
 					<button type="submit">Save</button>
+					<button
+						onClick={() => navigate('/profile')}
+						style={{
+							marginTop: '10px',
+							background: '#334155',
+							color: 'white',
+							padding: '10px',
+							borderRadius: '8px',
+							border: 'none',
+							cursor: 'pointer',
+							width: '100%',
+						}}
+					>
+						← Back to Profile
+					</button>
 				</form>
-
-				{msg && <div className="msg">{msg}</div>}
+				{msg && (
+					<div className={`msg ${error ? 'error' : 'success'}`}>
+						{msg}
+					</div>
+				)}
 			</div>
 		</div>
 	)

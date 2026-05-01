@@ -5,6 +5,11 @@ import { BadRequestException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 
+
+function isValidEmail(email: string) {
+	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
 @Injectable()
 export class AuthService {
 	constructor(private readonly usersService: UsersService,
@@ -30,6 +35,10 @@ export class AuthService {
 	}
 
 	async register({ email, username, password, repassword }) {
+		if (email && !isValidEmail(email)) {
+			throw new BadRequestException('Invalid email format')
+		}
+
 		if (password.length < 8) {
 			throw new BadRequestException('Password must be at least 8 characters long');
 		}

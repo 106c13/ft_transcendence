@@ -66,3 +66,17 @@
 .settings-btn:hover {
 	background: #2563eb;
 }
+
+.msg {
+	margin-top: 12px;
+	font-size: 13px;
+	text-align: center;
+}
+
+.error {
+	color: #f87171;
+}
+
+.success {
+	color: #4ade80;
+}
