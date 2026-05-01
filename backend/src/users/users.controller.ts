@@ -20,4 +20,13 @@ export class UsersController {
 	) {
 		return this.usersService.updateUser(req.user.userId, body)
 	}
+
+	@Patch('password')
+	@UseGuards(JwtAuthGuard)
+	async changePassword(
+		@Req() req,
+		@Body() body: { oldPassword: string; newPassword: string }
+	) {
+		return this.usersService.changePassword(req.user.userId, body)
+	}
 }

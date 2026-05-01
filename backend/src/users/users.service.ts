@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BadRequestException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
 
 function isValidEmail(email: string) {
@@ -83,5 +84,42 @@ export class UsersService {
 		if (data.bio !== undefined) user.bio = data.bio
 
 		return this.usersRepo.save(user)
+	}
+
+		async changePassword(
+		userId: number,
+		data: { oldPassword: string; newPassword: string }
+	) {
+		const user = await this.usersRepo.findOne({ where: { id: userId } })
+
+		if (!user) {
+			throw new BadRequestException('User not found')
+		}
+
+		const isMatch = await bcrypt.compare(data.oldPassword, user.password)
+
+		if (!isMatch) {
+			throw new BadRequestException('Old password is incorrect')
+		}
+
+		if (data.newPassword.length < 8) {
+			throw new BadRequestException('Password too short')
+		}
+
+		const hasLetter = /[a-zA-Z]/.test(data.newPassword);
+		const hasNumber = /[0-9]/.test(data.newPassword);
+		const hasSpecial = /[^a-zA-Z0-9]/.test(data.newPassword);
+
+		if (!hasLetter || !hasNumber || !hasSpecial) {
+			throw new BadRequestException('Password must contain at least one letter, one number, and one special character');
+		}
+
+		const hashed = await bcrypt.hash(data.newPassword, 10)
+
+		user.password = hashed
+
+		await this.usersRepo.save(user)
+
+		return { message: 'Password updated successfully' }
 	}
 }

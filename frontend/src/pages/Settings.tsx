@@ -5,6 +5,9 @@ import './Profile.css'
 function Settings() {
 	const [username, setUsername] = useState('')
 	const [email, setEmail] = useState('')
+	const [oldPassword, setOldPassword] = useState('')
+	const [newPassword, setNewPassword] = useState('')
+	const [confirmPassword, setConfirmPassword] = useState('')
 	const [bio, setBio] = useState('')
 	const [msg, setMsg] = useState('')
 	const [error, setError] = useState(false)
@@ -30,6 +33,48 @@ function Settings() {
 				setBio(data.bio || '')
 			})
 	}, [])
+
+	const handlePasswordChange = async (e: React.FormEvent) => {
+		e.preventDefault()
+
+		setMsg('')
+		setError(false)
+
+		if (newPassword !== confirmPassword) {
+			setMsg('Passwords do not match')
+			setError(true)
+			return
+		}
+
+		const token = localStorage.getItem('token')
+
+		const res = await fetch('/api/users/password', {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({
+				oldPassword,
+				newPassword,
+			}),
+		})
+
+		const result = await res.json()
+
+		if (!res.ok) {
+			setMsg(result.message || 'Password update failed')
+			setError(true)
+			return
+		}
+
+		setMsg('Password updated ✓')
+		setError(false)
+
+		setOldPassword('')
+		setNewPassword('')
+		setConfirmPassword('')
+	}
 
 	const handleSave = async (e: React.FormEvent) => {
 		e.preventDefault()
@@ -86,27 +131,60 @@ function Settings() {
 					/>
 
 					<button type="submit">Save</button>
-					<button
-						onClick={() => navigate('/profile')}
-						style={{
-							marginTop: '10px',
-							background: '#334155',
-							color: 'white',
-							padding: '10px',
-							borderRadius: '8px',
-							border: 'none',
-							cursor: 'pointer',
-							width: '100%',
-						}}
-					>
-						← Back to Profile
-					</button>
 				</form>
+
+				<h1 style={{ marginTop: '30px' }}>Change password</h1>
+				<form onSubmit={handlePasswordChange}>
+
+					<input
+						type="password"
+						placeholder="Old password"
+						value={oldPassword}
+						onChange={e => setOldPassword(e.target.value)}
+						required
+					/>
+
+					<input
+						type="password"
+						placeholder="New password"
+						value={newPassword}
+						onChange={e => setNewPassword(e.target.value)}
+						required
+					/>
+
+					<input
+						type="password"
+						placeholder="Confirm password"
+						value={confirmPassword}
+						onChange={e => setConfirmPassword(e.target.value)}
+						required
+					/>
+
+					<button type="submit">Update password</button>
+				</form>
+
+				<button
+					onClick={() => navigate('/profile')}
+					style={{
+						marginTop: '10px',
+						background: '#334155',
+						color: 'white',
+						padding: '10px',
+						borderRadius: '8px',
+						border: 'none',
+						cursor: 'pointer',
+						width: '100%',
+					}}
+				>
+					← Back to Profile
+				</button>
+
 				{msg && (
 					<div className={`msg ${error ? 'error' : 'success'}`}>
 						{msg}
 					</div>
 				)}
+
 			</div>
 		</div>
 	)
