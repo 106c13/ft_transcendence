@@ -2,11 +2,12 @@
 	display: flex;
 	align-items: center;
 	gap: 20px;
-	background: #1e293b;
+	background: #1E293B;
 	padding: 25px 30px;
-	border-radius: 12px;
-	box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-	min-width: 300px;
+	border-radius: 14px;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+	min-width: 340px;
 }
 
 .avatar {
@@ -14,59 +15,67 @@
 	height: 90px;
 	border-radius: 50%;
 	object-fit: cover;
-	border: 2px solid #3b82f6;
+	border: 2px solid #3B82F6;
 }
 
 .info {
 	display: flex;
 	flex-direction: column;
+	flex: 1;
 }
 
 .username {
 	font-size: 22px;
-	font-weight: bold;
+	font-weight: 700;
+	color: #E2E8F0;
 }
 
 .email {
 	font-size: 14px;
-	color: #94a3b8;
-	margin-top: 5px;
+	color: #94A3B8;
+	margin-top: 4px;
 }
 
 .bio {
 	font-size: 14px;
-	color: #94a3b8;
-	margin-top: 5px;
+	color: #94A3B8;
+	margin-top: 8px;
+	line-height: 1.4;
 }
 
+/* LOGOUT */
 .logout-btn {
-	margin-top: 20px;
+	margin-top: 18px;
 	padding: 10px 15px;
 	border: none;
 	border-radius: 8px;
-	background: #ef4444;
-	color: white;
+	background: #EF4444;
+	color: #E2E8F0;
 	cursor: pointer;
+	transition: 0.2s;
 }
 
 .logout-btn:hover {
-	background: #dc2626;
+	background: #DC2626;
 }
+
+/* SETTINGS */
 .settings-btn {
 	margin-top: 10px;
 	padding: 10px 15px;
 	border: none;
 	border-radius: 8px;
-	background: #3b82f6;
-	color: white;
+	background: #3B82F6;
+	color: #E2E8F0;
 	cursor: pointer;
 	transition: 0.2s;
 }
 
 .settings-btn:hover {
-	background: #2563eb;
+	background: #2563EB;
 }
 
+/* MESSAGE */
 .msg {
 	margin-top: 12px;
 	font-size: 13px;
@@ -74,9 +83,9 @@
 }
 
 .error {
-	color: #f87171;
+	color: #F87171;
 }
 
 .success {
-	color: #4ade80;
+	color: #4ADE80;
 }
