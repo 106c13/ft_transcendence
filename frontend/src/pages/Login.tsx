@@ -85,7 +85,7 @@ function Login() {
 				</form>
 
 				{msg && (
-					<div className={`msg ${error ? 'error' : ''}`}>
+					<div className={`msg ${error ? 'error' : 'success'}`}>
 						{msg}
 					</div>
 				)}

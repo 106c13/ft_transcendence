@@ -1,6 +1,6 @@
 * {
 	box-sizing: border-box;
-	font-family: system-ui, Arial;
+	font-family: system-ui, Arial, sans-serif;
 }
 
 /* PAGE WRAPPER */
@@ -9,8 +9,8 @@
 	justify-content: center;
 	align-items: center;
 	height: 100vh;
-	background: radial-gradient(circle at top, #1e293b, #0f172a);
-	color: white;
+	background: radial-gradient(circle at top, ##0F172A, #101A30);
+	color: #E2E8F0;
 }
 
 /* CARD */
@@ -18,10 +18,9 @@
 	width: 340px;
 	padding: 30px;
 	border-radius: 14px;
-	background: rgba(255, 255, 255, 0.05);
-	backdrop-filter: blur(10px);
-	box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-	border: 1px solid rgba(255,255,255,0.08);
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
 }
 
 /* TITLE */
@@ -29,6 +28,7 @@
 	margin: 0 0 20px;
 	font-size: 22px;
 	text-align: center;
+	color: #E2E8F0;
 }
 
 /* FORM */
@@ -38,21 +38,29 @@ form {
 	gap: 10px;
 }
 
-/* INPUT */
-input {
+/* INPUT + TEXTAREA */
+input,
+textarea {
 	width: 100%;
 	padding: 12px;
 	border-radius: 10px;
-	border: 1px solid rgba(255,255,255,0.1);
-	background: rgba(255,255,255,0.05);
-	color: white;
+	border: 1px solid rgba(148, 163, 184, 0.15);
+	background: rgba(15, 23, 42, 0.45);
+	color: #E2E8F0;
 	outline: none;
 	transition: 0.2s;
+	resize: vertical;
 }
 
-input:focus {
-	border-color: #3b82f6;
-	background: rgba(59,130,246,0.1);
+input::placeholder,
+textarea::placeholder {
+	color: #94A3B8;
+}
+
+input:focus,
+textarea:focus {
+	border-color: #3B82F6;
+	background: rgba(59, 130, 246, 0.08);
 }
 
 /* BUTTON */
@@ -62,16 +70,16 @@ button {
 	padding: 12px;
 	border: none;
 	border-radius: 10px;
-	background: linear-gradient(135deg, #3b82f6, #2563eb);
-	color: white;
-	font-weight: bold;
+	background: linear-gradient(135deg, #3B82F6, #2563EB);
+	color: #E2E8F0;
+	font-weight: 600;
 	cursor: pointer;
 	transition: 0.2s;
 }
 
 button:hover {
 	transform: translateY(-1px);
-	box-shadow: 0 10px 20px rgba(59,130,246,0.3);
+	box-shadow: 0 10px 20px rgba(59, 130, 246, 0.25);
 }
 
 /* MESSAGE */
@@ -82,11 +90,11 @@ button:hover {
 }
 
 .error {
-	color: #f87171;
+	color: #F87171;
 }
 
 .success {
-	color: #4ade80;
+	color: #4ADE80;
 }
 
 /* LINK */
@@ -95,10 +103,11 @@ button:hover {
 	text-align: center;
 	margin-top: 10px;
 	font-size: 13px;
-	color: #93c5fd;
+	color: #94A3B8;
 	text-decoration: none;
 }
 
 .link:hover {
+	color: #E2E8F0;
 	text-decoration: underline;
 }

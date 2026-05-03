@@ -1,27 +1,71 @@
-import { Controller, Get, Headers } from '@nestjs/common';
-import { UsersService } from './users.service';
-import * as jwt from 'jsonwebtoken';
+import {
+	Controller,
+	Get,
+	Patch,
+	Body,
+	Req,
+	UseGuards,
+	UseInterceptors,
+	UploadedFile,
+} from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { diskStorage } from 'multer'
+import { extname } from 'path'
+import type { Express } from 'express'
+import { JwtAuthGuard } from '../auth/jwt-auth.guard'
+import { UsersService } from './users.service'
 
 @Controller('users')
 export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
 
 	@Get('me')
-	async getMe(@Headers('authorization') auth: string) {
-		const token = auth?.replace('Bearer ', '');
+	@UseGuards(JwtAuthGuard)
+	getMe(@Req() req) {
+		return this.usersService.findById(req.user.userId)
+	}
 
-		if (!token) {
-			return { message: 'No token provided' };
+	@Patch('me')
+	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(
+		FileInterceptor('file', {
+			storage: diskStorage({
+				destination: './uploads',
+				filename: (req, file, cb) => {
+					const uniqueName =
+						Date.now() + '-' + Math.round(Math.random() * 1e9)
+
+					cb(null, uniqueName + extname(file.originalname))
+				},
+			}),
+		}),
+	)
+	async updateMe(
+		@Req() req,
+		@UploadedFile() file: Express.Multer.File,
+		@Body() body: any,
+	) {
+		const userId = req.user.userId
+
+		const updateData: any = {
+			username: body.username,
+			email: body.email,
+			bio: body.bio,
 		}
 
-		const decoded = jwt.decode(token) as any;
-
-		if (!decoded?.sub) {
-			return { message: 'Invalid token' };
+		if (file) {
+			updateData.avatar = file.filename
 		}
 
-		const user = await this.usersService.findById(decoded.sub);
+		return this.usersService.updateUser(userId, updateData)
+	}
 
-		return user;
+	@Patch('password')
+	@UseGuards(JwtAuthGuard)
+	async changePassword(
+		@Req() req,
+		@Body() body: { oldPassword: string; newPassword: string }
+	) {
+		return this.usersService.changePassword(req.user.userId, body)
 	}
 }
