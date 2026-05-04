@@ -64,7 +64,7 @@ textarea:focus {
 }
 
 /* BUTTON */
-button {
+.button {
 	width: 100%;
 	margin-top: 12px;
 	padding: 12px;
@@ -77,7 +77,7 @@ button {
 	transition: 0.2s;
 }
 
-button:hover {
+.button:hover {
 	transform: translateY(-1px);
 	box-shadow: 0 10px 20px rgba(59, 130, 246, 0.25);
 }
@@ -110,4 +110,58 @@ button:hover {
 .link:hover {
 	color: #E2E8F0;
 	text-decoration: underline;
+}
+.password-wrapper {
+	position: relative;
+	width: 100%;
+}
+
+.password-wrapper input {
+	width: 100%;
+	padding-right: 70px; /* space for button */
+	box-sizing: border-box;
+	margin-top: 5px;
+}
+.eye-btn {
+	position: absolute;
+	right: 12px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 34px;
+	height: 34px;
+
+	background: transparent;
+	border: none;
+	cursor: pointer;
+
+	color: #94A3B8;
+	font-size: 12px;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	border-radius: 6px;
+}
+
+.eye-btn-r {
+	position: absolute;
+	right: 12px;
+	top: 25%;
+	transform: translateY(-50%);
+	width: 34px;
+	height: 34px;
+
+	background: transparent;
+	border: none;
+	cursor: pointer;
+
+	color: #94A3B8;
+	font-size: 12px;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	border-radius: 6px;
 }
