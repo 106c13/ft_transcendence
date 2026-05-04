@@ -99,4 +99,36 @@ export class FriendsService {
 			.where('user1.id = :userId OR user2.id = :userId', { userId })
 			.getMany()
 	}
+
+	async getRequestStatus(senderId: number, receiverId: number) {
+		return this.friendRequestRepo.findOne({
+		where: [
+			{ sender: { id: senderId }, receiver: { id: receiverId } },
+			{ sender: { id: receiverId }, receiver: { id: senderId } },
+		],
+		});
+	}
+
+	async getRequestStatusByUsername(senderId: number, username: string) {
+		const receiver = await this.userRepo.findOne({
+			where: { username },
+		})
+
+		if (!receiver) {
+			throw new NotFoundException('User not found')
+		}
+
+		const request = await this.friendRequestRepo.findOne({
+			where: [
+				{ sender: { id: senderId }, receiver: { id: receiver.id } },
+				{ sender: { id: receiver.id }, receiver: { id: senderId } },
+			],
+		})
+
+		if (!request) {
+			return { status: 'NONE' }
+		}
+
+		return { status: request.status }
+	}
 }

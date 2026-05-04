@@ -17,6 +17,7 @@ function Profile() {
 	const navigate = useNavigate()
 	const { username } = useParams()
 	const isOwnProfile = !username || username === "me"
+	const [friendStatus, setFriendStatus] = useState<'NONE' | 'PENDING' | 'ACCEPTED'>('NONE')
 
 	const loadProfile = async () => {
 		try {
@@ -55,11 +56,30 @@ function Profile() {
 
 			const data = await res.json()
 			setUser(data)
+
+			const loadFriendStatus = async (token: string, username: string) => {
+				const res = await fetch(`/api/friends/status/${username}`, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				})
+
+				if (!res.ok) return
+
+				const data = await res.json()
+				setFriendStatus(data?.status.toUpperCase() || 'NONE')
+			}
+			
+			if (!isOwnProfile && token) {
+				loadFriendStatus(token, username);
+			}
+
 		} catch {
 			localStorage.removeItem('token')
 			navigate('/login')
 		}
 	}
+
 
 	useEffect(() => {
 		loadProfile()
@@ -88,42 +108,36 @@ function Profile() {
 
 	return (
 		<div className="profile-page">
-
 			<div className="profile-header">
 
 				{isOwnProfile && (
-				<div className="profile-actions">
-					<div
-						className="menu-btn"
-						onClick={() => setMenuOpen(!menuOpen)}
-					>
-						⋯
-					</div>
-
-					<div className={`menu-dropdown ${menuOpen ? 'open' : ''}`}>
-						<div onClick={() => navigate('/profile/settings')}>
-							⚙️ Settings
+					<div className="profile-actions">
+						<div
+							className="menu-btn"
+							onClick={() => setMenuOpen(!menuOpen)}
+						>
+							⋯
 						</div>
 
-						<div onClick={logout} className="danger">
-							🚪 Logout
+						<div className={`menu-dropdown ${menuOpen ? 'open' : ''}`}>
+							<div onClick={() => navigate('/profile/settings')}>
+								⚙️ Settings
+							</div>
+
+							<div onClick={logout} className="danger">
+								🚪 Logout
+							</div>
 						</div>
 					</div>
-				</div>
 				)}
 
 				<img
 					className="profile-avatar"
-					src={
-						user.avatar
-							? `/uploads/${user.avatar}`
-							: `/assets/default.jpg`
-					}
+					src={user.avatar ? `/uploads/${user.avatar}` : `/assets/default.jpg`}
 					alt="avatar"
 				/>
 
 				<div className="profile-info">
-
 					<div className="top-row">
 						<div className="username">{user.username}</div>
 						<div className="flag">🏳️</div>
@@ -142,8 +156,29 @@ function Profile() {
 						<span>• Friends: 0</span>
 						<span>• Online</span>
 					</div>
-
 				</div>
+
+				{!isOwnProfile && (
+					<div className="header-actions">
+						{friendStatus === 'NONE' && (
+							<button className="add-friend-btn">
+								+ Add Friend
+							</button>
+						)}
+
+						{friendStatus === 'PENDING' && (
+							<button className="pending-btn" disabled>
+								Request Sent
+							</button>
+						)}
+
+						{friendStatus === 'ACCEPTED' && (
+							<button className="friends-btn" disabled>
+								Friends ✓
+							</button>
+						)}
+					</div>
+				)}
 
 			</div>
 

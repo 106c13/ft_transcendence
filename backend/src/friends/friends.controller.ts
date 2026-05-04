@@ -16,7 +16,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 export class FriendsController {
 	constructor(private readonly friendsService: FriendsService) {}
 	
-	@Get('request/:id')
+	@Post('request/:id')
 	sendRequest(@Req() req, @Param('id') receiverId: string) {
 		return this.friendsService.sendRequest(
 			req.user.userId,
@@ -43,5 +43,17 @@ export class FriendsController {
 	@Get()
 	getFriends(@Req() req) {
 		return this.friendsService.getFriends(req.user.userId)
+	}
+
+	@Get('status/:username')
+	@UseGuards(JwtAuthGuard)
+	async getStatus(
+		@Req() req,
+		@Param('username') username: string,
+	) {
+		return this.friendsService.getRequestStatusByUsername(
+			req.user.userId,
+			username,
+		)
 	}
 }
