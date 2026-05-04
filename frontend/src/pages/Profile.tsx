@@ -10,14 +10,38 @@ type User = {
 	created_at?: string
 }
 
+type FriendStatus = 'NONE' | 'PENDING' | 'ACCEPTED' | 'RECEIVED' | 'SENT'
+
 function Profile() {
 	const [user, setUser] = useState<User | null>(null)
 	const [error] = useState('')
 	const [menuOpen, setMenuOpen] = useState(false)
+	const [friendStatus, setFriendStatus] = useState<FriendStatus>('NONE')
+
 	const navigate = useNavigate()
 	const { username } = useParams()
-	const isOwnProfile = !username || username === "me"
-	const [friendStatus, setFriendStatus] = useState<'NONE' | 'PENDING' | 'ACCEPTED'>('NONE')
+
+	const isOwnProfile = !username || username === 'me'
+
+	const loadFriendStatus = async (token: string, username: string) => {
+		try {
+			const res = await fetch(`/api/friends/status/${username}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+
+			if (!res.ok) return
+
+			const data = await res.json()
+
+			setFriendStatus(
+				data?.status?.toUpperCase() as FriendStatus || 'NONE'
+			)
+		} catch {
+			setFriendStatus('NONE')
+		}
+	}
 
 	const loadProfile = async () => {
 		try {
@@ -34,8 +58,6 @@ function Profile() {
 			}
 
 			const res = await fetch(endpoint, { headers })
-
-			console.log(res.status);
 
 			if (res.status === 404) {
 				setUser(null)
@@ -57,21 +79,9 @@ function Profile() {
 			const data = await res.json()
 			setUser(data)
 
-			const loadFriendStatus = async (token: string, username: string) => {
-				const res = await fetch(`/api/friends/status/${username}`, {
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				})
-
-				if (!res.ok) return
-
-				const data = await res.json()
-				setFriendStatus(data?.status.toUpperCase() || 'NONE')
-			}
-			
-			if (!isOwnProfile && token) {
-				loadFriendStatus(token, username);
+			// load friend status only for other users
+			if (username && token && !isOwnProfile) {
+				loadFriendStatus(token, username)
 			}
 
 		} catch {
@@ -80,10 +90,104 @@ function Profile() {
 		}
 	}
 
-
 	useEffect(() => {
 		loadProfile()
 	}, [username])
+
+	const sendFriendRequest = async () => {
+		try {
+			const token = localStorage.getItem('token')
+
+			const res = await fetch(`/api/friends/request/${user?.username}`, {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+
+			if (!res.ok) return
+
+			setFriendStatus('PENDING')
+		} catch (err) {
+			console.error(err)
+		}
+	}
+
+	const acceptFriendRequest = async (username: string) => {
+		try {
+			const token = localStorage.getItem('token')
+
+			const res = await fetch(`/api/friends/accept/${username}`, {
+				method: 'PATCH',
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+
+			if (!res.ok) return
+
+			setFriendStatus('ACCEPTED')
+		} catch (err) {
+			console.error(err)
+		}
+	}
+
+	const rejectFriendRequest = async (username: string) => {
+		try {
+			const token = localStorage.getItem('token')
+
+			const res = await fetch(`/api/friends/reject/${username}`, {
+				method: 'DELETE',
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+
+			if (!res.ok) return
+
+			setFriendStatus('NONE')
+		} catch (err) {
+			console.error(err)
+		}
+	}
+
+	const cancelFriendRequest = async () => {
+		try {
+			const token = localStorage.getItem('token')
+
+			const res = await fetch(`/api/friends/cancel/${user?.username}`, {
+				method: 'DELETE',
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+
+			if (!res.ok) return
+
+			setFriendStatus('NONE')
+		} catch (err) {
+			console.error(err)
+		}
+	}
+
+	const unFriendRequest = async () => {
+		try {
+			const token = localStorage.getItem('token')
+
+			const res = await fetch(`/api/friends/unfriend/${user?.username}`, {
+				method: 'DELETE',
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+
+			if (!res.ok) return
+
+			setFriendStatus('NONE')
+		} catch (err) {
+			console.error(err)
+		}
+	}
 
 	const logout = () => {
 		localStorage.removeItem('token')
@@ -108,6 +212,7 @@ function Profile() {
 
 	return (
 		<div className="profile-page">
+
 			<div className="profile-header">
 
 				{isOwnProfile && (
@@ -133,11 +238,16 @@ function Profile() {
 
 				<img
 					className="profile-avatar"
-					src={user.avatar ? `/uploads/${user.avatar}` : `/assets/default.jpg`}
+					src={
+						user.avatar
+							? `/uploads/${user.avatar}`
+							: `/assets/default.jpg`
+					}
 					alt="avatar"
 				/>
 
 				<div className="profile-info">
+
 					<div className="top-row">
 						<div className="username">{user.username}</div>
 						<div className="flag">🏳️</div>
@@ -149,31 +259,53 @@ function Profile() {
 
 					<div className="meta">
 						<span>
-							Joined: {user.created_at
+							Joined:{' '}
+							{user.created_at
 								? new Date(user.created_at).toLocaleDateString()
 								: 'unknown'}
 						</span>
 						<span>• Friends: 0</span>
 						<span>• Online</span>
 					</div>
+
 				</div>
 
+				{/* RIGHT SIDE BUTTON */}
 				{!isOwnProfile && (
 					<div className="header-actions">
+
 						{friendStatus === 'NONE' && (
-							<button className="add-friend-btn">
+							<button onClick={sendFriendRequest}>
 								+ Add Friend
 							</button>
 						)}
 
-						{friendStatus === 'PENDING' && (
-							<button className="pending-btn" disabled>
+						{friendStatus === 'SENT' && (
+							<button onClick={cancelFriendRequest}>
 								Request Sent
 							</button>
 						)}
 
+						{friendStatus === 'RECEIVED' && (
+							<>
+								<button
+									onClick={() => acceptFriendRequest(user!.username)}
+								>
+									Accept
+								</button>
+
+								<button
+									onClick={() => rejectFriendRequest(user!.username)}
+								>
+									Reject
+								</button>
+							</>
+						)}
+
 						{friendStatus === 'ACCEPTED' && (
-							<button className="friends-btn" disabled>
+							<button
+								onClick={() => unFriendRequest()}
+							>
 								Friends ✓
 							</button>
 						)}
@@ -182,6 +314,7 @@ function Profile() {
 
 			</div>
 
+			{/* TABS */}
 			<div className="profile-tabs">
 
 				<div

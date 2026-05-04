@@ -1,8 +1,9 @@
 import {
 	Controller,
+	Get,
 	Post,
 	Patch,
-	Get,
+	Delete,
 	Param,
 	Req,
 	UseGuards,
@@ -16,11 +17,14 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 export class FriendsController {
 	constructor(private readonly friendsService: FriendsService) {}
 	
-	@Post('request/:id')
-	sendRequest(@Req() req, @Param('id') receiverId: string) {
+	@Post('request/:username')
+	sendRequest(
+		@Req() req,
+		@Param('username') username: string,
+	) {
 		return this.friendsService.sendRequest(
 			req.user.userId,
-			Number(receiverId),
+			username,
 		)
 	}
 
@@ -37,6 +41,24 @@ export class FriendsController {
 		return this.friendsService.rejectRequest(
 			Number(requestId),
 			req.user.userId,
+		)
+	}
+
+	@Delete('cancel/:username')
+	@UseGuards(JwtAuthGuard)
+	cancel(@Req() req, @Param('username') username: string) {
+		return this.friendsService.cancelRequest(
+			req.user.userId,
+			username,
+		)
+	}
+
+	@Delete('unfriend/:username')
+	@UseGuards(JwtAuthGuard)
+	unfriend(@Req() req, @Param('username') username: string) {
+		return this.friendsService.unfriend(
+			req.user.userId,
+			username,
 		)
 	}
 
