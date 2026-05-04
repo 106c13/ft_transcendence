@@ -1,4 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	CreateDateColumn
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -25,6 +30,9 @@ export class User {
 
 	@Column({ type: 'timestamp', nullable: true })
 	last_seen: Date;
+	
+	@CreateDateColumn({ type: 'timestamp' })
+	created_at: Date;
 
 	@Column({ default: false })
 	email_verified: boolean;

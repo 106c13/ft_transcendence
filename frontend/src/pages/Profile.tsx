@@ -7,6 +7,7 @@ type User = {
 	email: string
 	avatar?: string
 	bio?: string
+	created_at?: string
 }
 
 function Profile() {
@@ -123,7 +124,11 @@ function Profile() {
 					</div>
 
 					<div className="meta">
-						<span>Joined: 2026-01-01</span>
+						<span>
+							Joined: {user.created_at
+								? new Date(user.created_at).toLocaleDateString()
+								: 'unknown'}
+						</span>
 						<span>• Friends: 0</span>
 						<span>• Online</span>
 					</div>
