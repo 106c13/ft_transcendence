@@ -10,6 +10,7 @@ import {
 	Param,
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { diskStorage } from 'multer'
 import { extname } from 'path'
 import type { Express } from 'express'
@@ -27,8 +28,14 @@ export class UsersController {
 	}
 
 	@Get(':username')
-	getByUsername(@Param('username') username: string) {
-		return this.usersService.findByUsername(username)
+	async getByUsername(@Param('username') username: string) {
+		const user = await this.usersService.findByUsername(username)
+
+		if (!user) {
+			throw new NotFoundException('User not found')
+		}
+
+		return user
 	}
 
 	@Patch('me')
