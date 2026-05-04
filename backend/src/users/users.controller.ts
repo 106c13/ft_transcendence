@@ -7,6 +7,7 @@ import {
 	UseGuards,
 	UseInterceptors,
 	UploadedFile,
+	Param,
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
@@ -23,6 +24,11 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	getMe(@Req() req) {
 		return this.usersService.findById(req.user.userId)
+	}
+
+	@Get(':username')
+	getByUsername(@Param('username') username: string) {
+		return this.usersService.findByUsername(username)
 	}
 
 	@Patch('me')

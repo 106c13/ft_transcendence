@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import './Profile.css'
 
 type User = {
@@ -12,33 +12,44 @@ type User = {
 
 function Profile() {
 	const [user, setUser] = useState<User | null>(null)
-	const [error, setError] = useState('')
+	const [error] = useState('')
 	const [menuOpen, setMenuOpen] = useState(false)
 	const navigate = useNavigate()
+	const { username } = useParams()
+	const isOwnProfile = !username || username === "me"
 
 	const loadProfile = async () => {
-		const token = localStorage.getItem('token')
-
-		if (!token) {
-			navigate('/login')
-			return
-		}
-
 		try {
-			const res = await fetch('/api/users/me', {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
+			const token = localStorage.getItem('token')
 
-			if (res.status === 401) {
+			const endpoint = username
+				? `/api/users/${username}`
+				: '/api/users/me'
+
+			const headers: HeadersInit = {}
+
+			if (token) {
+				headers.Authorization = `Bearer ${token}`
+			}
+
+			const res = await fetch(endpoint, { headers })
+
+			console.log(res.status);
+
+			if (res.status === 404) {
+				setUser(null)
+				return
+			}
+
+			if (!username && res.status === 401) {
 				localStorage.removeItem('token')
 				navigate('/login')
 				return
 			}
 
 			if (!res.ok) {
-				setError('Failed to load profile')
+				localStorage.removeItem('token')
+				navigate('/login')
 				return
 			}
 
@@ -52,7 +63,7 @@ function Profile() {
 
 	useEffect(() => {
 		loadProfile()
-	}, [])
+	}, [username])
 
 	const logout = () => {
 		localStorage.removeItem('token')
@@ -70,7 +81,7 @@ function Profile() {
 	if (!user) {
 		return (
 			<div className="auth-page">
-				<p className="msg">Loading...</p>
+				<p className="msg">User not found</p>
 			</div>
 		)
 	}
@@ -80,7 +91,7 @@ function Profile() {
 
 			<div className="profile-header">
 
-				{/* MENU */}
+				{isOwnProfile && (
 				<div className="profile-actions">
 					<div
 						className="menu-btn"
@@ -99,8 +110,8 @@ function Profile() {
 						</div>
 					</div>
 				</div>
+				)}
 
-				{/* AVATAR */}
 				<img
 					className="profile-avatar"
 					src={
@@ -111,7 +122,6 @@ function Profile() {
 					alt="avatar"
 				/>
 
-				{/* INFO */}
 				<div className="profile-info">
 
 					<div className="top-row">
@@ -137,7 +147,6 @@ function Profile() {
 
 			</div>
 
-			{/* TABS */}
 			<div className="profile-tabs">
 
 				<div
