@@ -5,8 +5,9 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { FriendsModule } from './friends/friends.module';
 
-@Module({
+	@Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
@@ -24,8 +25,8 @@ import { AuthModule } from './auth/auth.module';
     }),
 
     UsersModule,
-
     AuthModule,
+	FriendsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
