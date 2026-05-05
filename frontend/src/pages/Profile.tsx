@@ -34,6 +34,7 @@ function Profile() {
 			if (!res.ok) return
 
 			const data = await res.json()
+			console.log(data.status);
 
 			setFriendStatus(
 				data?.status?.toUpperCase() as FriendStatus || 'NONE'
@@ -95,10 +96,13 @@ function Profile() {
 	}, [username])
 
 	const sendFriendRequest = async () => {
+		if (!user) return
+
 		try {
 			const token = localStorage.getItem('token')
+			if (!token) return
 
-			const res = await fetch(`/api/friends/request/${user?.username}`, {
+			const res = await fetch(`/api/friends/request/${user.username}`, {
 				method: 'POST',
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -107,17 +111,20 @@ function Profile() {
 
 			if (!res.ok) return
 
-			setFriendStatus('PENDING')
+			setFriendStatus('SENT')
 		} catch (err) {
 			console.error(err)
 		}
 	}
 
-	const acceptFriendRequest = async (username: string) => {
+	const acceptFriendRequest = async () => {
+		if (!user) return
+
 		try {
 			const token = localStorage.getItem('token')
+			if (!token) return
 
-			const res = await fetch(`/api/friends/accept/${username}`, {
+			const res = await fetch(`/api/friends/accept/${user.username}`, {
 				method: 'PATCH',
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -132,11 +139,14 @@ function Profile() {
 		}
 	}
 
-	const rejectFriendRequest = async (username: string) => {
+	const rejectFriendRequest = async () => {
+		if (!user) return
+
 		try {
 			const token = localStorage.getItem('token')
+			if (!token) return
 
-			const res = await fetch(`/api/friends/reject/${username}`, {
+			const res = await fetch(`/api/friends/reject/${user.username}`, {
 				method: 'DELETE',
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -152,10 +162,13 @@ function Profile() {
 	}
 
 	const cancelFriendRequest = async () => {
+		if (!user) return
+
 		try {
 			const token = localStorage.getItem('token')
+			if (!token) return
 
-			const res = await fetch(`/api/friends/cancel/${user?.username}`, {
+			const res = await fetch(`/api/friends/cancel/${user.username}`, {
 				method: 'DELETE',
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -171,10 +184,13 @@ function Profile() {
 	}
 
 	const unFriendRequest = async () => {
+		if (!user) return
+
 		try {
 			const token = localStorage.getItem('token')
+			if (!token) return
 
-			const res = await fetch(`/api/friends/unfriend/${user?.username}`, {
+			const res = await fetch(`/api/friends/unfriend/${user.username}`, {
 				method: 'DELETE',
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -188,7 +204,6 @@ function Profile() {
 			console.error(err)
 		}
 	}
-
 	const logout = () => {
 		localStorage.removeItem('token')
 		navigate('/login')
@@ -270,18 +285,23 @@ function Profile() {
 
 				</div>
 
-				{/* RIGHT SIDE BUTTON */}
 				{!isOwnProfile && (
 					<div className="header-actions">
 
 						{friendStatus === 'NONE' && (
-							<button onClick={sendFriendRequest}>
+							<button
+								className="add-friend-btn"
+								onClick={sendFriendRequest}
+							>
 								+ Add Friend
 							</button>
 						)}
 
 						{friendStatus === 'SENT' && (
-							<button onClick={cancelFriendRequest}>
+							<button
+								className="pending-btn"
+								onClick={cancelFriendRequest}
+							>
 								Request Sent
 							</button>
 						)}
@@ -289,13 +309,15 @@ function Profile() {
 						{friendStatus === 'RECEIVED' && (
 							<>
 								<button
-									onClick={() => acceptFriendRequest(user!.username)}
+									className="accept-btn"
+									onClick={acceptFriendRequest}
 								>
 									Accept
 								</button>
 
 								<button
-									onClick={() => rejectFriendRequest(user!.username)}
+									className="reject-btn"
+									onClick={rejectFriendRequest}
 								>
 									Reject
 								</button>
@@ -304,11 +326,13 @@ function Profile() {
 
 						{friendStatus === 'ACCEPTED' && (
 							<button
-								onClick={() => unFriendRequest()}
+								className="friends-btn"
+								onClick={unFriendRequest}
 							>
 								Friends ✓
 							</button>
 						)}
+
 					</div>
 				)}
 

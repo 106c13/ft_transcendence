@@ -28,19 +28,25 @@ export class FriendsController {
 		)
 	}
 
-	@Patch('accept/:id')
-	accept(@Req() req, @Param('id') requestId: string) {
+	@Patch('accept/:username')
+	accept(
+		@Req() req,
+		@Param('username') username: string,
+	) {
 		return this.friendsService.acceptRequest(
-			Number(requestId),
 			req.user.userId,
+			username,
 		)
 	}
 
-	@Patch('reject/:id')
-	reject(@Req() req, @Param('id') requestId: string) {
+	@Delete('reject/:username')
+	reject(
+		@Req() req,
+		@Param('username') username: string,
+	) {
 		return this.friendsService.rejectRequest(
-			Number(requestId),
 			req.user.userId,
+			username,
 		)
 	}
 

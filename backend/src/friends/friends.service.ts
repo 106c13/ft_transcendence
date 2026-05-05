@@ -57,46 +57,76 @@ export class FriendsService {
 		return this.friendRequestRepo.save(request)
 	}
 
-	async acceptRequest(requestId: number, userId: number) {
-		const request = await this.friendRequestRepo.findOne({
-			where: { id: requestId },
-			relations: ['receiver', 'sender'],
+	async acceptRequest(userId: number, username: string) {
+		const sender = await this.userRepo.findOne({
+			where: { username },
 		})
 
-		if (!request) throw new NotFoundException('Request not found')
-
-		if (request.receiver.id !== userId) {
-			throw new BadRequestException('Not allowed')
+		if (!sender) {
+			throw new NotFoundException('User not found')
 		}
 
-		request.status = FriendRequestStatus.ACCEPTED
-		await this.friendRequestRepo.save(request)
+		const request = await this.friendRequestRepo.findOne({
+			where: {
+				sender: { id: sender.id },
+				receiver: { id: userId },
+				status: FriendRequestStatus.PENDING,
+			},
+			relations: ['sender', 'receiver'],
+		})
+
+		if (!request) {
+			throw new NotFoundException('Request not found')
+		}
 
 		const id1 = Math.min(request.sender.id, request.receiver.id)
 		const id2 = Math.max(request.sender.id, request.receiver.id)
 
-		const friendship = this.friendshipRepo.create({
-			user1: { id: id1 } as User,
-			user2: { id: id2 } as User,
+		const existing = await this.friendshipRepo.findOne({
+			where: {
+				user1: { id: id1 },
+				user2: { id: id2 },
+			},
 		})
 
-		return this.friendshipRepo.save(friendship)
-	}
+		if (!existing) {
+			const friendship = this.friendshipRepo.create({
+				user1: { id: id1 } as User,
+				user2: { id: id2 } as User,
+			})
 
-	async rejectRequest(requestId: number, userId: number) {
-		const request = await this.friendRequestRepo.findOne({
-			where: { id: requestId },
-			relations: ['receiver'],
-		})
-
-		if (!request) throw new NotFoundException('Request not found')
-
-		if (request.receiver.id !== userId) {
-			throw new BadRequestException('Not allowed')
+			await this.friendshipRepo.save(friendship)
 		}
 
-		request.status = FriendRequestStatus.REJECTED
-		return this.friendRequestRepo.save(request)
+		await this.friendRequestRepo.remove(request)
+
+		return { success: true }
+	}
+
+	async rejectRequest(userId: number, username: string) {
+		const sender = await this.userRepo.findOne({
+			where: { username },
+		})
+
+		if (!sender) {
+			throw new NotFoundException('User not found')
+		}
+
+		const request = await this.friendRequestRepo.findOne({
+			where: {
+				sender: { id: sender.id },
+				receiver: { id: userId },
+			},
+			relations: ['sender', 'receiver'],
+		})
+
+		if (!request) {
+			throw new NotFoundException('Request not found')
+		}
+
+		await this.friendRequestRepo.remove(request)
+
+		return { success: true }
 	}
 
 	async cancelRequest(senderId: number, username: string) {
@@ -163,25 +193,40 @@ export class FriendsService {
 			throw new NotFoundException('User not found')
 		}
 
+		const id1 = Math.min(senderId, receiver.id)
+		const id2 = Math.max(senderId, receiver.id)
+
+		const friendship = await this.friendshipRepo.findOne({
+			where: {
+				user1: { id: id1 },
+				user2: { id: id2 },
+			},
+		})
+
+		if (friendship) {
+			return { status: 'ACCEPTED' }
+		}
+
 		const request = await this.friendRequestRepo.findOne({
 			where: [
 				{ sender: { id: senderId }, receiver: { id: receiver.id } },
 				{ sender: { id: receiver.id }, receiver: { id: senderId } },
 			],
+			relations: ['sender', 'receiver'],
 		})
 
-		if (!request) return { status: 'NONE' }
-
-		if (request.status === FriendRequestStatus.ACCEPTED) {
-			return { status: 'ACCEPTED' }
+		if (!request) {
+			return { status: 'NONE' }
 		}
 
-		if (request.sender.id == senderId) {
+		if (request.sender.id === senderId) {
 			return { status: 'SENT' }
 		}
 
-		if (request.receiver.username === username) {
+		if (request.receiver.id === senderId) {
 			return { status: 'RECEIVED' }
 		}
+
+		return { status: 'NONE' }
 	}
 }
