@@ -84,4 +84,13 @@ export class FriendsController {
 			username,
 		)
 	}
+
+	@Get('list/:username')
+	@UseGuards(JwtAuthGuard)
+	async getFriendList(
+		@Req() req,
+		@Param('username') username: string,
+	) {
+		return this.friendsService.getFriendList(username);
+	}
 }

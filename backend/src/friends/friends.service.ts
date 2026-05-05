@@ -229,4 +229,34 @@ export class FriendsService {
 
 		return { status: 'NONE' }
 	}
+
+	async getFriendList(username: string) {
+		const user = await this.userRepo.findOne({
+			where: { username },
+		})
+
+		if (!user) {
+			throw new NotFoundException('User not found')
+		}
+
+		const friendships = await this.friendshipRepo.find({
+			where: [
+				{ user1: { id: user.id } },
+				{ user2: { id: user.id } },
+			],
+			relations: ['user1', 'user2'],
+		})
+
+		return friendships.map(friendship => {
+			const friend =
+				friendship.user1.id === user.id
+					? friendship.user2
+					: friendship.user1
+
+			return {
+				username: friend.username,
+				avatar: friend.avatar,
+			}
+		})
+	}
 }

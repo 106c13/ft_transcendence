@@ -235,3 +235,52 @@
 	transition: 0.2s;
 	cursor: default;
 }
+
+.friends-list {
+	margin-top: 20px;
+	background: #1E293B;
+	border-radius: 14px;
+	padding: 12px;
+	width: 100%;
+	max-width: 1000px;
+}
+
+.friend-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+
+	width: 100%;
+	max-width: 1000px;
+
+	padding: 10px;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.friend-row:hover {
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.friend-avatar {
+	width: 42px;
+	height: 42px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.friend-name {
+	font-weight: 600;
+	color: #E2E8F0;
+}
+
+.profile-content {
+	padding: 14px;
+	color: #94A3B8;
+}
+
+.empty-friends {
+	padding: 14px;
+	color: #94A3B8;
+}

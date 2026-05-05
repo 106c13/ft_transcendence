@@ -17,6 +17,8 @@ function Profile() {
 	const [error] = useState('')
 	const [menuOpen, setMenuOpen] = useState(false)
 	const [friendStatus, setFriendStatus] = useState<FriendStatus>('NONE')
+	const [activeTab, setActiveTab] = useState<'overview' | 'games' | 'friends'>('overview')
+	const [friends, setFriends] = useState<User[]>([])
 
 	const navigate = useNavigate()
 	const { username } = useParams()
@@ -41,6 +43,28 @@ function Profile() {
 			)
 		} catch {
 			setFriendStatus('NONE')
+		}
+	}
+
+	const loadFriends = async () => {
+		if (!user) return
+
+		try {
+			const token = localStorage.getItem('token')
+			if (!token) return
+
+			const res = await fetch(`/api/friends/list/${user.username}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+
+			if (!res.ok) return
+
+			const data = await res.json()
+			setFriends(data)
+		} catch (err) {
+			console.error(err)
 		}
 	}
 
@@ -342,8 +366,8 @@ function Profile() {
 			<div className="profile-tabs">
 
 				<div
-					className="tab active"
-					onClick={() => navigate(`/profile/${user.username}`)}
+					className={`tab ${activeTab === 'overview' ? 'active' : ''}`}
+					onClick={() => setActiveTab('overview')}
 				>
 					Overview
 				</div>
@@ -356,13 +380,52 @@ function Profile() {
 				</div>
 
 				<div
-					className="tab"
-					onClick={() => navigate(`/profile/${user.username}/friends`)}
+					className={`tab ${activeTab === 'friends' ? 'active' : ''}`}
+					onClick={() => {
+						setActiveTab('friends')
+						loadFriends()
+					}}
 				>
 					Friends
 				</div>
 
 			</div>
+
+			{activeTab === 'overview' && (
+				<div className="profile-content">
+					Overview content
+				</div>
+			)}
+
+			{activeTab === 'friends' && (
+				<div className="friends-list">
+					{friends.length === 0 ? (
+						<div className="empty-friends">No friends yet</div>
+					) : (
+						friends.map(friend => (
+							<div
+								key={friend.username}
+								className="friend-row"
+								onClick={() => navigate(`/profile/${friend.username}`)}
+							>
+								<img
+									className="friend-avatar"
+									src={
+										friend.avatar
+											? `/uploads/${friend.avatar}`
+											: `/assets/default.jpg`
+									}
+									alt="avatar"
+								/>
+
+								<div className="friend-name">
+									{friend.username}
+								</div>
+							</div>
+						))
+					)}
+				</div>
+			)}
 
 		</div>
 	)
