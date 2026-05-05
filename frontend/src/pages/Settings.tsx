@@ -147,7 +147,7 @@ function Settings() {
 					/>
 
 
-					<button type="submit">Save</button>
+					<button className="button" type="submit">Save</button>
 				</form>
 
 				<h1 style={{ marginTop: '30px' }}>Change password</h1>
@@ -176,7 +176,7 @@ function Settings() {
 						required
 					/>
 
-					<button type="submit">Update password</button>
+					<button className="button" type="submit">Update password</button>
 				</form>
 
 				<button

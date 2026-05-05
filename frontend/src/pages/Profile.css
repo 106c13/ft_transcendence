@@ -7,22 +7,22 @@
   min-height: 100vh;
 }
 
-/* MAIN HEADER CARD CENTERED */
 .profile-header {
-  width: 100%;
-  max-width: 1000px;   /* key fix */
-  display: flex;
-  align-items: flex-start;
-  gap: 25px;
+	display: flex;
+	align-items: flex-start;
+	gap: 25px;
 
-  background: #1E293B;
-  padding: 25px;
-  border-radius: 14px;
+	width: 100%;
+	max-width: 1000px;
+	margin: 0 auto;
 
-  position: relative;
+	background: #1E293B;
+	padding: 25px;
+	border-radius: 14px;
 
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+	position: relative;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
 /* AVATAR */
@@ -169,4 +169,118 @@
 
 .success {
   color: #4ADE80;
+}
+
+.header-actions {
+	margin-left: auto;
+	display: flex;
+	align-items: flex-start;
+}
+
+.header-actions button {
+	border: none;
+	border-radius: 10px;
+	padding: 10px 16px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: 0.2s;
+	color: white;
+}
+
+.header-actions button:hover {
+	transform: translateY(-1px);
+}
+
+/* button */
+.add-friend-btn {
+	background: #60A5FA;
+	color: #E2E8F0;
+	border: none;
+	padding: 8px 14px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: 600;
+	transition: 0.2s;
+}
+
+.add-friend-btn:hover {
+	background: #6aacfc;
+	transform: translateY(-1px);
+}
+
+.pending-btn {
+	background: #475569;
+}
+
+.accept-btn {
+	background: #22C55E;
+}
+
+.reject-btn {
+	background: #EF4444;
+}
+
+.friends-btn {
+	background: #2563EB;
+	color: #0f172a;
+	border: none;
+	padding: 8px 14px;
+	border-radius: 10px;
+	font-weight: 700;
+	font-size: 13px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	transition: 0.2s;
+	cursor: default;
+}
+
+.friends-list {
+	margin-top: 20px;
+	background: #1E293B;
+	border-radius: 14px;
+	padding: 12px;
+	width: 100%;
+	max-width: 1000px;
+}
+
+.friend-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+
+	width: 100%;
+	max-width: 1000px;
+
+	padding: 10px;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.friend-row:hover {
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.friend-avatar {
+	width: 42px;
+	height: 42px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.friend-name {
+	font-weight: 600;
+	color: #E2E8F0;
+}
+
+.profile-content {
+	padding: 14px;
+	color: #94A3B8;
+}
+
+.empty-friends {
+	padding: 14px;
+	color: #94A3B8;
 }
