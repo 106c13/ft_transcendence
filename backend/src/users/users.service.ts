@@ -88,7 +88,7 @@ export class UsersService {
 		return this.usersRepo.save(user)
 	}
 
-		async changePassword(
+	async changePassword(
 		userId: number,
 		data: { oldPassword: string; newPassword: string }
 	) {
@@ -123,5 +123,18 @@ export class UsersService {
 		await this.usersRepo.save(user)
 
 		return { message: 'Password updated successfully' }
+	}
+
+	async searchUser(query: string) {
+		if (!query || query.trim() === '') {
+			return []
+		}
+
+		return this.usersRepo
+			.createQueryBuilder('user')
+			.where('user.username ILIKE :query', { query: `%${query}%` })
+			.select(['user.username'])
+			.limit(5)
+			.getMany()
 	}
 }

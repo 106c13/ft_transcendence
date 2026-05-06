@@ -8,6 +8,7 @@ import {
 	UseInterceptors,
 	UploadedFile,
 	Param,
+	Query,
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { BadRequestException, NotFoundException } from '@nestjs/common';
@@ -25,6 +26,15 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	getMe(@Req() req) {
 		return this.usersService.findById(req.user.userId)
+	}
+
+	@Get('search')
+	@UseGuards(JwtAuthGuard)
+	async searchUser(
+		@Req() req,
+		@Query('q') query: string
+	) {
+		return this.usersService.searchUser(query)
 	}
 
 	@Get(':username')
@@ -81,4 +91,5 @@ export class UsersController {
 	) {
 		return this.usersService.changePassword(req.user.userId, body)
 	}
+
 }

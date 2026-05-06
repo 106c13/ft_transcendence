@@ -27,11 +27,26 @@ function Profile() {
 	const [activeTab, setActiveTab] =
 		useState<'overview' | 'games' | 'friends'>('overview')
 	const [friends, setFriends] = useState<User[]>([])
+	const [currentUser, setCurrentUser] = useState<User | null>(null)
 
 	const navigate = useNavigate()
 	const { username } = useParams()
 
-	const isOwnProfile = !username || username === 'me'
+    useEffect(() => {
+        const loadCurrentUser = async () => {
+            const token = localStorage.getItem('token')
+            const res = await fetch('/api/users/me', {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setCurrentUser(data)
+            }
+        }
+        loadCurrentUser()
+    }, [])
+
+	const isOwnProfile = !username || username === 'me' || username === currentUser?.username
 
 	const loadFriendStatus = async (token: string, username: string) => {
 		try {

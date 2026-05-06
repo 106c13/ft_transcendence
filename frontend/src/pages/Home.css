@@ -1,0 +1,468 @@
+/* Home Container */
+.home-container {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  color: #E2E8F0;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 280px;
+  background: #0F172A;
+  border-right: 1px solid rgba(148, 163, 184, 0.12);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 30px 24px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.sidebar-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #60A5FA, #A78BFA);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.sidebar-nav {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #94A3B8;
+  font-weight: 500;
+}
+
+.nav-item:hover {
+  background: rgba(96, 165, 250, 0.1);
+  color: #E2E8F0;
+}
+
+.nav-item.active {
+  background: #3B82F6;
+  color: white;
+}
+
+.nav-icon {
+  font-size: 20px;
+}
+
+/* Search Section */
+.sidebar-search {
+  padding: 20px 16px;
+  margin-top: auto;
+  position: relative;
+}
+
+.search-container {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #64748B;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 36px 10px 36px;
+  background: #1E293B;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+  color: #E2E8F0;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3B82F6;
+  background: #1E293B;
+}
+
+.search-input::placeholder {
+  color: #64748B;
+}
+
+.search-spinner {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid #64748B;
+  border-top-color: #3B82F6;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;  /* This makes it appear right below the input */
+  left: 0;
+  right: 0;
+  background: #1E293B;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+  margin-top: 8px;  /* Small gap from input */
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;  /* Higher z-index to appear on top */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}/* Search Results */
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.search-result-item:hover {
+  background: rgba(96, 165, 250, 0.1);
+}
+
+.search-result-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.search-result-info {
+  flex: 1;
+}
+
+.search-result-name {
+  font-weight: 600;
+  color: #E2E8F0;
+  margin-bottom: 4px;
+}
+
+.search-result-bio {
+  font-size: 12px;
+  color: #94A3B8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-results.empty {
+  padding: 20px;
+  text-align: center;
+  color: #94A3B8;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+  padding: 20px 16px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  margin-top: auto;
+}
+
+.current-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.current-user:hover {
+  background: rgba(96, 165, 250, 0.1);
+}
+
+.current-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.current-user-info {
+  flex: 1;
+}
+
+.current-user-name {
+  font-weight: 600;
+  color: #E2E8F0;
+  margin-bottom: 4px;
+}
+
+.current-user-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #94A3B8;
+}
+
+/* Status Dots */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.online {
+  background: #22C55E;
+  box-shadow: 0 0 6px #22C55E;
+}
+
+.status-dot.ingame {
+  background: #F59E0B;
+  box-shadow: 0 0 6px #F59E0B;
+}
+
+.status-dot.offline {
+  background: #64748B;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  margin-left: 280px;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.content-header {
+  margin-bottom: 32px;
+}
+
+.content-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #E2E8F0, #94A3B8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.content-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.content-section {
+  background: #1E293B;
+  border-radius: 14px;
+  padding: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.content-section h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: #E2E8F0;
+}
+
+/* Friends Grid */
+.friends-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.friend-card {
+  background: #0F172A;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.friend-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.friend-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+  border: 2px solid #3B82F6;
+}
+
+.friend-card .friend-name {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.challenge-btn {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: #3B82F6;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.challenge-btn:hover {
+  background: #2563EB;
+  transform: translateY(-1px);
+}
+
+/* Games List */
+.games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.game-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #0F172A;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.game-item:hover {
+  background: #1E293B;
+}
+
+.game-players {
+  display: flex;
+  gap: 12px;
+  font-weight: 500;
+}
+
+.game-score {
+  font-weight: 700;
+  color: #60A5FA;
+}
+
+.game-date {
+  font-size: 12px;
+  color: #64748B;
+}
+
+/* Empty States */
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #94A3B8;
+}
+
+.empty-state p {
+  margin-bottom: 16px;
+}
+
+.add-friend-btn,
+.play-now-btn {
+  padding: 10px 20px;
+  background: #3B82F6;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-friend-btn:hover,
+.play-now-btn:hover {
+  background: #2563EB;
+  transform: translateY(-1px);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0F172A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748B;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 80px;
+  }
+
+  .sidebar-header h2,
+  .nav-item span:not(.nav-icon),
+  .sidebar-search,
+  .current-user-info,
+  .search-container {
+    display: none;
+  }
+
+  .sidebar-nav {
+    align-items: center;
+  }
+
+  .nav-item {
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .nav-icon {
+    font-size: 24px;
+  }
+
+  .main-content {
+    margin-left: 80px;
+    padding: 20px;
+  }
+
+  .friends-grid {
+    grid-template-columns: 1fr;
+  }
+}

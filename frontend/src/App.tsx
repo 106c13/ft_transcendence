@@ -9,6 +9,7 @@ import Register from './pages/Register'
 import Profile from './pages/Profile'
 import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
+import Home	from './pages/Home'
 
 function App() {
   return (
@@ -20,6 +21,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
 		<Route path="/profile/settings" element={<Settings />} />
 		<Route path="/profile/:username" element={<Profile />} />
+
+		<Route path="/home" element={<Home />} />
 
 		<Route path="*" element={<NotFound />} />
       </Routes>
