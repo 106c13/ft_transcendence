@@ -15,6 +15,12 @@ check:
 	@printf "$(GREEN)[OK] Docker is running$(RESET)\n"
 
 start:
+	@printf "$(GREEN)[START] Building fronend pages...$(RESET)\n"
+	docker run --rm \
+	-v $(PWD)/frontend:/app \
+	-w /app \
+	node:20-alpine \
+	sh -c "npm install && npm run build"
 	@printf "$(GREEN)[START] Building and starting containers...$(RESET)\n"
 	@$(COMPOSE) up --build -d
 	@printf "$(GREEN)[OK] Project is running$(RESET)\n"
