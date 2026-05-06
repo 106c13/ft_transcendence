@@ -102,6 +102,11 @@ function Settings() {
 
 		const result = await res.json()
 
+		if (res.status == 413) {
+			setMsg(result.message || 'Image is too big')
+			setError(true)
+		}
+
 		if (!res.ok) {
 			setMsg(result.message || 'Update failed')
 			setError(true)
