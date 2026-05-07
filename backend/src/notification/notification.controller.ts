@@ -6,7 +6,7 @@ import {
 	Patch,
 	Param,
 	Body,
-	UseGuard,
+	UseGuards,
 } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
