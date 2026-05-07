@@ -65,12 +65,35 @@ function NotificationBell({ userId }: { userId: number }) {
 		}
 	}
 
+	const deleteNotification = async (notificationId: number, e: React.MouseEvent) => {
+		e.stopPropagation()
+		try {
+			const token = localStorage.getItem('token')
+			const res = await fetch(`/api/notifications/delete/${userId}/${notificationId}`, {
+				method: 'DELETE',
+				headers: { Authorization: `Bearer ${token}` },
+			})
+			
+			if (res.ok) {
+				const deleted = notifications.find(n => n.id === notificationId)
+				setNotifications(prev => prev.filter(n => n.id !== notificationId))
+				if (deleted && !deleted.is_read) {
+					setUnreadCount(prev => Math.max(0, prev - 1))
+				}
+			}
+		} catch (error) {
+			console.error('Error deleting notification:', error)
+		}
+	}
+
 	const handleNotificationClick = async (notification: Notification) => {
 		if (!notification.is_read) {
 			await markAsRead(notification.id)
 		}
 		setIsOpen(false)
-		navigate(notification.link)
+		if (notification.link) {
+			navigate(notification.link)
+		}
 	}
 
 	useEffect(() => {
@@ -118,10 +141,18 @@ function NotificationBell({ userId }: { userId: number }) {
 									className={`notification-item ${!notif.is_read ? 'unread' : ''}`}
 									onClick={() => handleNotificationClick(notif)}
 								>
-									<div className="notification-message">{notif.message}</div>
-									<div className="notification-time">
-										{new Date(notif.created_at).toLocaleString()}
+									<div className="notification-content">
+										<div className="notification-message">{notif.message}</div>
+										<div className="notification-time">
+											{new Date(notif.created_at).toLocaleString()}
+										</div>
 									</div>
+									<button
+										className="delete-notification"
+										onClick={(e) => deleteNotification(notif.id, e)}
+									>
+										✕
+									</button>
 								</div>
 							))
 						)}

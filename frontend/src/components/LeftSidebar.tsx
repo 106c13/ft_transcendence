@@ -67,7 +67,10 @@ function LeftSidebar({
 									onClick={() => onUserClick(user.username)}
 								>
 									<img 
-										src={user.avatar ? `/uploads/${user.avatar}` : `/assets/default.jpg`} 
+										src={user.avatar
+												? `/uploads/${user.avatar}`
+												: `/assets/default.jpg`
+										} 
 										alt={user.username}
 										className="search-result-avatar"
 									/>

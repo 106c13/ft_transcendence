@@ -4,6 +4,7 @@ import { Repository } from 'typeorm'
 import { FriendRequest, FriendRequestStatus } from './friend-request.entity'
 import { Friendship } from './friendship.entity'
 import { User } from '../users/user.entity'
+import { Notification } from '../notification/notification.entity'
 
 @Injectable()
 export class FriendsService {
@@ -16,6 +17,9 @@ export class FriendsService {
 
 		@InjectRepository(User)
 		private userRepo: Repository<User>,
+
+		@InjectRepository(Notification)
+		private notificationRepo: Repository<Notification>,
 	) {}
 
 	async sendRequest(senderId: number, receiverUsername: string) {
@@ -53,6 +57,15 @@ export class FriendsService {
 			receiver,
 			status: FriendRequestStatus.PENDING,
 		})
+
+		// Create notification for receiver
+		const notification = this.notificationRepo.create({
+			user_id: receiver.id,
+			message: `${sender.username} sent you a friend request`,
+			link: `/profile/${sender.username}`,
+			is_read: false,
+		})
+		await this.notificationRepo.save(notification)
 
 		return this.friendRequestRepo.save(request)
 	}
@@ -98,6 +111,21 @@ export class FriendsService {
 			await this.friendshipRepo.save(friendship)
 		}
 
+		// Delete the friend request notification
+		await this.notificationRepo.delete({
+			user_id: userId,
+			link: `/profile/${sender.username}`,
+		})
+
+		// Create notification for sender that request was accepted
+		const acceptedNotification = this.notificationRepo.create({
+			user_id: sender.id,
+			message: `${request.receiver.username} accepted your friend request`,
+			link: `/profile/${request.receiver.username}`,
+			is_read: false,
+		})
+		await this.notificationRepo.save(acceptedNotification)
+
 		await this.friendRequestRepo.remove(request)
 
 		return { success: true }
@@ -124,6 +152,12 @@ export class FriendsService {
 			throw new NotFoundException('Request not found')
 		}
 
+		// Delete the friend request notification
+		await this.notificationRepo.delete({
+			user_id: userId,
+			link: `/profile/${sender.username}`,
+		})
+
 		await this.friendRequestRepo.remove(request)
 
 		return { success: true }
@@ -139,9 +173,16 @@ export class FriendsService {
 				receiver: { id: user.id },
 				status: FriendRequestStatus.PENDING,
 			},
+			relations: ['receiver'],
 		})
 
 		if (!request) throw new NotFoundException('Request not found')
+
+		// Delete the friend request notification from receiver
+		await this.notificationRepo.delete({
+			user_id: user.id,
+			link: `/profile/${request.receiver.username}`,
+		})
 
 		await this.friendRequestRepo.remove(request)
 
