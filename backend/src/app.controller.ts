@@ -2,7 +2,8 @@ import { Controller, Get, Post, Body } from '@nestjs/common';
 import { AppService } from './app.service';
 import { UsersService } from './users/users.service';
 import { AuthService } from './auth/auth.service';
-import { FriendsService} from './friends/friends.service';
+import { FriendsService } from './friends/friends.service';
+import { NotificationService } from './notification/notification.service';
 
 @Controller()
 export class AppController {
@@ -11,6 +12,7 @@ export class AppController {
     private readonly usersService: UsersService,
     private readonly authService: AuthService,
 	private readonly friendsService: FriendsService,
+	private readonly notificationService: NotificationService,
   ) {}
 
   @Get()

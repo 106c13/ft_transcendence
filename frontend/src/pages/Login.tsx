@@ -15,7 +15,7 @@ function Login() {
 		const token = localStorage.getItem('token')
 
 		if (token) {
-			navigate('/profile')
+			navigate('/home')
 		}
 	}, [])
 
@@ -50,7 +50,7 @@ function Login() {
 			setMsg('Login successful ✓ Redirecting...')
 
 			setTimeout(() => {
-				navigate('/profile')
+				navigate('/home')
 			}, 700)
 
 		} catch (err) {

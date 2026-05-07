@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { FriendsModule } from './friends/friends.module';
+import { NotificationsModule } from './notification/notification.module';
+
 
 	@Module({
   imports: [
@@ -27,6 +29,7 @@ import { FriendsModule } from './friends/friends.module';
     UsersModule,
     AuthModule,
 	FriendsModule,
+	NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
