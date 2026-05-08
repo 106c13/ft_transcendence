@@ -76,3 +76,32 @@
 .profile-dropdown .danger {
 	color: #F87171;
 }
+
+.language-menu {
+	position: relative;
+}
+
+.language-dropdown {
+	position: absolute;
+	top: 50px;
+	right: 10px;
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	border-radius: 12px;
+	min-width: 140px;
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+	z-index: 1000;
+	overflow: hidden;
+}
+
+.language-dropdown div {
+	padding: 10px 16px;
+	cursor: pointer;
+	color: #E2E8F0;
+	transition: 0.2s;
+	font-size: 14px;
+}
+
+.language-dropdown div:hover {
+	background: rgba(96, 165, 250, 0.1);
+}

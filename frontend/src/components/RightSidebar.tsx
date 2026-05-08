@@ -9,9 +9,15 @@ type Props = {
 }
 
 function RightSidebar({ currentUser }: Props) {
-	const { t } = useTranslation()
+	const { t, i18n } = useTranslation()
 	const navigate = useNavigate()
 	const [showMenu, setShowMenu] = useState(false)
+	const [showLanguageMenu, setShowLanguageMenu] = useState(false)
+
+	const changeLanguage = (lng: string) => {
+		i18n.changeLanguage(lng)
+		setShowLanguageMenu(false)
+	}
 
 	return (
 		<aside className="right-sidebar">
@@ -52,6 +58,20 @@ function RightSidebar({ currentUser }: Props) {
 
 				{/* Notifications */}
 				{currentUser && <NotificationBell userId={currentUser.id} />}
+
+				{/* Language Switcher */}
+				<div className="icon-item language-menu" onClick={() => setShowLanguageMenu(!showLanguageMenu)}>
+					<span className="icon">🌐</span>
+					
+					{showLanguageMenu && (
+						<div className="language-dropdown">
+							<div onClick={() => changeLanguage('en')}>🇬🇧 English</div>
+							<div onClick={() => changeLanguage('ru')}>🇷🇺 Русский</div>
+							<div onClick={() => changeLanguage('hy')}>🇦🇲 Հայերեն</div>
+						</div>
+					)}
+				</div>
+
 			</div>
 		</aside>
 	)
