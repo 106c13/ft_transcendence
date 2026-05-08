@@ -26,24 +26,19 @@ function LeftSidebar({
 
 	return (
 		<aside className="left-sidebar">
-			<div className="sidebar-header">
+			<div
+				className="sidebar-header"
+				onClick={() => navigate('/home')}
+			>
 				<h2>ft_transcendence</h2>
 			</div>
 
 			<nav className="sidebar-nav">
 				<div 
 					className="nav-item"
-					onClick={() => navigate('/home')}
-				>
-					<span className="nav-icon">🏠</span>
-					<span>{t('home')}</span>
-				</div>
-
-				<div 
-					className="nav-item"
 					onClick={() => navigate('/game')}
 				>
-					<span className="nav-icon">🎮</span>
+					<span className="nav-icon">♟️</span>
 					<span>{t('games')}</span>
 				</div>
 			</nav>
