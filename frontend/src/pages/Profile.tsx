@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import './Profile.css'
 import ProfileHeader from '../components/profile/ProfileHeader'
 import FriendsList from '../components/profile/FriendsList'
 
 export type User = {
+	id: number
 	username: string
 	email: string
 	avatar?: string
 	bio?: string
 	created_at?: string
+	status?: string
 }
 
 export type FriendStatus =
@@ -20,6 +23,7 @@ export type FriendStatus =
 	| 'SENT'
 
 function Profile() {
+	const { t } = useTranslation()
 	const [user, setUser] = useState<User | null>(null)
 	const [error] = useState('')
 	const [menuOpen, setMenuOpen] = useState(false)
@@ -32,19 +36,19 @@ function Profile() {
 	const navigate = useNavigate()
 	const { username } = useParams()
 
-    useEffect(() => {
-        const loadCurrentUser = async () => {
-            const token = localStorage.getItem('token')
-            const res = await fetch('/api/users/me', {
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            if (res.ok) {
-                const data = await res.json()
-                setCurrentUser(data)
-            }
-        }
-        loadCurrentUser()
-    }, [])
+	useEffect(() => {
+		const loadCurrentUser = async () => {
+			const token = localStorage.getItem('token')
+			const res = await fetch('/api/users/me', {
+				headers: { Authorization: `Bearer ${token}` }
+			})
+			if (res.ok) {
+				const data = await res.json()
+				setCurrentUser(data)
+			}
+		}
+		loadCurrentUser()
+	}, [])
 
 	const isOwnProfile = !username || username === 'me' || username === currentUser?.username
 
@@ -137,7 +141,7 @@ function Profile() {
 
 	useEffect(() => {
 		loadProfile()
-	}, [username])
+	}, [username, currentUser])
 
 	const sendFriendRequest = async () => {
 		if (!user) return
@@ -235,7 +239,7 @@ function Profile() {
 	if (!user) {
 		return (
 			<div className="auth-page">
-				<p className="msg">User not found</p>
+				<p className="msg">{t('user_not_found')}</p>
 			</div>
 		)
 	}
@@ -262,14 +266,14 @@ function Profile() {
 					className={`tab ${activeTab === 'overview' ? 'active' : ''}`}
 					onClick={() => setActiveTab('overview')}
 				>
-					Overview
+					{t('overview')}
 				</div>
 
 				<div
 					className="tab"
 					onClick={() => navigate(`/profile/${user.username}/games`)}
 				>
-					Games
+					{t('games')}
 				</div>
 
 				<div
@@ -279,20 +283,18 @@ function Profile() {
 						loadFriends()
 					}}
 				>
-					Friends
+					{t('friends')}
 				</div>
 			</div>
 
 			{activeTab === 'overview' && (
-				<div className="profile-content">Overview content</div>
+				<div className="profile-content">{t('overview_content')}</div>
 			)}
 
 			{activeTab === 'friends' && (
 				<FriendsList
 					friends={friends}
-					onOpenProfile={(username: string) =>
-						navigate(`/profile/${username}`)
-					}
+					onOpenProfile={(username) => navigate(`/profile/${username}`)}
 				/>
 			)}
 		</div>

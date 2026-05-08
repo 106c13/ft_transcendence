@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import './NotificationBell.css'
 
 type Notification = {
@@ -11,6 +12,7 @@ type Notification = {
 }
 
 function NotificationBell({ userId }: { userId: number }) {
+	const { t } = useTranslation()
 	const [notifications, setNotifications] = useState<Notification[]>([])
 	const [unreadCount, setUnreadCount] = useState(0)
 	const [isOpen, setIsOpen] = useState(false)
@@ -116,7 +118,7 @@ function NotificationBell({ userId }: { userId: number }) {
 			{isOpen && (
 				<div className="notification-dropdown">
 					<div className="notification-header">
-						<h3>Notifications</h3>
+						<h3>{t('notifications')}</h3>
 						{notifications.length > 0 && (
 							<button
 								className="mark-all-read"
@@ -126,14 +128,14 @@ function NotificationBell({ userId }: { userId: number }) {
 									})
 								}}
 							>
-								Mark all read
+								{t('mark_all_read')}
 							</button>
 						)}
 					</div>
 
 					<div className="notification-list">
 						{notifications.length === 0 ? (
-							<div className="no-notifications">No notifications</div>
+							<div className="no-notifications">{t('no_notifications')}</div>
 						) : (
 							notifications.map(notif => (
 								<div

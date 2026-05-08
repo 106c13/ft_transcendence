@@ -1,6 +1,6 @@
-// frontend/src/components/RightSidebar.tsx
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import NotificationBell from './NotificationBell'
 import './RightSidebar.css'
 
@@ -9,6 +9,7 @@ type Props = {
 }
 
 function RightSidebar({ currentUser }: Props) {
+	const { t } = useTranslation()
 	const navigate = useNavigate()
 	const [showMenu, setShowMenu] = useState(false)
 
@@ -26,10 +27,10 @@ function RightSidebar({ currentUser }: Props) {
 					{showMenu && (
 						<div className="profile-dropdown">
 							<div onClick={() => navigate(`/profile/${currentUser?.username}`)}>
-								👤 My Profile
+								👤 {t('my_profile')}
 							</div>
 							<div onClick={() => navigate('/profile/settings')}>
-								⚙️ Settings
+								⚙️ {t('settings')}
 							</div>
 							<div 
 								className="danger"
@@ -38,7 +39,7 @@ function RightSidebar({ currentUser }: Props) {
 									navigate('/login')
 								}}
 							>
-								🚪 Logout
+								🚪 {t('logout')}
 							</div>
 						</div>
 					)}

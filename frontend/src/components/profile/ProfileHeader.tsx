@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { User, FriendStatus } from '../../pages/Profile'
 
 type Props = {
@@ -29,6 +30,8 @@ function ProfileHeader({
 	onLogout,
 	onSettings,
 }: Props) {
+	const { t } = useTranslation()
+
 	return (
 		<div className="profile-header">
 			{isOwnProfile && (
@@ -41,9 +44,9 @@ function ProfileHeader({
 					</div>
 
 					<div className={`menu-dropdown ${menuOpen ? 'open' : ''}`}>
-						<div onClick={onSettings}>⚙️ Settings</div>
+						<div onClick={onSettings}>⚙️ {t('settings')}</div>
 						<div onClick={onLogout} className="danger">
-							🚪 Logout
+							🚪 {t('logout')}
 						</div>
 					</div>
 				</div>
@@ -65,17 +68,17 @@ function ProfileHeader({
 					<div className="flag">🏳️</div>
 				</div>
 
-				<div className="bio">{user.bio || 'No bio yet'}</div>
+				<div className="bio">{user.bio || t('no_bio_yet')}</div>
 
 				<div className="meta">
 					<span>
-						Joined:{' '}
+						{t('joined')}:{' '}
 						{user.created_at
 							? new Date(user.created_at).toLocaleDateString()
-							: 'unknown'}
+							: t('unknown')}
 					</span>
-					<span>• Friends: 0</span>
-					<span>• Online</span>
+					<span>• {t('friends_count')}: 0</span>
+					<span>• {t('online')}</span>
 				</div>
 			</div>
 
@@ -86,7 +89,7 @@ function ProfileHeader({
 							className="add-friend-btn"
 							onClick={onSend}
 						>
-							+ Add Friend
+							+ {t('send_friend_request')}
 						</button>
 					)}
 
@@ -95,7 +98,7 @@ function ProfileHeader({
 							className="pending-btn"
 							onClick={onCancel}
 						>
-							Request Sent
+							{t('request_sent')}
 						</button>
 					)}
 
@@ -105,14 +108,14 @@ function ProfileHeader({
 								className="accept-btn"
 								onClick={onAccept}
 							>
-								Accept
+								{t('accept')}
 							</button>
 
 							<button
 								className="reject-btn"
 								onClick={onReject}
 							>
-								Reject
+								{t('reject')}
 							</button>
 						</>
 					)}
@@ -122,7 +125,7 @@ function ProfileHeader({
 							className="friends-btn"
 							onClick={onUnfriend}
 						>
-							Friends ✓
+							{t('friends')} ✓
 						</button>
 					)}
 				</div>

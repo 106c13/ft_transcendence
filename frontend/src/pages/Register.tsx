@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import './Auth.css'
 
 function Register() {
@@ -10,6 +11,7 @@ function Register() {
 	const [msg, setMsg] = useState('')
 	const [error, setError] = useState(false)
 	const [showPassword, setShowPassword] = useState(false)
+	const { t } = useTranslation()
 
 	const navigate = useNavigate()
 
@@ -20,7 +22,7 @@ function Register() {
 		setError(false)
 
 		if (password !== repassword) {
-			setMsg('Passwords do not match')
+			setMsg(t('passwords_do_not_match'))
 			setError(true)
 			return
 		}
@@ -42,19 +44,20 @@ function Register() {
 			const result = await res.json()
 
 			if (!res.ok) {
-				setMsg(result.message || 'Something went wrong')
+				setMsg(result.message || t('something_went_wrong'))
 				setError(true)
 				return
 			}
 
-			setMsg('Account created ✓ Redirecting...')
+			setMsg(t('account_created'))
+			setError(false)
 
 			setTimeout(() => {
 				navigate('/login')
 			}, 800)
 
 		} catch (err) {
-			setMsg('Network error')
+			setMsg(t('network_error'))
 			setError(true)
 		}
 	}
@@ -62,37 +65,38 @@ function Register() {
 	return (
 		<div className="auth-page">
 			<div className="card">
-				<h1>Create Account</h1>
+				<h1>{t('create_account')}</h1>
 
 				<form onSubmit={handleSubmit}>
 					<input
-						placeholder="Email"
+						placeholder={t('email')}
 						name="email"
+						type="email"
 						value={email}
 						onChange={e => setEmail(e.target.value)}
 						required
 					/>
 
 					<input
-						placeholder="Username"
+						placeholder={t('username')}
 						name="username"
 						value={username}
 						onChange={e => setUsername(e.target.value)}
 						required
 					/>
 
+					<input
+						type={showPassword ? 'text' : 'password'}
+						placeholder={t('password')}
+						value={password}
+						onChange={e => setPassword(e.target.value)}
+						required
+					/>
+
 					<div className="password-wrapper">
 						<input
 							type={showPassword ? 'text' : 'password'}
-							placeholder="Password"
-							value={password}
-							onChange={e => setPassword(e.target.value)}
-							required
-						/>
-
-						<input
-							type={showPassword ? 'text' : 'password'}
-							placeholder="Confirm assword"
+							placeholder={t('confirm_password')}
 							value={repassword}
 							onChange={e => setRepassword(e.target.value)}
 							required
@@ -100,26 +104,25 @@ function Register() {
 
 						<button
 							type="button"
-							className="eye-btn-r"
+							className="eye-btn"
 							onClick={() => setShowPassword(prev => !prev)}
 						>
-
-						{showPassword ? (
-							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-								<path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-10-8-10-8a18.45 18.45 0 0 1 5.06-6.94" />
-								<path d="M1 1l22 22" />
-							</svg>
-						) : (
-							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-								<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-								<circle cx="12" cy="12" r="3" />
-							</svg>
-						)}
-
+							{showPassword ? (
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+									<path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-10-8-10-8a18.45 18.45 0 0 1 5.06-6.94" />
+									<path d="M1 1l22 22" strokeWidth="2" />
+									<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+								</svg>
+							) : (
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+									<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+									<circle cx="12" cy="12" r="3" />
+								</svg>
+							)}
 						</button>
 					</div>
 
-					<button className="button" type="submit">Register</button>
+					<button className="button" type="submit">{t('register')}</button>
 				</form>
 
 				{msg && (
@@ -129,7 +132,7 @@ function Register() {
 				)}
 
 				<a className="link" href="/login">
-					Sign in
+					{t('sign_in')}
 				</a>
 			</div>
 		</div>

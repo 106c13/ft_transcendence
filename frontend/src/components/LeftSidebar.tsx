@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import './LeftSidebar.css'
 
 type Props = {
@@ -20,6 +21,7 @@ function LeftSidebar({
 	onUserClick,
 	getStatusDot,
 }: Props) {
+	const { t } = useTranslation()
 	const navigate = useNavigate()
 
 	return (
@@ -34,7 +36,7 @@ function LeftSidebar({
 					onClick={() => navigate('/home')}
 				>
 					<span className="nav-icon">🏠</span>
-					<span>Home</span>
+					<span>{t('home')}</span>
 				</div>
 
 				<div 
@@ -42,7 +44,7 @@ function LeftSidebar({
 					onClick={() => navigate('/game')}
 				>
 					<span className="nav-icon">🎮</span>
-					<span>Games</span>
+					<span>{t('games')}</span>
 				</div>
 			</nav>
 
@@ -51,7 +53,7 @@ function LeftSidebar({
 					<span className="search-icon">🔍</span>
 					<input
 						type="text"
-						placeholder="Search a user"
+						placeholder={t('search_placeholder')}
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 						className="search-input"
@@ -86,7 +88,7 @@ function LeftSidebar({
 
 					{showResults && searchResults.length === 0 && searchQuery && (
 						<div className="search-results empty">
-							No users found
+							{t('no_users_found')}
 						</div>
 					)}
 				</div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import './Home.css'
 import LeftSidebar from '../components/LeftSidebar'
 import RightSidebar from '../components/RightSidebar'
@@ -14,6 +15,7 @@ type User = {
 }
 
 function Home() {
+	const { t } = useTranslation()
 	const navigate = useNavigate()
 	const [searchQuery, setSearchQuery] = useState('')
 	const [searchResults, setSearchResults] = useState<User[]>([])
@@ -119,7 +121,7 @@ function Home() {
 
 			<main className="main-content">
 				<div className="content-header">
-					<h1>Welcome back, {currentUser?.username || 'Player'}!</h1>
+					<h1>{t('welcome', { username: currentUser?.username || 'Player' })}</h1>
 				</div>
 			</main>
 		</div>
