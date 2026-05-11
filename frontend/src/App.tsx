@@ -10,6 +10,7 @@ import Profile from './pages/Profile'
 import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
 import Home	from './pages/Home'
+import Chat from './pages/Chat'
 
 function App() {
   return (
@@ -23,6 +24,8 @@ function App() {
 		<Route path="/profile/:username" element={<Profile />} />
 
 		<Route path="/home" element={<Home />} />
+
+		<Route path="/chat" element={<Chat />} />
 
 		<Route path="*" element={<NotFound />} />
       </Routes>
