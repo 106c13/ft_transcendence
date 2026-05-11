@@ -43,10 +43,9 @@ export class AuthService {
 			throw new BadRequestException('Username should be less than 15 characters');
 		}
 		
-		const hasSpecial = /[^a-zA-Z0-9]/.test(username);
-
-		if (hasSpecial) {
+		if (/[^a-zA-Z0-9]/.test(username)) {
 			throw new BadRequestException('Username should contain only letters and numbers');
+		}
 
 		if (password.length < 8) {
 			throw new BadRequestException('Password must be at least 8 characters long');

@@ -4,6 +4,8 @@ import { UsersService } from './users/users.service';
 import { AuthService } from './auth/auth.service';
 import { FriendsService } from './friends/friends.service';
 import { NotificationService } from './notification/notification.service';
+import { ChatService } from './chat/chat.service';
+import { MessagesService } from './messages/messages.service';
 
 @Controller()
 export class AppController {
@@ -13,6 +15,8 @@ export class AppController {
     private readonly authService: AuthService,
 	private readonly friendsService: FriendsService,
 	private readonly notificationService: NotificationService,
+	private readonly chatService: ChatService,
+	private readonly messagesService: MessagesService,
   ) {}
 
   @Get()
