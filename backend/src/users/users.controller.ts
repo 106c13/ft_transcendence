@@ -18,6 +18,10 @@ import type { Express } from 'express'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { UsersService } from './users.service'
 
+function isValidEmail(email: string) {
+	return (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 256)
+}
+
 @Controller('users')
 export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
@@ -70,6 +74,19 @@ export class UsersController {
 	) {
 		const userId = req.user.userId
 
+		if (/[^a-zA-Z0-9]/.test(body.username)) {
+			throw new BadRequestException('Username should contain only letters and numbers');
+		}
+
+		if (body.username.length > 15) {
+			throw new BadRequestException('Username should be less than 15 characters');
+		}
+
+		if (body.email && !isValidEmail(body.email)) {
+			throw new BadRequestException('Invalid email format');
+		}
+
+
 		const updateData: any = {
 			username: body.username,
 			email: body.email,
@@ -80,7 +97,9 @@ export class UsersController {
 			updateData.avatar = file.filename
 		}
 
-		return this.usersService.updateUser(userId, updateData)
+		await this.usersService.updateUser(userId, updateData)
+		
+		return { success: true }
 	}
 
 	@Patch('password')
@@ -89,7 +108,9 @@ export class UsersController {
 		@Req() req,
 		@Body() body: { oldPassword: string; newPassword: string }
 	) {
-		return this.usersService.changePassword(req.user.userId, body)
+		await this.usersService.changePassword(req.user.userId, body)
+
+		return { succes: true }
 	}
 
 }
