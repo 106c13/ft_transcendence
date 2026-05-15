@@ -13,6 +13,7 @@ export type User = {
 	bio?: string
 	created_at?: string
 	status?: string
+	isOwnProfile?: boolean
 }
 
 export type FriendStatus =
@@ -31,27 +32,10 @@ function Profile() {
 	const [activeTab, setActiveTab] =
 		useState<'overview' | 'games' | 'friends'>('overview')
 	const [friends, setFriends] = useState<User[]>([])
-	const [currentUser, setCurrentUser] = useState<User | null>(null)
+	const isLoggedIn = !!localStorage.getItem('token')
 
 	const navigate = useNavigate()
 	const { username } = useParams()
-
-	// Load current user only once
-	useEffect(() => {
-		const loadCurrentUser = async () => {
-			const token = localStorage.getItem('token')
-			const res = await fetch('/api/users/me', {
-				headers: { Authorization: `Bearer ${token}` }
-			})
-			if (res.ok) {
-				const data = await res.json()
-				setCurrentUser(data)
-			}
-		}
-		loadCurrentUser()
-	}, [])
-
-	const isOwnProfile = !username || username === 'me' || username === currentUser?.username
 
 	const loadFriendStatus = async (token: string, username: string) => {
 		try {
@@ -98,14 +82,8 @@ function Profile() {
 	const loadProfile = async () => {
 		try {
 			const token = localStorage.getItem('token')
-
-			// If viewing own profile and we already have currentUser, use it
-			if ((!username || username === 'me') && currentUser) {
-				setUser(currentUser)
-				return
-			}
-
-			const endpoint = `/api/users/${username}`
+			
+			const endpoint = username ? `/api/users/${username}` : '/api/users/me'
 			const headers: HeadersInit = {}
 
 			if (token) {
@@ -124,12 +102,16 @@ function Profile() {
 				navigate('/login')
 				return
 			}
-
+			
 			const data = await res.json()
-			setUser(data)
+			setUser({
+				...data,
+				isOwnProfile: data.isOwnProfile ?? false
+			})
 
-			if (token && !isOwnProfile) {
-				loadFriendStatus(token, username as string)
+			// Load friend status only if not own profile and we have a username param
+			if (token && username && data.isOwnProfile === false) {
+				loadFriendStatus(token, username)
 			}
 		} catch {
 			localStorage.removeItem('token')
@@ -138,10 +120,8 @@ function Profile() {
 	}
 
 	useEffect(() => {
-		if (currentUser !== null) {
-			loadProfile()
-		}
-	}, [username, currentUser])
+		loadProfile()
+	}, [username])
 
 	const sendFriendRequest = async () => {
 		if (!user) return
@@ -248,7 +228,8 @@ function Profile() {
 		<div className="profile-page">
 			<ProfileHeader
 				user={user}
-				isOwnProfile={isOwnProfile}
+				isOwnProfile={user.isOwnProfile || false}
+				isLoggedIn={isLoggedIn}
 				menuOpen={menuOpen}
 				setMenuOpen={setMenuOpen}
 				friendStatus={friendStatus}

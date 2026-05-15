@@ -16,6 +16,7 @@ import { diskStorage } from 'multer'
 import { extname } from 'path'
 import type { Express } from 'express'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
+import { JwtService } from '@nestjs/jwt'
 import { UsersService } from './users.service'
 
 function isValidEmail(email: string) {
@@ -24,7 +25,10 @@ function isValidEmail(email: string) {
 
 @Controller('users')
 export class UsersController {
-	constructor(private readonly usersService: UsersService) {}
+	constructor(
+		private readonly usersService: UsersService,
+		private readonly jwtService: JwtService,
+	) {}
 
 	@Get('me')
 	@UseGuards(JwtAuthGuard)
@@ -36,11 +40,15 @@ export class UsersController {
 		}
 
 		return {
+			id: user.id,
 			username: user.username,
+			email: user.email,
 			bio: user.bio,
+			avatar: user.avatar,
 			is_active: user.is_active,
 			last_seen: user.last_seen,
 			created_at: user.created_at,
+			isOwnProfile: true,
 		}
 	}
 
@@ -54,19 +62,34 @@ export class UsersController {
 	}
 
 	@Get(':username')
-	async getByUsername(@Param('username') username: string) {
+	async getByUsername(@Req() req, @Param('username') username: string) {
 		const user = await this.usersService.findByUsername(username)
 
 		if (!user) {
 			throw new NotFoundException('User not found')
 		}
 
+		// Manually check token
+		let isOwnProfile = false
+		const authHeader = req.headers.authorization
+		if (authHeader) {
+			try {
+				const token = authHeader.split(' ')[1]
+				const decoded = this.jwtService.verify(token)
+				isOwnProfile = decoded.sub === user.id
+			} catch {
+				isOwnProfile = false
+			}
+		}
+
 		return {
+			id: user.id,
 			username: user.username,
+			email: user.email,
+			avatar: user.avatar,
 			bio: user.bio,
-			is_active: user.is_active,
-			last_seen: user.last_seen,
 			created_at: user.created_at,
+			isOwnProfile,
 		}
 	}
 

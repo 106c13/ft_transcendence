@@ -4,6 +4,7 @@ import type { User, FriendStatus } from '../../pages/Profile'
 type Props = {
 	user: User
 	isOwnProfile: boolean
+	isLoggedIn: boolean
 	menuOpen: boolean
 	setMenuOpen: (value: boolean) => void
 	friendStatus: FriendStatus
@@ -19,6 +20,7 @@ type Props = {
 function ProfileHeader({
 	user,
 	isOwnProfile,
+	isLoggedIn,
 	menuOpen,
 	setMenuOpen,
 	friendStatus,
@@ -82,7 +84,7 @@ function ProfileHeader({
 				</div>
 			</div>
 
-			{!isOwnProfile && (
+			{!isOwnProfile && isLoggedIn && (
 				<div className="header-actions">
 					{friendStatus === 'NONE' && (
 						<button

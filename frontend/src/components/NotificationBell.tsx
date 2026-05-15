@@ -101,7 +101,7 @@ function NotificationBell({ userId }: { userId: number }) {
 	useEffect(() => {
 		if (userId) {
 			fetchNotifications()
-			const interval = setInterval(fetchUnreadCount, 30000)
+			const interval = setInterval(fetchUnreadCount, 3000)
 			return () => clearInterval(interval)
 		}
 	}, [userId])
