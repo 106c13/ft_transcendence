@@ -28,8 +28,20 @@ export class UsersController {
 
 	@Get('me')
 	@UseGuards(JwtAuthGuard)
-	getMe(@Req() req) {
-		return this.usersService.findById(req.user.userId)
+	async getMe(@Req() req) {
+		const user = await this.usersService.findById(req.user.userId)
+
+		if (!user) {
+			throw new NotFoundException('User not found');
+		}
+
+		return {
+			username: user.username,
+			bio: user.bio,
+			is_active: user.is_active,
+			last_seen: user.last_seen,
+			created_at: user.created_at,
+		}
 	}
 
 	@Get('search')
@@ -49,7 +61,13 @@ export class UsersController {
 			throw new NotFoundException('User not found')
 		}
 
-		return user
+		return {
+			username: user.username,
+			bio: user.bio,
+			is_active: user.is_active,
+			last_seen: user.last_seen,
+			created_at: user.created_at,
+		}
 	}
 
 	@Patch('me')
@@ -80,6 +98,10 @@ export class UsersController {
 
 		if (body.username.length > 15) {
 			throw new BadRequestException('Username should be less than 15 characters');
+		}
+
+		if (body.bio.length > 100) {
+			throw new BadRequestException('Bio should be less than 100 characters');
 		}
 
 		if (body.email && !isValidEmail(body.email)) {

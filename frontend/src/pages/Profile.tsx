@@ -36,6 +36,7 @@ function Profile() {
 	const navigate = useNavigate()
 	const { username } = useParams()
 
+	// Load current user only once
 	useEffect(() => {
 		const loadCurrentUser = async () => {
 			const token = localStorage.getItem('token')
@@ -98,10 +99,13 @@ function Profile() {
 		try {
 			const token = localStorage.getItem('token')
 
-			const endpoint = username
-				? `/api/users/${username}`
-				: '/api/users/me'
+			// If viewing own profile and we already have currentUser, use it
+			if ((!username || username === 'me') && currentUser) {
+				setUser(currentUser)
+				return
+			}
 
+			const endpoint = `/api/users/${username}`
 			const headers: HeadersInit = {}
 
 			if (token) {
@@ -115,12 +119,6 @@ function Profile() {
 				return
 			}
 
-			if (!username && res.status === 401) {
-				localStorage.removeItem('token')
-				navigate('/login')
-				return
-			}
-
 			if (!res.ok) {
 				localStorage.removeItem('token')
 				navigate('/login')
@@ -130,8 +128,8 @@ function Profile() {
 			const data = await res.json()
 			setUser(data)
 
-			if (username && token && !isOwnProfile) {
-				loadFriendStatus(token, username)
+			if (token && !isOwnProfile) {
+				loadFriendStatus(token, username as string)
 			}
 		} catch {
 			localStorage.removeItem('token')
@@ -140,7 +138,9 @@ function Profile() {
 	}
 
 	useEffect(() => {
-		loadProfile()
+		if (currentUser !== null) {
+			loadProfile()
+		}
 	}, [username, currentUser])
 
 	const sendFriendRequest = async () => {
