@@ -137,13 +137,14 @@ function ProfileHeader({
 						</button>
 					)}
 
-					{/* Message Button */}
-					<button
-						className="message-btn"
-						onClick={handleMessageClick}
-					>
-						💬 {t('message')}
-					</button>
+					{friendStatus == 'ACCEPTED' && (
+						<button
+							className="message-btn"
+							onClick={handleMessageClick}
+						>
+							💬 {t('message')}
+						</button>
+					)}
 				</div>
 			)}
 		</div>

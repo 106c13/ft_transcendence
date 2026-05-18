@@ -52,8 +52,8 @@ function RightSidebar({ currentUser }: Props) {
 				</div>
 
 				{/* Messages */}
-				<div className="icon-item" onClick={() => navigate('/messages')}>
-					<span className="icon">💬</span>
+				<div className="icon-item" onClick={() => navigate('/chat')}>
+					<span className="icon">✉️</span>
 				</div>
 
 				{/* Notifications */}

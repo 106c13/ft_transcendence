@@ -126,8 +126,11 @@ function Chat() {
 	return (
 		<div className="chat-container">
 			<div className="chat-sidebar">
-				<div className="chat-sidebar-header">
-					<h2>Messages</h2>
+				<div
+					className="chat-sidebar-header"
+					onClick={() => navigate('/home')}
+				>
+					<h2>ft_transcendence</h2>
 				</div>
 				<div className="chat-list">
 					{chats.map(chat => {
@@ -155,7 +158,9 @@ function Chat() {
 			<div className="chat-main">
 				{selectedChat ? (
 					<>
-						<div className="chat-main-header">
+						<div className="chat-main-header"
+							onClick={() => navigate(`/profile/${getOtherUser(selectedChat)?.username}`)}
+						>
 							<img
 								src={getOtherUser(selectedChat)?.avatar ? `/uploads/${getOtherUser(selectedChat)?.avatar}` : '/assets/default.jpg'}
 								alt={getOtherUser(selectedChat)?.username}

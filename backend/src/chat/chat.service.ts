@@ -48,7 +48,7 @@ export class ChatService {
 		const notification = this.notificationRepo.create({
 			user_id: user2Id,
 			message: `${user1.username} started a new conversation`,
-			link: `/chat/${chatId}`,
+			link: `/chat/${user1.id}`,
 			is_read: false,
 		});
 

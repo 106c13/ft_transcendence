@@ -71,10 +71,13 @@ export class MessagesService {
 
 		await this.notificationRepo.save(notification)
 
-		return this.messageRepository.findOne({
-			where: { id: message.id },
-			relations: ['sender'],
-		})
+		return {
+			id: message.id,
+			chat_id: message.chat_id,
+			sender_id: message.sender_id,
+			content: message.content,
+			created_at: message.created_at,
+		}
 	}
 
 	async getLastMessage(chatId: string) {
