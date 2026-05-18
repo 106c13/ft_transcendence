@@ -26,6 +26,7 @@ function App() {
 		<Route path="/home" element={<Home />} />
 
 		<Route path="/chat" element={<Chat />} />
+		<Route path="/chat/:user_id" element={<Chat />} />
 
 		<Route path="*" element={<NotFound />} />
       </Routes>

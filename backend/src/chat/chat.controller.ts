@@ -23,35 +23,39 @@ export class ChatController {
 		private readonly messagesService: MessagesService,
 	) {}
 
-	@Get('get/:chat_id')
+	@Get('get/:user_id')
 	@UseGuards(JwtAuthGuard)
 	async getChat(
 		@Req() req,
-		@Param('chat_id') chatId: string
+		@Param('user_id') userIdParam: string
 	) {
-		const userId = req.user.userId
+		const currentUserId = req.user.userId
+		const otherUserId = parseInt(userIdParam)
 		
-		const [id1, id2] = chatId.split('_').map(Number)
-
-		if (userId !== id1 && userId !== id2) {
-			throw new BadRequestException('You are not a participant of this chat')
+		if (isNaN(otherUserId)) {
+			throw new BadRequestException('Invalid user ID')
 		}
-
+		
+		if (currentUserId === otherUserId) {
+			throw new BadRequestException('Cannot create chat with yourself')
+		}
+		
+		const id1 = Math.min(currentUserId, otherUserId)
+		const id2 = Math.max(currentUserId, otherUserId)
+		const chatId = `${id1}_${id2}`
+		
 		let chat = await this.chatService.getChat(chatId)
-
+		
 		if (chat) {
-			return chat;
+			return chat
 		}
 		
-		const user1 = await this.usersService.findById(id1)
-		const user2 = await this.usersService.findById(id2)
-		
-		if (!user1 || !user2) {
+		const otherUser = await this.usersService.findById(otherUserId)
+		if (!otherUser) {
 			throw new NotFoundException('User not found')
 		}
-	
-		let newChat = await this.chatService.createChat(id1, id2)
 		
+		let newChat = await this.chatService.createChat(id1, id2)
 		return newChat
 	}
 

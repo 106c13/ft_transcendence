@@ -1,19 +1,14 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import './Chat.css'
-
-type User = {
-	id: number
-	username: string
-	email: string
-	avatar?: string
-}
 
 type Chat = {
 	id: number
 	chat_id: string
-	user1: User
-	user2: User
+	user1_id: number
+	user2_id: number
+	user1: { id: number; username: string; avatar?: string }
+	user2: { id: number; username: string; avatar?: string }
 	created_at: string
 }
 
@@ -22,192 +17,182 @@ type Message = {
 	chat_id: string
 	sender_id: number
 	content: string
-	is_read: boolean
 	created_at: string
-	sender: User
 }
 
 function Chat() {
 	const navigate = useNavigate()
+	const { user_id } = useParams()
 	const [chats, setChats] = useState<Chat[]>([])
 	const [selectedChat, setSelectedChat] = useState<Chat | null>(null)
 	const [messages, setMessages] = useState<Message[]>([])
 	const [newMessage, setNewMessage] = useState('')
-	const [currentUser, setCurrentUser] = useState<User | null>(null)
+	const [currentUserId, setCurrentUserId] = useState<number | null>(null)
 
+	const token = localStorage.getItem('token')
+
+	// Get current user ID
 	useEffect(() => {
-		const token = localStorage.getItem('token')
 		if (!token) {
 			navigate('/login')
 			return
 		}
-
-		fetchCurrentUser()
-		fetchChats()
+		fetch('/api/users/me', {
+			headers: { Authorization: `Bearer ${token}` }
+		})
+			.then(res => res.json())
+			.then(data => setCurrentUserId(data.id))
+			.catch(err => console.error(err))
 	}, [])
 
+	// Fetch all chats
 	useEffect(() => {
-		if (selectedChat) {
-			fetchMessages(selectedChat.chat_id)
-		}
-	}, [selectedChat])
+		if (!currentUserId) return
 
-	const fetchCurrentUser = async () => {
-		const token = localStorage.getItem('token')
-		try {
-			const res = await fetch('/api/users/me', {
-				headers: { Authorization: `Bearer ${token}` },
-			})
-			if (res.ok) {
-				const data = await res.json()
-				setCurrentUser(data)
-			}
-		} catch (error) {
-			console.error('Error loading user:', error)
-		}
-	}
-
-	const fetchChats = async () => {
-		const token = localStorage.getItem('token')
-		try {
-			const res = await fetch('/api/chat/my-chats', {
-				headers: { Authorization: `Bearer ${token}` },
-			})
-			if (res.ok) {
-				const data = await res.json()
+		fetch('/api/chat/my-chats', {
+			headers: { Authorization: `Bearer ${token}` }
+		})
+			.then(res => res.json())
+			.then(data => {
 				setChats(data)
-				if (data.length > 0) {
-					setSelectedChat(data[0])
-				}
-			}
-		} catch (error) {
-			console.error('Error loading chats:', error)
-		}
-	}
-
-	const fetchMessages = async (chatId: string) => {
-		const token = localStorage.getItem('token')
-		try {
-			const res = await fetch(`/api/messages/${chatId}?limit=100`, {
-				headers: { Authorization: `Bearer ${token}` },
 			})
-			if (res.ok) {
-				const data = await res.json()
-				setMessages(data.messages)
-			}
-		} catch (error) {
-			console.error('Error loading messages:', error)
-		}
-	}
+			.catch(err => console.error(err))
+	}, [currentUserId])
+
+	useEffect(() => {
+		if (!currentUserId || !user_id) return
+
+		fetch(`/api/chat/get/${user_id}`, {
+			headers: { Authorization: `Bearer ${token}` }
+		})
+			.then(res => res.json())
+			.then(chat => {
+				setSelectedChat(chat)
+				return fetch(`/api/messages/${chat.chat_id}?limit=100`, {
+					headers: { Authorization: `Bearer ${token}` }
+				})
+			})
+			.then(res => res.json())
+			.then(data => {
+				setMessages(data.messages || [])
+			})
+			.catch(err => console.error(err))
+	}, [user_id, currentUserId])
+
+	useEffect(() => {
+		if (!selectedChat) return
+
+		fetch(`/api/messages/${selectedChat.chat_id}?limit=100`, {
+			headers: { Authorization: `Bearer ${token}` }
+		})
+			.then(res => res.json())
+			.then(data => {
+				setMessages(data.messages || [])
+			})
+			.catch(err => console.error(err))
+	}, [selectedChat])
 
 	const sendMessage = async () => {
 		if (!newMessage.trim() || !selectedChat) return
 
-		const token = localStorage.getItem('token')
-		try {
-			const res = await fetch('/api/messages/send', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`,
-				},
-				body: JSON.stringify({
-					chat_id: selectedChat.chat_id,
-					content: newMessage,
-				}),
+		const res = await fetch('/api/messages/send', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			},
+			body: JSON.stringify({
+				chat_id: selectedChat.chat_id,
+				content: newMessage
 			})
+		})
 
-			if (res.ok) {
-				const message = await res.json()
-				setMessages([...messages, message])
-				setNewMessage('')
-			}
-		} catch (error) {
-			console.error('Error sending message:', error)
+		if (res.ok) {
+			const message = await res.json()
+			setMessages([...messages, message])
+			setNewMessage('')
 		}
 	}
 
 	const getOtherUser = (chat: Chat) => {
-		if (!currentUser) return null
-		return chat.user1.id === currentUser.id ? chat.user2 : chat.user1
+		if (!currentUserId) return null
+		return chat.user1_id === currentUserId ? chat.user2 : chat.user1
+	}
+
+	if (!currentUserId) {
+		return <div className="chat-container">Loading...</div>
 	}
 
 	return (
 		<div className="chat-container">
-			
-			<div className="chat-main">
-				<div className="chat-list">
-					<div className="chat-list-header">
-						<h2>Messages</h2>
-					</div>
-					<div className="chat-list-items">
-						{chats.map((chat) => {
-							const otherUser = getOtherUser(chat)
-							return (
-								<div
-									key={chat.id}
-									className={`chat-item ${selectedChat?.id === chat.id ? 'active' : ''}`}
-									onClick={() => setSelectedChat(chat)}
-								>
-									<img
-										src={otherUser?.avatar ? `/uploads/${otherUser.avatar}` : '/default-avatar.png'}
-										alt={otherUser?.username}
-										className="chat-avatar"
-									/>
-									<div className="chat-info">
-										<div className="chat-name">{otherUser?.username}</div>
-									</div>
-								</div>
-							)
-						})}
-					</div>
+			<div className="chat-sidebar">
+				<div className="chat-sidebar-header">
+					<h2>Messages</h2>
 				</div>
-
-				<div className="chat-area">
-					{selectedChat ? (
-						<>
-							<div className="chat-header">
+				<div className="chat-list">
+					{chats.map(chat => {
+						const otherUser = getOtherUser(chat)
+						return (
+							// In the chat list
+							<div className="chat-item" key={chat.id} onClick={() => setSelectedChat(chat)} >
 								<img
-									src={getOtherUser(selectedChat)?.avatar ? `/uploads/${getOtherUser(selectedChat)?.avatar}` : '/default-avatar.png'}
-									alt={getOtherUser(selectedChat)?.username}
+									src={otherUser?.avatar ? `/uploads/${otherUser.avatar}` : '/assets/default.jpg'}
+									alt={otherUser?.username}
 									className="chat-avatar"
 								/>
-								<div className="chat-header-info">
-									<h3>{getOtherUser(selectedChat)?.username}</h3>
+								<div className="chat-item-info">
+									<div className="chat-item-name">{otherUser?.username}</div>
 								</div>
 							</div>
-
-							<div className="chat-messages">
-								{messages.map((msg) => (
-									<div
-										key={msg.id}
-										className={`message ${msg.sender_id === currentUser?.id ? 'sent' : 'received'}`}
-									>
-										<div className="message-content">{msg.content}</div>
-										<div className="message-time">
-											{new Date(msg.created_at).toLocaleTimeString()}
-										</div>
-									</div>
-								))}
-							</div>
-
-							<div className="chat-input">
-								<input
-									type="text"
-									value={newMessage}
-									onChange={(e) => setNewMessage(e.target.value)}
-									onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-									placeholder="Type a message..."
-								/>
-								<button onClick={sendMessage}>Send</button>
-							</div>
-						</>
-					) : (
-						<div className="no-chat-selected">
-							<p>Select a chat to start messaging</p>
-						</div>
+						)
+					})}
+					{chats.length === 0 && (
+						<div className="no-chats">No chats yet</div>
 					)}
 				</div>
+			</div>
+
+			<div className="chat-main">
+				{selectedChat ? (
+					<>
+						<div className="chat-main-header">
+							<img
+								src={getOtherUser(selectedChat)?.avatar ? `/uploads/${getOtherUser(selectedChat)?.avatar}` : '/assets/default.jpg'}
+								alt={getOtherUser(selectedChat)?.username}
+								className="chat-main-avatar"
+							/>
+							<h3>{getOtherUser(selectedChat)?.username}</h3>
+						</div>
+						<div className="chat-messages">
+							{messages.map(msg => (
+								<div
+									key={msg.id}
+									className={`message ${msg.sender_id === currentUserId ? 'sent' : 'received'}`}
+								>
+									<div className="message-bubble">{msg.content}</div>
+									<div className="message-time">
+										{new Date(msg.created_at).toLocaleTimeString()}
+									</div>
+								</div>
+							))}
+						</div>
+
+						<div className="chat-input-area">
+							<input
+								type="text"
+								value={newMessage}
+								onChange={e => setNewMessage(e.target.value)}
+								onKeyPress={e => e.key === 'Enter' && sendMessage()}
+								placeholder="Type a message..."
+							/>
+							<button onClick={sendMessage}>Send</button>
+						</div>
+					</>
+				) : (
+					<div className="no-chat-selected">
+						<p>Select a chat to start messaging</p>
+					</div>
+				)}
 			</div>
 		</div>
 	)

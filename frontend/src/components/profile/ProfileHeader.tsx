@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import type { User, FriendStatus } from '../../pages/Profile'
 
 type Props = {
@@ -33,6 +34,11 @@ function ProfileHeader({
 	onSettings,
 }: Props) {
 	const { t } = useTranslation()
+	const navigate = useNavigate()
+
+	const handleMessageClick = () => {
+		navigate(`/chat/${user.id}`)
+	}
 
 	return (
 		<div className="profile-header">
@@ -130,6 +136,14 @@ function ProfileHeader({
 							{t('friends')} ✓
 						</button>
 					)}
+
+					{/* Message Button */}
+					<button
+						className="message-btn"
+						onClick={handleMessageClick}
+					>
+						💬 {t('message')}
+					</button>
 				</div>
 			)}
 		</div>
