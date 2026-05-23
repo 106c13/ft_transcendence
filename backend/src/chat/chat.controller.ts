@@ -64,18 +64,6 @@ export class ChatController {
 	async getUserChats(@Req() req) {
 		const userId = req.user.userId
 		const chats = await this.chatService.getUserChats(userId)
-		
-		const enrichedChats = await Promise.all(
-			chats.map(async (chat) => {
-				const lastMessage = await this.messagesService.getLastMessage(chat.chat_id)
-				
-				return {
-					...chat,
-					lastMessage,
-				}
-			})
-		)
-		
-		return enrichedChats
+		return chats
 	}
 }

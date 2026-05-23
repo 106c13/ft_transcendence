@@ -30,6 +30,7 @@
 	-webkit-background-clip: text;
 	background-clip: text;
 	color: transparent;
+	cursor: pointer;
 }
 
 .chat-list {

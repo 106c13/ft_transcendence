@@ -9,7 +9,6 @@ type Chat = {
 	user2_id: number
 	user1: { id: number; username: string; avatar?: string }
 	user2: { id: number; username: string; avatar?: string }
-	created_at: string
 }
 
 type Message = {

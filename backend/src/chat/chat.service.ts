@@ -20,9 +20,13 @@ export class ChatService {
 	) {}
 
 	async getChat(chatId: string) {
-		let chat = await this.chatRepository.findOne({
-				where: { chat_id: chatId },
-			});
+		const chat = await this.chatRepository
+			.createQueryBuilder('chat')
+			.where('chat.chat_id = :chatId', { chatId })
+			.leftJoinAndSelect('chat.user1', 'user1')
+			.leftJoinAndSelect('chat.user2', 'user2')
+			.getOne();
+
 		return chat;
 	}
 
@@ -66,6 +70,21 @@ export class ChatService {
 			.orderBy('chat.created_at', 'DESC')
 			.getMany()
 
-		return chats
+		return chats.map(chat => ({
+			id: chat.id,
+			chat_id: chat.chat_id,
+			user1_id: chat.user1_id,
+			user2_id: chat.user2_id,
+			user1: chat.user1 ? {
+				id: chat.user1.id,
+				username: chat.user1.username,
+				avatar: chat.user1.avatar,
+			} : null,
+			user2: chat.user2 ? {
+				id: chat.user2.id,
+				username: chat.user2.username,
+				avatar: chat.user2.avatar,
+			} : null,
+		}))
 	}
 }
