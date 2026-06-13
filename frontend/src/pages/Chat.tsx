@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import io, { Socket } from 'socket.io-client'
 import './Chat.css'
 
 type Chat = {
@@ -17,6 +19,7 @@ type Message = {
 	sender_id: number
 	content: string
 	created_at: string
+	sender?: { id: number; username: string; avatar?: string }
 }
 
 function Chat() {
@@ -27,8 +30,16 @@ function Chat() {
 	const [messages, setMessages] = useState<Message[]>([])
 	const [newMessage, setNewMessage] = useState('')
 	const [currentUserId, setCurrentUserId] = useState<number | null>(null)
+	const { t } = useTranslation()
+	const socketRef = useRef<Socket | null>(null)
+	const selectedChatRef = useRef(selectedChat) // ADD THIS
 
 	const token = localStorage.getItem('token')
+
+	// Update ref when selectedChat changes
+	useEffect(() => {
+		selectedChatRef.current = selectedChat
+	}, [selectedChat])
 
 	// Get current user ID
 	useEffect(() => {
@@ -44,8 +55,41 @@ function Chat() {
 			.catch(err => console.error(err))
 	}, [])
 
-	// Fetch all chats
+	// Connect to Socket.io
 	useEffect(() => {
+		if (!currentUserId) return
+
+		const socket = io('http://localhost:8080', {
+			query: { userId: currentUserId.toString() },
+			transports: ['websocket'],
+		})
+		socketRef.current = socket
+
+		socket.on('connect', () => {
+			console.log('Socket connected')
+		})
+
+		socket.on('new_message', (data: { type: string; message: Message }) => {
+			console.log('New message received:', data)
+			const newMsg = data.message
+			
+			// Use ref instead of selectedChat state
+			if (selectedChatRef.current && newMsg.chat_id === selectedChatRef.current.chat_id) {
+				setMessages(prev => [...prev, newMsg])
+			}
+		})
+
+		socket.on('disconnect', () => {
+			console.log('Socket disconnected')
+		})
+
+		return () => {
+			socket.disconnect()
+		}
+	}, [currentUserId]) // Remove selectedChat from here
+
+	// Fetch all chats
+	const refreshChats = () => {
 		if (!currentUserId) return
 
 		fetch('/api/chat/my-chats', {
@@ -56,8 +100,14 @@ function Chat() {
 				setChats(data)
 			})
 			.catch(err => console.error(err))
+	}
+
+	useEffect(() => {
+		if (!currentUserId) return
+		refreshChats()
 	}, [currentUserId])
 
+	// Handle URL parameter (user_id)
 	useEffect(() => {
 		if (!currentUserId || !user_id) return
 
@@ -78,8 +128,9 @@ function Chat() {
 			.catch(err => console.error(err))
 	}, [user_id, currentUserId])
 
+	// Handle clicking on chat from sidebar
 	useEffect(() => {
-		if (!selectedChat) return
+		if (!selectedChat || user_id) return
 
 		fetch(`/api/messages/${selectedChat.chat_id}?limit=100`, {
 			headers: { Authorization: `Bearer ${token}` }
@@ -110,6 +161,15 @@ function Chat() {
 			const message = await res.json()
 			setMessages([...messages, message])
 			setNewMessage('')
+			
+			const otherUser = getOtherUser(selectedChat)
+			if (socketRef.current && otherUser) {
+				socketRef.current.emit('send_message', {
+					receiver_id: otherUser.id,
+					chat_id: selectedChat.chat_id,
+					message: message
+				})
+			}
 		}
 	}
 
@@ -135,8 +195,16 @@ function Chat() {
 					{chats.map(chat => {
 						const otherUser = getOtherUser(chat)
 						return (
-							// In the chat list
-							<div className="chat-item" key={chat.id} onClick={() => setSelectedChat(chat)} >
+							<div 
+								className={`chat-item ${selectedChat?.id === chat.id ? 'active' : ''}`}
+								key={chat.id} 
+								onClick={() => {
+									setSelectedChat(chat)
+									if (user_id) {
+										navigate('/chat', { replace: true })
+									}
+								}} 
+							>
 								<img
 									src={otherUser?.avatar ? `/uploads/${otherUser.avatar}` : '/assets/default.jpg'}
 									alt={otherUser?.username}
@@ -157,8 +225,14 @@ function Chat() {
 			<div className="chat-main">
 				{selectedChat ? (
 					<>
-						<div className="chat-main-header"
-							onClick={() => navigate(`/profile/${getOtherUser(selectedChat)?.username}`)}
+						<div 
+							className="chat-main-header"
+							onClick={() => {
+								const otherUser = getOtherUser(selectedChat)
+								if (otherUser) {
+									navigate(`/profile/${otherUser.username}`)
+								}
+							}}
 						>
 							<img
 								src={getOtherUser(selectedChat)?.avatar ? `/uploads/${getOtherUser(selectedChat)?.avatar}` : '/assets/default.jpg'}
@@ -187,14 +261,14 @@ function Chat() {
 								value={newMessage}
 								onChange={e => setNewMessage(e.target.value)}
 								onKeyPress={e => e.key === 'Enter' && sendMessage()}
-								placeholder="Type a message..."
+								placeholder={t('type_message')}
 							/>
-							<button onClick={sendMessage}>Send</button>
+							<button onClick={sendMessage}>{t('send')}</button>
 						</div>
 					</>
 				) : (
 					<div className="no-chat-selected">
-						<p>Select a chat to start messaging</p>
+						<p>{t('select_chat')}</p>
 					</div>
 				)}
 			</div>

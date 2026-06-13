@@ -47,7 +47,12 @@ export class ChatController {
 		let chat = await this.chatService.getChat(chatId)
 		
 		if (chat) {
-			return chat
+			return {
+				chat_id: chat.chat_id,
+				user1_id: chat.user1_id,
+				user2_id: chat.user2_id,
+				created_at: chat.created_at
+			}
 		}
 		
 		const otherUser = await this.usersService.findById(otherUserId)
@@ -56,7 +61,18 @@ export class ChatController {
 		}
 		
 		let newChat = await this.chatService.createChat(id1, id2)
-		return newChat
+		
+		if (!newChat) {
+			throw new NotFoundException('Cant create new chat')
+		}
+			
+		return {
+			chat_id: newChat.chat_id,
+			user1_id: newChat.user1_id,
+			user2_id: newChat.user2_id,
+			created_at: newChat.created_at
+		}
+			
 	}
 
 	@Get('my-chats')

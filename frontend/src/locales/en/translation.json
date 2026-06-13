@@ -48,5 +48,8 @@
   "request_sent": "Request Sent",
   "login": "Login",
   "invalid_credentials": "Invalid credentials",
-  "login_successful": "Login successful ✓ Redirecting..."
+  "login_successful": "Login successful ✓ Redirecting...",
+  "select_chat": "Select a chat to start messaging",
+  "type_message": "Type a message...",
+  "send": "Send"
 }

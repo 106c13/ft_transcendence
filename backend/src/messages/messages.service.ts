@@ -5,6 +5,7 @@ import { Message } from './messages.entity'
 import { Chat } from '../chat/chat.entity'
 import { User } from '../users/user.entity'
 import { Notification } from '../notification/notification.entity'
+import { ChatGateway } from '../chat/chat.gateway'
 
 @Injectable()
 export class MessagesService {
@@ -17,6 +18,7 @@ export class MessagesService {
 		private userRepository: Repository<User>,
 		@InjectRepository(Notification)
 		private notificationRepo: Repository<Notification>,
+		private chatGateway: ChatGateway,
 	) {}
 
 	async getMessages(chatId: string, options: { limit: number; offset: number }) {
@@ -29,7 +31,18 @@ export class MessagesService {
 		})
 
 		return {
-			messages: messages.reverse(),
+			messages: messages.reverse().map(msg => ({
+				id: msg.id,
+				chat_id: msg.chat_id,
+				sender_id: msg.sender_id,
+				content: msg.content,
+				created_at: msg.created_at,
+				sender: msg.sender ? {
+					id: msg.sender.id,
+					username: msg.sender.username,
+					avatar: msg.sender.avatar,
+				} : null,
+			})),
 			total,
 			limit: options.limit,
 			offset: options.offset,
@@ -70,6 +83,25 @@ export class MessagesService {
 		})
 
 		await this.notificationRepo.save(notification)
+
+		const messageResponse = {
+			id: message.id,
+			chat_id: message.chat_id,
+			sender_id: message.sender_id,
+			content: message.content,
+			created_at: message.created_at,
+			sender: {
+				id: sender.id,
+				username: sender.username,
+				avatar: sender.avatar,
+			},
+		}
+
+		// Emit to receiver via WebSocket
+		this.chatGateway.server.emit('new_message', {
+			type: 'new_message',
+			message: messageResponse,
+		})
 
 		return {
 			id: message.id,
