@@ -7,6 +7,7 @@ import { FriendsService } from './friends.service'
 import { FriendRequest } from './friend-request.entity'
 import { Friendship } from './friendship.entity'
 import { User } from '../users/user.entity'
+import { Notification } from '../notification/notification.entity'
 
 @Module({
 	imports: [
@@ -14,6 +15,7 @@ import { User } from '../users/user.entity'
 			FriendRequest,
 			Friendship,
 			User,
+			Notification,
 		]),
 	],
 	controllers: [FriendsController],

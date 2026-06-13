@@ -51,7 +51,6 @@ export class FriendsController {
 	}
 
 	@Delete('cancel/:username')
-	@UseGuards(JwtAuthGuard)
 	cancel(@Req() req, @Param('username') username: string) {
 		return this.friendsService.cancelRequest(
 			req.user.userId,
@@ -60,7 +59,6 @@ export class FriendsController {
 	}
 
 	@Delete('unfriend/:username')
-	@UseGuards(JwtAuthGuard)
 	unfriend(@Req() req, @Param('username') username: string) {
 		return this.friendsService.unfriend(
 			req.user.userId,
@@ -74,7 +72,6 @@ export class FriendsController {
 	}
 
 	@Get('status/:username')
-	@UseGuards(JwtAuthGuard)
 	async getStatus(
 		@Req() req,
 		@Param('username') username: string,
@@ -86,7 +83,6 @@ export class FriendsController {
 	}
 
 	@Get('list/:username')
-	@UseGuards(JwtAuthGuard)
 	async getFriendList(
 		@Req() req,
 		@Param('username') username: string,

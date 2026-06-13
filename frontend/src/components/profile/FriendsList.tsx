@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { User } from '../../pages/Profile'
 
 type Props = {
@@ -6,10 +7,12 @@ type Props = {
 }
 
 function FriendsList({ friends, onOpenProfile }: Props) {
+	const { t } = useTranslation()
+
 	return (
 		<div className="friends-list">
 			{friends.length === 0 ? (
-				<div className="empty-friends">No friends yet</div>
+				<div className="empty-friends">{t('no_friends_yet')}</div>
 			) : (
 				friends.map((friend) => (
 					<div

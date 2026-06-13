@@ -16,16 +16,40 @@ import { diskStorage } from 'multer'
 import { extname } from 'path'
 import type { Express } from 'express'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
+import { JwtService } from '@nestjs/jwt'
 import { UsersService } from './users.service'
+
+function isValidEmail(email: string) {
+	return (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 256)
+}
 
 @Controller('users')
 export class UsersController {
-	constructor(private readonly usersService: UsersService) {}
+	constructor(
+		private readonly usersService: UsersService,
+		private readonly jwtService: JwtService,
+	) {}
 
 	@Get('me')
 	@UseGuards(JwtAuthGuard)
-	getMe(@Req() req) {
-		return this.usersService.findById(req.user.userId)
+	async getMe(@Req() req) {
+		const user = await this.usersService.findById(req.user.userId)
+
+		if (!user) {
+			throw new NotFoundException('User not found');
+		}
+
+		return {
+			id: user.id,
+			username: user.username,
+			email: user.email,
+			bio: user.bio,
+			avatar: user.avatar,
+			is_active: user.is_active,
+			last_seen: user.last_seen,
+			created_at: user.created_at,
+			isOwnProfile: true,
+		}
 	}
 
 	@Get('search')
@@ -38,14 +62,35 @@ export class UsersController {
 	}
 
 	@Get(':username')
-	async getByUsername(@Param('username') username: string) {
+	async getByUsername(@Req() req, @Param('username') username: string) {
 		const user = await this.usersService.findByUsername(username)
 
 		if (!user) {
 			throw new NotFoundException('User not found')
 		}
 
-		return user
+		// Manually check token
+		let isOwnProfile = false
+		const authHeader = req.headers.authorization
+		if (authHeader) {
+			try {
+				const token = authHeader.split(' ')[1]
+				const decoded = this.jwtService.verify(token)
+				isOwnProfile = decoded.sub === user.id
+			} catch {
+				isOwnProfile = false
+			}
+		}
+
+		return {
+			id: user.id,
+			username: user.username,
+			email: user.email,
+			avatar: user.avatar,
+			bio: user.bio,
+			created_at: user.created_at,
+			isOwnProfile,
+		}
 	}
 
 	@Patch('me')
@@ -70,6 +115,23 @@ export class UsersController {
 	) {
 		const userId = req.user.userId
 
+		if (/[^a-zA-Z0-9]/.test(body.username)) {
+			throw new BadRequestException('Username should contain only letters and numbers');
+		}
+
+		if (body.username.length > 15) {
+			throw new BadRequestException('Username should be less than 15 characters');
+		}
+
+		if (body.bio.length > 100) {
+			throw new BadRequestException('Bio should be less than 100 characters');
+		}
+
+		if (body.email && !isValidEmail(body.email)) {
+			throw new BadRequestException('Invalid email format');
+		}
+
+
 		const updateData: any = {
 			username: body.username,
 			email: body.email,
@@ -80,7 +142,9 @@ export class UsersController {
 			updateData.avatar = file.filename
 		}
 
-		return this.usersService.updateUser(userId, updateData)
+		await this.usersService.updateUser(userId, updateData)
+		
+		return { success: true }
 	}
 
 	@Patch('password')
@@ -89,7 +153,9 @@ export class UsersController {
 		@Req() req,
 		@Body() body: { oldPassword: string; newPassword: string }
 	) {
-		return this.usersService.changePassword(req.user.userId, body)
+		await this.usersService.changePassword(req.user.userId, body)
+
+		return { succes: true }
 	}
 
 }

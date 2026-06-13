@@ -7,7 +7,7 @@ import * as bcrypt from 'bcrypt';
 
 
 function isValidEmail(email: string) {
-	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+	return (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 256)
 }
 
 @Injectable()
@@ -36,7 +36,15 @@ export class AuthService {
 
 	async register({ email, username, password, repassword }) {
 		if (email && !isValidEmail(email)) {
-			throw new BadRequestException('Invalid email format')
+			throw new BadRequestException('Invalid email format');
+		}
+
+		if (username.length > 15) {
+			throw new BadRequestException('Username should be less than 15 characters');
+		}
+		
+		if (/[^a-zA-Z0-9]/.test(username)) {
+			throw new BadRequestException('Username should contain only letters and numbers');
 		}
 
 		if (password.length < 8) {

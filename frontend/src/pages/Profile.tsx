@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import './Profile.css'
 import ProfileHeader from '../components/profile/ProfileHeader'
 import FriendsList from '../components/profile/FriendsList'
 
 export type User = {
+	id: number
 	username: string
 	email: string
 	avatar?: string
 	bio?: string
 	created_at?: string
+	status?: string
+	isOwnProfile?: boolean
 }
 
 export type FriendStatus =
@@ -20,6 +24,7 @@ export type FriendStatus =
 	| 'SENT'
 
 function Profile() {
+	const { t } = useTranslation()
 	const [user, setUser] = useState<User | null>(null)
 	const [error] = useState('')
 	const [menuOpen, setMenuOpen] = useState(false)
@@ -27,26 +32,10 @@ function Profile() {
 	const [activeTab, setActiveTab] =
 		useState<'overview' | 'games' | 'friends'>('overview')
 	const [friends, setFriends] = useState<User[]>([])
-	const [currentUser, setCurrentUser] = useState<User | null>(null)
+	const isLoggedIn = !!localStorage.getItem('token')
 
 	const navigate = useNavigate()
 	const { username } = useParams()
-
-    useEffect(() => {
-        const loadCurrentUser = async () => {
-            const token = localStorage.getItem('token')
-            const res = await fetch('/api/users/me', {
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            if (res.ok) {
-                const data = await res.json()
-                setCurrentUser(data)
-            }
-        }
-        loadCurrentUser()
-    }, [])
-
-	const isOwnProfile = !username || username === 'me' || username === currentUser?.username
 
 	const loadFriendStatus = async (token: string, username: string) => {
 		try {
@@ -93,11 +82,8 @@ function Profile() {
 	const loadProfile = async () => {
 		try {
 			const token = localStorage.getItem('token')
-
-			const endpoint = username
-				? `/api/users/${username}`
-				: '/api/users/me'
-
+			
+			const endpoint = username ? `/api/users/${username}` : '/api/users/me'
 			const headers: HeadersInit = {}
 
 			if (token) {
@@ -111,22 +97,20 @@ function Profile() {
 				return
 			}
 
-			if (!username && res.status === 401) {
-				localStorage.removeItem('token')
-				navigate('/login')
-				return
-			}
-
 			if (!res.ok) {
 				localStorage.removeItem('token')
 				navigate('/login')
 				return
 			}
-
+			
 			const data = await res.json()
-			setUser(data)
+			setUser({
+				...data,
+				isOwnProfile: data.isOwnProfile ?? false
+			})
 
-			if (username && token && !isOwnProfile) {
+			// Load friend status only if not own profile and we have a username param
+			if (token && username && data.isOwnProfile === false) {
 				loadFriendStatus(token, username)
 			}
 		} catch {
@@ -235,7 +219,7 @@ function Profile() {
 	if (!user) {
 		return (
 			<div className="auth-page">
-				<p className="msg">User not found</p>
+				<p className="msg">{t('user_not_found')}</p>
 			</div>
 		)
 	}
@@ -244,7 +228,8 @@ function Profile() {
 		<div className="profile-page">
 			<ProfileHeader
 				user={user}
-				isOwnProfile={isOwnProfile}
+				isOwnProfile={user.isOwnProfile || false}
+				isLoggedIn={isLoggedIn}
 				menuOpen={menuOpen}
 				setMenuOpen={setMenuOpen}
 				friendStatus={friendStatus}
@@ -262,14 +247,14 @@ function Profile() {
 					className={`tab ${activeTab === 'overview' ? 'active' : ''}`}
 					onClick={() => setActiveTab('overview')}
 				>
-					Overview
+					{t('overview')}
 				</div>
 
 				<div
 					className="tab"
 					onClick={() => navigate(`/profile/${user.username}/games`)}
 				>
-					Games
+					{t('games')}
 				</div>
 
 				<div
@@ -279,20 +264,18 @@ function Profile() {
 						loadFriends()
 					}}
 				>
-					Friends
+					{t('friends')}
 				</div>
 			</div>
 
 			{activeTab === 'overview' && (
-				<div className="profile-content">Overview content</div>
+				<div className="profile-content">{t('overview_content')}</div>
 			)}
 
 			{activeTab === 'friends' && (
 				<FriendsList
 					friends={friends}
-					onOpenProfile={(username: string) =>
-						navigate(`/profile/${username}`)
-					}
+					onOpenProfile={(username) => navigate(`/profile/${username}`)}
 				/>
 			)}
 		</div>
