@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import './Profile.css'
 
 function Settings() {
+	const { t } = useTranslation()
 	const [username, setUsername] = useState('')
 	const [email, setEmail] = useState('')
 	const [oldPassword, setOldPassword] = useState('')
@@ -42,7 +44,7 @@ function Settings() {
 		setError(false)
 
 		if (newPassword !== confirmPassword) {
-			setMsg('Passwords do not match')
+			setMsg(t('passwords_do_not_match'))
 			setError(true)
 			return
 		}
@@ -64,12 +66,12 @@ function Settings() {
 		const result = await res.json()
 
 		if (!res.ok) {
-			setMsg(result.message || 'Password update failed')
+			setMsg(result.message || t('password_update_failed'))
 			setError(true)
 			return
 		}
 
-		setMsg('Password updated ✓')
+		setMsg(t('password_updated'))
 		setError(false)
 
 		setOldPassword('')
@@ -103,42 +105,42 @@ function Settings() {
 		const result = await res.json()
 
 		if (res.status == 413) {
-			setMsg(result.message || 'Image is too big')
+			setMsg(result.message || t('image_too_big'))
 			setError(true)
 		}
 
 		if (!res.ok) {
-			setMsg(result.message || 'Update failed')
+			setMsg(result.message || t('update_failed'))
 			setError(true)
 			return
 		}
 
 		setError(false)
-		setMsg('Saved ✓')
+		setMsg(t('saved'))
 	}
 
 	return (
 		<div className="auth-page">
 			<div className="card">
-				<h1>Settings</h1>
+				<h1>{t('settings')}</h1>
 
 				<form onSubmit={handleSave}>
 					<input
 						value={username}
 						onChange={e => setUsername(e.target.value)}
-						placeholder="Username"
+						placeholder={t('username')}
 					/>
 
 					<input
 						value={email}
 						onChange={e => setEmail(e.target.value)}
-						placeholder="Email"
+						placeholder={t('email')}
 					/>
 
 					<textarea
 						value={bio}
 						onChange={e => setBio(e.target.value)}
-						placeholder="Bio"
+						placeholder={t('bio')}
 					/>
 
 					<input
@@ -151,15 +153,14 @@ function Settings() {
 						}}
 					/>
 
-
-					<button className="button" type="submit">Save</button>
+					<button className="button" type="submit">{t('save')}</button>
 				</form>
 
-				<h1 style={{ marginTop: '30px' }}>Change password</h1>
+				<h1 style={{ marginTop: '30px' }}>{t('change_password')}</h1>
 				<form onSubmit={handlePasswordChange}>
 					<input
 						type="password"
-						placeholder="Old password"
+						placeholder={t('old_password')}
 						value={oldPassword}
 						onChange={e => setOldPassword(e.target.value)}
 						required
@@ -167,7 +168,7 @@ function Settings() {
 
 					<input
 						type="password"
-						placeholder="New password"
+						placeholder={t('new_password')}
 						value={newPassword}
 						onChange={e => setNewPassword(e.target.value)}
 						required
@@ -175,13 +176,13 @@ function Settings() {
 
 					<input
 						type="password"
-						placeholder="Confirm password"
+						placeholder={t('confirm_password')}
 						value={confirmPassword}
 						onChange={e => setConfirmPassword(e.target.value)}
 						required
 					/>
 
-					<button className="button" type="submit">Update password</button>
+					<button className="button" type="submit">{t('update_password')}</button>
 				</form>
 
 				<button
@@ -197,7 +198,7 @@ function Settings() {
 						width: '100%',
 					}}
 				>
-					← Back to Profile
+					← {t('back_to_profile')}
 				</button>
 
 				{msg && (
