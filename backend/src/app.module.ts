@@ -9,6 +9,7 @@ import { FriendsModule } from './friends/friends.module';
 import { NotificationsModule } from './notification/notification.module';
 import { ChatModule } from './chat/chat.module';
 import { MessagesModule } from './messages/messages.module';
+import { GameModule } from './game/game.module';
 
 
 	@Module({
@@ -34,6 +35,7 @@ import { MessagesModule } from './messages/messages.module';
 	NotificationsModule,
 	ChatModule,
 	MessagesModule,
+	GameModule,
   ],
   controllers: [AppController],
   providers: [AppService],

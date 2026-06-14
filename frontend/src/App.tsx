@@ -11,6 +11,7 @@ import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
 import Home	from './pages/Home'
 import Chat from './pages/Chat'
+import Game from './pages/Game'
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
 
 		<Route path="/chat" element={<Chat />} />
 		<Route path="/chat/:user_id" element={<Chat />} />
+
+		<Route path="/game" element={<Game />} />
 
 		<Route path="*" element={<NotFound />} />
       </Routes>
