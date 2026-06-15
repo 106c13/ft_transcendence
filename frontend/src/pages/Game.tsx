@@ -300,6 +300,57 @@ export default function Game() {
 	};
 
 	// Piece Click/Movement handlers
+	const handleDragStart = (e: React.DragEvent, square: string) => {
+		if (gameState !== 'playing' || isGameOver || isPaused) {
+			e.preventDefault();
+			return;
+		}
+		if (turn !== playerColor) {
+			e.preventDefault();
+			return;
+		}
+
+		const piece = localChess.get(square as Square);
+		if (!piece || piece.color !== playerColor) {
+			e.preventDefault();
+			return;
+		}
+
+		e.dataTransfer.setData('text/plain', square);
+		e.dataTransfer.effectAllowed = 'move';
+		
+		setSelectedSquare(square);
+		const moves = localChess.moves({ square: square as Square, verbose: true });
+		setValidMoves(moves.map(m => m.to));
+	};
+
+	const handleDragOver = (e: React.DragEvent) => {
+		e.preventDefault(); // allow drop
+	};
+
+	const handleDrop = (e: React.DragEvent, targetSquare: string) => {
+		e.preventDefault();
+		const sourceSquare = e.dataTransfer.getData('text/plain');
+		
+		if (sourceSquare && sourceSquare !== targetSquare) {
+			if (validMoves.includes(targetSquare)) {
+				const selectedPiece = localChess.get(sourceSquare as Square);
+				const isPawn = selectedPiece?.type === 'p';
+				const isPromotionRank = targetSquare.endsWith('8') || targetSquare.endsWith('1');
+
+				if (isPawn && isPromotionRank) {
+					setPendingMove({ from: sourceSquare, to: targetSquare });
+					setShowPromotion(true);
+				} else {
+					sendMove(sourceSquare, targetSquare);
+				}
+			} else {
+				setSelectedSquare(null);
+				setValidMoves([]);
+			}
+		}
+	};
+
 	const handleSquareClick = (square: string) => {
 		if (gameState !== 'playing' || isGameOver || isPaused) return;
 
@@ -550,10 +601,16 @@ export default function Game() {
 											<div
 												key={sq}
 												onClick={() => handleSquareClick(sq)}
+												onDragOver={handleDragOver}
+												onDrop={(e) => handleDrop(e, sq)}
 												className={`square ${isLight ? 'light' : 'dark'} ${isSel ? 'selected' : ''} ${isLastSrc ? 'last-move-src' : ''} ${isLastDst ? 'last-move-dst' : ''} ${isKingInCheck ? 'check' : ''}`}
 											>
 												{piece && (
-													<span className={`piece ${piece.color === 'w' ? 'white' : 'black'}`}>
+													<span
+														className={`piece ${piece.color === 'w' ? 'white' : 'black'}`}
+														draggable={true}
+														onDragStart={(e) => handleDragStart(e, sq)}
+													>
 														{pieceGlyphs[piece.type]}
 													</span>
 												)}

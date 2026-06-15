@@ -264,8 +264,8 @@
   height: min(65vh, 520px);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-  border: 2px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(59, 130, 246, 0.2);
+  border: 4px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Board Squares */
@@ -281,21 +281,21 @@
 
 /* Alternating colors */
 .square.light {
-  background-color: #f0d9b5; /* classic warm wood cream */
+  background-color: rgba(226, 232, 240, 0.85); /* Slate 200 with transparency */
 }
 
 .square.dark {
-  background-color: #b58863; /* classic warm wood brown */
+  background-color: rgba(71, 85, 105, 0.85); /* Slate 600 with transparency */
 }
 
 /* Highlights */
 .square.selected {
-  background-color: #bac166 !important; /* Soft yellow-green */
+  background-color: rgba(59, 130, 246, 0.6) !important; /* Blue 500 */
 }
 
 .square.last-move-src,
 .square.last-move-dst {
-  background-color: rgba(245, 245, 120, 0.45) !important;
+  background-color: rgba(139, 92, 246, 0.45) !important; /* Violet 500 */
 }
 
 .square.check {
@@ -352,6 +352,11 @@
   justify-content: center;
   transition: transform 0.15s ease;
   z-index: 10;
+  cursor: grab;
+}
+
+.piece:active {
+  cursor: grabbing;
 }
 
 .piece:hover {
@@ -360,14 +365,15 @@
 
 /* Color filters for filled unicode pieces */
 .piece.white {
-  color: #FFFFFF;
-  text-shadow: 0 0 1px #000000;
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 1px rgba(0,0,0,0.5));
+  color: #F8FAFC;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.4));
 }
 
 .piece.black {
-  color: #1a1a24;
-  filter: drop-shadow(0 1.5px 1.5px rgba(255, 255, 255, 0.15));
+  color: #0F172A;
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.2);
+  filter: drop-shadow(0 4px 4px rgba(255, 255, 255, 0.15));
 }
 
 /* Right Panel */
