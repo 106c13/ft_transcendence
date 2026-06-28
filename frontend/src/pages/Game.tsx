@@ -39,6 +39,7 @@ export default function Game() {
 	
 	// Game Outcome States
 	const [isGameOver, setIsGameOver] = useState(false);
+	const [hideGameOverModal, setHideGameOverModal] = useState(false);
 	const [winnerColor, setWinnerColor] = useState<'w' | 'b' | null>(null);
 	const [gameOverReason, setGameOverReason] = useState('');
 
@@ -171,6 +172,7 @@ export default function Game() {
 			setTurn(data.turn);
 			setGameState('playing');
 			setIsGameOver(false);
+			setHideGameOverModal(false);
 			setWinnerColor(null);
 			setGameOverReason('');
 			setSelectedSquare(null);
@@ -216,6 +218,7 @@ export default function Game() {
 			fen: string;
 		}) => {
 			setIsGameOver(true);
+			setHideGameOverModal(false);
 			setWinnerColor(data.winner);
 			setGameOverReason(data.reason);
 			localChess.load(data.fen);
@@ -713,18 +716,25 @@ export default function Game() {
 
 							{/* Resign / Resign actions */}
 							<div className="game-actions">
-								<button className="resign-btn" onClick={resignGame}>
-									🏳️ {t('resign', 'Resign')}
-								</button>
+								{isGameOver ? (
+									<button className="resign-btn" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#60A5FA', borderColor: 'rgba(96, 165, 250, 0.4)' }} onClick={() => setGameState('lobby')}>
+										🏠 {t('back_to_lobby', 'Back to Lobby')}
+									</button>
+								) : (
+									<button className="resign-btn" onClick={resignGame}>
+										🏳️ {t('resign', 'Resign')}
+									</button>
+								)}
 							</div>
 						</div>
 					</div>
 				)}
 
 				{/* Game Over Dialog */}
-				{isGameOver && (
+				{isGameOver && !hideGameOverModal && (
 					<div className="game-over-modal">
 						<div className="game-over-box">
+							<button className="close-modal-x" onClick={() => setHideGameOverModal(true)}>✕</button>
 							<div className="game-over-icon">
 								{winnerColor === playerColor ? '🏆' : winnerColor === null ? '🤝' : '💀'}
 							</div>
@@ -740,7 +750,10 @@ export default function Game() {
 								{gameOverReason === 'DISCONNECTION' && t('reason_disconnection', 'Opponent Disconnected')}
 								{gameOverReason === 'DRAW' && t('reason_draw', 'Draw')}
 							</div>
-							<button className="play-again-btn" onClick={() => setGameState('lobby')}>
+							<button className="play-again-btn" onClick={() => {
+								setIsGameOver(false);
+								startMatchmaking();
+							}}>
 								{t('play_again', 'Play Again')}
 							</button>
 						</div>
