@@ -59,7 +59,7 @@ function Chat() {
 	useEffect(() => {
 		if (!currentUserId) return
 
-		const socket = io('http://localhost:8080', {
+		const socket = io('http://localhost:8080/chat', {
 			query: { userId: currentUserId.toString() },
 			transports: ['websocket'],
 		})

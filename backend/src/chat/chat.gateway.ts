@@ -6,9 +6,10 @@ import {
 	OnGatewayConnection,
 	OnGatewayDisconnect,
 } from '@nestjs/websockets'
-import { Server, Socket } from 'socket.io'
+import { Server, Socket, Namespace } from 'socket.io'
 
 @WebSocketGateway({
+	namespace: '/chat',
 	cors: {
 		origin: 'http://localhost:8080',
 		credentials: true,
@@ -16,7 +17,7 @@ import { Server, Socket } from 'socket.io'
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
-	server: Server
+	server: Namespace
 
 	private userSockets = new Map<number, string>()
 
@@ -41,5 +42,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('send_message')
 	handleMessage(client: Socket, payload: { receiver_id: number; chat_id: string; message: any }) {
 		const receiverSocketId = this.userSockets.get(payload.receiver_id)
+		if (receiverSocketId) {
+			this.server.to(receiverSocketId).emit('new_message', { type: 'new_message', message: payload.message })
+		}
 	}
 }

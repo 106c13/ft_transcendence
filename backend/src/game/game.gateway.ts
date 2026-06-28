@@ -5,11 +5,12 @@ import {
 	OnGatewayConnection,
 	OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server, Socket, Namespace } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 
 @WebSocketGateway({
+	namespace: '/game',
 	cors: {
 		origin: 'http://localhost:8080',
 		credentials: true,
@@ -17,7 +18,7 @@ import { UsersService } from '../users/users.service';
 })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
-	server: Server;
+	server: Namespace;
 
 	constructor(
 		private gameService: GameService,
@@ -90,8 +91,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const roomName = matchGame.gameId;
 
 			// Sockets join room
-			const whiteSocket = this.server.sockets.sockets.get(matchGame.white.socketId);
-			const blackSocket = this.server.sockets.sockets.get(matchGame.black.socketId);
+			const whiteSocket = this.server.sockets.get(matchGame.white.socketId);
+			const blackSocket = this.server.sockets.get(matchGame.black.socketId);
 
 			if (whiteSocket) whiteSocket.join(roomName);
 			if (blackSocket) blackSocket.join(roomName);
@@ -157,11 +158,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('leave_game')
-	handleLeaveGame(client: Socket, payload: { gameId: string }) {
+	handleLeaveGame(client: Socket, payload?: { gameId?: string }) {
 		const userIdStr = client.handshake.query.userId;
 		if (!userIdStr) return;
 
 		const userId = parseInt(userIdStr as string);
-		this.gameService.resign(payload.gameId, userId);
+		if (payload && payload.gameId) {
+			this.gameService.resign(payload.gameId, userId);
+		} else {
+			this.gameService.removeFromQueue(userId);
+		}
 	}
 }

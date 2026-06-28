@@ -139,7 +139,7 @@ export default function Game() {
 	useEffect(() => {
 		if (!currentUser) return;
 
-		const socket = io('http://localhost:8080', {
+		const socket = io('http://localhost:8080/game', {
 			query: { userId: currentUser.id.toString() },
 			transports: ['websocket'],
 		});
