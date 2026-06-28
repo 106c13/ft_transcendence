@@ -70,7 +70,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('find_match')
-	async handleFindMatch(client: Socket, payload: { mode: 'bullet' | 'blitz' | 'rapid' }) {
+	async handleFindMatch(client: Socket, payload: { mode: 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2' }) {
 		const userIdStr = client.handshake.query.userId;
 		if (!userIdStr) {
 			client.emit('error', { message: 'Unauthorized' });

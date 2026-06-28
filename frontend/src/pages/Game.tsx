@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import io, { Socket } from 'socket.io-client';
 import { Chess } from 'chess.js';
@@ -20,6 +20,7 @@ interface User {
 export default function Game() {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
 
 	// Search & layout states (align with Left/Right Sidebars)
 	const [searchQuery, setSearchQuery] = useState('');
@@ -29,8 +30,10 @@ export default function Game() {
 	const [currentUser, setCurrentUser] = useState<User | null>(null);
 
 	// Matchmaking and Game States
-	const [gameState, setGameState] = useState<'lobby' | 'searching' | 'playing'>('lobby');
-	const [selectedMode, setSelectedMode] = useState<'bullet' | 'blitz' | 'rapid'>('blitz');
+	const [gameState, setGameState] = useState<'searching' | 'playing'>('searching');
+	const [selectedMode, setSelectedMode] = useState<'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2'>(
+		(searchParams.get('mode') as any) || 'blitz'
+	);
 	const [opponentName, setOpponentName] = useState('');
 	const [playerColor, setPlayerColor] = useState<'w' | 'b'>('w'); // default to White
 	const [gameId, setGameId] = useState('');
@@ -140,6 +143,9 @@ export default function Game() {
 	useEffect(() => {
 		if (!currentUser) return;
 
+		const modeParam = (searchParams.get('mode') || 'blitz') as 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2';
+		setSelectedMode(modeParam);
+
 		const socket = io('http://localhost:8080/game', {
 			query: { userId: currentUser.id.toString() },
 			transports: ['websocket'],
@@ -148,6 +154,10 @@ export default function Game() {
 
 		socket.on('connect', () => {
 			console.log('Game Socket connected');
+			// Auto-start matchmaking immediately with the mode from URL
+			const mode = (searchParams.get('mode') || 'blitz') as 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2';
+			setGameState('searching');
+			socket.emit('find_match', { mode });
 		});
 
 		socket.on('match_found', (data: {
@@ -234,7 +244,7 @@ export default function Game() {
 		return () => {
 			socket.disconnect();
 		};
-	}, [currentUser, localChess]);
+	}, [currentUser, localChess, searchParams]);
 
 	// Ticking pause grace countdown
 	useEffect(() => {
@@ -288,9 +298,9 @@ export default function Game() {
 	// Cancel Matchmaking Search
 	const cancelMatchmaking = () => {
 		if (socketRef.current) {
-			setGameState('lobby');
 			socketRef.current.emit('leave_game'); // cleans user from matchmaking queues
 		}
+		navigate('/home');
 	};
 
 	// Resignation
@@ -513,52 +523,6 @@ export default function Game() {
 			<RightSidebar currentUser={currentUser} />
 
 			<main className="game-main">
-				{gameState === 'lobby' && (
-					<div className="lobby-card">
-						<h2 className="lobby-title">{t('chess_game', 'Chess Arena')}</h2>
-						<p className="lobby-subtitle">{t('chess_lobby_subtitle', 'Choose game speed and find your opponent')}</p>
-						
-						<div className="mode-selector">
-							<button 
-								className={`mode-button ${selectedMode === 'bullet' ? 'selected' : ''}`}
-								onClick={() => setSelectedMode('bullet')}
-							>
-								<div className="mode-details">
-									<h4>🔥 {t('bullet', 'Bullet')}</h4>
-									<p>1 {t('minute', 'minute')} • {t('bullet_desc', 'Fast and explosive')}</p>
-								</div>
-								<span className="mode-icon">♟️</span>
-							</button>
-
-							<button 
-								className={`mode-button ${selectedMode === 'blitz' ? 'selected' : ''}`}
-								onClick={() => setSelectedMode('blitz')}
-							>
-								<div className="mode-details">
-									<h4>⚡ {t('blitz', 'Blitz')}</h4>
-									<p>3 {t('minutes', 'minutes')} • {t('blitz_desc', 'Standard rapid action')}</p>
-								</div>
-								<span className="mode-icon">♞</span>
-							</button>
-
-							<button 
-								className={`mode-button ${selectedMode === 'rapid' ? 'selected' : ''}`}
-								onClick={() => setSelectedMode('rapid')}
-							>
-								<div className="mode-details">
-									<h4>⏳ {t('rapid', 'Rapid')}</h4>
-									<p>10 {t('minutes', 'minutes')} • {t('rapid_desc', 'Strategic classical thinking')}</p>
-								</div>
-								<span className="mode-icon">♛</span>
-							</button>
-						</div>
-
-						<button className="find-match-btn" onClick={startMatchmaking}>
-							⚔️ {t('find_match_cta', 'Find Opponent')}
-						</button>
-					</div>
-				)}
-
 				{gameState === 'searching' && (
 					<div className="searching-card">
 						<div className="searching-pulse">
@@ -567,7 +531,7 @@ export default function Game() {
 						<h3>{t('searching_match', 'Searching for opponent...')}</h3>
 						<p>{t('searching_desc', 'Filtering by match speed: ')} <strong>{selectedMode}</strong></p>
 						<button className="cancel-match-btn" onClick={cancelMatchmaking}>
-							{t('cancel', 'Cancel Search')}
+							{t('cancel', 'Cancel')}
 						</button>
 					</div>
 				)}
@@ -717,7 +681,7 @@ export default function Game() {
 							{/* Resign / Resign actions */}
 							<div className="game-actions">
 								{isGameOver ? (
-									<button className="resign-btn" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#60A5FA', borderColor: 'rgba(96, 165, 250, 0.4)' }} onClick={() => setGameState('lobby')}>
+									<button className="resign-btn" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#60A5FA', borderColor: 'rgba(96, 165, 250, 0.4)' }} onClick={() => navigate('/home')}>
 										🏠 {t('back_to_lobby', 'Back to Lobby')}
 									</button>
 								) : (

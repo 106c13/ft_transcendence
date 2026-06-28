@@ -28,7 +28,7 @@ export class Match {
 	winner: User;
 
 	@Column()
-	mode: 'bullet' | 'blitz' | 'rapid';
+	mode: 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2';
 
 	@Column()
 	result: string; // 'CHECKMATE', 'STALEMATE', 'TIMEOUT', 'RESIGNATION', 'DRAW'

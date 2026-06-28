@@ -14,6 +14,17 @@ type User = {
 	status?: 'ONLINE' | 'OFFLINE' | 'INGAME'
 }
 
+type GameMode = 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2'
+
+const MODES: { id: GameMode; emoji: string; label: string; time: string; desc: string; increment?: string }[] = [
+	{ id: 'bullet',   emoji: '🔥', label: 'Bullet',   time: '1 min',   desc: 'Fast and explosive' },
+	{ id: 'bullet+2', emoji: '🔥', label: 'Bullet',   time: '1 | +2s', desc: 'Fast with increment', increment: '+2' },
+	{ id: 'blitz',    emoji: '⚡', label: 'Blitz',    time: '3 min',   desc: 'Standard rapid action' },
+	{ id: 'blitz+2',  emoji: '⚡', label: 'Blitz',    time: '3 | +2s', desc: 'Blitz with increment', increment: '+2' },
+	{ id: 'rapid',    emoji: '⏳', label: 'Rapid',    time: '10 min',  desc: 'Strategic classical' },
+	{ id: 'rapid+2',  emoji: '⏳', label: 'Rapid',    time: '10 | +2s',desc: 'Rapid with increment', increment: '+2' },
+]
+
 function Home() {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
@@ -105,6 +116,10 @@ function Home() {
 		}
 	}
 
+	const handlePlayMode = (mode: GameMode) => {
+		navigate(`/game?mode=${encodeURIComponent(mode)}`)
+	}
+
 	return (
 		<div className="home-container">
 			<LeftSidebar
@@ -122,6 +137,28 @@ function Home() {
 			<main className="main-content">
 				<div className="content-header">
 					<h1>{t('welcome', { username: currentUser?.username || 'Player' })}</h1>
+					<p className="content-subtitle">{t('home_subtitle', 'Select a game mode and jump straight into a match')}</p>
+				</div>
+
+				<div className="home-modes-grid">
+					{MODES.map((mode) => (
+						<button
+							key={mode.id}
+							className={`home-mode-card home-mode-${mode.id.replace('+2', '-inc')}`}
+							onClick={() => handlePlayMode(mode.id)}
+						>
+							<div className="home-mode-top">
+								<span className="home-mode-emoji">{mode.emoji}</span>
+								{mode.increment && (
+									<span className="home-mode-inc-badge">+2s / move</span>
+								)}
+							</div>
+							<div className="home-mode-label">{mode.label}</div>
+							<div className="home-mode-time">{mode.time}</div>
+							<div className="home-mode-desc">{mode.desc}</div>
+							<div className="home-mode-play">Play ⚔️</div>
+						</button>
+					))}
 				</div>
 			</main>
 		</div>

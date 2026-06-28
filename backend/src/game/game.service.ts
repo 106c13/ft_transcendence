@@ -16,7 +16,8 @@ export interface ChessGame {
 	white: ChessPlayer;
 	black: ChessPlayer;
 	board: Chess;
-	mode: 'bullet' | 'blitz' | 'rapid';
+	mode: 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2';
+	increment: number; // ms to add per move
 	whiteTime: number; // Remaining time in ms
 	blackTime: number; // Remaining time in ms
 	lastMoveTime: number; // timestamp
@@ -31,10 +32,13 @@ export class GameService {
 	private activeGames = new Map<string, ChessGame>();
 
 	// Matchmaking queues separated by mode
-	private queues: Record<'bullet' | 'blitz' | 'rapid', ChessPlayer[]> = {
+	private queues: Record<'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2', ChessPlayer[]> = {
 		bullet: [],
 		blitz: [],
 		rapid: [],
+		'bullet+2': [],
+		'blitz+2': [],
+		'rapid+2': [],
 	};
 
 	// Callback to notify gateway when timers expire or game state changes
@@ -60,6 +64,9 @@ export class GameService {
 			bullet: this.queues.bullet.length,
 			blitz: this.queues.blitz.length,
 			rapid: this.queues.rapid.length,
+			'bullet+2': this.queues['bullet+2'].length,
+			'blitz+2': this.queues['blitz+2'].length,
+			'rapid+2': this.queues['rapid+2'].length,
 		};
 	}
 
@@ -77,7 +84,7 @@ export class GameService {
 	}
 
 	// Add player to matchmaking queue
-	addToQueue(userId: number, socketId: string, username: string, mode: 'bullet' | 'blitz' | 'rapid'): ChessGame | null {
+	addToQueue(userId: number, socketId: string, username: string, mode: 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2'): ChessGame | null {
 		// 1. Remove from other queues first
 		this.removeFromQueue(userId);
 
@@ -102,7 +109,9 @@ export class GameService {
 			const black = isP1White ? player2 : player1;
 
 			const gameId = `game_${Date.now()}_${white.userId}_${black.userId}`;
-			const initialTime = mode === 'bullet' ? 60000 : mode === 'blitz' ? 180000 : 600000;
+			const baseMode = mode.replace('+2', '') as 'bullet' | 'blitz' | 'rapid';
+			const initialTime = baseMode === 'bullet' ? 60000 : baseMode === 'blitz' ? 180000 : 600000;
+			const increment = mode.endsWith('+2') ? 2000 : 0;
 
 			const newGame: ChessGame = {
 				gameId,
@@ -110,6 +119,7 @@ export class GameService {
 				black,
 				board: new Chess(),
 				mode,
+				increment,
 				whiteTime: initialTime,
 				blackTime: initialTime,
 				lastMoveTime: Date.now(),
@@ -131,7 +141,7 @@ export class GameService {
 
 	// Remove player from matchmaking queue
 	removeFromQueue(userId: number) {
-		for (const mode of ['bullet', 'blitz', 'rapid'] as const) {
+		for (const mode of ['bullet', 'blitz', 'rapid', 'bullet+2', 'blitz+2', 'rapid+2'] as const) {
 			this.queues[mode] = this.queues[mode].filter(p => p.userId !== userId);
 		}
 	}
@@ -192,8 +202,17 @@ export class GameService {
 				game.timer = null;
 			}
 
+			const addIncrement = () => {
+				if (turn === 'w') {
+					game.whiteTime += game.increment;
+				} else {
+					game.blackTime += game.increment;
+				}
+			};
+
 			// Check if game is over
 			if (game.board.isGameOver()) {
+				addIncrement();
 				this.handleGameOver(game);
 				return {
 					move,
@@ -203,6 +222,9 @@ export class GameService {
 					isGameOver: true,
 				};
 			}
+
+			// Add increment for the player who just moved
+			addIncrement();
 
 			// Start timer for the next turn
 			this.startTurnTimer(game);
@@ -422,11 +444,14 @@ export class GameService {
 		}
 	}
 
-	private getGraceSeconds(mode: 'bullet' | 'blitz' | 'rapid'): number {
+	private getGraceSeconds(mode: 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2'): number {
 		switch (mode) {
-			case 'bullet': return 10;
-			case 'blitz': return 30;
-			case 'rapid': return 60;
+			case 'bullet':
+			case 'bullet+2': return 10;
+			case 'blitz':
+			case 'blitz+2': return 30;
+			case 'rapid':
+			case 'rapid+2': return 60;
 		}
 	}
 }
