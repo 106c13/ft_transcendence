@@ -147,6 +147,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		} else {
 			this.server.to(payload.gameId).emit('move_made', {
 				fen: result.fen,
+				san: result.san,
 				lastMove: result.move,
 				turn: result.turn,
 				whiteTime: result.whiteTime,

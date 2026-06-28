@@ -216,6 +216,7 @@ export class GameService {
 				this.handleGameOver(game);
 				return {
 					move,
+					san: move.san,
 					fen: game.board.fen(),
 					whiteTime: game.whiteTime,
 					blackTime: game.blackTime,
@@ -231,6 +232,7 @@ export class GameService {
 
 			return {
 				move,
+				san: move.san,
 				fen: game.board.fen(),
 				whiteTime: game.whiteTime,
 				blackTime: game.blackTime,

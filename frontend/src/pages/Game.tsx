@@ -63,6 +63,15 @@ export default function Game() {
 	const [pendingMove, setPendingMove] = useState<{ from: string; to: string } | null>(null);
 	const [showPromotion, setShowPromotion] = useState(false);
 
+	// Move History for browsing (list of FEN strings after each half-move; index 0 = start)
+	const [moveHistory, setMoveHistory] = useState<string[]>(['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1']);
+	const [viewIndex, setViewIndex] = useState<number>(0); // which half-move we're viewing
+	const moveListRef = useRef<HTMLDivElement>(null);
+	// Separate Chess instance just for rendering past positions
+	const [displayChess] = useState(() => new Chess());
+
+	const [moveSAN, setMoveSAN] = useState<string[]>([]);
+
 	// WebSocket ref
 	const socketRef = useRef<Socket | null>(null);
 	const token = localStorage.getItem('token');
@@ -190,10 +199,24 @@ export default function Game() {
 			setLastMove(null);
 			setIsPaused(data.isPaused || false);
 			setSelectedMode(data.mode);
+			// Reset history — if resuming, load existing moves as snapshots
+			const startFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+			const historyFens: string[] = [startFen];
+			if (data.history && data.history.length > 0) {
+				const replayChess = new Chess();
+				for (const san of data.history) {
+					try { replayChess.move(san); } catch {}
+					historyFens.push(replayChess.fen());
+				}
+			}
+			setMoveHistory(historyFens);
+			setViewIndex(historyFens.length - 1);
+			setMoveSAN(data.history);
 		});
 
 		socket.on('move_made', (data: {
 			fen: string;
+			san: string;
 			lastMove: { from: string; to: string };
 			turn: 'w' | 'b';
 			whiteTime: number;
@@ -210,6 +233,13 @@ export default function Game() {
 			setLastMove(data.lastMove);
 			setSelectedSquare(null);
 			setValidMoves([]);
+			// Append FEN snapshot and jump to latest
+			setMoveHistory(prev => {
+				const next = [...prev, data.fen];
+				setViewIndex(next.length - 1);
+				return next;
+			});
+			setMoveSAN(prev => [...prev, data.san]);
 		});
 
 		socket.on('opponent_disconnected', (data: { userId: number; graceSeconds: number }) => {
@@ -235,6 +265,14 @@ export default function Game() {
 			setBoardFen(data.fen);
 			setIsPaused(false);
 			setPauseCountdown(null);
+			// Make sure the final position is in history
+			setMoveHistory(prev => {
+				const last = prev[prev.length - 1];
+				if (last === data.fen) return prev;
+				const next = [...prev, data.fen];
+				setViewIndex(next.length - 1);
+				return next;
+			});
 		});
 
 		socket.on('error', (err: { message: string }) => {
@@ -269,6 +307,37 @@ export default function Game() {
 
 		return () => clearInterval(timerInterval);
 	}, [gameState, isGameOver, isPaused, turn]);
+
+	// Keyboard navigation for move history
+	useEffect(() => {
+		const handleKey = (e: KeyboardEvent) => {
+			if (gameState !== 'playing') return;
+			const total = moveHistory.length; // indices 0..total-1
+			if (e.key === 'ArrowLeft') {
+				e.preventDefault();
+				setViewIndex(v => Math.max(0, v - 1));
+			} else if (e.key === 'ArrowRight') {
+				e.preventDefault();
+				setViewIndex(v => Math.min(total - 1, v + 1));
+			} else if (e.key === 'ArrowUp') {
+				e.preventDefault();
+				setViewIndex(total - 1); // jump to last move
+			} else if (e.key === 'ArrowDown') {
+				e.preventDefault();
+				setViewIndex(0); // jump to starting position
+			}
+		};
+		window.addEventListener('keydown', handleKey);
+		return () => window.removeEventListener('keydown', handleKey);
+	}, [gameState, moveHistory.length]);
+
+	// Scroll highlighted move into view
+	useEffect(() => {
+		if (moveListRef.current) {
+			const active = moveListRef.current.querySelector('.move-cell.active-move');
+			if (active) active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+		}
+	}, [viewIndex]);
 
 	// Format clock timer
 	const formatTime = (timeMs: number) => {
@@ -485,28 +554,38 @@ export default function Game() {
 		};
 	})();
 
-	// Algebraic chess notation helper
-	const renderedMoveHistory = () => {
-		const history = localChess.history();
-		const rows = [];
-		for (let i = 0; i < history.length; i += 2) {
-			rows.push({
-				num: Math.floor(i / 2) + 1,
-				white: history[i],
-				black: history[i + 1] || '',
-			});
-		}
-		return rows;
-	};
 
 	// Visual indicators for pieces
 	const pieceGlyphs: Record<string, string> = {
 		p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚'
 	};
 
+	// Derive the board to display: either the live board or a past position
+	const isReviewing = viewIndex < moveHistory.length - 1;
+	const displayFen = moveHistory[viewIndex] ?? boardFen;
+	displayChess.load(displayFen);
+
 	// Grid perspectives
 	const ranks = playerColor === 'b' ? ['1', '2', '3', '4', '5', '6', '7', '8'] : ['8', '7', '6', '5', '4', '3', '2', '1'];
 	const files = playerColor === 'b' ? ['h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'] : ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
+	// Build rendered move history rows with half-move index awareness
+	const buildMoveRows = () => {
+		// moveHistory[0] = start, moveHistory[1] = after move 1 (white), etc.
+		// half-move index i corresponds to moveHistory[i+1] (0-based from history[1])
+		const halfMoves = moveHistory.length - 1; // number of half-moves played
+		const rows = [];
+		for (let i = 0; i < halfMoves; i += 2) {
+			rows.push({
+				num: Math.floor(i / 2) + 1,
+				whiteIdx: i,   // half-move index (0-based)
+				blackIdx: i + 1,
+				whiteSan: moveSAN[i] ?? '',
+				blackSan: moveSAN[i + 1] ?? '',
+			});
+		}
+		return rows;
+	};
 
 	return (
 		<div className="game-container">
@@ -552,11 +631,11 @@ export default function Game() {
 							</div>
 
 							{/* Active Board */}
-							<div className="chess-board" data-fen={boardFen}>
+							<div className={`chess-board${isReviewing ? ' reviewing' : ''}`} data-fen={displayFen}>
 								{ranks.map((rank, rankIdx) =>
 									files.map((file, fileIdx) => {
 										const sq = `${file}${rank}`;
-										const piece = localChess.get(sq as Square);
+										const piece = isReviewing ? displayChess.get(sq as Square) : localChess.get(sq as Square);
 										const isLight = (fileIdx + rankIdx) % 2 === 0;
 										const isSel = selectedSquare === sq;
 										const isValid = validMoves.includes(sq);
@@ -666,16 +745,40 @@ export default function Game() {
 
 							{/* Move History Logger */}
 							<div className="move-history-container">
-								<span className="move-history-title">{t('move_history', 'Move Log')}</span>
-								<div className="move-history-list">
-									{renderedMoveHistory().map((row) => (
-										<>
-											<span className="move-row-num" key={`num-${row.num}`}>{row.num}.</span>
-											<span className="move-cell" key={`w-${row.num}`}>{row.white}</span>
-											<span className="move-cell" key={`b-${row.num}`}>{row.black}</span>
-										</>
-									))}
+								<div className="move-history-header">
+									<span className="move-history-title">{t('move_history', 'Move Log')}</span>
+									<div className="move-nav-arrows">
+										<button title="Start" onClick={() => setViewIndex(0)}>⇤</button>
+										<button title="Previous" onClick={() => setViewIndex(v => Math.max(0, v - 1))}>◀</button>
+										<button title="Next" onClick={() => setViewIndex(v => Math.min(moveHistory.length - 1, v + 1))}>▶</button>
+										<button title="Latest" onClick={() => setViewIndex(moveHistory.length - 1)}>⇥</button>
+									</div>
 								</div>
+								<div className="move-history-list" ref={moveListRef}>
+									{buildMoveRows().map((row) => {
+										// viewIndex 0 = start (no move active), 1 = white move 1, 2 = black move 1, etc.
+										const whiteActive = viewIndex === row.whiteIdx + 1;
+										const blackActive = viewIndex === row.blackIdx + 1;
+										return (
+											<>
+												<span className="move-row-num" key={`num-${row.num}`}>{row.num}.</span>
+												<span
+													key={`w-${row.num}`}
+													className={`move-cell${whiteActive ? ' active-move' : ''}`}
+													onClick={() => setViewIndex(row.whiteIdx + 1)}
+												>{row.whiteSan}</span>
+												<span
+													key={`b-${row.num}`}
+													className={`move-cell${blackActive ? ' active-move' : ''}${!row.blackSan ? ' empty-cell' : ''}`}
+													onClick={() => row.blackSan && setViewIndex(row.blackIdx + 1)}
+												>{row.blackSan}</span>
+											</>
+										);
+									})}
+								</div>
+								{isReviewing && (
+									<div className="reviewing-banner">👁 Reviewing — not live</div>
+								)}
 							</div>
 
 							{/* Resign / Resign actions */}
