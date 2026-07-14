@@ -133,7 +133,7 @@ export class UsersService {
 		return this.usersRepo
 			.createQueryBuilder('user')
 			.where('user.username ILIKE :query', { query: `%${query}%` })
-			.select(['user.username', 'user.is_active'])
+			.select(['user.username', 'user.is_active', 'user.avatar'])
 			.limit(5)
 			.getMany()
 	}

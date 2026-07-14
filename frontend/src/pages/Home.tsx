@@ -17,10 +17,6 @@ type User = {
 function Home() {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
-	const [searchQuery, setSearchQuery] = useState('')
-	const [searchResults, setSearchResults] = useState<User[]>([])
-	const [showResults, setShowResults] = useState(false)
-	const [isSearching, setIsSearching] = useState(false)
 	const [currentUser, setCurrentUser] = useState<User | null>(null)
 
 	useEffect(() => {
@@ -51,72 +47,9 @@ function Home() {
 		loadCurrentUser()
 	}, [navigate])
 
-	const handleSearch = async () => {
-		if (!searchQuery.trim()) {
-			setSearchResults([])
-			setShowResults(false)
-			return
-		}
-
-		setIsSearching(true)
-		try {
-			const token = localStorage.getItem('token')
-			const res = await fetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}`, {
-				headers: { Authorization: `Bearer ${token}` },
-			})
-
-			if (res.ok) {
-				const data = await res.json()
-				setSearchResults(data)
-				setShowResults(true)
-			}
-		} catch (error) {
-			console.error('Search error:', error)
-		} finally {
-			setIsSearching(false)
-		}
-	}
-
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			if (searchQuery) {
-				handleSearch()
-			} else {
-				setShowResults(false)
-			}
-		}, 300)
-		return () => clearTimeout(timer)
-	}, [searchQuery])
-
-	const handleUserClick = (username: string) => {
-		setShowResults(false)
-		setSearchQuery('')
-		navigate(`/profile/${username}`)
-	}
-
-	const getStatusDot = (status?: string) => {
-		switch (status) {
-			case 'ONLINE':
-				return <span className="status-dot online"></span>
-			case 'INGAME':
-				return <span className="status-dot ingame"></span>
-			default:
-				return <span className="status-dot offline"></span>
-		}
-	}
-
 	return (
 		<div className="home-container">
-			<LeftSidebar
-				searchQuery={searchQuery}
-				setSearchQuery={setSearchQuery}
-				searchResults={searchResults}
-				showResults={showResults}
-				isSearching={isSearching}
-				onUserClick={handleUserClick}
-				getStatusDot={getStatusDot}
-			/>
-
+			<LeftSidebar />
 			<RightSidebar currentUser={currentUser} />
 
 			<main className="main-content">

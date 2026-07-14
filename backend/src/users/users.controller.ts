@@ -45,8 +45,8 @@ export class UsersController {
 			email: user.email,
 			bio: user.bio,
 			avatar: user.avatar,
-			is_active: user.is_active,
-			last_seen: user.last_seen,
+			//is_active: user.is_active,
+			//last_seen: user.last_seen,
 			created_at: user.created_at,
 			isOwnProfile: true,
 		}

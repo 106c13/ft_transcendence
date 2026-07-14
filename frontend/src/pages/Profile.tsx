@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import './Profile.css'
 import ProfileHeader from '../components/profile/ProfileHeader'
 import FriendsList from '../components/profile/FriendsList'
+import LeftSidebar from '../components/LeftSidebar'
+import RightSidebar from '../components/RightSidebar'
 
 export type User = {
 	id: number
@@ -226,6 +228,8 @@ function Profile() {
 
 	return (
 		<div className="profile-page">
+			<LeftSidebar />
+			<RightSidebar currentUser={user} />
 			<ProfileHeader
 				user={user}
 				isOwnProfile={user.isOwnProfile || false}
