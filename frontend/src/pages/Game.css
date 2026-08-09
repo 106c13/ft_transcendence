@@ -300,6 +300,10 @@
   background-color: rgba(139, 92, 246, 0.45) !important; /* Violet 500 */
 }
 
+.square.premove {
+  background-color: rgba(249, 115, 22, 0.55) !important; /* Orange 500 */
+}
+
 .square.check {
   background-color: rgba(239, 68, 68, 0.5) !important;
   animation: pulse-check 1s infinite alternate;

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import io, { Socket } from 'socket.io-client';
@@ -6,6 +6,42 @@ import { Chess } from 'chess.js';
 import type { Square } from 'chess.js';
 import Navbar from '../components/Navbar';
 import './Game.css';
+
+interface Premove {
+	from: string;
+	to: string;
+	promotion?: string;
+}
+
+const getSimulatedChess = (baseFen: string, color: 'w' | 'b' | null, premoveList: Premove[]) => {
+	const sim = new Chess(baseFen);
+	if (!color || premoveList.length === 0) return sim;
+
+	for (const pm of premoveList) {
+		const tokens = sim.fen().split(' ');
+		tokens[1] = color;
+		sim.load(tokens.join(' '));
+		try {
+			sim.move({ from: pm.from, to: pm.to, promotion: pm.promotion || 'q' });
+		} catch {
+			break;
+		}
+	}
+	return sim;
+};
+
+const getValidMovesForSquare = (simChess: Chess, square: string, color: 'w' | 'b') => {
+	const temp = new Chess(simChess.fen());
+	const tokens = temp.fen().split(' ');
+	tokens[1] = color;
+	temp.load(tokens.join(' '));
+	try {
+		const moves = temp.moves({ square: square as Square, verbose: true });
+		return moves.map(m => m.to);
+	} catch {
+		return [];
+	}
+};
 
 interface User {
 	id: number;
@@ -56,6 +92,17 @@ export default function Game() {
 	// Promotion Modal states
 	const [pendingMove, setPendingMove] = useState<{ from: string; to: string } | null>(null);
 	const [showPromotion, setShowPromotion] = useState(false);
+
+	// Premove States & Refs
+	const [premoves, setPremoves] = useState<Premove[]>([]);
+	const [pendingPremove, setPendingPremove] = useState<Premove | null>(null);
+
+	const premovesRef = useRef<Premove[]>([]);
+	premovesRef.current = premoves;
+	const playerColorRef = useRef<'w' | 'b'>(playerColor);
+	playerColorRef.current = playerColor;
+	const gameIdRef = useRef<string>(gameId);
+	gameIdRef.current = gameId;
 
 	// Move History for browsing (list of FEN strings after each half-move; index 0 = start)
 	const [moveHistory, setMoveHistory] = useState<string[]>(['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1']);
@@ -148,6 +195,7 @@ export default function Game() {
 			setLastMove(null);
 			setIsPaused(data.isPaused || false);
 			setSelectedMode(data.mode);
+			setPremoves([]);
 			// Reset history — if resuming, load existing moves as snapshots
 			const startFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 			const historyFens: string[] = [startFen];
@@ -189,6 +237,34 @@ export default function Game() {
 				return next;
 			});
 			setMoveSAN(prev => [...prev, data.san]);
+
+			// Process Premoves if it's now our turn
+			if (data.turn === playerColorRef.current && premovesRef.current.length > 0) {
+				const nextPremove = premovesRef.current[0];
+				const testChess = new Chess(data.fen);
+				let validMove = null;
+				try {
+					validMove = testChess.move({
+						from: nextPremove.from,
+						to: nextPremove.to,
+						promotion: nextPremove.promotion || 'q',
+					});
+				} catch {}
+
+				if (validMove) {
+					if (socketRef.current && gameIdRef.current) {
+						socketRef.current.emit('make_move', {
+							gameId: gameIdRef.current,
+							from: nextPremove.from,
+							to: nextPremove.to,
+							promotion: nextPremove.promotion,
+						});
+					}
+					setPremoves(prev => prev.slice(1));
+				} else {
+					setPremoves([]);
+				}
+			}
 		});
 
 		socket.on('opponent_disconnected', (data: { userId: number; graceSeconds: number }) => {
@@ -210,6 +286,7 @@ export default function Game() {
 			setHideGameOverModal(false);
 			setWinnerColor(data.winner);
 			setGameOverReason(data.reason);
+			setPremoves([]);
 			localChess.load(data.fen);
 			setBoardFen(data.fen);
 			setIsPaused(false);
@@ -332,16 +409,13 @@ export default function Game() {
 
 	// Piece Click/Movement handlers
 	const handleDragStart = (e: React.DragEvent, square: string) => {
-		if (gameState !== 'playing' || isGameOver || isPaused) {
-			e.preventDefault();
-			return;
-		}
-		if (turn !== playerColor) {
+		if (gameState !== 'playing' || isGameOver || isPaused || isReviewing) {
 			e.preventDefault();
 			return;
 		}
 
-		const piece = localChess.get(square as Square);
+		const simChess = getSimulatedChess(boardFen, playerColor, premoves);
+		const piece = simChess.get(square as Square);
 		if (!piece || piece.color !== playerColor) {
 			e.preventDefault();
 			return;
@@ -351,8 +425,8 @@ export default function Game() {
 		e.dataTransfer.effectAllowed = 'move';
 		
 		setSelectedSquare(square);
-		const moves = localChess.moves({ square: square as Square, verbose: true });
-		setValidMoves(moves.map(m => m.to));
+		const targets = getValidMovesForSquare(simChess, square, playerColor);
+		setValidMoves(targets);
 	};
 
 	const handleDragOver = (e: React.DragEvent) => {
@@ -365,15 +439,28 @@ export default function Game() {
 		
 		if (sourceSquare && sourceSquare !== targetSquare) {
 			if (validMoves.includes(targetSquare)) {
-				const selectedPiece = localChess.get(sourceSquare as Square);
+				const simChess = getSimulatedChess(boardFen, playerColor, premoves);
+				const selectedPiece = simChess.get(sourceSquare as Square);
 				const isPawn = selectedPiece?.type === 'p';
 				const isPromotionRank = targetSquare.endsWith('8') || targetSquare.endsWith('1');
 
+				const isRealTurn = turn === playerColor && premoves.length === 0;
+
 				if (isPawn && isPromotionRank) {
-					setPendingMove({ from: sourceSquare, to: targetSquare });
+					if (isRealTurn) {
+						setPendingMove({ from: sourceSquare, to: targetSquare });
+					} else {
+						setPendingPremove({ from: sourceSquare, to: targetSquare });
+					}
 					setShowPromotion(true);
 				} else {
-					sendMove(sourceSquare, targetSquare);
+					if (isRealTurn) {
+						sendMove(sourceSquare, targetSquare);
+					} else {
+						setPremoves(prev => [...prev, { from: sourceSquare, to: targetSquare }]);
+						setSelectedSquare(null);
+						setValidMoves([]);
+					}
 				}
 			} else {
 				setSelectedSquare(null);
@@ -383,37 +470,42 @@ export default function Game() {
 	};
 
 	const handleSquareClick = (square: string) => {
-		if (gameState !== 'playing' || isGameOver || isPaused) return;
+		if (gameState !== 'playing' || isGameOver || isPaused || isReviewing) return;
 
-		// Verify it's the current player's turn
-		const currentTurnColor = turn;
-		if (currentTurnColor !== playerColor) return;
+		const simChess = getSimulatedChess(boardFen, playerColor, premoves);
+		const piece = simChess.get(square as Square);
 
-		const piece = localChess.get(square as Square);
-
-		// If a piece belongs to the player is clicked, select it
+		// If a piece belonging to the player is clicked, select it
 		if (piece && piece.color === playerColor) {
 			setSelectedSquare(square);
-			
-			// Calculate valid moves
-			const moves = localChess.moves({ square: square as Square, verbose: true });
-			const targets = moves.map(m => m.to);
+			const targets = getValidMovesForSquare(simChess, square, playerColor);
 			setValidMoves(targets);
 			return;
 		}
 
 		// Check if clicked square is in valid move list
 		if (selectedSquare && validMoves.includes(square)) {
-			// Check if move is a pawn promotion (reaches 8th rank for White, 1st for Black)
-			const selectedPiece = localChess.get(selectedSquare as Square);
+			const selectedPiece = simChess.get(selectedSquare as Square);
 			const isPawn = selectedPiece?.type === 'p';
 			const isPromotionRank = square.endsWith('8') || square.endsWith('1');
 
+			const isRealTurn = turn === playerColor && premoves.length === 0;
+
 			if (isPawn && isPromotionRank) {
-				setPendingMove({ from: selectedSquare, to: square });
+				if (isRealTurn) {
+					setPendingMove({ from: selectedSquare, to: square });
+				} else {
+					setPendingPremove({ from: selectedSquare, to: square });
+				}
 				setShowPromotion(true);
 			} else {
-				sendMove(selectedSquare, square);
+				if (isRealTurn) {
+					sendMove(selectedSquare, square);
+				} else {
+					setPremoves(prev => [...prev, { from: selectedSquare, to: square }]);
+					setSelectedSquare(null);
+					setValidMoves([]);
+				}
 			}
 		} else {
 			// Clicked elsewhere, reset selection
@@ -436,7 +528,13 @@ export default function Game() {
 	};
 
 	const handlePromotionSelect = (pieceCode: string) => {
-		if (pendingMove) {
+		if (pendingPremove) {
+			setPremoves(prev => [...prev, { ...pendingPremove, promotion: pieceCode }]);
+			setPendingPremove(null);
+			setShowPromotion(false);
+			setSelectedSquare(null);
+			setValidMoves([]);
+		} else if (pendingMove) {
 			sendMove(pendingMove.from, pendingMove.to, pieceCode);
 			setPendingMove(null);
 			setShowPromotion(false);
@@ -509,10 +607,26 @@ export default function Game() {
 		p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚'
 	};
 
-	// Derive the board to display: either the live board or a past position
+	// Derive the board to display: either the live board, premoved board, or a past position
 	const isReviewing = viewIndex < moveHistory.length - 1;
-	const displayFen = moveHistory[viewIndex] ?? boardFen;
+	const displayFen = useMemo(() => {
+		if (isReviewing) return moveHistory[viewIndex] ?? boardFen;
+		if (premoves.length > 0 && playerColor) {
+			return getSimulatedChess(boardFen, playerColor, premoves).fen();
+		}
+		return boardFen;
+	}, [isReviewing, viewIndex, moveHistory, boardFen, premoves, playerColor]);
+
 	displayChess.load(displayFen);
+
+	const premoveSquares = useMemo(() => {
+		const set = new Set<string>();
+		for (const pm of premoves) {
+			set.add(pm.from);
+			set.add(pm.to);
+		}
+		return set;
+	}, [premoves]);
 
 	// Grid perspectives
 	const ranks = playerColor === 'b' ? ['1', '2', '3', '4', '5', '6', '7', '8'] : ['8', '7', '6', '5', '4', '3', '2', '1'];
@@ -557,7 +671,13 @@ export default function Game() {
 				{gameState === 'playing' && (
 					<div className="game-play-area">
 						{/* Chess Board Area */}
-						<div className="board-container">
+						<div
+							className="board-container"
+							onContextMenu={(e) => {
+								e.preventDefault();
+								setPremoves([]);
+							}}
+						>
 							{/* Opponent Banner */}
 							<div className={`player-banner ${turn !== playerColor ? 'active-turn' : ''} ${(turn !== playerColor && (turn === 'w' ? whiteTime : blackTime) < 15000) ? 'low-time' : ''}`}>
 								<div className="player-info">
@@ -574,12 +694,13 @@ export default function Game() {
 								{ranks.map((rank, rankIdx) =>
 									files.map((file, fileIdx) => {
 										const sq = `${file}${rank}`;
-										const piece = isReviewing ? displayChess.get(sq as Square) : localChess.get(sq as Square);
+										const piece = displayChess.get(sq as Square);
 										const isLight = (fileIdx + rankIdx) % 2 === 0;
 										const isSel = selectedSquare === sq;
 										const isValid = validMoves.includes(sq);
 										const isLastSrc = lastMove?.from === sq;
 										const isLastDst = lastMove?.to === sq;
+										const isPremoveSq = !isReviewing && premoveSquares.has(sq);
 										const isKingInCheck = isCheck && piece?.type === 'k' && piece?.color === turn;
 
 										return (
@@ -588,7 +709,7 @@ export default function Game() {
 												onClick={() => handleSquareClick(sq)}
 												onDragOver={handleDragOver}
 												onDrop={(e) => handleDrop(e, sq)}
-												className={`square ${isLight ? 'light' : 'dark'} ${isSel ? 'selected' : ''} ${isLastSrc ? 'last-move-src' : ''} ${isLastDst ? 'last-move-dst' : ''} ${isKingInCheck ? 'check' : ''}`}
+												className={`square ${isLight ? 'light' : 'dark'} ${isSel ? 'selected' : ''} ${isPremoveSq ? 'premove' : ''} ${isLastSrc ? 'last-move-src' : ''} ${isLastDst ? 'last-move-dst' : ''} ${isKingInCheck ? 'check' : ''}`}
 											>
 												{piece && (
 													<span
