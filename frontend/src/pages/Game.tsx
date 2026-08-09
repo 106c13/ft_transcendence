@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import io, { Socket } from 'socket.io-client';
 import { Chess } from 'chess.js';
 import type { Square } from 'chess.js';
-import LeftSidebar from '../components/LeftSidebar';
-import RightSidebar from '../components/RightSidebar';
+import Navbar from '../components/Navbar';
 import './Game.css';
 
 interface User {
@@ -22,11 +21,6 @@ export default function Game() {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 
-	// Search & layout states (align with Left/Right Sidebars)
-	const [searchQuery, setSearchQuery] = useState('');
-	const [searchResults, setSearchResults] = useState<User[]>([]);
-	const [showResults, setShowResults] = useState(false);
-	const [isSearchingUser, setIsSearchingUser] = useState(false);
 	const [currentUser, setCurrentUser] = useState<User | null>(null);
 
 	// Matchmaking and Game States
@@ -101,52 +95,7 @@ export default function Game() {
 		loadCurrentUser();
 	}, [navigate, token]);
 
-	// Search bar handlers
-	useEffect(() => {
-		const handleSearch = async () => {
-			if (!searchQuery.trim()) {
-				setSearchResults([]);
-				setShowResults(false);
-				return;
-			}
-			setIsSearchingUser(true);
-			try {
-				const res = await fetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}`, {
-					headers: { Authorization: `Bearer ${token}` },
-				});
-				if (res.ok) {
-					const data = await res.json();
-					setSearchResults(data);
-					setShowResults(true);
-				}
-			} catch (error) {
-				console.error('Search error:', error);
-			} finally {
-				setIsSearchingUser(false);
-			}
-		};
 
-		const timer = setTimeout(() => {
-			if (searchQuery) handleSearch();
-			else setShowResults(false);
-		}, 300);
-
-		return () => clearTimeout(timer);
-	}, [searchQuery, token]);
-
-	const handleUserClick = (username: string) => {
-		setShowResults(false);
-		setSearchQuery('');
-		navigate(`/profile/${username}`);
-	};
-
-	const getStatusDot = (status?: string) => {
-		switch (status) {
-			case 'ONLINE': return <span className="status-dot online"></span>;
-			case 'INGAME': return <span className="status-dot ingame"></span>;
-			default: return <span className="status-dot offline"></span>;
-		}
-	};
 
 	// WebSocket connection coordination
 	useEffect(() => {
@@ -589,17 +538,7 @@ export default function Game() {
 
 	return (
 		<div className="game-container">
-			<LeftSidebar
-				searchQuery={searchQuery}
-				setSearchQuery={setSearchQuery}
-				searchResults={searchResults}
-				showResults={showResults}
-				isSearching={isSearchingUser}
-				onUserClick={handleUserClick}
-				getStatusDot={getStatusDot}
-			/>
-
-			<RightSidebar currentUser={currentUser} />
+			<Navbar currentUser={currentUser} />
 
 			<main className="game-main">
 				{gameState === 'searching' && (

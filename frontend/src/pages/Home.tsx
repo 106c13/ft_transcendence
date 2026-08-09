@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import './Home.css'
-import LeftSidebar from '../components/LeftSidebar'
-import RightSidebar from '../components/RightSidebar'
+import Navbar from '../components/Navbar'
 
 type User = {
 	id: number
@@ -122,22 +121,56 @@ function Home() {
 
 	return (
 		<div className="home-container">
-			<LeftSidebar
-				searchQuery={searchQuery}
-				setSearchQuery={setSearchQuery}
-				searchResults={searchResults}
-				showResults={showResults}
-				isSearching={isSearching}
-				onUserClick={handleUserClick}
-				getStatusDot={getStatusDot}
-			/>
-
-			<RightSidebar currentUser={currentUser} />
+			<Navbar currentUser={currentUser} />
 
 			<main className="main-content">
 				<div className="content-header">
 					<h1>{t('welcome', { username: currentUser?.username || 'Player' })}</h1>
 					<p className="content-subtitle">{t('home_subtitle', 'Select a game mode and jump straight into a match')}</p>
+				</div>
+
+				{/* Central Search Section */}
+				<div className="home-search-section">
+					<div className="home-search-container">
+						<span className="home-search-icon">🔍</span>
+						<input
+							type="text"
+							placeholder={t('search_placeholder', 'Search players...')}
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+							className="home-search-input"
+						/>
+						{isSearching && <span className="home-search-spinner"></span>}
+
+						{showResults && searchResults.length > 0 && (
+							<div className="home-search-results">
+								{searchResults.map((user) => (
+									<div
+										key={user.username}
+										className="home-search-result-item"
+										onClick={() => handleUserClick(user.username)}
+									>
+										<img
+											src={user.avatar ? `/uploads/${user.avatar}` : `/assets/default.jpg`}
+											alt={user.username}
+											className="home-search-result-avatar"
+										/>
+										<div className="home-search-result-info">
+											<div className="home-search-result-name">{user.username}</div>
+											{user.bio && <div className="home-search-result-bio">{user.bio}</div>}
+										</div>
+										{getStatusDot(user.status)}
+									</div>
+								))}
+							</div>
+						)}
+
+						{showResults && searchResults.length === 0 && searchQuery && (
+							<div className="home-search-results empty">
+								{t('no_users_found', 'No users found')}
+							</div>
+						)}
+					</div>
 				</div>
 
 				<div className="home-modes-grid">

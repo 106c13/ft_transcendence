@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import './Profile.css'
+import Navbar from '../components/Navbar'
 
 function Settings() {
 	const { t } = useTranslation()
@@ -14,6 +15,7 @@ function Settings() {
 	const [bio, setBio] = useState('')
 	const [msg, setMsg] = useState('')
 	const [error, setError] = useState(false)
+	const [currentUser, setCurrentUser] = useState<any>(null)
 	const navigate = useNavigate()
 
 	useEffect(() => {
@@ -31,6 +33,7 @@ function Settings() {
 		})
 			.then(res => res.json())
 			.then(data => {
+				setCurrentUser(data)
 				setUsername(data.username)
 				setEmail(data.email)
 				setBio(data.bio || '')
@@ -120,7 +123,8 @@ function Settings() {
 	}
 
 	return (
-		<div className="auth-page">
+		<div className="profile-page">
+			<Navbar currentUser={currentUser} />
 			<div className="card">
 				<h1>{t('settings')}</h1>
 
