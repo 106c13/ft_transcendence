@@ -22,8 +22,8 @@ export interface ChessGame {
 	blackTime: number; // Remaining time in ms
 	lastMoveTime: number; // timestamp
 	timer: NodeJS.Timeout | null;
-	disconnectTimer: NodeJS.Timeout | null;
-	disconnectedPlayerId: number | null;
+	disconnectTimers: Map<number, NodeJS.Timeout>;
+	disconnectedPlayerIds: Set<number>;
 }
 
 @Injectable()
@@ -124,8 +124,8 @@ export class GameService {
 				blackTime: initialTime,
 				lastMoveTime: Date.now(),
 				timer: null,
-				disconnectTimer: null,
-				disconnectedPlayerId: null,
+				disconnectTimers: new Map(),
+				disconnectedPlayerIds: new Set(),
 			};
 
 			this.activeGames.set(gameId, newGame);
@@ -153,7 +153,7 @@ export class GameService {
 			return { error: 'Game not found' };
 		}
 
-		if (game.disconnectedPlayerId !== null) {
+		if (game.disconnectedPlayerIds.size > 0) {
 			return { error: 'Game paused. Opponent is disconnected' };
 		}
 
@@ -272,48 +272,69 @@ export class GameService {
 			return;
 		}
 
-		// If they are in a game, pause game clocks and start disconnection grace timer
-		if (game.disconnectedPlayerId === null) {
-			game.disconnectedPlayerId = userId;
+		if (game.disconnectedPlayerIds.has(userId)) return;
 
-			// Pause turn timer
-			if (game.timer) {
-				clearTimeout(game.timer);
-				game.timer = null;
+		game.disconnectedPlayerIds.add(userId);
+
+		// If both players disconnect, finish game immediately as DRAW
+		if (game.disconnectedPlayerIds.size === 2) {
+			for (const timer of game.disconnectTimers.values()) {
+				clearTimeout(timer);
 			}
+			game.disconnectTimers.clear();
 
-			// Subtract time elapsed before disconnection
-			const now = Date.now();
-			const elapsed = now - game.lastMoveTime;
-			if (game.board.turn() === 'w') {
-				game.whiteTime = Math.max(0, game.whiteTime - elapsed);
-			} else {
-				game.blackTime = Math.max(0, game.blackTime - elapsed);
-			}
-
-			// Notify other player
-			this.gameEventsCallback('opponent_disconnected', game, {
-				userId,
-				graceSeconds: this.getGraceSeconds(game.mode),
-			});
-
-			// Start grace period countdown
-			const graceMs = this.getGraceSeconds(game.mode) * 1000;
-			game.disconnectTimer = setTimeout(() => {
-				// Grace period expired, opponent wins
-				const winnerColor = game.white.userId === userId ? 'b' : 'w';
-				const reason = 'DISCONNECTION';
-
-				this.saveMatch(game, reason, winnerColor).then(() => {
-					this.gameEventsCallback('game_over', game, {
-						winner: winnerColor,
-						reason,
-						fen: game.board.fen(),
-					});
-					this.activeGames.delete(game.gameId);
+			const reason = 'DRAW';
+			this.saveMatch(game, reason, null).then(() => {
+				this.gameEventsCallback('game_over', game, {
+					winner: null,
+					reason,
+					fen: game.board.fen(),
 				});
-			}, graceMs);
+				this.activeGames.delete(game.gameId);
+			});
+			return;
 		}
+
+		// Pause turn timer if first player disconnected
+		if (game.timer) {
+			clearTimeout(game.timer);
+			game.timer = null;
+		}
+
+		// Subtract time elapsed before disconnection
+		const now = Date.now();
+		const elapsed = now - game.lastMoveTime;
+		if (game.board.turn() === 'w') {
+			game.whiteTime = Math.max(0, game.whiteTime - elapsed);
+		} else {
+			game.blackTime = Math.max(0, game.blackTime - elapsed);
+		}
+
+		// Notify other player
+		this.gameEventsCallback('opponent_disconnected', game, {
+			userId,
+			graceSeconds: this.getGraceSeconds(game.mode),
+		});
+
+		// Start grace period countdown for this user
+		const graceMs = this.getGraceSeconds(game.mode) * 1000;
+		const timer = setTimeout(() => {
+			game.disconnectTimers.delete(userId);
+			// Grace period expired, opponent wins
+			const winnerColor = game.white.userId === userId ? 'b' : 'w';
+			const reason = 'DISCONNECTION';
+
+			this.saveMatch(game, reason, winnerColor).then(() => {
+				this.gameEventsCallback('game_over', game, {
+					winner: winnerColor,
+					reason,
+					fen: game.board.fen(),
+				});
+				this.activeGames.delete(game.gameId);
+			});
+		}, graceMs);
+
+		game.disconnectTimers.set(userId, timer);
 	}
 
 	// Handle player reconnecting to WebSocket
@@ -321,13 +342,14 @@ export class GameService {
 		const game = this.getGameByUserId(userId);
 		if (!game) return null;
 
-		if (game.disconnectedPlayerId === userId) {
-			// Clear disconnection grace timer
-			if (game.disconnectTimer) {
-				clearTimeout(game.disconnectTimer);
-				game.disconnectTimer = null;
+		if (game.disconnectedPlayerIds.has(userId)) {
+			// Clear disconnection grace timer for this user
+			const timer = game.disconnectTimers.get(userId);
+			if (timer) {
+				clearTimeout(timer);
+				game.disconnectTimers.delete(userId);
 			}
-			game.disconnectedPlayerId = null;
+			game.disconnectedPlayerIds.delete(userId);
 
 			// Update socket ID
 			if (game.white.userId === userId) {
@@ -336,9 +358,11 @@ export class GameService {
 				game.black.socketId = newSocketId;
 			}
 
-			// Resume turn timer
-			game.lastMoveTime = Date.now();
-			this.startTurnTimer(game);
+			// Resume turn timer if all players reconnected
+			if (game.disconnectedPlayerIds.size === 0) {
+				game.lastMoveTime = Date.now();
+				this.startTurnTimer(game);
+			}
 
 			// Notify opponent
 			this.gameEventsCallback('opponent_reconnected', game, { userId });
@@ -419,10 +443,10 @@ export class GameService {
 			clearTimeout(game.timer);
 			game.timer = null;
 		}
-		if (game.disconnectTimer) {
-			clearTimeout(game.disconnectTimer);
-			game.disconnectTimer = null;
+		for (const timer of game.disconnectTimers.values()) {
+			clearTimeout(timer);
 		}
+		game.disconnectTimers.clear();
 
 		let winnerId: number | null = null;
 		if (winnerColor === 'w') {
