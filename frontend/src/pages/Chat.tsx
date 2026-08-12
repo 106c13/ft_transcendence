@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import io, { Socket } from 'socket.io-client'
 import './Chat.css'
+import Navbar from '../components/Navbar'
 
 type Chat = {
 	id: number
@@ -30,6 +31,7 @@ function Chat() {
 	const [messages, setMessages] = useState<Message[]>([])
 	const [newMessage, setNewMessage] = useState('')
 	const [currentUserId, setCurrentUserId] = useState<number | null>(null)
+	const [currentUser, setCurrentUser] = useState<any>(null)
 	const { t } = useTranslation()
 	const socketRef = useRef<Socket | null>(null)
 	const selectedChatRef = useRef(selectedChat) // ADD THIS
@@ -51,7 +53,10 @@ function Chat() {
 			headers: { Authorization: `Bearer ${token}` }
 		})
 			.then(res => res.json())
-			.then(data => setCurrentUserId(data.id))
+			.then(data => {
+				setCurrentUserId(data.id)
+				setCurrentUser(data)
+			})
 			.catch(err => console.error(err))
 	}, [])
 
@@ -59,7 +64,7 @@ function Chat() {
 	useEffect(() => {
 		if (!currentUserId) return
 
-		const socket = io('http://localhost:8080', {
+		const socket = io('http://localhost:8080/chat', {
 			query: { userId: currentUserId.toString() },
 			transports: ['websocket'],
 		})
@@ -159,7 +164,6 @@ function Chat() {
 
 		if (res.ok) {
 			const message = await res.json()
-			setMessages([...messages, message])
 			setNewMessage('')
 			
 			const otherUser = getOtherUser(selectedChat)
@@ -183,14 +187,10 @@ function Chat() {
 	}
 
 	return (
-		<div className="chat-container">
+		<div className="chat-page">
+			<Navbar currentUser={currentUser} />
+			<div className="chat-container">
 			<div className="chat-sidebar">
-				<div
-					className="chat-sidebar-header"
-					onClick={() => navigate('/home')}
-				>
-					<h2>ft_transcendence</h2>
-				</div>
 				<div className="chat-list">
 					{chats.map(chat => {
 						const otherUser = getOtherUser(chat)
@@ -271,6 +271,7 @@ function Chat() {
 						<p>{t('select_chat')}</p>
 					</div>
 				)}
+			</div>
 			</div>
 		</div>
 	)

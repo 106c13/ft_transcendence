@@ -1,10 +1,19 @@
 /* Chat.css */
 
-.chat-container {
+/* Add this - wrapper for the entire chat page */
+.chat-page {
 	display: flex;
+	flex-direction: column;
 	height: 100vh;
 	background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+}
+
+.chat-container {
+	display: flex;
+	flex: 1; /* Take remaining space after navbar */
+	overflow: hidden;
 	color: #E2E8F0;
+	background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
 }
 
 /* Sidebar */
@@ -15,11 +24,13 @@
 	border-right: 1px solid rgba(148, 163, 184, 0.12);
 	display: flex;
 	flex-direction: column;
+	height: 100%; /* Take full height of parent */
 }
 
 .chat-sidebar-header {
 	padding: 24px 20px;
 	border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+	flex-shrink: 0;
 }
 
 .chat-sidebar-header h2 {
@@ -84,6 +95,7 @@
 	display: flex;
 	flex-direction: column;
 	background: #0F172A;
+	height: 100%; /* Take full height of parent */
 }
 
 .chat-main-header {
@@ -95,6 +107,7 @@
 	background: rgba(30, 41, 59, 0.95);
 	backdrop-filter: blur(10px);
 	border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+	flex-shrink: 0;
 }
 
 .chat-main-avatar {
@@ -189,6 +202,7 @@
 	background: rgba(30, 41, 59, 0.95);
 	backdrop-filter: blur(10px);
 	border-top: 1px solid rgba(148, 163, 184, 0.12);
+	flex-shrink: 0;
 }
 
 .chat-input-area input {
