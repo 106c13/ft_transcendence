@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import './Profile.css'
 import ProfileHeader from '../components/profile/ProfileHeader'
 import FriendsList from '../components/profile/FriendsList'
+import GamesList from '../components/profile/GamesList'
 import Navbar from '../components/Navbar'
 
 export type User = {
@@ -24,19 +25,24 @@ export type FriendStatus =
 	| 'RECEIVED'
 	| 'SENT'
 
-function Profile() {
+type ProfileProps = {
+	defaultTab?: 'overview' | 'games' | 'friends'
+}
+
+function Profile({ defaultTab = 'overview' }: ProfileProps) {
 	const { t } = useTranslation()
 	const [user, setUser] = useState<User | null>(null)
 	const [error] = useState('')
 	const [menuOpen, setMenuOpen] = useState(false)
 	const [friendStatus, setFriendStatus] = useState<FriendStatus>('NONE')
 	const [activeTab, setActiveTab] =
-		useState<'overview' | 'games' | 'friends'>('overview')
+		useState<'overview' | 'games' | 'friends'>(defaultTab)
 	const [friends, setFriends] = useState<User[]>([])
 	const isLoggedIn = !!localStorage.getItem('token')
 
 	const navigate = useNavigate()
 	const { username } = useParams()
+
 
 	const loadFriendStatus = async (token: string, username: string) => {
 		try {
@@ -253,8 +259,8 @@ function Profile() {
 				</div>
 
 				<div
-					className="tab"
-					onClick={() => navigate(`/profile/${user.username}/games`)}
+					className={`tab ${activeTab === 'games' ? 'active' : ''}`}
+					onClick={() => setActiveTab('games')}
 				>
 					{t('games')}
 				</div>
@@ -274,12 +280,20 @@ function Profile() {
 				<div className="profile-content">{t('overview_content')}</div>
 			)}
 
+			{activeTab === 'games' && (
+				<GamesList
+					username={user.username}
+					isOwnProfile={user.isOwnProfile}
+				/>
+			)}
+
 			{activeTab === 'friends' && (
 				<FriendsList
 					friends={friends}
 					onOpenProfile={(username) => navigate(`/profile/${username}`)}
 				/>
 			)}
+
 		</div>
 	)
 }

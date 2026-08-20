@@ -480,4 +480,26 @@ export class GameService {
 			case 'rapid+2': return 60;
 		}
 	}
+
+	async getMatchesByUsername(username: string): Promise<Match[]> {
+		const user = await this.userRepo.findOne({ where: { username } });
+		if (!user) return [];
+
+		return this.matchRepo.find({
+			where: [
+				{ white_id: user.id },
+				{ black_id: user.id },
+			],
+			relations: ['white', 'black', 'winner'],
+			order: { played_at: 'DESC' },
+		});
+	}
+
+	async getMatchById(id: number): Promise<Match | null> {
+		return this.matchRepo.findOne({
+			where: { id },
+			relations: ['white', 'black', 'winner'],
+		});
+	}
 }
+

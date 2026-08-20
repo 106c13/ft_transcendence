@@ -7,8 +7,8 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./frontend/dist:/usr/share/nginx/html
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./frontend/dist:/usr/share/nginx/html:Z
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:Z
     networks:
       - ft_transcendence
 
@@ -31,7 +31,7 @@ services:
     env_file:
       - .env
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data:Z
     networks:
       - ft_transcendence
 

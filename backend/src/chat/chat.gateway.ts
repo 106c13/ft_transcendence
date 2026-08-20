@@ -11,10 +11,11 @@ import { Server, Socket, Namespace } from 'socket.io'
 @WebSocketGateway({
 	namespace: '/chat',
 	cors: {
-		origin: 'http://localhost:8080',
+		origin: true,
 		credentials: true,
 	},
 })
+
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Namespace

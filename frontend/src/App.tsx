@@ -23,6 +23,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
 		<Route path="/profile/settings" element={<Settings />} />
 		<Route path="/profile/:username" element={<Profile />} />
+		<Route path="/profile/:username/games" element={<Profile defaultTab="games" />} />
 
 		<Route path="/home" element={<Home />} />
 
