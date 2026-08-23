@@ -112,6 +112,24 @@ function GamesList({ username, isOwnProfile }: Props) {
 		}
 	}
 
+	const handleDownloadPgn = (match: MatchRecord) => {
+		if (!match.pgn) return
+		const whiteName = match.white?.username || 'White'
+		const blackName = match.black?.username || 'Black'
+		const dateStr = match.played_at ? new Date(match.played_at).toISOString().split('T')[0] : 'match'
+		const filename = `${whiteName}_vs_${blackName}_${dateStr}.pgn`
+
+		const blob = new Blob([match.pgn], { type: 'application/x-chess-pgn;charset=utf-8' })
+		const url = URL.createObjectURL(blob)
+		const link = document.createElement('a')
+		link.href = url
+		link.download = filename
+		document.body.appendChild(link)
+		link.click()
+		document.body.removeChild(link)
+		URL.revokeObjectURL(url)
+	}
+
 	if (loading) {
 		return (
 			<div className="games-list-container">
@@ -176,24 +194,41 @@ function GamesList({ username, isOwnProfile }: Props) {
 					</div>
 				</div>
 
-				{/* Analysis tab content placeholder */}
+				{/* Analysis in progress view */}
 				<div className="analysis-placeholder-card">
-					<div className="placeholder-icon">🔍♟️</div>
-					<h3>{t('analyze_game', 'Analyze Game')}</h3>
-					<p className="placeholder-desc">
-						{t('analysis_coming_soon', 'Analysis board and engine evaluation will be available soon.')}
+					<div className="analysis-anim-container">
+						<div className="analysis-pulse-ring-outer"></div>
+						<div className="analysis-pulse-ring"></div>
+						<div className="analysis-anim-icon">♟️</div>
+					</div>
+
+
+					<h3 className="analysis-title">{t('analyzing_game', 'Analyzing game...')}</h3>
+					
+					<div className="analysis-progressbar-container">
+						<div className="analysis-progressbar-fill"></div>
+					</div>
+
+					<p className="analysis-status-text">
+						{t('evaluating_moves', 'Evaluating moves and critical moments with chess engine...')}
 					</p>
 
 					{selectedGame.pgn && (
-						<div className="pgn-preview-box">
-							<span className="pgn-label">PGN Notation:</span>
-							<pre className="pgn-text">{selectedGame.pgn}</pre>
+						<div className="pgn-download-section">
+							<button
+								className="download-pgn-btn"
+								onClick={() => handleDownloadPgn(selectedGame)}
+							>
+								📥 {t('download_pgn', 'Download PGN')}
+							</button>
 						</div>
 					)}
 				</div>
 			</div>
 		)
 	}
+
+
 
 	return (
 		<div className="games-list-container">

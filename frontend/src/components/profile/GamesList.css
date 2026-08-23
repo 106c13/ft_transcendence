@@ -402,53 +402,144 @@
 	background: #1E293B;
 	border: 1px solid rgba(148, 163, 184, 0.12);
 	border-radius: 14px;
-	padding: 36px 24px;
+	padding: 44px 24px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	text-align: center;
-	gap: 12px;
+	gap: 16px;
 }
 
-.placeholder-icon {
-	font-size: 40px;
-}
-
-.placeholder-desc {
-	font-size: 14px;
-	color: #94A3B8;
-	max-width: 480px;
-	margin: 0;
-}
-
-.pgn-preview-box {
-	margin-top: 16px;
-	width: 100%;
-	max-width: 700px;
-	background: #0F172A;
-	border: 1px solid rgba(148, 163, 184, 0.15);
-	border-radius: 10px;
-	padding: 16px;
-	text-align: left;
-}
-
-.pgn-label {
-	font-size: 12px;
-	font-weight: 700;
-	color: #60A5FA;
-	text-transform: uppercase;
-	display: block;
+/* Animated Analysis Rings & Icon */
+.analysis-anim-container {
+	position: relative;
+	width: 90px;
+	height: 90px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	margin-bottom: 8px;
 }
 
-.pgn-text {
-	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-	font-size: 13px;
-	color: #CBD5E1;
-	white-space: pre-wrap;
-	word-break: break-word;
-	line-height: 1.5;
-	margin: 0;
-	max-height: 200px;
-	overflow-y: auto;
+.analysis-anim-icon {
+	font-size: 38px;
+	z-index: 2;
+	animation: enginePulse 2s infinite ease-in-out;
 }
+
+.analysis-pulse-ring {
+	position: absolute;
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	background: rgba(59, 130, 246, 0.2);
+	border: 2px solid rgba(96, 165, 250, 0.6);
+	animation: pulseRing 2s infinite ease-out;
+}
+
+.analysis-pulse-ring-outer {
+	position: absolute;
+	width: 84px;
+	height: 84px;
+	border-radius: 50%;
+	background: rgba(59, 130, 246, 0.08);
+	border: 1px dashed rgba(96, 165, 250, 0.35);
+	animation: rotateRing 8s infinite linear;
+}
+
+@keyframes enginePulse {
+	0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.4)); }
+	50% { transform: scale(1.1); filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.8)); }
+}
+
+@keyframes pulseRing {
+	0% { transform: scale(0.8); opacity: 0.8; }
+	50% { transform: scale(1.25); opacity: 0.3; }
+	100% { transform: scale(0.8); opacity: 0.8; }
+}
+
+@keyframes rotateRing {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
+.analysis-title {
+	font-size: 20px;
+	font-weight: 700;
+	color: #F1F5F9;
+	margin: 0;
+	letter-spacing: 0.2px;
+}
+
+/* Progress bar */
+.analysis-progressbar-container {
+	width: 100%;
+	max-width: 320px;
+	height: 6px;
+	background: #0F172A;
+	border-radius: 6px;
+	overflow: hidden;
+	position: relative;
+	border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.analysis-progressbar-fill {
+	position: absolute;
+	top: 0;
+	left: -50%;
+	width: 50%;
+	height: 100%;
+	background: linear-gradient(90deg, transparent, #3B82F6, #60A5FA, transparent);
+	border-radius: 6px;
+	animation: progressScan 1.6s infinite ease-in-out;
+}
+
+@keyframes progressScan {
+	0% { left: -50%; width: 40%; }
+	50% { left: 30%; width: 60%; }
+	100% { left: 110%; width: 40%; }
+}
+
+.analysis-status-text {
+	font-size: 14px;
+	color: #94A3B8;
+	max-width: 440px;
+	margin: 0;
+	line-height: 1.4;
+}
+
+/* PGN Download Section */
+.pgn-download-section {
+	margin-top: 14px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.download-pgn-btn {
+	background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+	color: #FFFFFF;
+	border: 1px solid rgba(147, 197, 253, 0.3);
+	padding: 11px 24px;
+	border-radius: 10px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+}
+
+.download-pgn-btn:hover {
+	transform: translateY(-2px);
+	background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+	box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+}
+
+.download-pgn-btn:active {
+	transform: translateY(0);
+}
+
+

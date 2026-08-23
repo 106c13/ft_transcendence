@@ -21,9 +21,20 @@ services:
       - .env
     depends_on:
       - db
+      - engine
     networks:
       - ft_transcendence
     restart: on-failure
+
+  engine:
+    build: ./engine
+    container_name: engine
+    expose:
+      - "5000"
+    networks:
+      - ft_transcendence
+    restart: on-failure
+
 
   db:
     build: ./db
