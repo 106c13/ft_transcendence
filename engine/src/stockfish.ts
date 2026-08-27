@@ -16,7 +16,7 @@ export class StockfishService {
 		this.enginePath = enginePath;
 	}
 
-	async evaluatePosition(fen: string, depth: number = 12): Promise<EvalResult> {
+	async evaluatePosition(fen: string, depth: number = 20): Promise<EvalResult> {
 		return new Promise((resolve, reject) => {
 			let process: ChildProcessWithoutNullStreams;
 			try {
@@ -46,7 +46,8 @@ export class StockfishService {
 					pv: latestPv,
 					depth: latestDepth,
 				});
-			}, 3500);
+			}, 6000);
+
 
 			rl.on('line', (line: string) => {
 				if (line.startsWith('info') && line.includes('score')) {

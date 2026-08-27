@@ -580,8 +580,9 @@ function GamesList({ username, isOwnProfile }: Props) {
 											<div className="engine-live-stats">
 												<div className="engine-stat-item">
 													<span className="stat-name">Engine:</span>
-													<span className="stat-val">Stockfish (Depth 12)</span>
+													<span className="stat-val">Stockfish (Depth 20)</span>
 												</div>
+
 												<div className="engine-stat-item">
 													<span className="stat-name">Eval Score:</span>
 													<span className="stat-val">{evalInfo.scoreText}</span>

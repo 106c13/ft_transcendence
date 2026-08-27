@@ -17,7 +17,7 @@ app.get('/health', (req, res) => {
 });
 
 app.post('/analyze', async (req, res) => {
-	const { pgn, depth = 12 } = req.body;
+	const { pgn, depth = 20 } = req.body;
 	if (!pgn) {
 		return res.status(400).json({ error: 'Missing pgn in request body' });
 	}
@@ -25,9 +25,10 @@ app.post('/analyze', async (req, res) => {
 	try {
 		console.log(`[Engine] Analyzing match (PGN length: ${pgn.length}, depth: ${depth})...`);
 		const startTime = Date.now();
-		const result = await analyzer.analyzeGame(pgn, Math.min(Math.max(depth, 8), 16));
+		const result = await analyzer.analyzeGame(pgn, Math.min(Math.max(depth, 8), 24));
 		const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
 		console.log(`[Engine] Analysis completed in ${elapsed}s for ${result.positions.length} moves.`);
+
 
 		res.json(result);
 	} catch (err: any) {
