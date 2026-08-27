@@ -524,8 +524,9 @@ export class GameService {
 		const response = await fetch(engineUrl, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ pgn: match.pgn, depth: 20 }),
+			body: JSON.stringify({ pgn: match.pgn, depth: 15 }),
 		});
+
 
 
 		if (!response.ok) {

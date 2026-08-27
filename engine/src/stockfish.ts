@@ -16,7 +16,8 @@ export class StockfishService {
 		this.enginePath = enginePath;
 	}
 
-	async evaluatePosition(fen: string, depth: number = 20): Promise<EvalResult> {
+	async evaluatePosition(fen: string, depth: number = 15): Promise<EvalResult> {
+
 		return new Promise((resolve, reject) => {
 			let process: ChildProcessWithoutNullStreams;
 			try {

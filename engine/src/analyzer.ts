@@ -138,7 +138,8 @@ export class GameAnalyzer {
 		this.stockfish = stockfish;
 	}
 
-	async analyzeGame(pgn: string, depth: number = 20): Promise<GameAnalysisResult> {
+	async analyzeGame(pgn: string, depth: number = 15): Promise<GameAnalysisResult> {
+
 		const chess = new Chess();
 		try {
 			chess.loadPgn(pgn);

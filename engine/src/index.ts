@@ -17,8 +17,9 @@ app.get('/health', (req, res) => {
 });
 
 app.post('/analyze', async (req, res) => {
-	const { pgn, depth = 20 } = req.body;
+	const { pgn, depth = 15 } = req.body;
 	if (!pgn) {
+
 		return res.status(400).json({ error: 'Missing pgn in request body' });
 	}
 
