@@ -501,5 +501,48 @@ export class GameService {
 			relations: ['white', 'black', 'winner'],
 		});
 	}
+
+	async analyzeMatch(id: number): Promise<any> {
+		const match = await this.matchRepo.findOne({
+			where: { id },
+			relations: ['white', 'black', 'winner'],
+		});
+
+		if (!match) {
+			throw new Error('Match not found');
+		}
+
+		if (match.analysis) {
+			return match.analysis;
+		}
+
+		if (!match.pgn) {
+			return { accuracy: { white: 100, black: 100 }, summary: { white: {}, black: {} }, positions: [] };
+		}
+
+		const engineUrl = process.env.ENGINE_URL || 'http://engine:5000/analyze';
+		const response = await fetch(engineUrl, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ pgn: match.pgn, depth: 12 }),
+		});
+
+		if (!response.ok) {
+			const errText = await response.text();
+			throw new Error(`Engine analysis failed: ${errText}`);
+		}
+
+		const analysisData = await response.json();
+
+		try {
+			match.analysis = analysisData;
+			await this.matchRepo.save(match);
+		} catch (err) {
+			console.error('Failed to cache match analysis in DB:', err);
+		}
+
+		return analysisData;
+	}
 }
+
 

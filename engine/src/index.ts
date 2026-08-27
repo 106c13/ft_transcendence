@@ -36,21 +36,6 @@ app.post('/analyze', async (req, res) => {
 	}
 });
 
-app.post('/evaluate', async (req, res) => {
-	const { fen, depth = 12 } = req.body;
-	if (!fen) {
-		return res.status(400).json({ error: 'Missing fen in request body' });
-	}
-
-	try {
-		const result = await stockfish.evaluatePosition(fen, depth);
-		res.json(result);
-	} catch (err: any) {
-		console.error('[Engine] Evaluate failed:', err);
-		res.status(500).json({ error: err?.message || 'Failed to evaluate position' });
-	}
-});
-
 app.listen(port, () => {
 	console.log(`Stockfish Analysis Microservice listening on port ${port}`);
 });

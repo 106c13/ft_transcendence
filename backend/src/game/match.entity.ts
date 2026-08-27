@@ -36,6 +36,10 @@ export class Match {
 	@Column({ type: 'text' })
 	pgn: string;
 
+	@Column({ type: 'jsonb', nullable: true })
+	analysis: any;
+
 	@CreateDateColumn()
 	played_at: Date;
+
 }

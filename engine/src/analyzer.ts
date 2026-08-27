@@ -1,5 +1,5 @@
-import { Chess } from 'chess.js';
-import { StockfishService, EvalResult } from './stockfish';
+import { Chess, Square } from 'chess.js';
+import { StockfishService } from './stockfish';
 
 export interface MoveAnalysis {
 	ply: number; // 0, 1, 2, ...
@@ -10,8 +10,9 @@ export interface MoveAnalysis {
 	to: string;
 	fenBefore: string;
 	fenAfter: string;
-	score: number; // centipawns from White's perspective
+	score: number; // centipawns from White's perspective (+ White, - Black)
 	mate: number | null;
+	centipawnLoss: number; // CPL >= 0
 	winChance: number; // 0 to 100 (White's win chance)
 	bestMove: {
 		from: string;
@@ -35,8 +36,31 @@ export interface GameAnalysisResult {
 	positions: MoveAnalysis[];
 }
 
+const PIECE_VALUES: Record<string, number> = {
+	p: 100,
+	n: 300,
+	b: 320,
+	r: 500,
+	q: 900,
+	k: 0,
+};
+
+function getMaterial(fen: string, color: 'w' | 'b'): number {
+	const boardPart = fen.split(' ')[0];
+	let total = 0;
+	for (const char of boardPart) {
+		const isWhite = char >= 'A' && char <= 'Z';
+		const lower = char.toLowerCase();
+		if (PIECE_VALUES[lower]) {
+			if ((color === 'w' && isWhite) || (color === 'b' && !isWhite)) {
+				total += PIECE_VALUES[lower];
+			}
+		}
+	}
+	return total;
+}
+
 function centipawnsToWinChance(cp: number): number {
-	// Lichess sigmoid win probability formula
 	const winProb = 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * cp)) - 1);
 	return Math.max(0, Math.min(100, winProb));
 }
@@ -77,6 +101,36 @@ function convertPvToSan(fen: string, pvList: string[]): string[] {
 	return result;
 }
 
+function checkSacrifice(fenBefore: string, fenAfter: string, playerColor: 'w' | 'b', playedMove: any): boolean {
+	const opponentColor = playerColor === 'w' ? 'b' : 'w';
+	const myMatBefore = getMaterial(fenBefore, playerColor);
+	const oppMatBefore = getMaterial(fenBefore, opponentColor);
+	const myMatAfter = getMaterial(fenAfter, playerColor);
+	const oppMatAfter = getMaterial(fenAfter, opponentColor);
+
+	const netMaterialBefore = myMatBefore - oppMatBefore;
+	const netMaterialAfter = myMatAfter - oppMatAfter;
+
+	// Did player lose net material directly (e.g. piece captured of lower value or moved into capture)
+	const pieceMovedType = playedMove.piece; // 'p', 'n', 'b', 'r', 'q'
+	const capturedType = playedMove.captured; // 'p', 'n', ...
+
+	if (pieceMovedType !== 'p') {
+		const movedVal = PIECE_VALUES[pieceMovedType] || 0;
+		const capturedVal = capturedType ? (PIECE_VALUES[capturedType] || 0) : 0;
+		// If gave up a higher piece for lower piece or nothing
+		if (movedVal > capturedVal + 100) {
+			return true;
+		}
+	}
+
+	if (netMaterialAfter < netMaterialBefore - 150) {
+		return true;
+	}
+
+	return false;
+}
+
 export class GameAnalyzer {
 	private stockfish: StockfishService;
 
@@ -88,17 +142,10 @@ export class GameAnalyzer {
 		const chess = new Chess();
 		try {
 			chess.loadPgn(pgn);
-		} catch {
-			// If pgn parsing fails, try loading as move text
-		}
+		} catch {}
 
 		const history = chess.history({ verbose: true });
 		const replay = new Chess();
-
-		const initialFen = replay.fen();
-		const initialEval = await this.stockfish.evaluatePosition(initialFen, depth);
-		let prevScore = initialEval.score;
-		let prevWinChance = centipawnsToWinChance(prevScore);
 
 		const positions: MoveAnalysis[] = [];
 
@@ -116,35 +163,35 @@ export class GameAnalyzer {
 			const move = history[i];
 			const fenBefore = replay.fen();
 
-			// Apply move
+			// 1. Evaluate position BEFORE the move (to get best move and best possible evaluation)
+			const evalBefore = await this.stockfish.evaluatePosition(fenBefore, depth);
+			const bestMoveSanObj = uciToSan(fenBefore, evalBefore.bestMove);
+			const bestContinuationSan = convertPvToSan(fenBefore, evalBefore.pv);
+
+			// Apply the player's move
 			replay.move(move);
 			const fenAfter = replay.fen();
 
-			// Evaluate the position after the move
-			const evalResult = await this.stockfish.evaluatePosition(fenAfter, depth);
-			const currentScore = evalResult.score;
-			const currentWinChance = centipawnsToWinChance(currentScore);
+			// 2. Evaluate position AFTER the move
+			const evalAfter = await this.stockfish.evaluatePosition(fenAfter, depth);
 
 			const playerColor = move.color; // 'w' or 'b'
 			const moveNumber = Math.floor(i / 2) + 1;
 
-			// Win chance drop from the player's perspective
-			let winDrop = 0;
-			if (playerColor === 'w') {
-				winDrop = Math.max(0, prevWinChance - currentWinChance);
-			} else {
-				const prevBlackWinChance = 100 - prevWinChance;
-				const currentBlackWinChance = 100 - currentWinChance;
-				winDrop = Math.max(0, prevBlackWinChance - currentBlackWinChance);
-			}
+			// Normalize scores from the moving player's perspective (+ is good for moving player)
+			const bestEvalFromPlayer = playerColor === 'w' ? evalBefore.score : -evalBefore.score;
+			const playedEvalFromPlayer = playerColor === 'w' ? evalAfter.score : -evalAfter.score;
 
-			// Pre-move top engine recommendation from fenBefore
-			const bestEvalBefore = await this.stockfish.evaluatePosition(fenBefore, depth);
-			const bestMoveSanObj = uciToSan(fenBefore, bestEvalBefore.bestMove);
-			const bestContinuationSan = convertPvToSan(fenBefore, bestEvalBefore.pv);
+			// 3. Centipawn Loss (CPL) = bestEval - playedEval
+			const rawCpl = bestEvalFromPlayer - playedEvalFromPlayer;
+			const centipawnLoss = Math.max(0, rawCpl);
 
-			// Accuracy score for this move (100% - penalty)
-			const moveAccuracy = Math.max(0, Math.min(100, 100 - winDrop * 2.5));
+			// Score from White's perspective for global board eval
+			const scoreWhitePerspective = evalAfter.score;
+			const winChanceWhite = centipawnsToWinChance(scoreWhitePerspective);
+
+			// 4. Move accuracy % derived from CPL (smooth exponential curve)
+			const moveAccuracy = Math.max(0, Math.min(100, Math.round((100 * Math.exp(-0.0035 * centipawnLoss)) * 10) / 10));
 			if (playerColor === 'w') {
 				whiteAccuracySum += moveAccuracy;
 				whiteMoveCount++;
@@ -153,35 +200,44 @@ export class GameAnalyzer {
 				blackMoveCount++;
 			}
 
-			// Classify move
+			// 5. Classification based on CPL and Sacrifice Detection
 			let classification: 'brilliant' | 'great' | 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder' = 'best';
 			let explanation = '';
 
+			const isSacrifice = checkSacrifice(fenBefore, fenAfter, playerColor, move);
 			const isPlayedMoveBest = bestMoveSanObj && (bestMoveSanObj.san === move.san || (bestMoveSanObj.from === move.from && bestMoveSanObj.to === move.to));
 
-			if (isPlayedMoveBest || winDrop < 2.0) {
-				if (move.captured && (currentWinChance > 80 || currentWinChance < 20) && winDrop <= 0.5) {
-					classification = 'brilliant';
-					explanation = 'A brilliant tactical move!';
-				} else {
-					classification = 'best';
-					explanation = 'The best move in the position.';
-				}
-			} else if (winDrop <= 5.0) {
+			// Brilliant Move condition:
+			// - Low CPL (<= 15) or matches best move
+			// - Involves material sacrifice
+			// - Player position is clearly winning/strong (playedEvalFromPlayer >= +150 cp or mate)
+			if (isSacrifice && centipawnLoss <= 15 && playedEvalFromPlayer >= 150) {
+				classification = 'brilliant';
+				explanation = 'A brilliant move involving a tactical piece sacrifice while keeping a winning advantage!';
+			} else if (centipawnLoss <= 10 || isPlayedMoveBest) {
+				classification = 'best';
+				explanation = 'The best move in this position.';
+			} else if (centipawnLoss <= 30) {
 				classification = 'excellent';
 				explanation = 'An excellent and solid move.';
-			} else if (winDrop <= 10.0) {
+			} else if (centipawnLoss <= 80) {
 				classification = 'good';
-				explanation = 'A good playable move.';
-			} else if (winDrop <= 20.0) {
+				explanation = 'A good, natural move.';
+			} else if (centipawnLoss <= 150) {
 				classification = 'inaccuracy';
-				explanation = bestMoveSanObj ? `An inaccuracy. Better was ${bestMoveSanObj.san}.` : 'An inaccuracy that gives away initiative.';
-			} else if (winDrop <= 35.0) {
+				explanation = bestMoveSanObj
+					? `An inaccuracy (lost ${Math.round(centipawnLoss)} cp). Better was ${bestMoveSanObj.san}.`
+					: `An inaccuracy (lost ${Math.round(centipawnLoss)} cp).`;
+			} else if (centipawnLoss <= 300) {
 				classification = 'mistake';
-				explanation = bestMoveSanObj ? `A mistake. The best continuation was ${bestMoveSanObj.san}.` : 'A mistake that worsens the position.';
+				explanation = bestMoveSanObj
+					? `A mistake (lost ${Math.round(centipawnLoss)} cp). The best continuation was ${bestMoveSanObj.san}.`
+					: `A mistake (lost ${Math.round(centipawnLoss)} cp) that worsens your position.`;
 			} else {
 				classification = 'blunder';
-				explanation = bestMoveSanObj ? `A blunder. Overlooked ${bestMoveSanObj.san} which maintains the advantage.` : 'A blunder that loses significant material or advantage.';
+				explanation = bestMoveSanObj
+					? `A blunder (lost ${Math.round(centipawnLoss)} cp). Overlooked ${bestMoveSanObj.san} which keeps the advantage.`
+					: `A critical blunder (lost ${Math.round(centipawnLoss)} cp) that loses significant advantage.`;
 			}
 
 			if (playerColor === 'w') {
@@ -199,17 +255,19 @@ export class GameAnalyzer {
 				to: move.to,
 				fenBefore,
 				fenAfter,
-				score: currentScore,
-				mate: evalResult.mate,
-				winChance: Math.round(currentWinChance * 10) / 10,
+				score: scoreWhitePerspective,
+				mate: evalAfter.mate,
+				centipawnLoss: Math.round(centipawnLoss),
+				winChance: Math.round(winChanceWhite * 10) / 10,
 				bestMove: bestMoveSanObj,
 				continuation: bestContinuationSan,
 				classification,
 				explanation,
 			});
 
-			prevScore = currentScore;
-			prevWinChance = currentWinChance;
+			console.log(
+				`[Stockfish] Move ${moveNumber}${playerColor === 'w' ? '.' : '...'} ${move.san.padEnd(5)} | CPL: ${String(Math.round(centipawnLoss)).padStart(4)} cp | Eval: ${evalAfter.mate !== null ? ('M' + evalAfter.mate).padEnd(6) : ((scoreWhitePerspective / 100).toFixed(2)).padEnd(6)} | Best: ${(bestMoveSanObj?.san || '-').padEnd(6)} | Quality: ${classification.toUpperCase()}`
+			);
 		}
 
 		const whiteAccuracy = whiteMoveCount > 0 ? Math.round((whiteAccuracySum / whiteMoveCount) * 10) / 10 : 100;

@@ -1,7 +1,7 @@
 .games-list-container {
 	margin-top: 20px;
 	width: 100%;
-	max-width: 1000px;
+	max-width: 1050px;
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
@@ -112,6 +112,7 @@
 	box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
+/* Games Grid */
 .games-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
@@ -293,7 +294,7 @@
 	color: white;
 }
 
-/* Analysis view headers & cards */
+/* Analysis Header */
 .analysis-header-card {
 	background: #1E293B;
 	border: 1px solid rgba(148, 163, 184, 0.12);
@@ -398,6 +399,7 @@
 	font-size: 12px;
 }
 
+/* Analysis Loading Card */
 .analysis-placeholder-card {
 	background: #1E293B;
 	border: 1px solid rgba(148, 163, 184, 0.12);
@@ -410,7 +412,6 @@
 	gap: 16px;
 }
 
-/* Animated Analysis Rings & Icon */
 .analysis-anim-container {
 	position: relative;
 	width: 90px;
@@ -471,7 +472,6 @@
 	letter-spacing: 0.2px;
 }
 
-/* Progress bar */
 .analysis-progressbar-container {
 	width: 100%;
 	max-width: 320px;
@@ -508,7 +508,6 @@
 	line-height: 1.4;
 }
 
-/* PGN Download Section */
 .pgn-download-section {
 	margin-top: 14px;
 	display: flex;
@@ -542,4 +541,546 @@
 	transform: translateY(0);
 }
 
+/* =========================================
+   FULL INTERACTIVE ANALYSIS WORKSPACE
+   ========================================= */
 
+.analysis-workspace {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+/* Accuracy Banner */
+.analysis-accuracy-banner {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+}
+
+.accuracy-player-card {
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	border-radius: 14px;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.accuracy-player-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.player-title {
+	font-weight: 700;
+	color: #F1F5F9;
+	font-size: 15px;
+}
+
+.accuracy-score-val {
+	font-size: 28px;
+	font-weight: 800;
+	color: #38BDF8;
+}
+
+.accuracy-bar-track {
+	width: 100%;
+	height: 6px;
+	background: #0F172A;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.accuracy-bar-fill.white {
+	height: 100%;
+	background: linear-gradient(90deg, #38BDF8, #60A5FA);
+	border-radius: 4px;
+}
+
+.accuracy-bar-fill.black {
+	height: 100%;
+	background: linear-gradient(90deg, #818CF8, #A855F7);
+	border-radius: 4px;
+}
+
+.accuracy-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 4px;
+}
+
+.chip {
+	font-size: 11px;
+	font-weight: 700;
+	padding: 2px 7px;
+	border-radius: 6px;
+}
+
+.chip.brilliant { background: rgba(56, 189, 248, 0.15); color: #38BDF8; }
+.chip.best { background: rgba(34, 197, 94, 0.15); color: #4ADE80; }
+.chip.mistake { background: rgba(249, 115, 22, 0.15); color: #FB923C; }
+.chip.blunder { background: rgba(239, 68, 68, 0.15); color: #F87171; }
+
+/* Main Board & Panel Area */
+.analysis-main-area {
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
+}
+
+/* Side Evaluation Bar (Chess.com style) */
+.eval-bar-wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+}
+
+.eval-bar-container {
+	width: 28px;
+	height: 480px;
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	border-radius: 8px;
+	overflow: hidden;
+	position: relative;
+	display: flex;
+	flex-direction: column-reverse;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.eval-bar-fill-white {
+	width: 100%;
+	background: #FFFFFF;
+	transition: height 0.3s ease;
+}
+
+.eval-bar-fill-black {
+	width: 100%;
+	flex-grow: 1;
+	background: #1E293B;
+}
+
+.eval-bar-label {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 11px;
+	font-weight: 800;
+	padding: 2px;
+	border-radius: 4px;
+	z-index: 5;
+	pointer-events: none;
+}
+
+.eval-bar-label.white-side {
+	bottom: 8px;
+	color: #0F172A;
+}
+
+.eval-bar-label.black-side {
+	top: 8px;
+	color: #F8FAFC;
+}
+
+.eval-side-hint {
+	font-size: 11px;
+	font-weight: 700;
+	color: #64748B;
+	text-transform: uppercase;
+}
+
+/* Analysis Chess Board */
+.analysis-board-wrapper {
+	flex-shrink: 0;
+}
+
+.analysis-chess-board {
+	display: grid;
+	grid-template-columns: repeat(8, 60px);
+	grid-template-rows: repeat(8, 60px);
+	border: 3px solid #334155;
+	border-radius: 10px;
+	overflow: hidden;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+	user-select: none;
+}
+
+.analysis-sq {
+	width: 60px;
+	height: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	transition: background 0.15s ease;
+}
+
+.analysis-sq.light {
+	background-color: #E2E8F0;
+}
+
+.analysis-sq.dark {
+	background-color: #64748B;
+}
+
+/* Highlights for played move */
+.analysis-sq.played-src {
+	background-color: rgba(251, 191, 36, 0.4) !important;
+}
+
+.analysis-sq.played-dst {
+	background-color: rgba(251, 191, 36, 0.6) !important;
+}
+
+/* Highlights for Best Move */
+.analysis-sq.best-src {
+	outline: 3px dashed #22C55E;
+	outline-offset: -3px;
+}
+
+.analysis-sq.best-dst {
+	background-color: rgba(34, 197, 94, 0.35) !important;
+}
+
+.best-move-target-ring {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	font-size: 12px;
+	filter: drop-shadow(0 0 4px #22C55E);
+	z-index: 6;
+}
+
+.analysis-piece {
+	font-size: 42px;
+	line-height: 1;
+	z-index: 3;
+}
+
+.analysis-piece.white {
+	color: #FFFFFF;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 1px #000;
+}
+
+.analysis-piece.black {
+	color: #0F172A;
+	text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.eval-marker {
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	font-size: 12px;
+	font-weight: 800;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 5;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Control Panel & Details */
+.analysis-control-panel {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	min-width: 280px;
+}
+
+.move-assessment-card {
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	border-radius: 12px;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.assessment-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.assessment-move-title {
+	font-size: 18px;
+	font-weight: 800;
+	color: #F1F5F9;
+}
+
+.classification-badge {
+	font-size: 12px;
+	font-weight: 700;
+	padding: 4px 10px;
+	border-radius: 8px;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+/* Rating Badge Themes */
+.badge-brilliant, .eval-marker.badge-brilliant { background: #0284C7; color: #FFFFFF; }
+.badge-great, .eval-marker.badge-great { background: #0EA5E9; color: #FFFFFF; }
+.badge-best, .eval-marker.badge-best { background: #16A34A; color: #FFFFFF; }
+.badge-excellent, .eval-marker.badge-excellent { background: #22C55E; color: #0F172A; }
+.badge-good, .eval-marker.badge-good { background: #3B82F6; color: #FFFFFF; }
+.badge-inaccuracy, .eval-marker.badge-inaccuracy { background: #EAB308; color: #0F172A; }
+.badge-mistake, .eval-marker.badge-mistake { background: #F97316; color: #FFFFFF; }
+.badge-blunder, .eval-marker.badge-blunder { background: #DC2626; color: #FFFFFF; }
+.badge-default, .eval-marker.badge-default { background: #475569; color: #FFFFFF; }
+
+.assessment-explanation {
+	font-size: 13px;
+	color: #CBD5E1;
+	margin: 0;
+	line-height: 1.4;
+}
+
+.assessment-start-placeholder {
+	text-align: center;
+	color: #94A3B8;
+	font-size: 13px;
+	padding: 12px;
+}
+
+.assessment-start-placeholder span {
+	font-weight: 700;
+	color: #E2E8F0;
+	display: block;
+	margin-bottom: 4px;
+}
+
+/* Best Move Recommendation Box */
+.best-move-recommendation-box {
+	background: rgba(15, 23, 42, 0.7);
+	border: 1px solid rgba(34, 197, 94, 0.3);
+	border-radius: 8px;
+	padding: 10px 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.rec-header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+}
+
+.rec-label {
+	color: #4ADE80;
+	font-weight: 600;
+}
+
+.rec-move-san {
+	color: #FFFFFF;
+	font-size: 14px;
+}
+
+.continuation-line {
+	font-size: 12px;
+	color: #94A3B8;
+	display: flex;
+	gap: 6px;
+}
+
+.continuation-label {
+	color: #64748B;
+}
+
+.continuation-moves {
+	color: #E2E8F0;
+	font-family: monospace;
+}
+
+.toggle-best-hint-btn {
+	background: rgba(34, 197, 94, 0.15);
+	color: #4ADE80;
+	border: 1px solid rgba(34, 197, 94, 0.3);
+	padding: 4px 10px;
+	border-radius: 6px;
+	font-size: 11px;
+	font-weight: 600;
+	cursor: pointer;
+	margin-top: 4px;
+	align-self: flex-start;
+	transition: 0.2s;
+}
+
+.toggle-best-hint-btn:hover {
+	background: #22C55E;
+	color: #0F172A;
+}
+
+/* Navigation Bar */
+.analysis-nav-bar {
+	display: flex;
+	gap: 6px;
+	justify-content: center;
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	border-radius: 10px;
+	padding: 8px;
+}
+
+.analysis-nav-bar button {
+	flex: 1;
+	background: #0F172A;
+	color: #94A3B8;
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	padding: 8px;
+	border-radius: 8px;
+	font-size: 14px;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.analysis-nav-bar button:hover {
+	background: #26334A;
+	color: #FFFFFF;
+}
+
+/* Moves Table */
+.analysis-moves-table {
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	border-radius: 10px;
+	padding: 10px;
+	max-height: 200px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.analysis-move-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+}
+
+.row-number {
+	width: 24px;
+	color: #64748B;
+	font-size: 12px;
+	text-align: right;
+}
+
+.analysis-move-cell {
+	flex: 1;
+	background: #0F172A;
+	border: 1px solid transparent;
+	padding: 5px 8px;
+	border-radius: 6px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	transition: 0.15s;
+}
+
+.analysis-move-cell:hover {
+	background: #26334A;
+	color: #F1F5F9;
+}
+
+.analysis-move-cell.active {
+	background: #2563EB;
+	color: #FFFFFF;
+	font-weight: 700;
+	border-color: #60A5FA;
+}
+
+.analysis-move-cell.empty {
+	background: transparent;
+	border: none;
+	cursor: default;
+}
+
+.move-san {
+	color: inherit;
+}
+
+.cell-badge {
+	font-size: 10px;
+	font-weight: 800;
+	padding: 1px 5px;
+	border-radius: 4px;
+}
+
+.download-pgn-btn-small {
+	background: rgba(59, 130, 246, 0.15);
+	color: #60A5FA;
+	border: 1px solid rgba(96, 165, 250, 0.3);
+	padding: 8px 16px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.download-pgn-btn-small:hover {
+	background: #3B82F6;
+	color: #FFFFFF;
+}
+
+/* Engine Live Stats */
+.engine-live-stats {
+	background: rgba(15, 23, 42, 0.8);
+	border: 1px solid rgba(148, 163, 184, 0.15);
+	border-radius: 8px;
+	padding: 8px 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-top: 4px;
+}
+
+.engine-stat-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 12px;
+}
+
+.engine-stat-item .stat-name {
+	color: #64748B;
+	font-weight: 600;
+}
+
+.engine-stat-item .stat-val {
+	color: #38BDF8;
+	font-family: monospace;
+	font-weight: 700;
+}
+
+/* Responsive adjustments */
+
+@media (max-width: 900px) {
+	.analysis-main-area {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.analysis-control-panel {
+		width: 100%;
+	}
+
+	.analysis-accuracy-banner {
+		grid-template-columns: 1fr;
+	}
+}

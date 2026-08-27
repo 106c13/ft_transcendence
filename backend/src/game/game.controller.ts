@@ -12,8 +12,14 @@ export class GameController {
 		return this.gameService.getMatchesByUsername(username);
 	}
 
+	@Get('analyze/:id')
+	async analyzeMatch(@Param('id') id: string) {
+		return this.gameService.analyzeMatch(parseInt(id, 10));
+	}
+
 	@Get(':id')
 	async getMatch(@Param('id') id: string) {
 		return this.gameService.getMatchById(parseInt(id, 10));
 	}
 }
+

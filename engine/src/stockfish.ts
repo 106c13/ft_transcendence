@@ -2,8 +2,8 @@ import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import * as readline from 'readline';
 
 export interface EvalResult {
-	score: number; // centipawns from White's perspective (+ is white advantage, - is black)
-	mate: number | null; // mate in N from White's perspective (+ is white mates, - is black mates)
+	score: number; // centipawns from White's perspective (+ White, - Black)
+	mate: number | null; // mate in N from White's perspective (+ White mates, - Black mates)
 	bestMove: string; // e.g. "e2e4"
 	pv: string[]; // principal variation line e.g. ["e2e4", "e7e5", "g1f3"]
 	depth: number;
@@ -33,7 +33,6 @@ export class StockfishService {
 			let latestDepth = depth;
 			let bestMove = '';
 
-			// FEN turn: 'w' or 'b'
 			const turn = fen.split(' ')[1] || 'w';
 
 			const timeout = setTimeout(() => {
@@ -50,18 +49,15 @@ export class StockfishService {
 			}, 3500);
 
 			rl.on('line', (line: string) => {
-				// Parse info lines
 				if (line.startsWith('info') && line.includes('score')) {
 					const depthMatch = line.match(/depth (\d+)/);
 					if (depthMatch) {
 						latestDepth = parseInt(depthMatch[1], 10);
 					}
 
-					// Score cp
 					const cpMatch = line.match(/score cp (-?\d+)/);
 					if (cpMatch) {
 						let cp = parseInt(cpMatch[1], 10);
-						// Stockfish reports score from perspective of player to move
 						if (turn === 'b') {
 							cp = -cp;
 						}
@@ -69,7 +65,6 @@ export class StockfishService {
 						latestMate = null;
 					}
 
-					// Score mate
 					const mateMatch = line.match(/score mate (-?\d+)/);
 					if (mateMatch) {
 						let mateIn = parseInt(mateMatch[1], 10);
@@ -80,7 +75,6 @@ export class StockfishService {
 						latestScore = mateIn > 0 ? 10000 - mateIn * 100 : -10000 - mateIn * 100;
 					}
 
-					// PV line
 					const pvIndex = line.indexOf(' pv ');
 					if (pvIndex !== -1) {
 						const pvStr = line.substring(pvIndex + 4).trim();
@@ -111,7 +105,6 @@ export class StockfishService {
 				reject(err);
 			});
 
-			// Send UCI commands
 			process.stdin.write('uci\n');
 			process.stdin.write('isready\n');
 			process.stdin.write(`position fen ${fen}\n`);
