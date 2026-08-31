@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
+import AuthLayout from './layouts/AuthLayout'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
@@ -13,12 +14,15 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public / Auth Routes */}
         <Route path="/" element={<Navigate to="/home" replace />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
 
-        {/* Protected App Routes with Navbar Layout */}
+        {/* Guest Auth Layout */}
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Route>
+
+        {/* Authenticated Layout */}
         <Route element={<MainLayout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
@@ -29,7 +33,6 @@ export default function App() {
           <Route path="/game" element={<Game />} />
         </Route>
 
-        {/* Fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
