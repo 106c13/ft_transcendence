@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import io, { Socket } from 'socket.io-client';
 import { Chess } from 'chess.js';
 import type { Square } from 'chess.js';
-import Navbar from '../components/Navbar';
 import './Game.css';
 
 interface Premove {
@@ -652,8 +651,6 @@ export default function Game() {
 
 	return (
 		<div className="game-container">
-			<Navbar currentUser={currentUser} />
-
 			<main className="game-main">
 				{gameState === 'searching' && (
 					<div className="searching-card">

@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import io, { Socket } from 'socket.io-client'
+import type { LayoutContextType } from '../layouts/MainLayout'
 import './Chat.css'
-import Navbar from '../components/Navbar'
 
 type Chat = {
 	id: number
@@ -30,8 +30,8 @@ function Chat() {
 	const [selectedChat, setSelectedChat] = useState<Chat | null>(null)
 	const [messages, setMessages] = useState<Message[]>([])
 	const [newMessage, setNewMessage] = useState('')
-	const [currentUserId, setCurrentUserId] = useState<number | null>(null)
-	const [currentUser, setCurrentUser] = useState<any>(null)
+	const {currentUser} = useOutletContext<LayoutContextType>()
+	const currentUserId = currentUser?.id ?? null
 	const { t } = useTranslation()
 	const socketRef = useRef<Socket | null>(null)
 	const selectedChatRef = useRef(selectedChat) // ADD THIS
@@ -42,23 +42,6 @@ function Chat() {
 	useEffect(() => {
 		selectedChatRef.current = selectedChat
 	}, [selectedChat])
-
-	// Get current user ID
-	useEffect(() => {
-		if (!token) {
-			navigate('/login')
-			return
-		}
-		fetch('/api/users/me', {
-			headers: { Authorization: `Bearer ${token}` }
-		})
-			.then(res => res.json())
-			.then(data => {
-				setCurrentUserId(data.id)
-				setCurrentUser(data)
-			})
-			.catch(err => console.error(err))
-	}, [])
 
 	// Connect to Socket.io
 	useEffect(() => {
@@ -188,8 +171,6 @@ function Chat() {
 
 	return (
 		<div className="chat-container">
-			<Navbar currentUser={currentUser} />
-
 			<main className="chat-content">
 
 				<div className="chat-sidebar">
