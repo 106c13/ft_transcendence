@@ -77,7 +77,7 @@ function Chat() {
 		socket.on('new_message', (data: { type: string; message: Message }) => {
 			console.log('New message received:', data)
 			const newMsg = data.message
-			
+
 			// Use ref instead of selectedChat state
 			if (selectedChatRef.current && newMsg.chat_id === selectedChatRef.current.chat_id) {
 				setMessages(prev => [...prev, newMsg])
@@ -165,7 +165,7 @@ function Chat() {
 		if (res.ok) {
 			const message = await res.json()
 			setNewMessage('')
-			
+
 			const otherUser = getOtherUser(selectedChat)
 			if (socketRef.current && otherUser) {
 				socketRef.current.emit('send_message', {
@@ -187,92 +187,95 @@ function Chat() {
 	}
 
 	return (
-		<div className="chat-page">
+		<div className="chat-container">
 			<Navbar currentUser={currentUser} />
-			<div className="chat-container">
-			<div className="chat-sidebar">
-				<div className="chat-list">
-					{chats.map(chat => {
-						const otherUser = getOtherUser(chat)
-						return (
-							<div 
-								className={`chat-item ${selectedChat?.id === chat.id ? 'active' : ''}`}
-								key={chat.id} 
-								onClick={() => {
-									setSelectedChat(chat)
-									if (user_id) {
-										navigate('/chat', { replace: true })
-									}
-								}} 
-							>
-								<img
-									src={otherUser?.avatar ? `/uploads/${otherUser.avatar}` : '/assets/default.jpg'}
-									alt={otherUser?.username}
-									className="chat-avatar"
-								/>
-								<div className="chat-item-info">
-									<div className="chat-item-name">{otherUser?.username}</div>
-								</div>
-							</div>
-						)
-					})}
-					{chats.length === 0 && (
-						<div className="no-chats">No chats yet</div>
-					)}
-				</div>
-			</div>
 
-			<div className="chat-main">
-				{selectedChat ? (
-					<>
-						<div 
-							className="chat-main-header"
-							onClick={() => {
-								const otherUser = getOtherUser(selectedChat)
-								if (otherUser) {
-									navigate(`/profile/${otherUser.username}`)
-								}
-							}}
-						>
-							<img
-								src={getOtherUser(selectedChat)?.avatar ? `/uploads/${getOtherUser(selectedChat)?.avatar}` : '/assets/default.jpg'}
-								alt={getOtherUser(selectedChat)?.username}
-								className="chat-main-avatar"
-							/>
-							<h3>{getOtherUser(selectedChat)?.username}</h3>
-						</div>
-						<div className="chat-messages">
-							{messages.map(msg => (
+			<main className="chat-content">
+
+				<div className="chat-sidebar">
+					<div className="chat-list">
+						{chats.map(chat => {
+							const otherUser = getOtherUser(chat)
+							return (
 								<div
-									key={msg.id}
-									className={`message ${msg.sender_id === currentUserId ? 'sent' : 'received'}`}
+									className={`chat-item ${selectedChat?.id === chat.id ? 'active' : ''}`}
+									key={chat.id}
+									onClick={() => {
+										setSelectedChat(chat)
+										if (user_id) {
+											navigate('/chat', { replace: true })
+										}
+									}}
 								>
-									<div className="message-bubble">{msg.content}</div>
-									<div className="message-time">
-										{new Date(msg.created_at).toLocaleTimeString()}
+									<img
+										src={otherUser?.avatar ? `/uploads/${otherUser.avatar}` : '/assets/default.jpg'}
+										alt={otherUser?.username}
+										className="chat-avatar"
+									/>
+									<div className="chat-item-info">
+										<div className="chat-item-name">{otherUser?.username}</div>
 									</div>
 								</div>
-							))}
-						</div>
-
-						<div className="chat-input-area">
-							<input
-								type="text"
-								value={newMessage}
-								onChange={e => setNewMessage(e.target.value)}
-								onKeyPress={e => e.key === 'Enter' && sendMessage()}
-								placeholder={t('type_message')}
-							/>
-							<button onClick={sendMessage}>{t('send')}</button>
-						</div>
-					</>
-				) : (
-					<div className="no-chat-selected">
-						<p>{t('select_chat')}</p>
+							)
+						})}
+						{chats.length === 0 && (
+							<div className="no-chats">No chats yet</div>
+						)}
 					</div>
-				)}
-			</div>
-			</div>
+				</div>
+
+				<div className="chat-main">
+					{selectedChat ? (
+						<>
+							<div
+								className="chat-main-header"
+								onClick={() => {
+									const otherUser = getOtherUser(selectedChat)
+									if (otherUser) {
+										navigate(`/profile/${otherUser.username}`)
+									}
+								}}
+							>
+								<img
+									src={getOtherUser(selectedChat)?.avatar ? `/uploads/${getOtherUser(selectedChat)?.avatar}` : '/assets/default.jpg'}
+									alt={getOtherUser(selectedChat)?.username}
+									className="chat-main-avatar"
+								/>
+								<h3>{getOtherUser(selectedChat)?.username}</h3>
+							</div>
+							<div className="chat-messages">
+								{messages.map(msg => (
+									<div
+										key={msg.id}
+										className={`message ${msg.sender_id === currentUserId ? 'sent' : 'received'}`}
+									>
+										<div className="message-bubble">{msg.content}</div>
+										<div className="message-time">
+											{new Date(msg.created_at).toLocaleTimeString()}
+										</div>
+									</div>
+								))}
+							</div>
+
+							<div className="chat-input-area">
+								<input
+									type="text"
+									value={newMessage}
+									onChange={e => setNewMessage(e.target.value)}
+									onKeyPress={e => e.key === 'Enter' && sendMessage()}
+									placeholder={t('type_message')}
+								/>
+								<button onClick={sendMessage}>{t('send')}</button>
+							</div>
+						</>
+					) : (
+						<div className="no-chat-selected">
+							<p>{t('select_chat')}</p>
+						</div>
+					)}
+				</div>
+
+			</main>
 		</div>
 	)
 }

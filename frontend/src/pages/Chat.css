@@ -1,17 +1,20 @@
 /* Chat.css */
 
 /* Add this - wrapper for the entire chat page */
-.chat-page {
+.chat-container {
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
 	background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+	padding-top: 64px; /* Account for fixed navbar */
 }
 
-.chat-container {
+.chat-content {
 	display: flex;
 	flex: 1; /* Take remaining space after navbar */
+	width: 100%;
 	overflow: hidden;
+	display: flex;
 	color: #E2E8F0;
 	background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
 }
