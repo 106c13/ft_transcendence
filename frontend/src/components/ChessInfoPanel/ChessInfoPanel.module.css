@@ -1,0 +1,58 @@
+.gameInfoPanel {
+	width: 320px;
+	background: rgba(30, 41, 59, 0.5);
+	backdrop-filter: blur(10px);
+	border-radius: 12px;
+	border: 1px solid rgba(148, 163, 184, 0.1);
+	padding: 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	height: min(78vh, 620px);
+}
+
+.panelHeader {
+	border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+	padding-bottom: 12px;
+}
+
+.panelHeader h3 {
+	margin: 0;
+	font-size: 18px;
+	font-weight: 600;
+}
+
+.gameModeTag {
+	display: inline-block;
+	padding: 4px 8px;
+	border-radius: 4px;
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	margin-top: 6px;
+}
+
+.gameModeTag.bullet,
+.gameModeTag.bulletInc {
+	background: #DC2626;
+	color: white;
+}
+
+.gameModeTag.blitz,
+.gameModeTag.blitzInc {
+	background: #D97706;
+	color: white;
+}
+
+.gameModeTag.rapid,
+.gameModeTag.rapidInc {
+	background: #059669;
+	color: white;
+}
+
+@media (max-width: 950px) {
+	.gameInfoPanel {
+		width: min(65vh, 520px);
+		height: auto;
+	}
+}

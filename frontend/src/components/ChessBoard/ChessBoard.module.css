@@ -1,0 +1,119 @@
+.chessBoard {
+	display: grid;
+	grid-template-columns: repeat(8, 1fr);
+	grid-template-rows: repeat(8, 1fr);
+	width: min(65vh, 520px);
+	height: min(65vh, 520px);
+	border-radius: 8px;
+	overflow: hidden;
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(59, 130, 246, 0.2);
+	border: 4px solid rgba(255, 255, 255, 0.08);
+}
+
+.chessBoard.reviewing {
+	filter: brightness(0.88) saturate(0.85);
+	transition: filter 0.2s;
+}
+
+.square {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	user-select: none;
+	cursor: pointer;
+	transition: background-color 0.1s ease;
+}
+
+.square.light {
+	background-color: rgba(226, 232, 240, 0.85);
+}
+
+.square.dark {
+	background-color: rgba(71, 85, 105, 0.85);
+}
+
+.square.selected {
+	background-color: rgba(59, 130, 246, 0.6) !important;
+}
+
+.square.lastMoveSrc,
+.square.lastMoveDst {
+	background-color: rgba(139, 92, 246, 0.45) !important;
+}
+
+.square.premove {
+	background-color: rgba(249, 115, 22, 0.55) !important;
+}
+
+.square.check {
+	background-color: rgba(239, 68, 68, 0.5) !important;
+	animation: pulseCheck 1s infinite alternate;
+}
+
+@keyframes pulseCheck {
+	0% {
+		background-color: rgba(239, 68, 68, 0.35);
+	}
+
+	100% {
+		background-color: rgba(239, 68, 68, 0.65);
+	}
+}
+
+.validMoveDot {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background-color: rgba(0, 0, 0, 0.15);
+	pointer-events: none;
+}
+
+.square.light .validMoveDot {
+	background-color: rgba(0, 0, 0, 0.2);
+}
+
+.square.dark .validMoveDot {
+	background-color: rgba(255, 255, 255, 0.3);
+}
+
+.validMoveCapture {
+	position: absolute;
+	width: 80%;
+	height: 80%;
+	border-radius: 50%;
+	border: 4px solid rgba(0, 0, 0, 0.15);
+	pointer-events: none;
+}
+
+.square.light .validMoveCapture {
+	border-color: rgba(0, 0, 0, 0.2);
+}
+
+.square.dark .validMoveCapture {
+	border-color: rgba(255, 255, 255, 0.3);
+}
+
+.piece {
+	width: min(7vh, 48px);
+	height: min(7vh, 48px);
+	display: block;
+	transition: transform 0.15s ease;
+	z-index: 10;
+	cursor: grab;
+	user-select: none;
+	-webkit-user-drag: element;
+}
+
+.piece:active {
+	cursor: grabbing;
+}
+
+.piece:hover {
+	transform: translateY(-2px) scale(1.05);
+}
+
+.piece.white,
+.piece.black {
+	filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35));
+}

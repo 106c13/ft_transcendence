@@ -1,0 +1,97 @@
+.playerBanner {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	padding: 10px 16px;
+	background: rgba(30, 41, 59, 0.6);
+	backdrop-filter: blur(10px);
+	border-radius: 8px;
+	border: 1px solid rgba(148, 163, 184, 0.1);
+	margin-bottom: 12px;
+}
+
+.playerBanner.bottom {
+	margin-top: 12px;
+	margin-bottom: 0;
+}
+
+.playerInfo {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.playerName {
+	font-weight: 600;
+	font-size: 15px;
+	color: #F8FAFC;
+}
+
+.playerColorDot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+.playerColorDot.white {
+	background: #FFFFFF;
+	border: 1px solid #94A3B8;
+}
+
+.playerColorDot.black {
+	background: #1E293B;
+	border: 1px solid #FFFFFF;
+}
+
+.gameClock {
+	font-family: var(--mono, monospace);
+	font-size: 26px;
+	font-weight: 700;
+	padding: 6px 12px;
+	border-radius: 6px;
+	background: rgba(15, 23, 42, 0.4);
+	border: 1px solid rgba(148, 163, 184, 0.1);
+	letter-spacing: 1px;
+}
+
+.playerBanner.activeTurn {
+	border-color: rgba(96, 165, 250, 0.5);
+	box-shadow: 0 0 10px rgba(96, 165, 250, 0.2);
+}
+
+.playerBanner.activeTurn .gameClock {
+	border-color: #3B82F6;
+	color: #60A5FA;
+	box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+	animation: timerPulse 1.5s infinite alternate;
+}
+
+@keyframes timerPulse {
+	0% {
+		opacity: 0.85;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+.playerBanner.lowTime .gameClock {
+	border-color: #EF4444 !important;
+	color: #EF4444 !important;
+	animation: lowTimePulse 0.5s infinite alternate !important;
+}
+
+@keyframes lowTimePulse {
+	0% {
+		transform: scale(1);
+		box-shadow: 0 0 0px rgba(239, 68, 68, 0);
+	}
+
+	100% {
+		transform: scale(1.03);
+		box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+	}
+}
