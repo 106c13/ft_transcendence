@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { getPieceImageSrc, PIECE_NAME } from '../../constants/gameConstants'
 import styles from './CapturedPieces.module.css'
 
 type PieceCapture = { type: string; color: 'w' | 'b' }
@@ -8,11 +9,9 @@ type Props = {
 	whiteScore: number
 	blackScore: number
 	playerColor: 'w' | 'b'
-	pieceNames: Record<string, string>
-	getPieceImageSrc: (type: string, color: 'w' | 'b') => string
 }
 
-function CapturedPieces({ captured, whiteScore, blackScore, playerColor, pieceNames, getPieceImageSrc }: Props) {
+function CapturedPieces({ captured, whiteScore, blackScore, playerColor }: Props) {
 	const { t } = useTranslation()
 
 	return (
@@ -23,7 +22,7 @@ function CapturedPieces({ captured, whiteScore, blackScore, playerColor, pieceNa
 					<img
 						key={idx}
 						src={getPieceImageSrc(p.type, p.color)}
-						alt={pieceNames[p.type]}
+						alt={PIECE_NAME[p.type]}
 						className={`${styles.capturedPiece} ${p.color === 'w' ? styles.white : styles.black}`}
 					/>
 				))}
@@ -43,7 +42,7 @@ function CapturedPieces({ captured, whiteScore, blackScore, playerColor, pieceNa
 					<img
 						key={idx}
 						src={getPieceImageSrc(p.type, p.color)}
-						alt={pieceNames[p.type]}
+						alt={PIECE_NAME[p.type]}
 						className={`${styles.capturedPiece} ${p.color === 'w' ? styles.white : styles.black}`}
 					/>
 				))}

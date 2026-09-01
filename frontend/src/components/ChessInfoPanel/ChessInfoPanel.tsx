@@ -17,8 +17,6 @@ type Props = {
 	viewIndex: number
 	isReviewing: boolean
 	isGameOver: boolean
-	pieceNames: Record<string, string>
-	getPieceImageSrc: (type: string, color: 'w' | 'b') => string
 	onSelectIndex: (idx: number) => void
 	onResign: () => void
 }
@@ -43,8 +41,6 @@ function ChessInfoPanel({
 	viewIndex,
 	isReviewing,
 	isGameOver,
-	pieceNames,
-	getPieceImageSrc,
 	onSelectIndex,
 	onResign,
 }: Props) {
@@ -64,8 +60,6 @@ function ChessInfoPanel({
 				whiteScore={whiteScore}
 				blackScore={blackScore}
 				playerColor={playerColor}
-				pieceNames={pieceNames}
-				getPieceImageSrc={getPieceImageSrc}
 			/>
 
 			<MoveHistory

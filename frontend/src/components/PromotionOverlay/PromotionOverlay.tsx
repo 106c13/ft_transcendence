@@ -1,14 +1,13 @@
 import { useTranslation } from 'react-i18next'
+import { getPieceImageSrc, PIECE_NAME } from '../../constants/gameConstants'
 import styles from './PromotionOverlay.module.css'
 
 type Props = {
 	playerColor: 'w' | 'b'
-	getPieceImageSrc: (type: string, color: 'w' | 'b') => string
-	pieceNames: Record<string, string>
 	onSelect: (pieceCode: string) => void
 }
 
-function PromotionOverlay({ playerColor, getPieceImageSrc, pieceNames, onSelect }: Props) {
+function PromotionOverlay({ playerColor, onSelect }: Props) {
 	const { t } = useTranslation()
 
 	return (
@@ -24,7 +23,7 @@ function PromotionOverlay({ playerColor, getPieceImageSrc, pieceNames, onSelect 
 						>
 							<img
 								src={getPieceImageSrc(code, playerColor)}
-								alt={pieceNames[code]}
+								alt={PIECE_NAME[code]}
 								className={styles.promotionPieceIcon}
 							/>
 						</button>

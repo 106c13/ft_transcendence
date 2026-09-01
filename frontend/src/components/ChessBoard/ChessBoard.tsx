@@ -1,4 +1,5 @@
 import type { Chess, Square } from 'chess.js'
+import { getPieceImageSrc, PIECE_NAME } from '../../constants/gameConstants'
 import PromotionOverlay from '../PromotionOverlay/PromotionOverlay'
 import DisconnectWarning from '../DisconnectWarning/DisconnectWarning'
 import styles from './ChessBoard.module.css'
@@ -19,8 +20,6 @@ type Props = {
     showPromotion: boolean
     isPaused: boolean
     pauseCountdown: number | null
-    pieceNames: Record<string, string>
-    getPieceImageSrc: (type: string, color: 'w' | 'b') => string
     onSquareClick: (sq: string) => void
     onDragStart: (e: React.DragEvent, sq: string) => void
     onDragOver: (e: React.DragEvent) => void
@@ -44,8 +43,6 @@ function ChessBoard({
     showPromotion,
     isPaused,
     pauseCountdown,
-    pieceNames,
-    getPieceImageSrc,
     onSquareClick,
     onDragStart,
     onDragOver,
@@ -77,7 +74,7 @@ function ChessBoard({
                             {piece && (
                                 <img
                                     src={getPieceImageSrc(piece.type, piece.color)}
-                                    alt={`${piece.color === 'w' ? 'White' : 'Black'} ${pieceNames[piece.type]}`}
+                                    alt={`${piece.color === 'w' ? 'White' : 'Black'} ${PIECE_NAME[piece.type]}`}
                                     className={`${styles.piece} ${piece.color === 'w' ? styles.white : styles.black}`}
                                     draggable={true}
                                     onDragStart={e => onDragStart(e, sq)}
@@ -94,8 +91,6 @@ function ChessBoard({
             {showPromotion && (
                 <PromotionOverlay
                     playerColor={playerColor}
-                    getPieceImageSrc={getPieceImageSrc}
-                    pieceNames={pieceNames}
                     onSelect={onPromotionSelect}
                 />
             )}
