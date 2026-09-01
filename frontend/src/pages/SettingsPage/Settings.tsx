@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import './Profile.css'
-import Navbar from '../components/Navbar/Navbar'
+import profileStyles from '../Profile.module.css'
+import authStyles from '../Auth.module.css'
+import Navbar from '../../components/Navbar/Navbar'
 
 function Settings() {
 	const { t } = useTranslation()
@@ -123,9 +124,9 @@ function Settings() {
 	}
 
 	return (
-		<div className="profile-page">
+		<div className={profileStyles.profilePage}>
 			<Navbar currentUser={currentUser} />
-			<div className="card">
+			<div className={authStyles.card}>
 				<h1>{t('settings')}</h1>
 
 				<form onSubmit={handleSave}>
@@ -157,7 +158,7 @@ function Settings() {
 						}}
 					/>
 
-					<button className="button" type="submit">{t('save')}</button>
+					<button className={authStyles.button} type="submit">{t('save')}</button>
 				</form>
 
 				<h1 style={{ marginTop: '30px' }}>{t('change_password')}</h1>
@@ -186,7 +187,7 @@ function Settings() {
 						required
 					/>
 
-					<button className="button" type="submit">{t('update_password')}</button>
+					<button className={authStyles.button} type="submit">{t('update_password')}</button>
 				</form>
 
 				<button
@@ -206,7 +207,7 @@ function Settings() {
 				</button>
 
 				{msg && (
-					<div className={`msg ${error ? 'error' : 'success'}`}>
+					<div className={`${authStyles.msg} ${error ? authStyles.error : authStyles.success}`}>
 						{msg}
 					</div>
 				)}

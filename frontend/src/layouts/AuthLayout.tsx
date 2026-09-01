@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
-import '../pages/Auth.css'
+import styles from '../pages/Auth.module.css'
 
 export default function AuthLayout() {
 	const navigate = useNavigate()
@@ -13,8 +13,8 @@ export default function AuthLayout() {
 	}, [token, navigate])
 
 	return (
-		<div className="auth-page">
-			<div className="card">
+		<div className={styles.authPage}>
+			<div className={styles.card}>
 				<Outlet />
 			</div>
 		</div>

@@ -1,4 +1,4 @@
-.game-container {
+.gameContainer {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -7,7 +7,7 @@
   padding-top: 64px;
 }
 
-.game-main {
+.gameMain {
   flex: 1;
   margin-left: 0;
   padding-bottom: 20px;
@@ -18,7 +18,7 @@
 }
 
 /* Layout for Board + Panel */
-.game-play-area {
+.gamePlayArea {
   display: flex;
   gap: 40px;
   align-items: flex-start;
@@ -29,7 +29,7 @@
 }
 
 /* Board Wrapper */
-.board-container {
+.boardContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -37,7 +37,7 @@
 }
 
 /* Player Info Banner (rendered above and below board) */
-.player-banner {
+.playerBanner {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -50,18 +50,18 @@
   margin-bottom: 12px;
 }
 
-.player-banner.bottom {
+.playerBanner.bottom {
   margin-top: 12px;
   margin-bottom: 0;
 }
 
-.player-info {
+.playerInfo {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.player-avatar-small {
+.playerAvatarSmall {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -69,31 +69,31 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.player-name {
+.playerName {
   font-weight: 600;
   font-size: 15px;
   color: #F8FAFC;
 }
 
-.player-color-dot {
+.playerColorDot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   display: inline-block;
 }
 
-.player-color-dot.white {
+.playerColorDot.white {
   background: #FFFFFF;
   border: 1px solid #94A3B8;
 }
 
-.player-color-dot.black {
+.playerColorDot.black {
   background: #1E293B;
   border: 1px solid #FFFFFF;
 }
 
 /* Matchmaking Selector Screen */
-.lobby-card {
+.lobbyCard {
   background: rgba(30, 41, 59, 0.7);
   backdrop-filter: blur(12px);
   border-radius: 16px;
@@ -106,7 +106,7 @@
   box-shadow: var(--shadow);
 }
 
-.lobby-title {
+.lobbyTitle {
   font-size: 28px;
   margin-bottom: 12px;
   font-weight: 700;
@@ -116,20 +116,20 @@
   color: transparent;
 }
 
-.lobby-subtitle {
+.lobbySubtitle {
   color: #94A3B8;
   margin-bottom: 30px;
   font-size: 15px;
 }
 
-.mode-selector {
+.modeSelector {
   display: flex;
   flex-direction: column;
   gap: 14px;
   margin-bottom: 30px;
 }
 
-.mode-button {
+.modeButton {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -143,35 +143,35 @@
   text-align: left;
 }
 
-.mode-button:hover {
+.modeButton:hover {
   transform: translateY(-2px);
   border-color: rgba(96, 165, 250, 0.4);
   background: rgba(15, 23, 42, 0.8);
 }
 
-.mode-button.selected {
+.modeButton.selected {
   border-color: #3B82F6;
   background: rgba(59, 130, 246, 0.15);
   box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
 }
 
-.mode-icon {
+.modeIcon {
   font-size: 24px;
 }
 
-.mode-details h4 {
+.modeDetails h4 {
   margin: 0 0 4px 0;
   font-size: 16px;
   font-weight: 600;
 }
 
-.mode-details p {
+.modeDetails p {
   margin: 0;
   font-size: 12px;
   color: #94A3B8;
 }
 
-.find-match-btn {
+.findMatchBtn {
   width: 100%;
   padding: 14px;
   border-radius: 10px;
@@ -185,13 +185,13 @@
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
 }
 
-.find-match-btn:hover {
+.findMatchBtn:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
 /* Searching Match Screen */
-.searching-card {
+.searchingCard {
   background: rgba(30, 41, 59, 0.7);
   backdrop-filter: blur(12px);
   border-radius: 16px;
@@ -204,7 +204,7 @@
   box-shadow: var(--shadow);
 }
 
-.searching-pulse {
+.searchingPulse {
   position: relative;
   width: 80px;
   height: 80px;
@@ -214,10 +214,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: pulse-ring 1.5s infinite;
+  animation: pulseRing 1.5s infinite;
 }
 
-@keyframes pulse-ring {
+@keyframes pulseRing {
   0% {
     box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
   }
@@ -229,19 +229,19 @@
   }
 }
 
-.searching-pulse-icon {
+.searchingPulseIcon {
   width: 40px;
   height: 40px;
-  animation: spin-slow 8s linear infinite;
+  animation: spinSlow 8s linear infinite;
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
 }
 
-@keyframes spin-slow {
+@keyframes spinSlow {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
-.cancel-match-btn {
+.cancelMatchBtn {
   margin-top: 30px;
   padding: 10px 24px;
   border-radius: 8px;
@@ -253,12 +253,12 @@
   transition: all 0.2s;
 }
 
-.cancel-match-btn:hover {
+.cancelMatchBtn:hover {
   background: rgba(239, 68, 68, 0.2);
 }
 
 /* Chess Board */
-.chess-board {
+.chessBoard {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
@@ -295,8 +295,8 @@
   background-color: rgba(59, 130, 246, 0.6) !important; /* Blue 500 */
 }
 
-.square.last-move-src,
-.square.last-move-dst {
+.square.lastMoveSrc,
+.square.lastMoveDst {
   background-color: rgba(139, 92, 246, 0.45) !important; /* Violet 500 */
 }
 
@@ -306,16 +306,16 @@
 
 .square.check {
   background-color: rgba(239, 68, 68, 0.5) !important;
-  animation: pulse-check 1s infinite alternate;
+  animation: pulseCheck 1s infinite alternate;
 }
 
-@keyframes pulse-check {
+@keyframes pulseCheck {
   0% { background-color: rgba(239, 68, 68, 0.35); }
   100% { background-color: rgba(239, 68, 68, 0.65); }
 }
 
 /* Valid move indicator */
-.valid-move-dot {
+.validMoveDot {
   width: 14px;
   height: 14px;
   border-radius: 50%;
@@ -323,16 +323,16 @@
   pointer-events: none;
 }
 
-.square.light .valid-move-dot {
+.square.light .validMoveDot {
   background-color: rgba(0, 0, 0, 0.2);
 }
 
-.square.dark .valid-move-dot {
+.square.dark .validMoveDot {
   background-color: rgba(255, 255, 255, 0.3);
 }
 
 /* For capturing an enemy piece, we draw an hollow circle */
-.valid-move-capture {
+.validMoveCapture {
   position: absolute;
   width: 80%;
   height: 80%;
@@ -341,11 +341,11 @@
   pointer-events: none;
 }
 
-.square.light .valid-move-capture {
+.square.light .validMoveCapture {
   border-color: rgba(0, 0, 0, 0.2);
 }
 
-.square.dark .valid-move-capture {
+.square.dark .validMoveCapture {
   border-color: rgba(255, 255, 255, 0.3);
 }
 
@@ -369,16 +369,14 @@
   transform: translateY(-2px) scale(1.05);
 }
 
-/* Subtle depth so pieces read clearly against both square colors.
-   Individual SVGs already carry their own fill/stroke colors, so we no
-   longer need separate white/black color rules — just a shared shadow. */
+/* Subtle depth so pieces read clearly against both square colors. */
 .piece.white,
 .piece.black {
   filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35));
 }
 
 /* Right Panel */
-.game-info-panel {
+.gameInfoPanel {
   width: 320px;
   background: rgba(30, 41, 59, 0.5);
   backdrop-filter: blur(10px);
@@ -391,18 +389,18 @@
   height: min(78vh, 620px);
 }
 
-.panel-header {
+.panelHeader {
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
   padding-bottom: 12px;
 }
 
-.panel-header h3 {
+.panelHeader h3 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
 }
 
-.game-mode-tag {
+.gameModeTag {
   display: inline-block;
   padding: 4px 8px;
   border-radius: 4px;
@@ -412,24 +410,27 @@
   margin-top: 6px;
 }
 
-.game-mode-tag.bullet { background: #DC2626; color: white; }
-.game-mode-tag.blitz { background: #D97706; color: white; }
-.game-mode-tag.rapid { background: #059669; color: white; }
+.gameModeTag.bullet,
+.gameModeTag.bulletInc { background: #DC2626; color: white; }
+.gameModeTag.blitz,
+.gameModeTag.blitzInc { background: #D97706; color: white; }
+.gameModeTag.rapid,
+.gameModeTag.rapidInc { background: #059669; color: white; }
 
 /* Captured Pieces section */
-.captured-container {
+.capturedContainer {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.captured-label {
+.capturedLabel {
   font-size: 13px;
   color: #94A3B8;
   font-weight: 500;
 }
 
-.captured-list {
+.capturedList {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
@@ -437,13 +438,13 @@
   align-items: center;
 }
 
-.captured-piece {
+.capturedPiece {
   width: 16px;
   height: 16px;
   display: block;
 }
 
-.material-diff {
+.materialDiff {
   font-size: 11px;
   font-weight: 700;
   color: #10B981;
@@ -451,7 +452,7 @@
 }
 
 /* Digital clock */
-.game-clock {
+.gameClock {
   font-family: var(--mono);
   font-size: 26px;
   font-weight: 700;
@@ -463,36 +464,36 @@
 }
 
 /* Glowing timer on active turn */
-.player-banner.active-turn {
+.playerBanner.activeTurn {
   border-color: rgba(96, 165, 250, 0.5);
   box-shadow: 0 0 10px rgba(96, 165, 250, 0.2);
 }
 
-.player-banner.active-turn .game-clock {
+.playerBanner.activeTurn .gameClock {
   border-color: #3B82F6;
   color: #60A5FA;
   box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
-  animation: timer-pulse 1.5s infinite alternate;
+  animation: timerPulse 1.5s infinite alternate;
 }
 
-@keyframes timer-pulse {
+@keyframes timerPulse {
   0% { opacity: 0.85; }
   100% { opacity: 1; }
 }
 
-.player-banner.low-time .game-clock {
+.playerBanner.lowTime .gameClock {
   border-color: #EF4444 !important;
   color: #EF4444 !important;
-  animation: low-time-pulse 0.5s infinite alternate !important;
+  animation: lowTimePulse 0.5s infinite alternate !important;
 }
 
-@keyframes low-time-pulse {
+@keyframes lowTimePulse {
   0% { transform: scale(1); box-shadow: 0 0 0px rgba(239, 68, 68, 0); }
   100% { transform: scale(1.03); box-shadow: 0 0 8px rgba(239, 68, 68, 0.3); }
 }
 
 /* Move History Log */
-.move-history-container {
+.moveHistoryContainer {
   flex: 1;
   background: rgba(15, 23, 42, 0.4);
   border-radius: 8px;
@@ -504,25 +505,25 @@
   gap: 6px;
 }
 
-.move-history-header {
+.moveHistoryHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2px;
 }
 
-.move-history-title {
+.moveHistoryTitle {
   font-size: 13px;
   color: #94A3B8;
   font-weight: 500;
 }
 
-.move-nav-arrows {
+.moveNavArrows {
   display: flex;
   gap: 2px;
 }
 
-.move-nav-arrows button {
+.moveNavArrows button {
   background: rgba(30, 41, 59, 0.7);
   border: 1px solid rgba(148, 163, 184, 0.15);
   color: #94A3B8;
@@ -538,13 +539,13 @@
   padding: 0;
 }
 
-.move-nav-arrows button:hover {
+.moveNavArrows button:hover {
   background: rgba(59, 130, 246, 0.2);
   border-color: rgba(59, 130, 246, 0.4);
   color: #60A5FA;
 }
 
-.move-history-list {
+.moveHistoryList {
   flex: 1;
   overflow-y: auto;
   display: grid;
@@ -554,13 +555,13 @@
   align-content: start;
 }
 
-.move-row-num {
+.moveRowNum {
   color: #64748B;
   font-weight: 600;
   line-height: 1.8;
 }
 
-.move-cell {
+.moveCell {
   color: #E2E8F0;
   cursor: pointer;
   padding: 2px 6px;
@@ -568,23 +569,23 @@
   transition: background 0.1s;
 }
 
-.move-cell:hover {
+.moveCell:hover {
   background: rgba(255, 255, 255, 0.07);
 }
 
-.move-cell.active-move {
+.moveCell.activeMove {
   background: rgba(59, 130, 246, 0.25);
   color: #93C5FD;
   font-weight: 600;
   border-radius: 4px;
 }
 
-.move-cell.empty-cell {
+.moveCell.emptyCell {
   cursor: default;
   color: transparent;
 }
 
-.reviewing-banner {
+.reviewingBanner {
   font-size: 11px;
   text-align: center;
   color: #F59E0B;
@@ -596,18 +597,18 @@
 }
 
 /* Board review mode tint */
-.chess-board.reviewing {
+.chessBoard.reviewing {
   filter: brightness(0.88) saturate(0.85);
   transition: filter 0.2s;
 }
 
 /* Game Actions Buttons */
-.game-actions {
+.gameActions {
   display: flex;
   gap: 10px;
 }
 
-.resign-btn {
+.resignBtn {
   flex: 1;
   padding: 10px;
   border-radius: 6px;
@@ -619,13 +620,13 @@
   transition: all 0.2s;
 }
 
-.resign-btn:hover {
+.resignBtn:hover {
   background: #EF4444;
   color: white;
 }
 
 /* Pawn Promotion Overlay */
-.promotion-overlay {
+.promotionOverlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -639,7 +640,7 @@
   z-index: 100;
 }
 
-.promotion-box {
+.promotionBox {
   background: #1E293B;
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 12px;
@@ -648,18 +649,18 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
 }
 
-.promotion-box h4 {
+.promotionBox h4 {
   margin: 0 0 14px 0;
   color: #F8FAFC;
 }
 
-.promotion-options {
+.promotionOptions {
   display: flex;
   gap: 12px;
   justify-content: center;
 }
 
-.promotion-option {
+.promotionOption {
   width: 60px;
   height: 60px;
   border-radius: 8px;
@@ -673,13 +674,13 @@
   padding: 0;
 }
 
-.promotion-option:hover {
+.promotionOption:hover {
   transform: scale(1.1);
   background: #3B82F6;
   border-color: #3B82F6;
 }
 
-.promotion-piece-icon {
+.promotionPieceIcon {
   width: 40px;
   height: 40px;
   display: block;
@@ -687,7 +688,7 @@
 }
 
 /* Game Over Modal */
-.game-over-modal {
+.gameOverModal {
   position: fixed;
   top: 0;
   left: 0;
@@ -701,7 +702,7 @@
   z-index: 200;
 }
 
-.game-over-box {
+.gameOverBox {
   background: #1E293B;
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 16px;
@@ -710,11 +711,11 @@
   max-width: 400px;
   text-align: center;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-  animation: scale-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
 }
 
-.close-modal-x {
+.closeModalX {
   position: absolute;
   top: 16px;
   right: 16px;
@@ -728,40 +729,40 @@
   line-height: 1;
 }
 
-.close-modal-x:hover {
+.closeModalX:hover {
   color: #F8FAFC;
 }
 
-@keyframes scale-up {
+@keyframes scaleUp {
   from { transform: scale(0.9); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
 
-.game-over-icon {
+.gameOverIcon {
   font-size: 50px;
   margin-bottom: 16px;
 }
 
-.game-over-box h2 {
+.gameOverBox h2 {
   font-size: 26px;
   margin: 0 0 10px 0;
   font-weight: 700;
 }
 
-.game-over-result {
+.gameOverResult {
   color: #60A5FA;
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 8px;
 }
 
-.game-over-reason {
+.gameOverReason {
   color: #94A3B8;
   font-size: 14px;
   margin-bottom: 30px;
 }
 
-.play-again-btn {
+.playAgainBtn {
   width: 100%;
   padding: 12px;
   border-radius: 8px;
@@ -773,11 +774,11 @@
   transition: all 0.2s;
 }
 
-.play-again-btn:hover {
+.playAgainBtn:hover {
   background: #2563EB;
 }
 
-.game-pause-warning {
+.gamePauseWarning {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -793,22 +794,22 @@
   pointer-events: none;
 }
 
-.game-pause-warning h4 {
+.gamePauseWarning h4 {
   margin: 0 0 4px 0;
   font-size: 16px;
 }
-.game-pause-warning p {
+.gamePauseWarning p {
   margin: 0;
   font-size: 13px;
 }
 
 /* Responsive elements */
 @media (max-width: 950px) {
-  .game-play-area {
+  .gamePlayArea {
     flex-direction: column;
     align-items: center;
   }
-  .game-info-panel {
+  .gameInfoPanel {
     width: min(65vh, 520px);
     height: auto;
   }

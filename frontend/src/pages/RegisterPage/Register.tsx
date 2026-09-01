@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import './Auth.css'
+import styles from '../Auth.module.css'
 
 function Register() {
 	const [email, setEmail] = useState('')
@@ -92,7 +92,7 @@ function Register() {
 					required
 				/>
 
-				<div className="password-wrapper">
+				<div className={styles.passwordWrapper}>
 					<input
 						type={showPassword ? 'text' : 'password'}
 						placeholder={t('confirm_password')}
@@ -103,7 +103,7 @@ function Register() {
 
 					<button
 						type="button"
-						className="eye-btn"
+						className={styles.eyeBtn}
 						onClick={() => setShowPassword(prev => !prev)}
 					>
 						{showPassword ? (
@@ -121,16 +121,16 @@ function Register() {
 					</button>
 				</div>
 
-				<button className="button" type="submit">{t('register')}</button>
+				<button className={styles.button} type="submit">{t('register')}</button>
 			</form>
 
 			{msg && (
-				<div className={`msg ${error ? 'error' : 'success'}`}>
+				<div className={`${styles.msg} ${error ? styles.error : styles.success}`}>
 					{msg}
 				</div>
 			)}
 
-			<Link className="link" to="/login">
+			<Link className={styles.link} to="/login">
 				{t('sign_in')}
 			</Link>
 		</>

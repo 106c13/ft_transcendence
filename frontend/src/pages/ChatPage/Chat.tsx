@@ -2,8 +2,8 @@ import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import io, { Socket } from 'socket.io-client'
-import type { LayoutContextType } from '../layouts/MainLayout'
-import './Chat.css'
+import type { LayoutContextType } from '../../layouts/MainLayout'
+import styles from './Chat.module.css'
 
 type Chat = {
 	id: number
@@ -30,7 +30,7 @@ function Chat() {
 	const [selectedChat, setSelectedChat] = useState<Chat | null>(null)
 	const [messages, setMessages] = useState<Message[]>([])
 	const [newMessage, setNewMessage] = useState('')
-	const {currentUser} = useOutletContext<LayoutContextType>()
+	const { currentUser } = useOutletContext<LayoutContextType>()
 	const currentUserId = currentUser?.id ?? null
 	const { t } = useTranslation()
 	const socketRef = useRef<Socket | null>(null)
@@ -166,20 +166,20 @@ function Chat() {
 	}
 
 	if (!currentUserId) {
-		return <div className="chat-container">Loading...</div>
+		return <div className={styles.chatContainer}>Loading...</div>
 	}
 
 	return (
-		<div className="chat-container">
-			<main className="chat-content">
+		<div className={styles.chatContainer}>
+			<main className={styles.chatContent}>
 
-				<div className="chat-sidebar">
-					<div className="chat-list">
+				<div className={styles.chatSidebar}>
+					<div className={styles.chatList}>
 						{chats.map(chat => {
 							const otherUser = getOtherUser(chat)
 							return (
 								<div
-									className={`chat-item ${selectedChat?.id === chat.id ? 'active' : ''}`}
+									className={`${styles.chatItem} ${selectedChat?.id === chat.id ? styles.active : ''}`}
 									key={chat.id}
 									onClick={() => {
 										setSelectedChat(chat)
@@ -191,25 +191,25 @@ function Chat() {
 									<img
 										src={otherUser?.avatar ? `/uploads/${otherUser.avatar}` : '/assets/default.jpg'}
 										alt={otherUser?.username}
-										className="chat-avatar"
+										className={styles.chatAvatar}
 									/>
-									<div className="chat-item-info">
-										<div className="chat-item-name">{otherUser?.username}</div>
+									<div className={styles.chatItemInfo}>
+										<div className={styles.chatItemName}>{otherUser?.username}</div>
 									</div>
 								</div>
 							)
 						})}
 						{chats.length === 0 && (
-							<div className="no-chats">No chats yet</div>
+							<div className={styles.noChats}>No chats yet</div>
 						)}
 					</div>
 				</div>
 
-				<div className="chat-main">
+				<div className={styles.chatMain}>
 					{selectedChat ? (
 						<>
 							<div
-								className="chat-main-header"
+								className={styles.chatMainHeader}
 								onClick={() => {
 									const otherUser = getOtherUser(selectedChat)
 									if (otherUser) {
@@ -220,25 +220,25 @@ function Chat() {
 								<img
 									src={getOtherUser(selectedChat)?.avatar ? `/uploads/${getOtherUser(selectedChat)?.avatar}` : '/assets/default.jpg'}
 									alt={getOtherUser(selectedChat)?.username}
-									className="chat-main-avatar"
+									className={styles.chatMainAvatar}
 								/>
 								<h3>{getOtherUser(selectedChat)?.username}</h3>
 							</div>
-							<div className="chat-messages">
+							<div className={styles.chatMessages}>
 								{messages.map(msg => (
 									<div
 										key={msg.id}
-										className={`message ${msg.sender_id === currentUserId ? 'sent' : 'received'}`}
+										className={`${styles.message} ${msg.sender_id === currentUserId ? styles.sent : styles.received}`}
 									>
-										<div className="message-bubble">{msg.content}</div>
-										<div className="message-time">
+										<div className={styles.messageBubble}>{msg.content}</div>
+										<div className={styles.messageTime}>
 											{new Date(msg.created_at).toLocaleTimeString()}
 										</div>
 									</div>
 								))}
 							</div>
 
-							<div className="chat-input-area">
+							<div className={styles.chatInputArea}>
 								<input
 									type="text"
 									value={newMessage}
@@ -250,7 +250,7 @@ function Chat() {
 							</div>
 						</>
 					) : (
-						<div className="no-chat-selected">
+						<div className={styles.noChatSelected}>
 							<p>{t('select_chat')}</p>
 						</div>
 					)}

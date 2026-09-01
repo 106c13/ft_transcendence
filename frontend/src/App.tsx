@@ -1,14 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
 import AuthLayout from './layouts/AuthLayout'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Profile from './pages/Profile'
-import Settings from './pages/Settings'
-import NotFound from './pages/NotFound'
-import Home from './pages/Home'
-import Chat from './pages/Chat'
-import Game from './pages/Game'
+import Login from './pages/LoginPage/Login'
+import Register from './pages/RegisterPage/Register'
+import Profile from './pages/ProfilePage/Profile'
+import Settings from './pages/SettingsPage/Settings'
+import NotFound from './pages/NotFoundPage/NotFound'
+import Home from './pages/HomePage/Home'
+import Chat from './pages/ChatPage/Chat'
+import Game from './pages/GamePage/Game'
 
 export default function App() {
   return (

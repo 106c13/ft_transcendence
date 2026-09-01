@@ -1,0 +1,285 @@
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import styles from '../Profile.module.css'
+import authStyles from '../Auth.module.css'
+import ProfileHeader from '../../components/ProfileHeader/ProfileHeader'
+import FriendsList from '../../components/FriendsList/FriendsList'
+
+export type User = {
+    id: number
+    username: string
+    email: string
+    avatar?: string
+    bio?: string
+    created_at?: string
+    status?: string
+    isOwnProfile?: boolean
+}
+
+export type FriendStatus =
+    | 'NONE'
+    | 'PENDING'
+    | 'ACCEPTED'
+    | 'RECEIVED'
+    | 'SENT'
+
+function Profile() {
+    const { t } = useTranslation()
+    const [user, setUser] = useState<User | null>(null)
+    const [error] = useState('')
+    const [menuOpen, setMenuOpen] = useState(false)
+    const [friendStatus, setFriendStatus] = useState<FriendStatus>('NONE')
+    const [activeTab, setActiveTab] =
+        useState<'overview' | 'games' | 'friends'>('overview')
+    const [friends, setFriends] = useState<User[]>([])
+    const isLoggedIn = !!localStorage.getItem('token')
+
+    const navigate = useNavigate()
+    const { username } = useParams()
+
+    const loadFriendStatus = async (token: string, username: string) => {
+        try {
+            const res = await fetch(`/api/friends/status/${username}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+
+            if (!res.ok) return
+
+            const data = await res.json()
+
+            setFriendStatus(
+                (data?.status?.toUpperCase() as FriendStatus) || 'NONE',
+            )
+        } catch {
+            setFriendStatus('NONE')
+        }
+    }
+
+    const loadFriends = async () => {
+        if (!user) return
+
+        try {
+            const token = localStorage.getItem('token')
+            if (!token) return
+
+            const res = await fetch(`/api/friends/list/${user.username}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+
+            if (!res.ok) return
+
+            const data = await res.json()
+            setFriends(data)
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    const loadProfile = async () => {
+        try {
+            const token = localStorage.getItem('token')
+
+            const endpoint = username ? `/api/users/${username}` : '/api/users/me'
+            const headers: HeadersInit = {}
+
+            if (token) {
+                headers.Authorization = `Bearer ${token}`
+            }
+
+            const res = await fetch(endpoint, { headers })
+
+            if (res.status === 404) {
+                setUser(null)
+                return
+            }
+
+            if (!res.ok) {
+                localStorage.removeItem('token')
+                navigate('/login')
+                return
+            }
+
+            const data = await res.json()
+            setUser({
+                ...data,
+                isOwnProfile: data.isOwnProfile ?? false
+            })
+
+            if (token && username && data.isOwnProfile === false) {
+                loadFriendStatus(token, username)
+            }
+        } catch {
+            localStorage.removeItem('token')
+            navigate('/login')
+        }
+    }
+
+    useEffect(() => {
+        loadProfile()
+    }, [username])
+
+    const sendFriendRequest = async () => {
+        if (!user) return
+
+        const token = localStorage.getItem('token')
+        if (!token) return
+
+        const res = await fetch(`/api/friends/request/${user.username}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+
+        if (res.ok) setFriendStatus('SENT')
+    }
+
+    const acceptFriendRequest = async () => {
+        if (!user) return
+
+        const token = localStorage.getItem('token')
+        if (!token) return
+
+        const res = await fetch(`/api/friends/accept/${user.username}`, {
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+
+        if (res.ok) setFriendStatus('ACCEPTED')
+    }
+
+    const rejectFriendRequest = async () => {
+        if (!user) return
+
+        const token = localStorage.getItem('token')
+        if (!token) return
+
+        const res = await fetch(`/api/friends/reject/${user.username}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+
+        if (res.ok) setFriendStatus('NONE')
+    }
+
+    const cancelFriendRequest = async () => {
+        if (!user) return
+
+        const token = localStorage.getItem('token')
+        if (!token) return
+
+        const res = await fetch(`/api/friends/cancel/${user.username}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+
+        if (res.ok) setFriendStatus('NONE')
+    }
+
+    const unFriendRequest = async () => {
+        if (!user) return
+
+        const token = localStorage.getItem('token')
+        if (!token) return
+
+        const res = await fetch(`/api/friends/unfriend/${user.username}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+
+        if (res.ok) setFriendStatus('NONE')
+    }
+
+    const logout = () => {
+        localStorage.removeItem('token')
+        navigate('/login')
+    }
+
+    if (error) {
+        return (
+            <div className={authStyles.authPage}>
+                <p className={`${styles.msg} ${styles.error}`}>{error}</p>
+            </div>
+        )
+    }
+
+    if (!user) {
+        return (
+            <div className={authStyles.authPage}>
+                <p className={styles.msg}>{t('user_not_found')}</p>
+            </div>
+        )
+    }
+
+    return (
+        <div className={styles.profilePage}>
+            <ProfileHeader
+                user={user}
+                isOwnProfile={user.isOwnProfile || false}
+                isLoggedIn={isLoggedIn}
+                menuOpen={menuOpen}
+                setMenuOpen={setMenuOpen}
+                friendStatus={friendStatus}
+                onSend={sendFriendRequest}
+                onAccept={acceptFriendRequest}
+                onReject={rejectFriendRequest}
+                onCancel={cancelFriendRequest}
+                onUnfriend={unFriendRequest}
+                onLogout={logout}
+                onSettings={() => navigate('/profile/settings')}
+            />
+
+            <div className={styles.profileTabs}>
+                <div
+                    className={`${styles.tab} ${activeTab === 'overview' ? styles.active : ''}`}
+                    onClick={() => setActiveTab('overview')}
+                >
+                    {t('overview')}
+                </div>
+
+                <div
+                    className={styles.tab}
+                    onClick={() => navigate(`/profile/${user.username}/games`)}
+                >
+                    {t('games')}
+                </div>
+
+                <div
+                    className={`${styles.tab} ${activeTab === 'friends' ? styles.active : ''}`}
+                    onClick={() => {
+                        setActiveTab('friends')
+                        loadFriends()
+                    }}
+                >
+                    {t('friends')}
+                </div>
+            </div>
+
+            {activeTab === 'overview' && (
+                <div className={styles.profileContent}>{t('overview_content')}</div>
+            )}
+
+            {activeTab === 'friends' && (
+                <FriendsList
+                    friends={friends}
+                    onOpenProfile={(username) => navigate(`/profile/${username}`)}
+                />
+            )}
+        </div>
+    )
+}
+
+export default Profile

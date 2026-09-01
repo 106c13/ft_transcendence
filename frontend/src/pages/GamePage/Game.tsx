@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import io, { Socket } from 'socket.io-client';
 import { Chess } from 'chess.js';
 import type { Square } from 'chess.js';
-import './Game.css';
+import styles from './Game.module.css';
 
 interface Premove {
     from: string;
@@ -61,6 +61,15 @@ const getPieceImageSrc = (type: string, color: 'w' | 'b'): string => {
 
 const PIECE_NAME: Record<string, string> = {
     p: 'Pawn', n: 'Knight', b: 'Bishop', r: 'Rook', q: 'Queen', k: 'King',
+};
+
+const modeTagClassMap: Record<string, keyof typeof styles> = {
+    'bullet': 'bullet',
+    'bullet+2': 'bulletInc',
+    'blitz': 'blitz',
+    'blitz+2': 'blitzInc',
+    'rapid': 'rapid',
+    'rapid+2': 'rapidInc',
 };
 
 interface User {
@@ -237,7 +246,7 @@ export default function Game() {
             if (data.history && data.history.length > 0) {
                 const replayChess = new Chess();
                 for (const san of data.history) {
-                    try { replayChess.move(san); } catch {}
+                    try { replayChess.move(san); } catch { }
                     historyFens.push(replayChess.fen());
                 }
             }
@@ -284,7 +293,7 @@ export default function Game() {
                         to: nextPremove.to,
                         promotion: nextPremove.promotion || 'q',
                     });
-                } catch {}
+                } catch { }
 
                 if (validMove) {
                     if (socketRef.current && gameIdRef.current) {
@@ -395,7 +404,7 @@ export default function Game() {
     // Scroll highlighted move into view
     useEffect(() => {
         if (moveListRef.current) {
-            const active = moveListRef.current.querySelector('.move-cell.active-move');
+            const active = moveListRef.current.querySelector(`.${styles.moveCell}.${styles.activeMove}`);
             if (active) active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
     }, [viewIndex]);
@@ -677,48 +686,48 @@ export default function Game() {
     };
 
     return (
-        <div className="game-container">
-            <main className="game-main">
+        <div className={styles.gameContainer}>
+            <main className={styles.gameMain}>
                 {gameState === 'searching' && (
-                    <div className="searching-card">
-                        <div className="searching-pulse">
+                    <div className={styles.searchingCard}>
+                        <div className={styles.searchingPulse}>
                             <img
                                 src={getPieceImageSrc('p', 'w')}
                                 alt=""
-                                className="searching-pulse-icon"
+                                className={styles.searchingPulseIcon}
                             />
                         </div>
                         <h3>{t('searching_match', 'Searching for opponent...')}</h3>
                         <p>{t('searching_desc', 'Filtering by match speed: ')} <strong>{selectedMode}</strong></p>
-                        <button className="cancel-match-btn" onClick={cancelMatchmaking}>
+                        <button className={styles.cancelMatchBtn} onClick={cancelMatchmaking}>
                             {t('cancel', 'Cancel')}
                         </button>
                     </div>
                 )}
 
                 {gameState === 'playing' && (
-                    <div className="game-play-area">
+                    <div className={styles.gamePlayArea}>
                         {/* Chess Board Area */}
                         <div
-                            className="board-container"
+                            className={styles.boardContainer}
                             onContextMenu={(e) => {
                                 e.preventDefault();
                                 setPremoves([]);
                             }}
                         >
                             {/* Opponent Banner */}
-                            <div className={`player-banner ${turn !== playerColor ? 'active-turn' : ''} ${(turn !== playerColor && (turn === 'w' ? whiteTime : blackTime) < 15000) ? 'low-time' : ''}`}>
-                                <div className="player-info">
-                                    <span className={`player-color-dot ${playerColor === 'w' ? 'black' : 'white'}`}></span>
-                                    <span className="player-name">{opponentName}</span>
+                            <div className={`${styles.playerBanner} ${turn !== playerColor ? styles.activeTurn : ''} ${(turn !== playerColor && (turn === 'w' ? whiteTime : blackTime) < 15000) ? styles.lowTime : ''}`}>
+                                <div className={styles.playerInfo}>
+                                    <span className={`${styles.playerColorDot} ${playerColor === 'w' ? styles.black : styles.white}`}></span>
+                                    <span className={styles.playerName}>{opponentName}</span>
                                 </div>
-                                <div className="game-clock">
+                                <div className={styles.gameClock}>
                                     {formatTime(playerColor === 'w' ? blackTime : whiteTime)}
                                 </div>
                             </div>
 
                             {/* Active Board */}
-                            <div className={`chess-board${isReviewing ? ' reviewing' : ''}`} data-fen={displayFen}>
+                            <div className={`${styles.chessBoard}${isReviewing ? ` ${styles.reviewing}` : ''}`} data-fen={displayFen}>
                                 {ranks.map((rank, rankIdx) =>
                                     files.map((file, fileIdx) => {
                                         const sq = `${file}${rank}`;
@@ -737,21 +746,21 @@ export default function Game() {
                                                 onClick={() => handleSquareClick(sq)}
                                                 onDragOver={handleDragOver}
                                                 onDrop={(e) => handleDrop(e, sq)}
-                                                className={`square ${isLight ? 'light' : 'dark'} ${isSel ? 'selected' : ''} ${isPremoveSq ? 'premove' : ''} ${isLastSrc ? 'last-move-src' : ''} ${isLastDst ? 'last-move-dst' : ''} ${isKingInCheck ? 'check' : ''}`}
+                                                className={`${styles.square} ${isLight ? styles.light : styles.dark} ${isSel ? styles.selected : ''} ${isPremoveSq ? styles.premove : ''} ${isLastSrc ? styles.lastMoveSrc : ''} ${isLastDst ? styles.lastMoveDst : ''} ${isKingInCheck ? styles.check : ''}`}
                                             >
                                                 {piece && (
                                                     <img
                                                         src={getPieceImageSrc(piece.type, piece.color)}
                                                         alt={`${piece.color === 'w' ? 'White' : 'Black'} ${PIECE_NAME[piece.type]}`}
-                                                        className={`piece ${piece.color === 'w' ? 'white' : 'black'}`}
+                                                        className={`${styles.piece} ${piece.color === 'w' ? styles.white : styles.black}`}
                                                         draggable={true}
                                                         onDragStart={(e) => handleDragStart(e, sq)}
                                                     />
                                                 )}
 
                                                 {/* Valid target highlights */}
-                                                {isValid && !piece && <div className="valid-move-dot" />}
-                                                {isValid && piece && <div className="valid-move-capture" />}
+                                                {isValid && !piece && <div className={styles.validMoveDot} />}
+                                                {isValid && piece && <div className={styles.validMoveCapture} />}
                                             </div>
                                         );
                                     })
@@ -759,20 +768,20 @@ export default function Game() {
 
                                 {/* Pawn Promotion Overlay */}
                                 {showPromotion && (
-                                    <div className="promotion-overlay">
-                                        <div className="promotion-box">
+                                    <div className={styles.promotionOverlay}>
+                                        <div className={styles.promotionBox}>
                                             <h4>{t('promote_pawn', 'Promote Pawn')}</h4>
-                                            <div className="promotion-options">
+                                            <div className={styles.promotionOptions}>
                                                 {(['q', 'r', 'b', 'n'] as const).map((code) => (
                                                     <button
                                                         key={code}
-                                                        className="promotion-option"
+                                                        className={styles.promotionOption}
                                                         onClick={() => handlePromotionSelect(code)}
                                                     >
                                                         <img
                                                             src={getPieceImageSrc(code, playerColor)}
                                                             alt={PIECE_NAME[code]}
-                                                            className="promotion-piece-icon"
+                                                            className={styles.promotionPieceIcon}
                                                         />
                                                     </button>
                                                 ))}
@@ -783,7 +792,7 @@ export default function Game() {
 
                                 {/* Disconnection Warning Box */}
                                 {isPaused && (
-                                    <div className="game-pause-warning">
+                                    <div className={styles.gamePauseWarning}>
                                         <h4>⚠️ {t('opponent_disconnected_title', 'Opponent Disconnected')}</h4>
                                         <p>{t('opponent_reconnect_wait', 'Waiting for reconnection...')} {pauseCountdown}s</p>
                                     </div>
@@ -791,92 +800,92 @@ export default function Game() {
                             </div>
 
                             {/* Player self Banner */}
-                            <div className={`player-banner bottom ${turn === playerColor ? 'active-turn' : ''} ${(turn === playerColor && (turn === 'w' ? whiteTime : blackTime) < 15000) ? 'low-time' : ''}`}>
-                                <div className="player-info">
-                                    <span className={`player-color-dot ${playerColor === 'w' ? 'white' : 'black'}`}></span>
-                                    <span className="player-name">{currentUser?.username || 'You'}</span>
+                            <div className={`${styles.playerBanner} ${styles.bottom} ${turn === playerColor ? styles.activeTurn : ''} ${(turn === playerColor && (turn === 'w' ? whiteTime : blackTime) < 15000) ? styles.lowTime : ''}`}>
+                                <div className={styles.playerInfo}>
+                                    <span className={`${styles.playerColorDot} ${playerColor === 'w' ? styles.white : styles.black}`}></span>
+                                    <span className={styles.playerName}>{currentUser?.username || 'You'}</span>
                                 </div>
-                                <div className="game-clock">
+                                <div className={styles.gameClock}>
                                     {formatTime(playerColor === 'w' ? whiteTime : blackTime)}
                                 </div>
                             </div>
                         </div>
 
                         {/* Side Information Panel */}
-                        <div className="game-info-panel">
-                            <div className="panel-header">
+                        <div className={styles.gameInfoPanel}>
+                            <div className={styles.panelHeader}>
                                 <h3>{t('match_panel', 'Match Control')}</h3>
-                                <span className={`game-mode-tag ${selectedMode}`}>
+                                <span className={`${styles.gameModeTag} ${styles[modeTagClassMap[selectedMode] || 'blitz']}`}>
                                     {selectedMode}
                                 </span>
                             </div>
 
                             {/* Captured pieces */}
-                            <div className="captured-container">
-                                <span className="captured-label">{t('captured_by_you', 'Captured by You')}</span>
-                                <div className="captured-list">
+                            <div className={styles.capturedContainer}>
+                                <span className={styles.capturedLabel}>{t('captured_by_you', 'Captured by You')}</span>
+                                <div className={styles.capturedList}>
                                     {(playerColor === 'w' ? captured.b : captured.w).map((p, idx) => (
                                         <img
                                             key={idx}
                                             src={getPieceImageSrc(p.type, p.color)}
                                             alt={PIECE_NAME[p.type]}
-                                            className={`captured-piece ${p.color === 'w' ? 'white' : 'black'}`}
+                                            className={`${styles.capturedPiece} ${p.color === 'w' ? styles.white : styles.black}`}
                                         />
                                     ))}
                                     {playerColor === 'w' && whiteScore > blackScore && (
-                                        <span className="material-diff">+{whiteScore - blackScore}</span>
+                                        <span className={styles.materialDiff}>+{whiteScore - blackScore}</span>
                                     )}
                                     {playerColor === 'b' && blackScore > whiteScore && (
-                                        <span className="material-diff">+{blackScore - whiteScore}</span>
+                                        <span className={styles.materialDiff}>+{blackScore - whiteScore}</span>
                                     )}
                                 </div>
 
-                                <span className="captured-label" style={{ marginTop: '10px' }}>{t('captured_by_opponent', 'Captured by Opponent')}</span>
-                                <div className="captured-list">
+                                <span className={styles.capturedLabel} style={{ marginTop: '10px' }}>{t('captured_by_opponent', 'Captured by Opponent')}</span>
+                                <div className={styles.capturedList}>
                                     {(playerColor === 'w' ? captured.w : captured.b).map((p, idx) => (
                                         <img
                                             key={idx}
                                             src={getPieceImageSrc(p.type, p.color)}
                                             alt={PIECE_NAME[p.type]}
-                                            className={`captured-piece ${p.color === 'w' ? 'white' : 'black'}`}
+                                            className={`${styles.capturedPiece} ${p.color === 'w' ? styles.white : styles.black}`}
                                         />
                                     ))}
                                     {playerColor === 'w' && blackScore > whiteScore && (
-                                        <span className="material-diff">+{blackScore - whiteScore}</span>
+                                        <span className={styles.materialDiff}>+{blackScore - whiteScore}</span>
                                     )}
                                     {playerColor === 'b' && whiteScore > blackScore && (
-                                        <span className="material-diff">+{whiteScore - blackScore}</span>
+                                        <span className={styles.materialDiff}>+{whiteScore - blackScore}</span>
                                     )}
                                 </div>
                             </div>
 
                             {/* Move History Logger */}
-                            <div className="move-history-container">
-                                <div className="move-history-header">
-                                    <span className="move-history-title">{t('move_history', 'Move Log')}</span>
-                                    <div className="move-nav-arrows">
+                            <div className={styles.moveHistoryContainer}>
+                                <div className={styles.moveHistoryHeader}>
+                                    <span className={styles.moveHistoryTitle}>{t('move_history', 'Move Log')}</span>
+                                    <div className={styles.moveNavArrows}>
                                         <button title="Start" onClick={() => setViewIndex(0)}>⇤</button>
                                         <button title="Previous" onClick={() => setViewIndex(v => Math.max(0, v - 1))}>◀</button>
                                         <button title="Next" onClick={() => setViewIndex(v => Math.min(moveHistory.length - 1, v + 1))}>▶</button>
                                         <button title="Latest" onClick={() => setViewIndex(moveHistory.length - 1)}>⇥</button>
                                     </div>
                                 </div>
-                                <div className="move-history-list" ref={moveListRef}>
+                                <div className={styles.moveHistoryList} ref={moveListRef}>
                                     {buildMoveRows().map((row) => {
                                         // viewIndex 0 = start (no move active), 1 = white move 1, 2 = black move 1, etc.
                                         const whiteActive = viewIndex === row.whiteIdx + 1;
                                         const blackActive = viewIndex === row.blackIdx + 1;
                                         return (
                                             <>
-                                                <span className="move-row-num" key={`num-${row.num}`}>{row.num}.</span>
+                                                <span className={styles.moveRowNum} key={`num-${row.num}`}>{row.num}.</span>
                                                 <span
                                                     key={`w-${row.num}`}
-                                                    className={`move-cell${whiteActive ? ' active-move' : ''}`}
+                                                    className={`${styles.moveCell}${whiteActive ? ` ${styles.activeMove}` : ''}`}
                                                     onClick={() => setViewIndex(row.whiteIdx + 1)}
                                                 >{row.whiteSan}</span>
                                                 <span
                                                     key={`b-${row.num}`}
-                                                    className={`move-cell${blackActive ? ' active-move' : ''}${!row.blackSan ? ' empty-cell' : ''}`}
+                                                    className={`${styles.moveCell}${blackActive ? ` ${styles.activeMove}` : ''}${!row.blackSan ? ` ${styles.emptyCell}` : ''}`}
                                                     onClick={() => row.blackSan && setViewIndex(row.blackIdx + 1)}
                                                 >{row.blackSan}</span>
                                             </>
@@ -884,18 +893,18 @@ export default function Game() {
                                     })}
                                 </div>
                                 {isReviewing && (
-                                    <div className="reviewing-banner">👁 Reviewing — not live</div>
+                                    <div className={styles.reviewingBanner}>👁 Reviewing — not live</div>
                                 )}
                             </div>
 
                             {/* Resign / Resign actions */}
-                            <div className="game-actions">
+                            <div className={styles.gameActions}>
                                 {isGameOver ? (
-                                    <button className="resign-btn" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#60A5FA', borderColor: 'rgba(96, 165, 250, 0.4)' }} onClick={() => navigate('/home')}>
+                                    <button className={styles.resignBtn} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#60A5FA', borderColor: 'rgba(96, 165, 250, 0.4)' }} onClick={() => navigate('/home')}>
                                         🏠 {t('back_to_lobby', 'Back to Lobby')}
                                     </button>
                                 ) : (
-                                    <button className="resign-btn" onClick={resignGame}>
+                                    <button className={styles.resignBtn} onClick={resignGame}>
                                         🏳️ {t('resign', 'Resign')}
                                     </button>
                                 )}
@@ -906,17 +915,17 @@ export default function Game() {
 
                 {/* Game Over Dialog */}
                 {isGameOver && !hideGameOverModal && (
-                    <div className="game-over-modal">
-                        <div className="game-over-box">
-                            <button className="close-modal-x" onClick={() => setHideGameOverModal(true)}>✕</button>
-                            <div className="game-over-icon">
+                    <div className={styles.gameOverModal}>
+                        <div className={styles.gameOverBox}>
+                            <button className={styles.closeModalX} onClick={() => setHideGameOverModal(true)}>✕</button>
+                            <div className={styles.gameOverIcon}>
                                 {winnerColor === playerColor ? '🏆' : winnerColor === null ? '🤝' : '💀'}
                             </div>
                             <h2>{t('game_over', 'Game Over')}</h2>
-                            <div className="game-over-result">
+                            <div className={styles.gameOverResult}>
                                 {winnerColor === playerColor ? t('victory', 'Victory!') : winnerColor === null ? t('draw', 'Draw') : t('defeat', 'Defeat')}
                             </div>
-                            <div className="game-over-reason">
+                            <div className={styles.gameOverReason}>
                                 {gameOverReason === 'CHECKMATE' && t('reason_checkmate', 'Checkmate')}
                                 {gameOverReason === 'STALEMATE' && t('reason_stalemate', 'Stalemate')}
                                 {gameOverReason === 'TIMEOUT' && t('reason_timeout', 'Time Out')}
@@ -924,7 +933,7 @@ export default function Game() {
                                 {gameOverReason === 'DISCONNECTION' && t('reason_disconnection', 'Opponent Disconnected')}
                                 {gameOverReason === 'DRAW' && t('reason_draw', 'Draw')}
                             </div>
-                            <button className="play-again-btn" onClick={() => {
+                            <button className={styles.playAgainBtn} onClick={() => {
                                 setIsGameOver(false);
                                 startMatchmaking();
                             }}>

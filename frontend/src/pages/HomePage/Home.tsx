@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import type { LayoutContextType } from '../layouts/MainLayout'
-import './Home.css'
+import type { LayoutContextType } from '../../layouts/MainLayout'
+import styles from './Home.module.css'
 
 type User = {
 	id: number
@@ -16,13 +16,22 @@ type User = {
 type GameMode = 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2'
 
 const MODES: { id: GameMode; emoji: string; label: string; time: string; desc: string; increment?: string }[] = [
-	{ id: 'bullet',   emoji: '🔥', label: 'Bullet',   time: '1 min',   desc: 'Fast and explosive' },
-	{ id: 'bullet+2', emoji: '🔥', label: 'Bullet',   time: '1 | +2s', desc: 'Fast with increment', increment: '+2' },
-	{ id: 'blitz',    emoji: '⚡', label: 'Blitz',    time: '3 min',   desc: 'Standard rapid action' },
-	{ id: 'blitz+2',  emoji: '⚡', label: 'Blitz',    time: '3 | +2s', desc: 'Blitz with increment', increment: '+2' },
-	{ id: 'rapid',    emoji: '⏳', label: 'Rapid',    time: '10 min',  desc: 'Strategic classical' },
-	{ id: 'rapid+2',  emoji: '⏳', label: 'Rapid',    time: '10 | +2s',desc: 'Rapid with increment', increment: '+2' },
+	{ id: 'bullet', emoji: '🔥', label: 'Bullet', time: '1 min', desc: 'Fast and explosive' },
+	{ id: 'bullet+2', emoji: '🔥', label: 'Bullet', time: '1 | +2s', desc: 'Fast with increment', increment: '+2' },
+	{ id: 'blitz', emoji: '⚡', label: 'Blitz', time: '3 min', desc: 'Standard rapid action' },
+	{ id: 'blitz+2', emoji: '⚡', label: 'Blitz', time: '3 | +2s', desc: 'Blitz with increment', increment: '+2' },
+	{ id: 'rapid', emoji: '⏳', label: 'Rapid', time: '10 min', desc: 'Strategic classical' },
+	{ id: 'rapid+2', emoji: '⏳', label: 'Rapid', time: '10 | +2s', desc: 'Rapid with increment', increment: '+2' },
 ]
+
+const modeClassMap: Record<GameMode, keyof typeof styles> = {
+	'bullet': 'homeModeBullet',
+	'bullet+2': 'homeModeBulletInc',
+	'blitz': 'homeModeBlitz',
+	'blitz+2': 'homeModeBlitzInc',
+	'rapid': 'homeModeRapid',
+	'rapid+2': 'homeModeRapidInc',
+}
 
 function Home() {
 	const { t } = useTranslation()
@@ -31,7 +40,7 @@ function Home() {
 	const [searchResults, setSearchResults] = useState<User[]>([])
 	const [showResults, setShowResults] = useState(false)
 	const [isSearching, setIsSearching] = useState(false)
-	const {currentUser} = useOutletContext<LayoutContextType>();
+	const { currentUser } = useOutletContext<LayoutContextType>();
 
 	const handleSearch = async () => {
 		if (!searchQuery.trim()) {
@@ -79,11 +88,11 @@ function Home() {
 	const getStatusDot = (status?: string) => {
 		switch (status) {
 			case 'ONLINE':
-				return <span className="status-dot online"></span>
+				return <span className={`${styles.statusDot} ${styles.online}`}></span>
 			case 'INGAME':
-				return <span className="status-dot ingame"></span>
+				return <span className={`${styles.statusDot} ${styles.ingame}`}></span>
 			default:
-				return <span className="status-dot offline"></span>
+				return <span className={`${styles.statusDot} ${styles.offline}`}></span>
 		}
 	}
 
@@ -92,42 +101,42 @@ function Home() {
 	}
 
 	return (
-		<div className="home-container">
-			<main className="main-content">
-				<div className="content-header">
+		<div className={styles.homeContainer}>
+			<main className={styles.mainContent}>
+				<div className={styles.contentHeader}>
 					<h1>{t('welcome', { username: currentUser?.username || 'Player' })}</h1>
-					<p className="content-subtitle">{t('home_subtitle', 'Select a game mode and jump straight into a match')}</p>
+					<p className={styles.contentSubtitle}>{t('home_subtitle', 'Select a game mode and jump straight into a match')}</p>
 				</div>
 
 				{/* Central Search Section */}
-				<div className="home-search-section">
-					<div className="home-search-container">
-						<span className="home-search-icon">🔍</span>
+				<div className={styles.homeSearchSection}>
+					<div className={styles.homeSearchContainer}>
+						<span className={styles.homeSearchIcon}>🔍</span>
 						<input
 							type="text"
 							placeholder={t('search_placeholder', 'Search players...')}
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							className="home-search-input"
+							className={styles.homeSearchInput}
 						/>
-						{isSearching && <span className="home-search-spinner"></span>}
+						{isSearching && <span className={styles.homeSearchSpinner}></span>}
 
 						{showResults && searchResults.length > 0 && (
-							<div className="home-search-results">
+							<div className={styles.homeSearchResults}>
 								{searchResults.map((user) => (
 									<div
 										key={user.username}
-										className="home-search-result-item"
+										className={styles.homeSearchResultItem}
 										onClick={() => handleUserClick(user.username)}
 									>
 										<img
 											src={user.avatar ? `/uploads/${user.avatar}` : `/assets/default.jpg`}
 											alt={user.username}
-											className="home-search-result-avatar"
+											className={styles.homeSearchResultAvatar}
 										/>
-										<div className="home-search-result-info">
-											<div className="home-search-result-name">{user.username}</div>
-											{user.bio && <div className="home-search-result-bio">{user.bio}</div>}
+										<div className={styles.homeSearchResultInfo}>
+											<div className={styles.homeSearchResultName}>{user.username}</div>
+											{user.bio && <div className={styles.homeSearchResultBio}>{user.bio}</div>}
 										</div>
 										{getStatusDot(user.status)}
 									</div>
@@ -136,30 +145,30 @@ function Home() {
 						)}
 
 						{showResults && searchResults.length === 0 && searchQuery && (
-							<div className="home-search-results empty">
+							<div className={`${styles.homeSearchResults} ${styles.empty}`}>
 								{t('no_users_found', 'No users found')}
 							</div>
 						)}
 					</div>
 				</div>
 
-				<div className="home-modes-grid">
+				<div className={styles.homeModesGrid}>
 					{MODES.map((mode) => (
 						<button
 							key={mode.id}
-							className={`home-mode-card home-mode-${mode.id.replace('+2', '-inc')}`}
+							className={`${styles.homeModeCard} ${styles[modeClassMap[mode.id]]}`}
 							onClick={() => handlePlayMode(mode.id)}
 						>
-							<div className="home-mode-top">
-								<span className="home-mode-emoji">{mode.emoji}</span>
+							<div className={styles.homeModeTop}>
+								<span className={styles.homeModeEmoji}>{mode.emoji}</span>
 								{mode.increment && (
-									<span className="home-mode-inc-badge">+2s / move</span>
+									<span className={styles.homeModeIncBadge}>+2s / move</span>
 								)}
 							</div>
-							<div className="home-mode-label">{mode.label}</div>
-							<div className="home-mode-time">{mode.time}</div>
-							<div className="home-mode-desc">{mode.desc}</div>
-							<div className="home-mode-play">Play ⚔️</div>
+							<div className={styles.homeModeLabel}>{mode.label}</div>
+							<div className={styles.homeModeTime}>{mode.time}</div>
+							<div className={styles.homeModeDesc}>{mode.desc}</div>
+							<div className={styles.homeModePlay}>Play ⚔️</div>
 						</button>
 					))}
 				</div>

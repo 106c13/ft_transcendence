@@ -1,4 +1,4 @@
-.profile-page {
+.profilePage {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -8,10 +8,10 @@
 }
 
 /* TABS */
-.profile-tabs {
-	display: flex;
-	gap: 20px;
-	margin-top: 20px;
+.profileTabs {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
 }
 
 .tab {
@@ -47,7 +47,7 @@
   color: #4ADE80;
 }
 
-.profile-content {
-	padding: 14px;
-	color: #94A3B8;
+.profileContent {
+  padding: 14px;
+  color: #94A3B8;
 }
