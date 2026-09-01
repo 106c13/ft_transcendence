@@ -1,49 +1,29 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import io, { Socket } from 'socket.io-client'
 import type { LayoutContextType } from '../../layouts/MainLayout'
+import ChatSidebar, { type ChatObject } from '../../components/ChatSidebar/ChatSidebar'
+import ChatMain, { type Message } from '../../components/ChatMain/ChatMain'
 import styles from './Chat.module.css'
-
-type Chat = {
-	id: number
-	chat_id: string
-	user1_id: number
-	user2_id: number
-	user1: { id: number; username: string; avatar?: string }
-	user2: { id: number; username: string; avatar?: string }
-}
-
-type Message = {
-	id: number
-	chat_id: string
-	sender_id: number
-	content: string
-	created_at: string
-	sender?: { id: number; username: string; avatar?: string }
-}
 
 function Chat() {
 	const navigate = useNavigate()
 	const { user_id } = useParams()
-	const [chats, setChats] = useState<Chat[]>([])
-	const [selectedChat, setSelectedChat] = useState<Chat | null>(null)
+	const [chats, setChats] = useState<ChatObject[]>([])
+	const [selectedChat, setSelectedChat] = useState<ChatObject | null>(null)
 	const [messages, setMessages] = useState<Message[]>([])
 	const [newMessage, setNewMessage] = useState('')
 	const { currentUser } = useOutletContext<LayoutContextType>()
 	const currentUserId = currentUser?.id ?? null
-	const { t } = useTranslation()
 	const socketRef = useRef<Socket | null>(null)
-	const selectedChatRef = useRef(selectedChat) // ADD THIS
+	const selectedChatRef = useRef(selectedChat)
 
 	const token = localStorage.getItem('token')
 
-	// Update ref when selectedChat changes
 	useEffect(() => {
 		selectedChatRef.current = selectedChat
 	}, [selectedChat])
 
-	// Connect to Socket.io
 	useEffect(() => {
 		if (!currentUserId) return
 
@@ -61,7 +41,6 @@ function Chat() {
 			console.log('New message received:', data)
 			const newMsg = data.message
 
-			// Use ref instead of selectedChat state
 			if (selectedChatRef.current && newMsg.chat_id === selectedChatRef.current.chat_id) {
 				setMessages(prev => [...prev, newMsg])
 			}
@@ -74,9 +53,8 @@ function Chat() {
 		return () => {
 			socket.disconnect()
 		}
-	}, [currentUserId]) // Remove selectedChat from here
+	}, [currentUserId])
 
-	// Fetch all chats
 	const refreshChats = () => {
 		if (!currentUserId) return
 
@@ -95,7 +73,6 @@ function Chat() {
 		refreshChats()
 	}, [currentUserId])
 
-	// Handle URL parameter (user_id)
 	useEffect(() => {
 		if (!currentUserId || !user_id) return
 
@@ -116,7 +93,6 @@ function Chat() {
 			.catch(err => console.error(err))
 	}, [user_id, currentUserId])
 
-	// Handle clicking on chat from sidebar
 	useEffect(() => {
 		if (!selectedChat || user_id) return
 
@@ -160,9 +136,16 @@ function Chat() {
 		}
 	}
 
-	const getOtherUser = (chat: Chat) => {
+	const getOtherUser = (chat: ChatObject) => {
 		if (!currentUserId) return null
 		return chat.user1_id === currentUserId ? chat.user2 : chat.user1
+	}
+
+	const handleSelectChat = (chat: ChatObject) => {
+		setSelectedChat(chat)
+		if (user_id) {
+			navigate('/chat', { replace: true })
+		}
 	}
 
 	if (!currentUserId) {
@@ -172,90 +155,20 @@ function Chat() {
 	return (
 		<div className={styles.chatContainer}>
 			<main className={styles.chatContent}>
-
-				<div className={styles.chatSidebar}>
-					<div className={styles.chatList}>
-						{chats.map(chat => {
-							const otherUser = getOtherUser(chat)
-							return (
-								<div
-									className={`${styles.chatItem} ${selectedChat?.id === chat.id ? styles.active : ''}`}
-									key={chat.id}
-									onClick={() => {
-										setSelectedChat(chat)
-										if (user_id) {
-											navigate('/chat', { replace: true })
-										}
-									}}
-								>
-									<img
-										src={otherUser?.avatar ? `/uploads/${otherUser.avatar}` : '/assets/default.jpg'}
-										alt={otherUser?.username}
-										className={styles.chatAvatar}
-									/>
-									<div className={styles.chatItemInfo}>
-										<div className={styles.chatItemName}>{otherUser?.username}</div>
-									</div>
-								</div>
-							)
-						})}
-						{chats.length === 0 && (
-							<div className={styles.noChats}>No chats yet</div>
-						)}
-					</div>
-				</div>
-
-				<div className={styles.chatMain}>
-					{selectedChat ? (
-						<>
-							<div
-								className={styles.chatMainHeader}
-								onClick={() => {
-									const otherUser = getOtherUser(selectedChat)
-									if (otherUser) {
-										navigate(`/profile/${otherUser.username}`)
-									}
-								}}
-							>
-								<img
-									src={getOtherUser(selectedChat)?.avatar ? `/uploads/${getOtherUser(selectedChat)?.avatar}` : '/assets/default.jpg'}
-									alt={getOtherUser(selectedChat)?.username}
-									className={styles.chatMainAvatar}
-								/>
-								<h3>{getOtherUser(selectedChat)?.username}</h3>
-							</div>
-							<div className={styles.chatMessages}>
-								{messages.map(msg => (
-									<div
-										key={msg.id}
-										className={`${styles.message} ${msg.sender_id === currentUserId ? styles.sent : styles.received}`}
-									>
-										<div className={styles.messageBubble}>{msg.content}</div>
-										<div className={styles.messageTime}>
-											{new Date(msg.created_at).toLocaleTimeString()}
-										</div>
-									</div>
-								))}
-							</div>
-
-							<div className={styles.chatInputArea}>
-								<input
-									type="text"
-									value={newMessage}
-									onChange={e => setNewMessage(e.target.value)}
-									onKeyPress={e => e.key === 'Enter' && sendMessage()}
-									placeholder={t('type_message')}
-								/>
-								<button onClick={sendMessage}>{t('send')}</button>
-							</div>
-						</>
-					) : (
-						<div className={styles.noChatSelected}>
-							<p>{t('select_chat')}</p>
-						</div>
-					)}
-				</div>
-
+				<ChatSidebar
+					chats={chats}
+					selectedChat={selectedChat}
+					currentUserId={currentUserId}
+					onSelectChat={handleSelectChat}
+				/>
+				<ChatMain
+					selectedChat={selectedChat}
+					messages={messages}
+					newMessage={newMessage}
+					currentUserId={currentUserId}
+					onNewMessageChange={setNewMessage}
+					onSendMessage={sendMessage}
+				/>
 			</main>
 		</div>
 	)
