@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import NotificationBell from './NotificationBell'
-import './Navbar.css'
+import NotificationBell from '../NotificationBell/NotificationBell'
+import styles from './Navbar.module.css'
 
 type Props = {
 	currentUser?: { id: number; username: string; avatar?: string } | null
@@ -20,15 +20,15 @@ function Navbar({ currentUser }: Props) {
 	}
 
 	return (
-		<header className="navbar">
-			<div className="navbar-brand" onClick={() => navigate('/home')}>
+		<header className={styles.navbar}>
+			<div className={styles.navbarBrand} onClick={() => navigate('/home')}>
 				<h2>ft_transcendence</h2>
 			</div>
 
-			<div className="navbar-actions">
+			<div className={styles.navbarActions}>
 				{/* Messages */}
-				<div className="nav-action-item" onClick={() => navigate('/chat')} title={t('chat', 'Chat')}>
-					<span className="nav-action-icon">✉️</span>
+				<div className={styles.navActionItem} onClick={() => navigate('/chat')} title={t('chat', 'Chat')}>
+					<span className={styles.navActionIcon}>✉️</span>
 				</div>
 
 				{/* Notifications */}
@@ -36,17 +36,17 @@ function Navbar({ currentUser }: Props) {
 
 				{/* Language Switcher */}
 				<div
-					className="nav-action-item language-menu"
+					className={styles.navActionItem}
 					onClick={() => {
 						setShowLanguageMenu(!showLanguageMenu)
 						setShowProfileMenu(false)
 					}}
 					title={t('language', 'Language')}
 				>
-					<span className="nav-action-icon">🌐</span>
+					<span className={styles.navActionIcon}>🌐</span>
 
 					{showLanguageMenu && (
-						<div className="language-dropdown">
+						<div className={styles.languageDropdown}>
 							<div onClick={() => changeLanguage('en')}>🇬🇧 English</div>
 							<div onClick={() => changeLanguage('ru')}>🇷🇺 Русский</div>
 							<div onClick={() => changeLanguage('hy')}>🇦🇲 Հայերեն</div>
@@ -56,7 +56,7 @@ function Navbar({ currentUser }: Props) {
 
 				{/* Profile Dropdown */}
 				<div
-					className="nav-action-item profile-menu"
+					className={`${styles.navActionItem} ${styles.profileMenu}`}
 					onClick={() => {
 						setShowProfileMenu(!showProfileMenu)
 						setShowLanguageMenu(false)
@@ -65,11 +65,11 @@ function Navbar({ currentUser }: Props) {
 					<img
 						src={currentUser?.avatar ? `/uploads/${currentUser.avatar}` : '/assets/default.jpg'}
 						alt="profile"
-						className="nav-profile-avatar"
+						className={styles.navProfileAvatar}
 					/>
 
 					{showProfileMenu && (
-						<div className="profile-dropdown">
+						<div className={styles.profileDropdown}>
 							<div onClick={() => navigate(`/profile/${currentUser?.username || ''}`)}>
 								👤 {t('my_profile', 'My Profile')}
 							</div>
@@ -77,7 +77,7 @@ function Navbar({ currentUser }: Props) {
 								⚙️ {t('settings', 'Settings')}
 							</div>
 							<div
-								className="danger"
+								className={styles.danger}
 								onClick={() => {
 									localStorage.removeItem('token')
 									navigate('/login')

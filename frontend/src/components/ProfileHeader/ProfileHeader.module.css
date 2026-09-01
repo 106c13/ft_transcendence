@@ -1,0 +1,197 @@
+.profileHeader {
+    display: flex;
+    align-items: flex-start;
+    gap: 25px;
+
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+
+    background: #1E293B;
+    padding: 25px;
+    border-radius: 14px;
+
+    position: relative;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.profileActions {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.menuBtn {
+  cursor: pointer;
+  font-size: 22px;
+  color: #94A3B8;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.menuBtn:hover {
+  background: #26334A;
+}
+
+/* dropdown (FIXED - no hover flicker) */
+.menuDropdown {
+  position: absolute;
+  right: 0;
+  top: 40px;
+
+  background: #0F172A;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+
+  min-width: 160px;
+
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 100;
+}
+
+/* controlled open state (NOT hover) */
+.menuDropdown.open {
+  display: flex;
+}
+
+.menuDropdown div {
+  padding: 12px;
+  cursor: pointer;
+  color: #E2E8F0;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.menuDropdown div:hover {
+  background: #1E293B;
+}
+
+.menuDropdown .danger {
+  color: #F87171;
+}
+
+.profileAvatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #3B82F6;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.username {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.flag {
+  font-size: 20px;
+}
+
+.bio {
+  margin-top: 8px;
+  color: #94A3B8;
+}
+
+.meta {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #94A3B8;
+  display: flex;
+  gap: 10px;
+}
+
+.headerActions {
+    margin-left: auto;
+    display: flex;
+    align-items: flex-start;
+}
+
+.headerActions button {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    color: white;
+}
+
+.headerActions button:hover {
+    transform: translateY(-1px);
+}
+
+.addFriendBtn {
+    background: #60A5FA;
+    color: #E2E8F0;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.addFriendBtn:hover {
+    background: #6aacfc;
+    transform: translateY(-1px);
+}
+
+.pendingBtn {
+    background: #475569;
+}
+
+.acceptBtn {
+    background: #22C55E;
+}
+
+.rejectBtn {
+    background: #EF4444;
+}
+
+.friendsBtn {
+    background: #2563EB;
+    color: #0f172a;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s;
+    cursor: default;
+}
+
+.messageBtn {
+    background: #3B82F6;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+    margin-left: 8px;
+}
+
+.messageBtn:hover {
+    background: #2563EB;
+    transform: translateY(-1px);
+}

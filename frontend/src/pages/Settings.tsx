@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import './Profile.css'
-import Navbar from '../components/Navbar'
+import Navbar from '../components/Navbar/Navbar'
 
 function Settings() {
 	const { t } = useTranslation()

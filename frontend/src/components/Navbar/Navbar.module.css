@@ -14,12 +14,12 @@
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-.navbar-brand {
+.navbarBrand {
 	cursor: pointer;
 	user-select: none;
 }
 
-.navbar-brand h2 {
+.navbarBrand h2 {
 	font-size: 22px;
 	font-weight: 700;
 	margin: 0;
@@ -30,13 +30,13 @@
 	letter-spacing: -0.5px;
 }
 
-.navbar-actions {
+.navbarActions {
 	display: flex;
 	align-items: center;
 	gap: 16px;
 }
 
-.nav-action-item {
+.navActionItem {
 	width: 42px;
 	height: 42px;
 	display: flex;
@@ -48,16 +48,16 @@
 	position: relative;
 }
 
-.nav-action-item:hover {
+.navActionItem:hover {
 	background: rgba(96, 165, 250, 0.12);
 	transform: translateY(-1px);
 }
 
-.nav-action-icon {
+.navActionIcon {
 	font-size: 20px;
 }
 
-.nav-profile-avatar {
+.navProfileAvatar {
 	width: 36px;
 	height: 36px;
 	border-radius: 50%;
@@ -66,13 +66,13 @@
 	transition: border-color 0.2s ease;
 }
 
-.nav-action-item.profile-menu:hover .nav-profile-avatar {
+.navActionItem.profileMenu:hover .navProfileAvatar {
 	border-color: #60A5FA;
 }
 
 /* Dropdown menus */
-.profile-dropdown,
-.language-dropdown {
+.profileDropdown,
+.languageDropdown {
 	position: absolute;
 	top: 52px;
 	right: 0;
@@ -97,8 +97,8 @@
 	}
 }
 
-.profile-dropdown div,
-.language-dropdown div {
+.profileDropdown div,
+.languageDropdown div {
 	padding: 12px 18px;
 	cursor: pointer;
 	color: #E2E8F0;
@@ -110,16 +110,16 @@
 	gap: 10px;
 }
 
-.profile-dropdown div:hover,
-.language-dropdown div:hover {
+.profileDropdown div:hover,
+.languageDropdown div:hover {
 	background: rgba(96, 165, 250, 0.12);
 }
 
-.profile-dropdown .danger {
+.profileDropdown .danger {
 	color: #F87171;
 	border-top: 1px solid rgba(148, 163, 184, 0.12);
 }
 
-.profile-dropdown .danger:hover {
+.profileDropdown .danger:hover {
 	background: rgba(248, 113, 113, 0.12);
 }

@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import './Profile.css'
-import ProfileHeader from '../components/profile/ProfileHeader'
-import FriendsList from '../components/profile/FriendsList'
+import ProfileHeader from '../components/ProfileHeader/ProfileHeader'
+import FriendsList from '../components/FriendsList/FriendsList'
 
 export type User = {
 	id: number
