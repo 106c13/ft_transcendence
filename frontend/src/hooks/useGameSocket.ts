@@ -6,6 +6,7 @@ import { Chess } from 'chess.js'
 import type { Square } from 'chess.js'
 
 import { getPieceImageSrc } from '../constants/gameConstants'
+import type { GameModeType } from '../constants/gameModeConstats'
 
 interface Premove {
     from: string
@@ -39,8 +40,6 @@ const getSimulatedChess = (baseFen: string, color: 'w' | 'b' | null, premoveList
     return sim
 }
 
-export type GameMode = 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2'
-
 export function useGameSocket() {
     const { t } = useTranslation()
     const navigate = useNavigate()
@@ -50,8 +49,8 @@ export function useGameSocket() {
 
     // Matchmaking and Game States
     const [gameState, setGameState] = useState<'searching' | 'playing'>('searching')
-    const [selectedMode, setSelectedMode] = useState<GameMode>(
-        (searchParams.get('mode') as GameMode) || 'blitz'
+    const [selectedMode, setSelectedMode] = useState<GameModeType>(
+        (searchParams.get('mode') as GameModeType) || 'blitz'
     )
     const [opponentName, setOpponentName] = useState('')
     const [playerColor, setPlayerColor] = useState<'w' | 'b'>('w')
@@ -136,7 +135,7 @@ export function useGameSocket() {
     useEffect(() => {
         if (!currentUser) return
 
-        const modeParam = (searchParams.get('mode') || 'blitz') as GameMode
+        const modeParam = (searchParams.get('mode') || 'blitz') as GameModeType
         setSelectedMode(modeParam)
 
         const socket = io('http://localhost:8080/game', {
@@ -147,7 +146,7 @@ export function useGameSocket() {
 
         socket.on('connect', () => {
             console.log('Game Socket connected')
-            const mode = (searchParams.get('mode') || 'blitz') as GameMode
+            const mode = (searchParams.get('mode') || 'blitz') as GameModeType
             setGameState('searching')
             socket.emit('find_match', { mode })
         })
