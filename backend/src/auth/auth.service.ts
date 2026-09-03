@@ -1,20 +1,18 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { BadRequestException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 
-
 function isValidEmail(email: string) {
-	return (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 256)
+	return (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 256);
 }
 
 @Injectable()
 export class AuthService {
-	constructor(private readonly usersService: UsersService,
-			    private readonly jwtService: JwtService,
-			   ) {}
+	constructor(
+		private readonly usersService: UsersService,
+		private readonly jwtService: JwtService,
+	) { }
 
 	async test() {
 		const email = "admin@admin.com";
@@ -24,7 +22,7 @@ export class AuthService {
 		const existingUser = await this.usersService.findByEmail(email);
 
 		if (existingUser) {
-			throw new BadRequestException('User already exits');
+			throw new BadRequestException('user_already_exists');
 		}
 		const hashedPassword = await bcrypt.hash(password, 10);
 		return this.usersService.create({
@@ -36,23 +34,23 @@ export class AuthService {
 
 	async register({ email, username, password, repassword }) {
 		if (email && !isValidEmail(email)) {
-			throw new BadRequestException('Invalid email format');
+			throw new BadRequestException('invalid_email_format');
 		}
 
 		if (username.length > 15) {
-			throw new BadRequestException('Username should be less than 15 characters');
+			throw new BadRequestException('username_too_long');
 		}
-		
+
 		if (/[^a-zA-Z0-9]/.test(username)) {
-			throw new BadRequestException('Username should contain only letters and numbers');
+			throw new BadRequestException('username_invalid_chars');
 		}
 
 		if (password.length < 8) {
-			throw new BadRequestException('Password must be at least 8 characters long');
+			throw new BadRequestException('password_too_short');
 		}
 
-		if (password != repassword) {
-			throw new BadRequestException('Passwords doesn\'t match');
+		if (password !== repassword) {
+			throw new BadRequestException('passwords_do_not_match');
 		}
 
 		const hasLetter = /[a-zA-Z]/.test(password);
@@ -60,7 +58,7 @@ export class AuthService {
 		const hasSpecial = /[^a-zA-Z0-9]/.test(password);
 
 		if (!hasLetter || !hasNumber || !hasSpecial) {
-			throw new BadRequestException('Password must contain at least one letter, one number, and one special character');
+			throw new BadRequestException('password_complexity_error');
 		}
 
 		const hashedPassword = await bcrypt.hash(password, 10);
@@ -72,7 +70,7 @@ export class AuthService {
 		const isDublicateUsername = await this.usersService.findByUsername(username);
 
 		if (isDublicateEmail || isDublicateUsername) {
-			throw new BadRequestException('User already exits');
+			throw new BadRequestException('user_already_exists');
 		}
 
 		return this.usersService.create({
@@ -86,13 +84,13 @@ export class AuthService {
 		const user = await this.usersService.findByEmail(email);
 
 		if (!user) {
-			throw new BadRequestException('Invalid credentials');
+			throw new BadRequestException('invalid_credentials');
 		}
 
 		const isMatch = await bcrypt.compare(password, user.password);
 
 		if (!isMatch) {
-			throw new BadRequestException('Invalid credentials');
+			throw new BadRequestException('invalid_credentials');
 		}
 
 		const payload = {
@@ -103,10 +101,10 @@ export class AuthService {
 
 		const token = this.jwtService.sign(payload, {
 			expiresIn: '7d',
-		})
+		});
 
 		return {
-			message: 'login successful',
+			message: 'login_successful',
 			token,
 		};
 	}

@@ -97,5 +97,11 @@
 	"reason_resignation": "Resigned",
 	"reason_disconnection": "Opponent Disconnected",
 	"reason_draw": "Draw",
-	"play_again": "Play Again"
+	"play_again": "Play Again",
+	"invalid_email_format": "Invalid email format",
+    "username_too_long": "Username should be less than 15 characters",
+    "username_invalid_chars": "Username should contain only letters and numbers",
+    "password_too_short": "Password must be at least 8 characters long",
+    "password_complexity_error": "Password must contain at least one letter, one number, and one special character",
+    "user_already_exists": "User already exists"
 }

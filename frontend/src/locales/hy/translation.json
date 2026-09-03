@@ -97,5 +97,11 @@
 	"reason_resignation": "Հանձնում",
 	"reason_disconnection": "Մրցակցի անջատում",
 	"reason_draw": "Ոչ-ոքի",
-	"play_again": "Խաղալ նորից"
+	"play_again": "Խաղալ նորից",
+	"invalid_email_format": "Էլ. փոստի անվավեր ձևաչափ",
+    "username_too_long": "Օգտանունը պետք է պարունակի 15 նիշից պակաս",
+    "username_invalid_chars": "Օգտանունը պետք է պարունակի միայն տառեր և թվեր",
+    "password_too_short": "Գաղտնաբառը պետք է կազմված լինի առնվազն 8 նիշից",
+    "password_complexity_error": "Գաղտնաբառը պետք է պարունակի առնվազն մեկ տառ, մեկ թիվ և մեկ հատուկ նշան",
+    "user_already_exists": "Օգտատերն արդեն գոյություն ունի"
 }
