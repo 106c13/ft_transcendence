@@ -4,7 +4,7 @@ import type { LayoutContextType } from '../../layouts/MainLayout'
 import PlayerSearch from '../../components/PlayerSearch/PlayerSearch'
 import GameModesGrid from '../../components/GameModesGrid/GameModesGrid'
 import type { GameModeType, ModeItem } from '../../constants/gameModeConstats'
-import styles from './Home.module.css'
+import styles from './HomePage.module.css'
 
 const MODES: ModeItem[] = [
 	{ id: 'bullet', emoji: '🔥', label: 'Bullet', time: '1 min', desc: 'Fast and explosive' },

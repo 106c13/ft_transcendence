@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import profileStyles from '../Profile.module.css'
-import authStyles from '../Auth.module.css'
+import styles from '../Common.module.css'
 import Navbar from '../../components/Navbar/Navbar'
 
 function Settings() {
@@ -124,9 +123,9 @@ function Settings() {
 	}
 
 	return (
-		<div className={profileStyles.profilePage}>
+		<div className={styles.profilePage}>
 			<Navbar currentUser={currentUser} />
-			<div className={authStyles.card}>
+			<div className={styles.card}>
 				<h1>{t('settings')}</h1>
 
 				<form onSubmit={handleSave}>
@@ -158,7 +157,7 @@ function Settings() {
 						}}
 					/>
 
-					<button className={authStyles.button} type="submit">{t('save')}</button>
+					<button className={styles.button} type="submit">{t('save')}</button>
 				</form>
 
 				<h1 style={{ marginTop: '30px' }}>{t('change_password')}</h1>
@@ -187,7 +186,7 @@ function Settings() {
 						required
 					/>
 
-					<button className={authStyles.button} type="submit">{t('update_password')}</button>
+					<button className={styles.button} type="submit">{t('update_password')}</button>
 				</form>
 
 				<button
@@ -207,7 +206,7 @@ function Settings() {
 				</button>
 
 				{msg && (
-					<div className={`${authStyles.msg} ${error ? authStyles.error : authStyles.success}`}>
+					<div className={`${styles.msg} ${error ? styles.error : styles.success}`}>
 						{msg}
 					</div>
 				)}

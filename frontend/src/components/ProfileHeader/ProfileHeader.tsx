@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import type { User, FriendStatus } from '../../pages/ProfilePage/Profile'
+import type { User, FriendStatus } from '../../constants/profileConstants'
 import styles from './ProfileHeader.module.css'
 
 type Props = {

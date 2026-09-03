@@ -7,7 +7,7 @@ import PlayerBanner from '../../components/PlayerBanner/Playerbanner'
 import ChessBoard from '../../components/ChessBoard/ChessBoard'
 import ChessInfoPanel from '../../components/ChessInfoPanel/ChessInfoPanel'
 import GameOverDialog from '../../components/GameOverDialog/GameOverDialog'
-import styles from './Game.module.css'
+import styles from './GamePage.module.css'
 
 export default function Game() {
     const { t } = useTranslation()

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import type { User } from '../../pages/ProfilePage/Profile'
+import type { User } from '../../constants/profileConstants'
 import styles from './FriendsList.module.css'
 
 type Props = {

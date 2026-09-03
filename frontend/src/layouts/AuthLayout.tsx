@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
-import styles from '../pages/Auth.module.css'
+import styles from '../pages/Common.module.css'
 
 export default function AuthLayout() {
 	const navigate = useNavigate()

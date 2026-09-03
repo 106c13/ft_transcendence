@@ -3,7 +3,7 @@ import type { LayoutContextType } from '../../layouts/MainLayout'
 import { useChat } from '../../hooks/useChat'
 import ChatSidebar from '../../components/ChatSidebar/ChatSidebar'
 import ChatMain from '../../components/ChatMain/ChatMain'
-import styles from './Chat.module.css'
+import styles from './ChatPage.module.css'
 
 function Chat() {
 	const { currentUser } = useOutletContext<LayoutContextType>()

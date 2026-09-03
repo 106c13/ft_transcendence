@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useLogin } from '../../hooks/useLogin'
 import PasswordInput from '../../components/PasswordInput/PasswordInput'
-import styles from '../Auth.module.css'
+import styles from '../Common.module.css'
 
 function Login() {
 	const { t } = useTranslation()
