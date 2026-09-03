@@ -15,7 +15,7 @@ const MODES: ModeItem[] = [
 	{ id: 'rapid+2', emoji: '⏳', label: 'Rapid', time: '10 | +2s', desc: 'Rapid with increment', increment: '+2' },
 ]
 
-function Home() {
+function HomePage() {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
 	const { currentUser } = useOutletContext<LayoutContextType>()
@@ -42,4 +42,4 @@ function Home() {
 	)
 }
 
-export default Home
+export default HomePage

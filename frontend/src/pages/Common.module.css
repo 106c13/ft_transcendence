@@ -90,6 +90,25 @@ textarea:focus {
 	box-shadow: 0 10px 20px rgba(59, 130, 246, 0.25);
 }
 
+.backButton {
+	width: 100%;
+	margin-top: 20px;
+	padding: 12px;
+	border: none;
+	border-radius: 10px;
+	background: #334155;
+	color: #E2E8F0;
+	font-weight: 600;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.backButton:hover {
+	background: #475569;
+	transform: translateY(-1px);
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+}
+
 .eyeBtnR {
 	position: absolute;
 	right: 12px;

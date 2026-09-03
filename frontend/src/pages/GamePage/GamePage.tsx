@@ -9,7 +9,7 @@ import ChessInfoPanel from '../../components/ChessInfoPanel/ChessInfoPanel'
 import GameOverDialog from '../../components/GameOverDialog/GameOverDialog'
 import styles from './GamePage.module.css'
 
-export default function Game() {
+export default function GamePage() {
     const { t } = useTranslation()
 
     const game = useGameSocket()

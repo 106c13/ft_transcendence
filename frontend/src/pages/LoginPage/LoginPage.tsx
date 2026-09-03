@@ -4,7 +4,7 @@ import { useLogin } from '../../hooks/useLogin'
 import PasswordInput from '../../components/PasswordInput/PasswordInput'
 import styles from '../Common.module.css'
 
-function Login() {
+function LoginPage() {
 	const { t } = useTranslation()
 	const {
 		email,
@@ -54,4 +54,4 @@ function Login() {
 	)
 }
 
-export default Login
+export default LoginPage

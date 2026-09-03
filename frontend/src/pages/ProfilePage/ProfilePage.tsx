@@ -5,7 +5,7 @@ import ProfileHeader from '../../components/ProfileHeader/ProfileHeader'
 import ProfileTabs from '../../components/ProfileTabs/ProfileTabs'
 import styles from '../Common.module.css'
 
-function Profile() {
+function ProfilePage() {
     const { t } = useTranslation()
     const { username } = useParams()
 
@@ -74,4 +74,4 @@ function Profile() {
     )
 }
 
-export default Profile
+export default ProfilePage

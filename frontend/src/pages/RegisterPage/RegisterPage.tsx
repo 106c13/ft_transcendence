@@ -4,7 +4,7 @@ import PasswordInput from '../../components/PasswordInput/PasswordInput'
 import { useRegister } from '../../hooks/useRegister'
 import styles from '../Common.module.css'
 
-function Register() {
+function RegisterPage() {
 	const { t } = useTranslation()
 	const {
 		email,
@@ -72,4 +72,4 @@ function Register() {
 	)
 }
 
-export default Register
+export default RegisterPage

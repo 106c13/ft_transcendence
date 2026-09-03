@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import styles from './NotFoundPage.module.css'
 
-function NotFound() {
+function NotFoundPage() {
 	const { t } = useTranslation()
 
 	return (
@@ -20,4 +20,4 @@ function NotFound() {
 	)
 }
 
-export default NotFound
+export default NotFoundPage

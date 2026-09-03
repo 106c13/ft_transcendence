@@ -5,7 +5,7 @@ import ChatSidebar from '../../components/ChatSidebar/ChatSidebar'
 import ChatMain from '../../components/ChatMain/ChatMain'
 import styles from './ChatPage.module.css'
 
-function Chat() {
+function ChatPage() {
 	const { currentUser } = useOutletContext<LayoutContextType>()
 	const currentUserId = currentUser?.id ?? null
 
@@ -45,4 +45,4 @@ function Chat() {
 	)
 }
 
-export default Chat
+export default ChatPage
