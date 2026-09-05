@@ -1,0 +1,102 @@
+.moveHistoryContainer {
+	flex: 1;
+	background: rgba(15, 23, 42, 0.4);
+	border-radius: 8px;
+	padding: 12px;
+	border: 1px solid rgba(148, 163, 184, 0.08);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	gap: 6px;
+}
+
+.moveHistoryHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 2px;
+}
+
+.moveHistoryTitle {
+	font-size: 13px;
+	color: #94A3B8;
+	font-weight: 500;
+}
+
+.moveNavArrows {
+	display: flex;
+	gap: 2px;
+}
+
+.moveNavArrows button {
+	background: rgba(30, 41, 59, 0.7);
+	border: 1px solid rgba(148, 163, 184, 0.15);
+	color: #94A3B8;
+	border-radius: 4px;
+	width: 24px;
+	height: 22px;
+	font-size: 11px;
+	cursor: pointer;
+	transition: all 0.15s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+}
+
+.moveNavArrows button:hover {
+	background: rgba(59, 130, 246, 0.2);
+	border-color: rgba(59, 130, 246, 0.4);
+	color: #60A5FA;
+}
+
+.moveHistoryList {
+	flex: 1;
+	overflow-y: auto;
+	display: grid;
+	grid-template-columns: 30px 1fr 1fr;
+	row-gap: 4px;
+	font-size: 13px;
+	align-content: start;
+}
+
+.moveRowNum {
+	color: #64748B;
+	font-weight: 600;
+	line-height: 1.8;
+}
+
+.moveCell {
+	color: #E2E8F0;
+	cursor: pointer;
+	padding: 2px 6px;
+	border-radius: 4px;
+	transition: background 0.1s;
+}
+
+.moveCell:hover {
+	background: rgba(255, 255, 255, 0.07);
+}
+
+.moveCell.activeMove {
+	background: rgba(59, 130, 246, 0.25);
+	color: #93C5FD;
+	font-weight: 600;
+	border-radius: 4px;
+}
+
+.moveCell.emptyCell {
+	cursor: default;
+	color: transparent;
+}
+
+.reviewingBanner {
+	font-size: 11px;
+	text-align: center;
+	color: #F59E0B;
+	background: rgba(245, 158, 11, 0.1);
+	border: 1px solid rgba(245, 158, 11, 0.2);
+	border-radius: 4px;
+	padding: 4px 8px;
+	letter-spacing: 0.3px;
+}

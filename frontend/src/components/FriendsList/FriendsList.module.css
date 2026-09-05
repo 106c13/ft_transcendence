@@ -1,0 +1,43 @@
+.friendsList {
+	margin-top: 20px;
+	background: #1E293B;
+	border-radius: 14px;
+	padding: 12px;
+	width: 100%;
+	max-width: 1000px;
+}
+
+.emptyFriends {
+	padding: 14px;
+	color: #94A3B8;
+}
+
+.friendRow {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+
+	width: 100%;
+	max-width: 1000px;
+
+	padding: 10px;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.friendRow:hover {
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.friendAvatar {
+	width: 42px;
+	height: 42px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.friendName {
+	font-weight: 600;
+	color: #E2E8F0;
+}

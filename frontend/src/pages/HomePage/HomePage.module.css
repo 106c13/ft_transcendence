@@ -1,0 +1,43 @@
+/* Home Container */
+.homeContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  color: #E2E8F0;
+  padding-top: 64px;
+  /* Account for fixed navbar */
+}
+
+/* Main Content */
+.mainContent {
+  flex: 1;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  padding-bottom: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contentHeader {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.contentHeader h1 {
+  font-size: 34px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #E2E8F0, #94A3B8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 8px;
+}
+
+.contentSubtitle {
+  color: #64748B;
+  font-size: 15px;
+}

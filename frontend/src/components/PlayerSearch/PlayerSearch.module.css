@@ -1,0 +1,150 @@
+.homeSearchSection {
+	width: 100%;
+	max-width: 820px;
+	margin-bottom: 32px;
+}
+
+.homeSearchContainer {
+	position: relative;
+	width: 100%;
+}
+
+.homeSearchIcon {
+	position: absolute;
+	left: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 18px;
+	color: #64748B;
+}
+
+.homeSearchInput {
+	width: 100%;
+	padding: 14px 44px 14px 48px;
+	background: rgba(30, 41, 59, 0.7);
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	border-radius: 14px;
+	color: #E2E8F0;
+	font-size: 15px;
+	transition: all 0.2s ease;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+	box-sizing: border-box;
+}
+
+.homeSearchInput:focus {
+	outline: none;
+	border-color: #3B82F6;
+	background: rgba(30, 41, 59, 0.9);
+	box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25);
+}
+
+.homeSearchInput::placeholder {
+	color: #64748B;
+}
+
+.homeSearchSpinner {
+	position: absolute;
+	right: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 18px;
+	height: 18px;
+	border: 2px solid #64748B;
+	border-top-color: #3B82F6;
+	border-radius: 50%;
+	animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+	to {
+		transform: translateY(-50%) rotate(360deg);
+	}
+}
+
+.homeSearchResults {
+	position: absolute;
+	top: calc(100% + 8px);
+	left: 0;
+	right: 0;
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	border-radius: 14px;
+	max-height: 320px;
+	overflow-y: auto;
+	z-index: 1000;
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.homeSearchResultItem {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 14px 16px;
+	cursor: pointer;
+	transition: background 0.2s ease;
+	border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.homeSearchResultItem:last-child {
+	border-bottom: none;
+}
+
+.homeSearchResultItem:hover {
+	background: rgba(96, 165, 250, 0.12);
+}
+
+.homeSearchResultAvatar {
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 1.5px solid rgba(148, 163, 184, 0.2);
+}
+
+.homeSearchResultInfo {
+	flex: 1;
+}
+
+.homeSearchResultName {
+	font-weight: 600;
+	color: #E2E8F0;
+	font-size: 15px;
+	margin-bottom: 2px;
+}
+
+.homeSearchResultBio {
+	font-size: 12px;
+	color: #94A3B8;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.homeSearchResults.empty {
+	padding: 24px;
+	text-align: center;
+	color: #94A3B8;
+	font-size: 14px;
+}
+
+/* Status dots */
+.statusDot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+.statusDot.online {
+	background: #22C55E;
+	box-shadow: 0 0 8px #22C55E;
+}
+
+.statusDot.ingame {
+	background: #F59E0B;
+	box-shadow: 0 0 8px #F59E0B;
+}
+
+.statusDot.offline {
+	background: #64748B;
+}

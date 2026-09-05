@@ -1,0 +1,60 @@
+.promotionOverlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(15, 23, 42, 0.7);
+	backdrop-filter: blur(4px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 100;
+}
+
+.promotionBox {
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	border-radius: 12px;
+	padding: 20px;
+	text-align: center;
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.promotionBox h4 {
+	margin: 0 0 14px 0;
+	color: #F8FAFC;
+}
+
+.promotionOptions {
+	display: flex;
+	gap: 12px;
+	justify-content: center;
+}
+
+.promotionOption {
+	width: 60px;
+	height: 60px;
+	border-radius: 8px;
+	border: 1px solid rgba(148, 163, 184, 0.1);
+	background: rgba(30, 41, 59, 0.6);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s;
+	padding: 0;
+}
+
+.promotionOption:hover {
+	transform: scale(1.1);
+	background: #3B82F6;
+	border-color: #3B82F6;
+}
+
+.promotionPieceIcon {
+	width: 40px;
+	height: 40px;
+	display: block;
+	pointer-events: none;
+}

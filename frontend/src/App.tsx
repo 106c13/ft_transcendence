@@ -1,41 +1,40 @@
-import {
-	BrowserRouter,
-	Routes,
-	Route,
-	Navigate
-} from 'react-router-dom'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Profile from './pages/Profile'
-import Settings from './pages/Settings'
-import NotFound from './pages/NotFound'
-import Home	from './pages/Home'
-import Chat from './pages/Chat'
-import Game from './pages/Game'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import MainLayout from './layouts/MainLayout'
+import AuthLayout from './layouts/AuthLayout'
+import LoginPage from './pages/LoginPage/LoginPage'
+import RegisterPage from './pages/RegisterPage/RegisterPage'
+import ProfilePage from './pages/ProfilePage/ProfilePage'
+import SettingsPage from './pages/SettingsPage/SettingsPage'
+import NotFoundPage from './pages/NotFoundPage/NotFoundPage'
+import HomePage from './pages/HomePage/HomePage'
+import ChatPage from './pages/ChatPage/ChatPage'
+import GamePage from './pages/GamePage/GamePage'
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
-		<Route path="/profile/settings" element={<Settings />} />
-		<Route path="/profile/:username" element={<Profile />} />
-		<Route path="/profile/:username/games" element={<Profile defaultTab="games" />} />
+        <Route path="/" element={<Navigate to="/home" replace />} />
 
-		<Route path="/home" element={<Home />} />
+        {/* Guest Auth Layout */}
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
 
-		<Route path="/chat" element={<Chat />} />
-		<Route path="/chat/:user_id" element={<Chat />} />
+        {/* Authenticated Layout */}
+        <Route element={<MainLayout />}>
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/settings" element={<SettingsPage />} />
+          <Route path="/profile/:username" element={<ProfilePage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/chat/:user_id" element={<ChatPage />} />
+          <Route path="/game" element={<GamePage />} />
+        </Route>
 
-		<Route path="/game" element={<Game />} />
-
-		<Route path="*" element={<NotFound />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   )
 }
-
-export default App

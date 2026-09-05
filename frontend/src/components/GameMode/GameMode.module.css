@@ -1,0 +1,120 @@
+.homeModeCard {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 24px 22px;
+	border-radius: 16px;
+	background: rgba(30, 41, 59, 0.6);
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	cursor: pointer;
+	transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+	text-align: left;
+	position: relative;
+	overflow: hidden;
+}
+
+.homeModeCard::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	transition: opacity 0.22s;
+	border-radius: 16px;
+}
+
+.homeModeCard:hover::before {
+	opacity: 1;
+}
+
+.homeModeCard:hover {
+	transform: translateY(-4px);
+	border-color: rgba(96, 165, 250, 0.4);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.homeModeCard.homeModeBullet::before,
+.homeModeCard.homeModeBulletInc::before {
+	background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), transparent);
+}
+
+.homeModeCard.homeModeBullet:hover,
+.homeModeCard.homeModeBulletInc:hover {
+	border-color: rgba(220, 38, 38, 0.45);
+}
+
+.homeModeCard.homeModeBlitz::before,
+.homeModeCard.homeModeBlitzInc::before {
+	background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), transparent);
+}
+
+.homeModeCard.homeModeBlitz:hover,
+.homeModeCard.homeModeBlitzInc:hover {
+	border-color: rgba(217, 119, 6, 0.45);
+}
+
+.homeModeCard.homeModeRapid::before,
+.homeModeCard.homeModeRapidInc::before {
+	background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), transparent);
+}
+
+.homeModeCard.homeModeRapid:hover,
+.homeModeCard.homeModeRapidInc:hover {
+	border-color: rgba(5, 150, 105, 0.45);
+}
+
+.homeModeTop {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 10px;
+	width: 100%;
+}
+
+.homeModeEmoji {
+	font-size: 28px;
+}
+
+.homeModeIncBadge {
+	margin-left: auto;
+	font-size: 10px;
+	font-weight: 700;
+	padding: 3px 8px;
+	border-radius: 20px;
+	background: rgba(96, 165, 250, 0.15);
+	color: #60A5FA;
+	border: 1px solid rgba(96, 165, 250, 0.3);
+	letter-spacing: 0.3px;
+}
+
+.homeModeLabel {
+	font-size: 18px;
+	font-weight: 700;
+	color: #F1F5F9;
+	margin-bottom: 2px;
+}
+
+.homeModeTime {
+	font-size: 24px;
+	font-weight: 800;
+	color: #E2E8F0;
+	font-family: var(--mono, monospace);
+	margin-bottom: 6px;
+}
+
+.homeModeDesc {
+	font-size: 13px;
+	color: #64748B;
+	margin-bottom: 18px;
+}
+
+.homeModePlay {
+	font-size: 14px;
+	font-weight: 600;
+	color: #3B82F6;
+	letter-spacing: 0.3px;
+	transition: color 0.2s;
+}
+
+.homeModeCard:hover .homeModePlay {
+	color: #60A5FA;
+}

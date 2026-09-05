@@ -1,0 +1,23 @@
+.profileTabs {
+	display: flex;
+	gap: 20px;
+	margin-top: 20px;
+}
+
+.tab {
+	padding: 10px 15px;
+	border-radius: 8px;
+	cursor: pointer;
+	color: #94A3B8;
+	transition: 0.2s;
+}
+
+.tab:hover {
+	background: #26334A;
+	color: #E2E8F0;
+}
+
+.tab.active {
+	background: #3B82F6;
+	color: white;
+}

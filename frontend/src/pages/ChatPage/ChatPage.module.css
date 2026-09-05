@@ -1,0 +1,16 @@
+.chatContainer {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+	padding-top: 64px;
+}
+
+.chatContent {
+	display: flex;
+	flex: 1;
+	width: 100%;
+	overflow: hidden;
+	color: #E2E8F0;
+	background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+}
