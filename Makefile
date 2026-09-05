@@ -16,7 +16,7 @@ check:
 
 start:
 	@printf "$(GREEN)[START] Building fronend pages...$(RESET)\n"
-	docker run \
+	docker run --rm \
 	-v $(PWD)/frontend:/app:Z \
 	-w /app \
 	node:20-alpine \
