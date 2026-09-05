@@ -1,17 +1,28 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import type { TabType, User, FriendStatus } from '../constants/profileConstants'
 
-export function useProfile(username?: string) {
+export function useProfile(username?: string, defaultTab: TabType = 'overview') {
+	const location = useLocation()
+	const initialTab: TabType = (location.state as any)?.defaultTab || defaultTab
 	const [user, setUser] = useState<User | null>(null)
 	const [error] = useState('')
 	const [menuOpen, setMenuOpen] = useState(false)
 	const [friendStatus, setFriendStatus] = useState<FriendStatus>('NONE')
-	const [activeTab, setActiveTab] = useState<TabType>('overview')
+	const [activeTab, setActiveTab] = useState<TabType>(initialTab)
 	const [friends, setFriends] = useState<User[]>([])
 	const isLoggedIn = !!localStorage.getItem('token')
 
 	const navigate = useNavigate()
+
+	useEffect(() => {
+		const stateTab = (location.state as any)?.defaultTab
+		if (stateTab) {
+			setActiveTab(stateTab)
+		} else if (defaultTab) {
+			setActiveTab(defaultTab)
+		}
+	}, [location.state, defaultTab])
 
 	const loadFriendStatus = async (token: string, targetUsername: string) => {
 		try {

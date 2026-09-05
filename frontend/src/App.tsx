@@ -9,6 +9,7 @@ import NotFoundPage from './pages/NotFoundPage/NotFoundPage'
 import HomePage from './pages/HomePage/HomePage'
 import ChatPage from './pages/ChatPage/ChatPage'
 import GamePage from './pages/GamePage/GamePage'
+import GameAnalysisPage from './pages/GameAnalysisPage/GameAnalysisPage'
 
 export default function App() {
   return (
@@ -28,6 +29,10 @@ export default function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/settings" element={<SettingsPage />} />
           <Route path="/profile/:username" element={<ProfilePage />} />
+          <Route path="/profile/:username/games" element={<ProfilePage defaultTab="games" />} />
+          <Route path="/profile/:username/analysis/:id" element={<GameAnalysisPage />} />
+          <Route path="/profile/:username/games/:id" element={<GameAnalysisPage />} />
+          <Route path="/game/analysis/:id" element={<GameAnalysisPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/chat/:user_id" element={<ChatPage />} />
           <Route path="/game" element={<GamePage />} />

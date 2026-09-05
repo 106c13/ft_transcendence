@@ -1,0 +1,81 @@
+.page {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 84px 40px 40px;
+	color: #E2E8F0;
+	min-height: 100vh;
+	width: 100%;
+}
+
+.breadcrumb {
+	width: 100%;
+	max-width: 1050px;
+	margin-bottom: 8px;
+	display: flex;
+	align-items: center;
+}
+
+.backBtn {
+	background: rgba(30, 41, 59, 0.6);
+	border: 1px solid rgba(148, 163, 184, 0.15);
+	color: #94A3B8;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 8px 16px;
+	border-radius: 8px;
+	transition: all 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.backBtn:hover {
+	background: rgba(51, 65, 85, 0.8);
+	color: #60A5FA;
+	border-color: rgba(96, 165, 250, 0.3);
+}
+
+.loadingSpinner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	padding: 80px 20px;
+	color: #94A3B8;
+}
+
+.spinnerIcon {
+	font-size: 48px;
+	animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+	from {
+		transform: scale(0.9);
+		opacity: 0.6;
+	}
+	to {
+		transform: scale(1.1);
+		opacity: 1;
+	}
+}
+
+.errorCard {
+	background: rgba(30, 41, 59, 0.7);
+	border: 1px solid rgba(239, 68, 68, 0.3);
+	border-radius: 12px;
+	padding: 40px;
+	text-align: center;
+	max-width: 500px;
+	width: 100%;
+	margin-top: 40px;
+}
+
+.errorMsg {
+	color: #F87171;
+	font-size: 16px;
+	font-weight: 500;
+}

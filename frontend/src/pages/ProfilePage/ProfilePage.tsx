@@ -1,11 +1,16 @@
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useProfile } from '../../hooks/useProfile'
+import type { TabType } from '../../constants/profileConstants'
 import ProfileHeader from '../../components/ProfileHeader/ProfileHeader'
 import ProfileTabs from '../../components/ProfileTabs/ProfileTabs'
 import styles from '../Common.module.css'
 
-function ProfilePage() {
+type Props = {
+    defaultTab?: TabType
+}
+
+function ProfilePage({ defaultTab = 'overview' }: Props) {
     const { t } = useTranslation()
     const { username } = useParams()
 
@@ -27,7 +32,7 @@ function ProfilePage() {
         logout,
         goToSettings,
         goToUserProfile,
-    } = useProfile(username)
+    } = useProfile(username, defaultTab)
 
     if (error) {
         return (
@@ -67,6 +72,7 @@ function ProfilePage() {
                 activeTab={activeTab}
                 friends={friends}
                 username={user.username}
+                isOwnProfile={user.isOwnProfile || false}
                 onSelectTab={handleSelectTab}
                 onFriendClick={goToUserProfile}
             />
