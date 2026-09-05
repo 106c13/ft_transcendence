@@ -7,8 +7,8 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./frontend/dist:/usr/share/nginx/html
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./frontend/dist:/usr/share/nginx/html:Z
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:Z
     networks:
       - ft_transcendence
 
@@ -21,9 +21,20 @@ services:
       - .env
     depends_on:
       - db
+      - engine
     networks:
       - ft_transcendence
     restart: on-failure
+
+  engine:
+    build: ./engine
+    container_name: engine
+    expose:
+      - "5000"
+    networks:
+      - ft_transcendence
+    restart: on-failure
+
 
   db:
     build: ./db
@@ -31,7 +42,7 @@ services:
     env_file:
       - .env
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data:Z
     networks:
       - ft_transcendence
 

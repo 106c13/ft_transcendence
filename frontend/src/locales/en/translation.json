@@ -97,5 +97,22 @@
 	"reason_resignation": "Resigned",
 	"reason_disconnection": "Opponent Disconnected",
 	"reason_draw": "Draw",
-	"play_again": "Play Again"
+	"play_again": "Play Again",
+	"no_games_yet": "No games played yet",
+	"analyze_game": "Analyze Game",
+	"analyze": "Analyze",
+	"choose_game_to_analyze": "Choose a game from history to analyze.",
+	"analysis_coming_soon": "Analysis board and engine evaluation will be available soon.",
+	"back_to_games": "Back to Games",
+	"vs": "vs",
+	"played_as": "Played as",
+	"play_first_game_prompt": "Play matches to build your game history and analysis log.",
+	"user_no_games": "This user has not played any games yet.",
+	"loading": "Loading...",
+	"download_pgn": "Download PGN",
+	"analyzing_game": "Analyzing game...",
+	"evaluating_moves": "Evaluating moves and critical moments with chess engine..."
 }
+
+
+

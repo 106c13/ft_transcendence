@@ -12,10 +12,11 @@ import { UsersService } from '../users/users.service';
 @WebSocketGateway({
 	namespace: '/game',
 	cors: {
-		origin: 'http://localhost:8080',
+		origin: true,
 		credentials: true,
 	},
 })
+
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server: Namespace;

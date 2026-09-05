@@ -151,10 +151,11 @@ export default function Game() {
 		const modeParam = (searchParams.get('mode') || 'blitz') as 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2';
 		setSelectedMode(modeParam);
 
-		const socket = io('http://localhost:8080/game', {
+		const socket = io('/game', {
 			query: { userId: currentUser.id.toString() },
 			transports: ['websocket'],
 		});
+
 		socketRef.current = socket;
 
 		socket.on('connect', () => {
