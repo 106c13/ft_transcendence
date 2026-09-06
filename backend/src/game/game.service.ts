@@ -91,12 +91,24 @@ export class GameService {
 		// 2. Check if player has an active game to resume
 		const existingGame = this.getGameByUserId(userId);
 		if (existingGame) {
-			return existingGame;
+			if (existingGame.board.isGameOver()) {
+				this.activeGames.delete(existingGame.gameId);
+			} else {
+				if (existingGame.white.userId === userId) {
+					existingGame.white.socketId = socketId;
+				} else if (existingGame.black.userId === userId) {
+					existingGame.black.socketId = socketId;
+				}
+				return existingGame;
+			}
 		}
 
 		// 3. Add to the queue
-		const queue = this.queues[mode];
+		const validModes = ['bullet', 'blitz', 'rapid', 'bullet+2', 'blitz+2', 'rapid+2'] as const;
+		const selectedMode = validModes.includes(mode as any) ? mode : 'blitz';
+		const queue = this.queues[selectedMode];
 		queue.push({ userId, socketId, username });
+
 
 		// 4. Pair if we have at least 2 players
 		if (queue.length >= 2) {
@@ -342,6 +354,13 @@ export class GameService {
 		const game = this.getGameByUserId(userId);
 		if (!game) return null;
 
+		// Always update socket ID to latest connection
+		if (game.white.userId === userId) {
+			game.white.socketId = newSocketId;
+		} else {
+			game.black.socketId = newSocketId;
+		}
+
 		if (game.disconnectedPlayerIds.has(userId)) {
 			// Clear disconnection grace timer for this user
 			const timer = game.disconnectTimers.get(userId);
@@ -351,13 +370,6 @@ export class GameService {
 			}
 			game.disconnectedPlayerIds.delete(userId);
 
-			// Update socket ID
-			if (game.white.userId === userId) {
-				game.white.socketId = newSocketId;
-			} else {
-				game.black.socketId = newSocketId;
-			}
-
 			// Resume turn timer if all players reconnected
 			if (game.disconnectedPlayerIds.size === 0) {
 				game.lastMoveTime = Date.now();
@@ -366,12 +378,11 @@ export class GameService {
 
 			// Notify opponent
 			this.gameEventsCallback('opponent_reconnected', game, { userId });
-
-			return game;
 		}
 
-		return null;
+		return game;
 	}
+
 
 	// Start standard chess clock timer for active player
 	private startTurnTimer(game: ChessGame) {

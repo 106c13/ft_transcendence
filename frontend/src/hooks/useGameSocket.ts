@@ -132,24 +132,31 @@ export function useGameSocket() {
     }, [navigate, token])
 
     // Socket connection & game event handlers
+    const modeParam = (searchParams.get('mode') || 'blitz') as GameModeType
+    const currentUserId = currentUser?.id
+
     useEffect(() => {
         if (!currentUser) return
 
-        const modeParam = (searchParams.get('mode') || 'blitz') as GameModeType
         setSelectedMode(modeParam)
 
-        const socket = io('http://localhost:8080/game', {
+        const socket = io('/game', {
             query: { userId: currentUser.id.toString() },
-            transports: ['websocket'],
+            transports: ['websocket', 'polling'],
         })
         socketRef.current = socket
 
         socket.on('connect', () => {
-            console.log('Game Socket connected')
-            const mode = (searchParams.get('mode') || 'blitz') as GameModeType
+            console.log('Game Socket connected:', socket.id)
             setGameState('searching')
-            socket.emit('find_match', { mode })
+            socket.emit('find_match', { mode: modeParam })
         })
+
+        if (socket.connected) {
+            setGameState('searching')
+            socket.emit('find_match', { mode: modeParam })
+        }
+
 
         socket.on('match_found', (data: {
             gameId: string
@@ -160,7 +167,7 @@ export function useGameSocket() {
             blackTime: number
             turn: 'w' | 'b'
             history: string[]
-            mode: 'bullet' | 'blitz' | 'rapid'
+            mode: GameModeType
             isPaused?: boolean
         }) => {
             setGameId(data.gameId)
@@ -168,6 +175,7 @@ export function useGameSocket() {
             setOpponentName(data.opponentName)
             localChess.load(data.fen)
             setBoardFen(data.fen)
+
             setWhiteTime(data.whiteTime)
             setBlackTime(data.blackTime)
             setTurn(data.turn)
@@ -289,7 +297,8 @@ export function useGameSocket() {
         return () => {
             socket.disconnect()
         }
-    }, [currentUser, localChess, searchParams])
+    }, [currentUserId, modeParam])
+
 
     // Pause countdown timer
     useEffect(() => {

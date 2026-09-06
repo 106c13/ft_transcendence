@@ -85,11 +85,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			return;
 		}
 
-		const mode = payload.mode || 'blitz';
+		const mode = payload?.mode || 'blitz';
+		console.log(`Game Gateway: User ${userId} (${user.username}) searching match in mode ${mode}`);
 		const matchGame = this.gameService.addToQueue(userId, client.id, user.username, mode);
 
 		if (matchGame) {
+			console.log(`Game Gateway: Match found ${matchGame.gameId}: ${matchGame.white.username} vs ${matchGame.black.username}`);
 			const roomName = matchGame.gameId;
+
+			// Ensure calling client socket is updated and joins the room
+			if (matchGame.white.userId === userId) {
+				matchGame.white.socketId = client.id;
+			} else if (matchGame.black.userId === userId) {
+				matchGame.black.socketId = client.id;
+			}
+			client.join(roomName);
 
 			// Sockets join room
 			const whiteSocket = this.server.sockets.get(matchGame.white.socketId);
@@ -98,8 +108,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			if (whiteSocket) whiteSocket.join(roomName);
 			if (blackSocket) blackSocket.join(roomName);
 
+			const matchHistory = matchGame.board.history ? matchGame.board.history() : [];
+
 			// Notify White
-			this.server.to(matchGame.white.socketId).emit('match_found', {
+			const whitePayload = {
 				gameId: matchGame.gameId,
 				color: 'w',
 				opponentName: matchGame.black.username,
@@ -107,12 +119,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				whiteTime: matchGame.whiteTime,
 				blackTime: matchGame.blackTime,
 				turn: matchGame.board.turn(),
-				history: [],
+				history: matchHistory,
 				mode: matchGame.mode,
-			});
+				isPaused: matchGame.disconnectedPlayerIds.size > 0,
+			};
+			if (whiteSocket) {
+				whiteSocket.emit('match_found', whitePayload);
+			} else {
+				this.server.to(matchGame.white.socketId).emit('match_found', whitePayload);
+			}
 
 			// Notify Black
-			this.server.to(matchGame.black.socketId).emit('match_found', {
+			const blackPayload = {
 				gameId: matchGame.gameId,
 				color: 'b',
 				opponentName: matchGame.white.username,
@@ -120,11 +138,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				whiteTime: matchGame.whiteTime,
 				blackTime: matchGame.blackTime,
 				turn: matchGame.board.turn(),
-				history: [],
+				history: matchHistory,
 				mode: matchGame.mode,
-			});
+				isPaused: matchGame.disconnectedPlayerIds.size > 0,
+			};
+			if (blackSocket) {
+				blackSocket.emit('match_found', blackPayload);
+			} else {
+				this.server.to(matchGame.black.socketId).emit('match_found', blackPayload);
+			}
 		}
 	}
+
 
 	@SubscribeMessage('make_move')
 	handleMakeMove(
