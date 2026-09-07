@@ -79,10 +79,10 @@ export default function GamePage() {
                                 isPaused={game.isPaused}
                                 pauseCountdown={game.pauseCountdown}
                                 onSquareClick={board.handleSquareClick}
-                                onDragStart={board.handleDragStart}
-                                onDragOver={board.handleDragOver}
-                                onDrop={board.handleDrop}
+                                onSquareSelect={board.handleSquareSelect}
+                                onPieceDrop={board.handlePieceDrop}
                                 onPromotionSelect={board.handlePromotionSelect}
+                                isGameOver={game.isGameOver}
                             />
 
                             <PlayerBanner

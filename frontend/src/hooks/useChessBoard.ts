@@ -51,6 +51,72 @@ export function useChessBoard({
     // Premove promotion
     const [pendingPremove, setPendingPremove] = useState<Premove | null>(null)
 
+    const executeMove = (sourceSquare: string, targetSquare: string) => {
+        const simChess = getSimulatedChess(boardFen, playerColor, premoves)
+        const selectedPiece = simChess.get(sourceSquare as Square)
+        const isPawn = selectedPiece?.type === 'p'
+        const isPromotionRank = targetSquare.endsWith('8') || targetSquare.endsWith('1')
+
+        const isRealTurn = turn === playerColor && premoves.length === 0
+
+        if (isPawn && isPromotionRank) {
+            if (isRealTurn) {
+                setPendingMove({ from: sourceSquare, to: targetSquare })
+            } else {
+                setPendingPremove({ from: sourceSquare, to: targetSquare })
+            }
+            setShowPromotion(true)
+        } else {
+            if (isRealTurn) {
+                sendMove(sourceSquare, targetSquare)
+            } else {
+                setPremoves(prev => [...prev, { from: sourceSquare, to: targetSquare }])
+            }
+            setSelectedSquare(null)
+            setValidMoves([])
+        }
+    }
+
+    const handleSquareSelect = (square: string) => {
+        if (gameState !== 'playing' || isGameOver || isPaused || isReviewing) return
+
+        const simChess = getSimulatedChess(boardFen, playerColor, premoves)
+        const piece = simChess.get(square as Square)
+
+        if (piece && piece.color === playerColor) {
+            setSelectedSquare(square)
+            const targets = getValidMovesForSquare(simChess, square, playerColor)
+            setValidMoves(targets)
+        }
+    }
+
+    const handlePieceDrop = (sourceSquare: string, targetSquare: string) => {
+        if (gameState !== 'playing' || isGameOver || isPaused || isReviewing) return
+
+        if (!targetSquare || sourceSquare === targetSquare) {
+            return
+        }
+
+        const simChess = getSimulatedChess(boardFen, playerColor, premoves)
+        const targetPiece = simChess.get(targetSquare as Square)
+
+        // Dropping on another friendly piece selects that piece instead
+        if (targetPiece && targetPiece.color === playerColor) {
+            setSelectedSquare(targetSquare)
+            const targets = getValidMovesForSquare(simChess, targetSquare, playerColor)
+            setValidMoves(targets)
+            return
+        }
+
+        const targets = getValidMovesForSquare(simChess, sourceSquare, playerColor)
+        if (targets.includes(targetSquare as Square)) {
+            executeMove(sourceSquare, targetSquare)
+        } else {
+            setSelectedSquare(null)
+            setValidMoves([])
+        }
+    }
+
     const handleDragStart = (e: React.DragEvent, square: string) => {
         if (gameState !== 'playing' || isGameOver || isPaused || isReviewing) {
             e.preventDefault()
@@ -81,36 +147,7 @@ export function useChessBoard({
         const sourceSquare = e.dataTransfer.getData('text/plain')
 
         if (sourceSquare && sourceSquare !== targetSquare) {
-            if (validMoves.includes(targetSquare)) {
-                const simChess = getSimulatedChess(boardFen, playerColor, premoves)
-                const selectedPiece = simChess.get(sourceSquare as Square)
-                const isPawn = selectedPiece?.type === 'p'
-                const isPromotionRank = targetSquare.endsWith('8') || targetSquare.endsWith('1')
-
-                const isRealTurn = turn === playerColor && premoves.length === 0
-
-                if (isPawn && isPromotionRank) {
-                    if (isRealTurn) {
-                        setPendingMove({ from: sourceSquare, to: targetSquare })
-                    } else {
-                        setPendingPremove({ from: sourceSquare, to: targetSquare })
-                    }
-                    setShowPromotion(true)
-                } else {
-                    if (isRealTurn) {
-                        sendMove(sourceSquare, targetSquare)
-                        setSelectedSquare(null)
-                        setValidMoves([])
-                    } else {
-                        setPremoves(prev => [...prev, { from: sourceSquare, to: targetSquare }])
-                        setSelectedSquare(null)
-                        setValidMoves([])
-                    }
-                }
-            } else {
-                setSelectedSquare(null)
-                setValidMoves([])
-            }
+            handlePieceDrop(sourceSquare, targetSquare)
         }
     }
 
@@ -121,6 +158,11 @@ export function useChessBoard({
         const piece = simChess.get(square as Square)
 
         if (piece && piece.color === playerColor) {
+            if (selectedSquare === square) {
+                setSelectedSquare(null)
+                setValidMoves([])
+                return
+            }
             setSelectedSquare(square)
             const targets = getValidMovesForSquare(simChess, square, playerColor)
             setValidMoves(targets)
@@ -128,30 +170,7 @@ export function useChessBoard({
         }
 
         if (selectedSquare && validMoves.includes(square)) {
-            const selectedPiece = simChess.get(selectedSquare as Square)
-            const isPawn = selectedPiece?.type === 'p'
-            const isPromotionRank = square.endsWith('8') || square.endsWith('1')
-
-            const isRealTurn = turn === playerColor && premoves.length === 0
-
-            if (isPawn && isPromotionRank) {
-                if (isRealTurn) {
-                    setPendingMove({ from: selectedSquare, to: square })
-                } else {
-                    setPendingPremove({ from: selectedSquare, to: square })
-                }
-                setShowPromotion(true)
-            } else {
-                if (isRealTurn) {
-                    sendMove(selectedSquare, square)
-                    setSelectedSquare(null)
-                    setValidMoves([])
-                } else {
-                    setPremoves(prev => [...prev, { from: selectedSquare, to: square }])
-                    setSelectedSquare(null)
-                    setValidMoves([])
-                }
-            }
+            executeMove(selectedSquare, square)
         } else {
             setSelectedSquare(null)
             setValidMoves([])
@@ -179,6 +198,8 @@ export function useChessBoard({
         validMoves,
         showPromotion,
         handleSquareClick,
+        handleSquareSelect,
+        handlePieceDrop,
         handleDragStart,
         handleDragOver,
         handleDrop,
