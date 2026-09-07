@@ -64,6 +64,10 @@ export function useGameSocket() {
     const [winnerColor, setWinnerColor] = useState<'w' | 'b' | null>(null)
     const [gameOverReason, setGameOverReason] = useState('')
 
+    // Rematch States
+    type RematchState = 'idle' | 'sent' | 'received' | 'declined' | 'opponent_left'
+    const [rematchState, setRematchState] = useState<RematchState>('idle')
+
     // Timing States
     const [whiteTime, setWhiteTime] = useState(180000)
     const [blackTime, setBlackTime] = useState(180000)
@@ -140,6 +144,8 @@ export function useGameSocket() {
 
         setSelectedMode(modeParam)
 
+        const challengeGameId = searchParams.get('challenge')
+
         const socket = io('/game', {
             query: { userId: currentUser.id.toString() },
             transports: ['websocket', 'polling'],
@@ -148,13 +154,22 @@ export function useGameSocket() {
 
         socket.on('connect', () => {
             console.log('Game Socket connected:', socket.id)
-            setGameState('searching')
-            socket.emit('find_match', { mode: modeParam })
+            if (challengeGameId) {
+                // Joining a challenge game — don't search for match
+                setGameState('searching')
+            } else {
+                setGameState('searching')
+                socket.emit('find_match', { mode: modeParam })
+            }
         })
 
         if (socket.connected) {
-            setGameState('searching')
-            socket.emit('find_match', { mode: modeParam })
+            if (challengeGameId) {
+                setGameState('searching')
+            } else {
+                setGameState('searching')
+                socket.emit('find_match', { mode: modeParam })
+            }
         }
 
 
@@ -280,6 +295,7 @@ export function useGameSocket() {
             setBoardFen(data.fen)
             setIsPaused(false)
             setPauseCountdown(null)
+            setRematchState('idle')
 
             setMoveHistory(prev => {
                 const last = prev[prev.length - 1]
@@ -288,6 +304,19 @@ export function useGameSocket() {
                 setViewIndex(next.length - 1)
                 return next
             })
+        })
+
+        // Rematch events
+        socket.on('rematch_received', (_data: { gameId: string; from: string }) => {
+            setRematchState('received')
+        })
+
+        socket.on('rematch_declined', (data: { gameId: string; reason: string }) => {
+            if (data.reason === 'opponent_left') {
+                setRematchState('opponent_left')
+            } else {
+                setRematchState('declined')
+            }
         })
 
         socket.on('error', (err: { message: string }) => {
@@ -457,6 +486,27 @@ export function useGameSocket() {
         }
     }
 
+    // Rematch actions
+    const sendRematch = () => {
+        if (socketRef.current && gameId) {
+            setRematchState('sent')
+            socketRef.current.emit('rematch_request', { gameId })
+        }
+    }
+
+    const acceptRematch = () => {
+        if (socketRef.current && gameId) {
+            socketRef.current.emit('rematch_accept', { gameId })
+        }
+    }
+
+    const declineRematch = () => {
+        if (socketRef.current && gameId) {
+            setRematchState('idle')
+            socketRef.current.emit('rematch_decline', { gameId })
+        }
+    }
+
     return {
         currentUser,
         gameState,
@@ -497,6 +547,10 @@ export function useGameSocket() {
         resignGame,
         sendMove,
         setIsGameOver,
+        rematchState,
+        sendRematch,
+        acceptRematch,
+        declineRematch,
     }
 }
 

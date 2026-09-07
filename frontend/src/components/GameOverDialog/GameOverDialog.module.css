@@ -79,8 +79,14 @@
 	margin-bottom: 30px;
 }
 
-.playAgainBtn {
+.buttonRow {
+	display: flex;
+	gap: 12px;
 	width: 100%;
+}
+
+.playAgainBtn {
+	flex: 1;
 	padding: 12px;
 	border-radius: 8px;
 	border: none;
@@ -93,4 +99,64 @@
 
 .playAgainBtn:hover {
 	background: #2563EB;
+}
+
+.rematchBtn {
+	flex: 1;
+	padding: 12px;
+	border-radius: 8px;
+	border: none;
+	background: linear-gradient(135deg, #F59E0B, #D97706);
+	color: white;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.rematchBtn:hover {
+	background: linear-gradient(135deg, #D97706, #B45309);
+}
+
+.rematchBtnDisabled {
+	background: #374151 !important;
+	color: #6B7280 !important;
+	cursor: not-allowed;
+}
+
+.rematchReceivedRow {
+	flex: 1;
+	display: flex;
+	gap: 8px;
+}
+
+.acceptRematchBtn {
+	flex: 1;
+	padding: 12px;
+	border-radius: 8px;
+	border: none;
+	background: linear-gradient(135deg, #22C55E, #16A34A);
+	color: white;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.acceptRematchBtn:hover {
+	background: linear-gradient(135deg, #16A34A, #15803D);
+}
+
+.declineRematchBtn {
+	flex: 1;
+	padding: 12px;
+	border-radius: 8px;
+	border: none;
+	background: linear-gradient(135deg, #EF4444, #DC2626);
+	color: white;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.declineRematchBtn:hover {
+	background: linear-gradient(135deg, #DC2626, #B91C1C);
 }

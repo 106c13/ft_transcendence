@@ -5,6 +5,28 @@ import { User } from '../users/user.entity';
 import { Match } from './match.entity';
 import { Chess } from 'chess.js';
 
+export type GameModeType = 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2';
+
+export interface PendingRematch {
+	gameId: string; // original game id
+	requesterId: number;
+	opponentId: number;
+	mode: GameModeType;
+	// Colors from the original game (will be swapped for the new game)
+	requesterWasWhite: boolean;
+	timer: NodeJS.Timeout;
+}
+
+export interface PendingChallenge {
+	challengeId: string;
+	senderId: number;
+	senderUsername: string;
+	receiverId: number;
+	receiverUsername: string;
+	mode: GameModeType;
+	timer: NodeJS.Timeout;
+}
+
 export interface ChessPlayer {
 	userId: number;
 	socketId: string;
@@ -16,7 +38,7 @@ export interface ChessGame {
 	white: ChessPlayer;
 	black: ChessPlayer;
 	board: Chess;
-	mode: 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2';
+	mode: GameModeType;
 	increment: number; // ms to add per move
 	whiteTime: number; // Remaining time in ms
 	blackTime: number; // Remaining time in ms
@@ -32,7 +54,7 @@ export class GameService {
 	private activeGames = new Map<string, ChessGame>();
 
 	// Matchmaking queues separated by mode
-	private queues: Record<'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2', ChessPlayer[]> = {
+	private queues: Record<GameModeType, ChessPlayer[]> = {
 		bullet: [],
 		blitz: [],
 		rapid: [],
@@ -40,6 +62,16 @@ export class GameService {
 		'blitz+2': [],
 		'rapid+2': [],
 	};
+
+	// Pending rematch requests keyed by original gameId
+	private pendingRematches = new Map<string, PendingRematch>();
+
+	// Recently finished games: tracks which players were in which game
+	// Keyed by gameId, stores player IDs and mode. Cleaned after 5 minutes.
+	private recentlyFinishedGames = new Map<string, { whiteUserId: number; blackUserId: number; mode: GameModeType; whiteUsername: string; blackUsername: string }>();
+
+	// Pending challenge requests keyed by challengeId
+	private pendingChallenges = new Map<string, PendingChallenge>();
 
 	// Callback to notify gateway when timers expire or game state changes
 	private gameEventsCallback: (event: string, game: ChessGame, payload: any) => void = () => {};
@@ -84,7 +116,7 @@ export class GameService {
 	}
 
 	// Add player to matchmaking queue
-	addToQueue(userId: number, socketId: string, username: string, mode: 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2'): ChessGame | null {
+	addToQueue(userId: number, socketId: string, username: string, mode: GameModeType): ChessGame | null {
 		// 1. Remove from other queues first
 		this.removeFromQueue(userId);
 
@@ -156,6 +188,117 @@ export class GameService {
 		for (const mode of ['bullet', 'blitz', 'rapid', 'bullet+2', 'blitz+2', 'rapid+2'] as const) {
 			this.queues[mode] = this.queues[mode].filter(p => p.userId !== userId);
 		}
+	}
+
+	// Check if a player is still connected to the game page (has an active socket in the game namespace)
+	isPlayerInFinishedGame(gameId: string, userId: number): boolean {
+		const finished = this.recentlyFinishedGames.get(gameId);
+		if (!finished) return false;
+		return finished.whiteUserId === userId || finished.blackUserId === userId;
+	}
+
+	// === REMATCH SYSTEM ===
+
+	addRematchRequest(gameId: string, requesterId: number): PendingRematch | null {
+		// Check if the game recently finished
+		const finished = this.recentlyFinishedGames.get(gameId);
+		if (!finished) return null;
+
+		// Don't allow duplicate rematches
+		if (this.pendingRematches.has(gameId)) return null;
+
+		const opponentId = finished.whiteUserId === requesterId ? finished.blackUserId : finished.whiteUserId;
+		const requesterWasWhite = finished.whiteUserId === requesterId;
+
+		const timer = setTimeout(() => {
+			this.declineRematch(gameId);
+		}, 30000);
+
+		const rematch: PendingRematch = {
+			gameId,
+			requesterId,
+			opponentId,
+			mode: finished.mode,
+			requesterWasWhite,
+			timer,
+		};
+
+		this.pendingRematches.set(gameId, rematch);
+		return rematch;
+	}
+
+	acceptRematch(gameId: string, userId: number): { rematch: PendingRematch; newGame: ChessGame } | null {
+		const rematch = this.pendingRematches.get(gameId);
+		if (!rematch || rematch.opponentId !== userId) return null;
+
+		clearTimeout(rematch.timer);
+		this.pendingRematches.delete(gameId);
+		this.recentlyFinishedGames.delete(gameId);
+
+		return { rematch, newGame: null as any }; // newGame created by gateway with socket IDs
+	}
+
+	declineRematch(gameId: string): PendingRematch | null {
+		const rematch = this.pendingRematches.get(gameId);
+		if (!rematch) return null;
+
+		clearTimeout(rematch.timer);
+		this.pendingRematches.delete(gameId);
+		return rematch;
+	}
+
+	getPendingRematch(gameId: string): PendingRematch | undefined {
+		return this.pendingRematches.get(gameId);
+	}
+
+	// === DIRECT MATCH (for challenges and rematches) ===
+
+	createDirectMatch(
+		whiteUserId: number, whiteSocketId: string, whiteUsername: string,
+		blackUserId: number, blackSocketId: string, blackUsername: string,
+		mode: GameModeType,
+	): ChessGame {
+		const gameId = `game_${Date.now()}_${whiteUserId}_${blackUserId}`;
+		const baseMode = mode.replace('+2', '') as 'bullet' | 'blitz' | 'rapid';
+		const initialTime = baseMode === 'bullet' ? 60000 : baseMode === 'blitz' ? 180000 : 600000;
+		const increment = mode.endsWith('+2') ? 2000 : 0;
+
+		const newGame: ChessGame = {
+			gameId,
+			white: { userId: whiteUserId, socketId: whiteSocketId, username: whiteUsername },
+			black: { userId: blackUserId, socketId: blackSocketId, username: blackUsername },
+			board: new Chess(),
+			mode,
+			increment,
+			whiteTime: initialTime,
+			blackTime: initialTime,
+			lastMoveTime: Date.now(),
+			timer: null,
+			disconnectTimers: new Map(),
+			disconnectedPlayerIds: new Set(),
+		};
+
+		this.activeGames.set(gameId, newGame);
+		this.startTurnTimer(newGame);
+		return newGame;
+	}
+
+	// === CHALLENGE SYSTEM ===
+
+	addChallenge(challenge: PendingChallenge) {
+		this.pendingChallenges.set(challenge.challengeId, challenge);
+	}
+
+	getChallenge(challengeId: string): PendingChallenge | undefined {
+		return this.pendingChallenges.get(challengeId);
+	}
+
+	removeChallenge(challengeId: string): PendingChallenge | null {
+		const challenge = this.pendingChallenges.get(challengeId);
+		if (!challenge) return null;
+		clearTimeout(challenge.timer);
+		this.pendingChallenges.delete(challengeId);
+		return challenge;
 	}
 
 	// Make a move on the board
@@ -271,6 +414,7 @@ export class GameService {
 				reason,
 				fen: game.board.fen(),
 			});
+			this.trackFinishedGame(game);
 			this.activeGames.delete(gameId);
 		});
 	}
@@ -342,6 +486,7 @@ export class GameService {
 					reason,
 					fen: game.board.fen(),
 				});
+				this.trackFinishedGame(game);
 				this.activeGames.delete(game.gameId);
 			});
 		}, graceMs);
@@ -416,6 +561,7 @@ export class GameService {
 				reason,
 				fen: game.board.fen(),
 			});
+			this.trackFinishedGame(game);
 			this.activeGames.delete(game.gameId);
 		});
 	}
@@ -444,6 +590,8 @@ export class GameService {
 				reason,
 				fen: game.board.fen(),
 			});
+			// Track the finished game for rematch purposes
+			this.trackFinishedGame(game);
 			this.activeGames.delete(game.gameId);
 		});
 	}
@@ -481,7 +629,7 @@ export class GameService {
 		}
 	}
 
-	private getGraceSeconds(mode: 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2'): number {
+	private getGraceSeconds(mode: GameModeType): number {
 		switch (mode) {
 			case 'bullet':
 			case 'bullet+2': return 10;
@@ -489,6 +637,29 @@ export class GameService {
 			case 'blitz+2': return 30;
 			case 'rapid':
 			case 'rapid+2': return 60;
+		}
+	}
+
+	// Track a finished game for rematch. Auto-cleanup after 5 minutes.
+	private trackFinishedGame(game: ChessGame) {
+		this.recentlyFinishedGames.set(game.gameId, {
+			whiteUserId: game.white.userId,
+			blackUserId: game.black.userId,
+			mode: game.mode,
+			whiteUsername: game.white.username,
+			blackUsername: game.black.username,
+		});
+		setTimeout(() => {
+			this.recentlyFinishedGames.delete(game.gameId);
+			this.pendingRematches.delete(game.gameId);
+		}, 5 * 60 * 1000);
+	}
+
+	// Resign a player's active game (used when accepting a challenge while in-game)
+	resignActiveGame(userId: number): void {
+		const game = this.getGameByUserId(userId);
+		if (game && !game.board.isGameOver()) {
+			this.resign(game.gameId, userId);
 		}
 	}
 

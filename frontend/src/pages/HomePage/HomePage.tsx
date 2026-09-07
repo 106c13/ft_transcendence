@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { LayoutContextType } from '../../layouts/MainLayout'
 import PlayerSearch from '../../components/PlayerSearch/PlayerSearch'
 import GameModesGrid from '../../components/GameModesGrid/GameModesGrid'
+import ChallengeSection from '../../components/ChallengeSection/ChallengeSection'
 import type { GameModeType, ModeItem } from '../../constants/gameModeConstats'
 import styles from './HomePage.module.css'
 
@@ -15,13 +17,54 @@ const MODES: ModeItem[] = [
 	{ id: 'rapid+2', emoji: '⏳', label: 'Rapid', time: '10 | +2s', desc: 'Rapid with increment', increment: '+2' },
 ]
 
+type Friend = {
+	username: string
+	avatar: string | null
+}
+
 function HomePage() {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
-	const { currentUser } = useOutletContext<LayoutContextType>()
+	const { currentUser, challengeSocket } = useOutletContext<LayoutContextType>()
+
+	const [challengeActive, setChallengeActive] = useState(false)
+	const [selectedFriend, setSelectedFriend] = useState('')
+	const [friends, setFriends] = useState<Friend[]>([])
+	const [errorMessage, setErrorMessage] = useState('')
+
+	// Load friends list
+	useEffect(() => {
+		if (!currentUser) return
+		const token = localStorage.getItem('token')
+		fetch(`/api/friends/list/${currentUser.username}`, {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+			.then(res => res.json())
+			.then(data => setFriends(data))
+			.catch(err => console.error('Failed to load friends:', err))
+	}, [currentUser])
 
 	const handlePlayMode = (mode: GameModeType) => {
-		navigate(`/game?mode=${encodeURIComponent(mode)}`)
+		if (challengeActive) {
+			if (!selectedFriend) {
+				setErrorMessage(t('select_friend_error', 'Please select a friend first before choosing a game mode.'))
+				setTimeout(() => setErrorMessage(''), 3000)
+				return
+			}
+			// Send challenge
+			challengeSocket.sendChallenge(selectedFriend, mode)
+		} else {
+			navigate(`/game?mode=${encodeURIComponent(mode)}`)
+		}
+	}
+
+	const handleToggleChallenge = () => {
+		setChallengeActive(!challengeActive)
+		if (challengeActive) {
+			setSelectedFriend('')
+			setErrorMessage('')
+			challengeSocket.resetChallengeStatus()
+		}
 	}
 
 	return (
@@ -37,6 +80,22 @@ function HomePage() {
 				<PlayerSearch />
 
 				<GameModesGrid modes={MODES} onSelectMode={handlePlayMode} />
+
+				<ChallengeSection
+					active={challengeActive}
+					onToggle={handleToggleChallenge}
+					selectedFriend={selectedFriend}
+					onSelectFriend={setSelectedFriend}
+					friends={friends}
+					challengeStatus={challengeSocket.challengeStatus}
+					challengeError={challengeSocket.challengeError}
+				/>
+
+				{errorMessage && (
+					<div className={styles.errorToast}>
+						{errorMessage}
+					</div>
+				)}
 			</main>
 		</div>
 	)

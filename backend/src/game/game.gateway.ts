@@ -196,4 +196,191 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.gameService.removeFromQueue(userId);
 		}
 	}
+
+	@SubscribeMessage('rematch_request')
+	async handleRematchRequest(client: Socket, payload: { gameId: string }) {
+		const userIdStr = client.handshake.query.userId;
+		if (!userIdStr) return;
+
+		const userId = parseInt(userIdStr as string);
+		const gameId = payload?.gameId;
+		if (!gameId) {
+			client.emit('error', { message: 'Missing gameId' });
+			return;
+		}
+
+		// Check if opponent is still connected to the game namespace
+		const allSockets = this.server.sockets;
+		let opponentConnected = false;
+		let opponentSocketId: string | null = null;
+
+		for (const [socketId, socket] of allSockets) {
+			const sockUserId = socket.handshake.query.userId;
+			if (sockUserId && parseInt(sockUserId as string) !== userId &&
+				this.gameService.isPlayerInFinishedGame(gameId, parseInt(sockUserId as string))) {
+				opponentConnected = true;
+				opponentSocketId = socketId;
+				break;
+			}
+		}
+
+		if (!opponentConnected) {
+			client.emit('rematch_declined', { gameId, reason: 'opponent_left' });
+			return;
+		}
+
+		const rematch = this.gameService.addRematchRequest(gameId, userId);
+		if (!rematch) {
+			client.emit('error', { message: 'Cannot request rematch' });
+			return;
+		}
+
+		// Store the auto-decline callback to notify the requester
+		const originalTimer = rematch.timer;
+		clearTimeout(originalTimer);
+		rematch.timer = setTimeout(() => {
+			const declined = this.gameService.declineRematch(gameId);
+			if (declined) {
+				// Notify requester
+				for (const [, socket] of this.server.sockets) {
+					const uid = socket.handshake.query.userId;
+					if (uid && parseInt(uid as string) === declined.requesterId) {
+						socket.emit('rematch_declined', { gameId, reason: 'timeout' });
+						break;
+					}
+				}
+			}
+		}, 30000);
+
+		// Notify opponent
+		if (opponentSocketId) {
+			const user = await this.usersService.findById(userId);
+			const opponentSocket = this.server.sockets.get(opponentSocketId);
+			if (opponentSocket) {
+				opponentSocket.emit('rematch_received', {
+					gameId,
+					from: user?.username || 'Unknown',
+				});
+			}
+		}
+	}
+
+	@SubscribeMessage('rematch_accept')
+	handleRematchAccept(client: Socket, payload: { gameId: string }) {
+		const userIdStr = client.handshake.query.userId;
+		if (!userIdStr) return;
+
+		const userId = parseInt(userIdStr as string);
+		const gameId = payload?.gameId;
+		if (!gameId) return;
+
+		const result = this.gameService.acceptRematch(gameId, userId);
+		if (!result) {
+			client.emit('error', { message: 'Rematch not found or expired' });
+			return;
+		}
+
+		const { rematch } = result;
+
+		// Find requester socket
+		let requesterSocketId: string | null = null;
+		for (const [socketId, socket] of this.server.sockets) {
+			const uid = socket.handshake.query.userId;
+			if (uid && parseInt(uid as string) === rematch.requesterId) {
+				requesterSocketId = socketId;
+				break;
+			}
+		}
+
+		if (!requesterSocketId) {
+			client.emit('rematch_declined', { gameId, reason: 'opponent_left' });
+			return;
+		}
+
+		// Swap colors from the original game
+		const whiteUserId = rematch.requesterWasWhite ? rematch.opponentId : rematch.requesterId;
+		const blackUserId = rematch.requesterWasWhite ? rematch.requesterId : rematch.opponentId;
+
+		const requesterSocket = this.server.sockets.get(requesterSocketId);
+		const accepterSocket = client;
+
+		const whiteSocketId = whiteUserId === rematch.requesterId ? requesterSocketId : accepterSocket.id;
+		const blackSocketId = blackUserId === rematch.requesterId ? requesterSocketId : accepterSocket.id;
+
+		// Look up usernames
+		const getUsername = async (uid: number) => {
+			const user = await this.usersService.findById(uid);
+			return user?.username || 'Unknown';
+		};
+
+		(async () => {
+			const whiteUsername = await getUsername(whiteUserId);
+			const blackUsername = await getUsername(blackUserId);
+
+			const newGame = this.gameService.createDirectMatch(
+				whiteUserId, whiteSocketId, whiteUsername,
+				blackUserId, blackSocketId, blackUsername,
+				rematch.mode,
+			);
+
+			const roomName = newGame.gameId;
+			if (requesterSocket) requesterSocket.join(roomName);
+			accepterSocket.join(roomName);
+
+			const matchHistory = newGame.board.history ? newGame.board.history() : [];
+
+			// Notify both players
+			const whitePayload = {
+				gameId: newGame.gameId,
+				color: 'w',
+				opponentName: blackUsername,
+				fen: newGame.board.fen(),
+				whiteTime: newGame.whiteTime,
+				blackTime: newGame.blackTime,
+				turn: newGame.board.turn(),
+				history: matchHistory,
+				mode: newGame.mode,
+				isPaused: false,
+			};
+			const blackPayload = {
+				gameId: newGame.gameId,
+				color: 'b',
+				opponentName: whiteUsername,
+				fen: newGame.board.fen(),
+				whiteTime: newGame.whiteTime,
+				blackTime: newGame.blackTime,
+				turn: newGame.board.turn(),
+				history: matchHistory,
+				mode: newGame.mode,
+				isPaused: false,
+			};
+
+			const whiteSocket = this.server.sockets.get(whiteSocketId);
+			const blackSocket = this.server.sockets.get(blackSocketId);
+
+			if (whiteSocket) whiteSocket.emit('match_found', whitePayload);
+			if (blackSocket) blackSocket.emit('match_found', blackPayload);
+		})();
+	}
+
+	@SubscribeMessage('rematch_decline')
+	handleRematchDecline(client: Socket, payload: { gameId: string }) {
+		const userIdStr = client.handshake.query.userId;
+		if (!userIdStr) return;
+
+		const gameId = payload?.gameId;
+		if (!gameId) return;
+
+		const rematch = this.gameService.declineRematch(gameId);
+		if (!rematch) return;
+
+		// Notify requester
+		for (const [, socket] of this.server.sockets) {
+			const uid = socket.handshake.query.userId;
+			if (uid && parseInt(uid as string) === rematch.requesterId) {
+				socket.emit('rematch_declined', { gameId, reason: 'declined' });
+				break;
+			}
+		}
+	}
 }

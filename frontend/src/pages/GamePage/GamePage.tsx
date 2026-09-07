@@ -121,6 +121,10 @@ export default function GamePage() {
                             game.setIsGameOver(false)
                             game.startMatchmaking()
                         }}
+                        rematchState={game.rematchState}
+                        onRematch={game.sendRematch}
+                        onAcceptRematch={game.acceptRematch}
+                        onDeclineRematch={game.declineRematch}
                     />
                 )}
             </main>

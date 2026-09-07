@@ -2,18 +2,21 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GameService } from './game.service';
 import { GameGateway } from './game.gateway';
+import { ChallengeGateway } from './challenge.gateway';
 import { GameController } from './game.controller';
 import { Match } from './match.entity';
 import { User } from '../users/user.entity';
 import { UsersModule } from '../users/users.module';
+import { FriendsModule } from '../friends/friends.module';
 
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([Match, User]),
 		UsersModule,
+		FriendsModule,
 	],
 	controllers: [GameController],
-	providers: [GameService, GameGateway],
+	providers: [GameService, GameGateway, ChallengeGateway],
 	exports: [GameService],
 })
 export class GameModule {}
