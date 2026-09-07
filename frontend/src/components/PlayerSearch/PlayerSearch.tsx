@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styles from './PlayerSearch.module.css'
@@ -15,10 +15,52 @@ export type SearchUser = {
 function PlayerSearch() {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
+	const [isExpanded, setIsExpanded] = useState(false)
 	const [searchQuery, setSearchQuery] = useState('')
 	const [searchResults, setSearchResults] = useState<SearchUser[]>([])
 	const [showResults, setShowResults] = useState(false)
 	const [isSearching, setIsSearching] = useState(false)
+
+	const containerRef = useRef<HTMLDivElement>(null)
+	const inputRef = useRef<HTMLInputElement>(null)
+
+	// Focus input when expanded
+	useEffect(() => {
+		if (isExpanded) {
+			inputRef.current?.focus()
+		}
+	}, [isExpanded])
+
+	// Click outside to collapse
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+				setShowResults(false)
+				if (!searchQuery.trim()) {
+					setIsExpanded(false)
+				}
+			}
+		}
+
+		document.addEventListener('mousedown', handleClickOutside)
+		return () => document.removeEventListener('mousedown', handleClickOutside)
+	}, [searchQuery])
+
+	// Escape key to close
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				setShowResults(false)
+				setIsExpanded(false)
+				setSearchQuery('')
+			}
+		}
+
+		if (isExpanded) {
+			document.addEventListener('keydown', handleKeyDown)
+		}
+		return () => document.removeEventListener('keydown', handleKeyDown)
+	}, [isExpanded])
 
 	const handleSearch = async () => {
 		if (!searchQuery.trim()) {
@@ -60,7 +102,25 @@ function PlayerSearch() {
 	const handleUserClick = (username: string) => {
 		setShowResults(false)
 		setSearchQuery('')
+		setIsExpanded(false)
 		navigate(`/profile/${username}`)
+	}
+
+	const handleBoxClick = () => {
+		if (!isExpanded) {
+			setIsExpanded(true)
+		}
+	}
+
+	const handleClose = (e: React.MouseEvent) => {
+		e.stopPropagation()
+		if (searchQuery) {
+			setSearchQuery('')
+			inputRef.current?.focus()
+		} else {
+			setIsExpanded(false)
+			setShowResults(false)
+		}
 	}
 
 	const getStatusDot = (status?: string) => {
@@ -75,47 +135,72 @@ function PlayerSearch() {
 	}
 
 	return (
-		<div className={styles.homeSearchSection}>
-			<div className={styles.homeSearchContainer}>
-				<span className={styles.homeSearchIcon}>🔍</span>
+		<div
+			ref={containerRef}
+			className={styles.navSearchContainer}
+		>
+			<div
+				className={`${styles.searchBox} ${isExpanded ? styles.expanded : ''}`}
+				onClick={handleBoxClick}
+				role="button"
+				tabIndex={isExpanded ? -1 : 0}
+				onKeyDown={(e) => {
+					if (!isExpanded && (e.key === 'Enter' || e.key === ' ')) {
+						setIsExpanded(true)
+					}
+				}}
+				title={!isExpanded ? t('search_players', 'Search Players') : undefined}
+			>
+				<span className={styles.searchIcon}>🔍</span>
 				<input
+					ref={inputRef}
 					type="text"
-					placeholder={t('search_placeholder', 'Search players...')}
+					placeholder={isExpanded ? t('search_placeholder', 'Search players...') : ''}
 					value={searchQuery}
 					onChange={(e) => setSearchQuery(e.target.value)}
-					className={styles.homeSearchInput}
+					className={styles.navbarSearchInput}
+					tabIndex={isExpanded ? 0 : -1}
 				/>
-				{isSearching && <span className={styles.homeSearchSpinner}></span>}
-
-				{showResults && searchResults.length > 0 && (
-					<div className={styles.homeSearchResults}>
-						{searchResults.map((user) => (
-							<div
-								key={user.username}
-								className={styles.homeSearchResultItem}
-								onClick={() => handleUserClick(user.username)}
-							>
-								<img
-									src={user.avatar ? `/uploads/${user.avatar}` : `/assets/default.jpg`}
-									alt={user.username}
-									className={styles.homeSearchResultAvatar}
-								/>
-								<div className={styles.homeSearchResultInfo}>
-									<div className={styles.homeSearchResultName}>{user.username}</div>
-									{user.bio && <div className={styles.homeSearchResultBio}>{user.bio}</div>}
-								</div>
-								{getStatusDot(user.status)}
-							</div>
-						))}
-					</div>
-				)}
-
-				{showResults && searchResults.length === 0 && searchQuery && (
-					<div className={`${styles.homeSearchResults} ${styles.empty}`}>
-						{t('no_users_found', 'No users found')}
-					</div>
-				)}
+				{isSearching && isExpanded && <span className={styles.searchSpinner}></span>}
+				<button
+					type="button"
+					className={`${styles.searchCloseBtn} ${isExpanded ? styles.showClose : ''}`}
+					onClick={handleClose}
+					title={t('close', 'Close')}
+					tabIndex={isExpanded ? 0 : -1}
+				>
+					✕
+				</button>
 			</div>
+
+			{isExpanded && showResults && searchResults.length > 0 && (
+				<div className={styles.navSearchResults}>
+					{searchResults.map((user) => (
+						<div
+							key={user.username}
+							className={styles.navSearchResultItem}
+							onClick={() => handleUserClick(user.username)}
+						>
+							<img
+								src={user.avatar ? `/uploads/${user.avatar}` : '/assets/default.jpg'}
+								alt={user.username}
+								className={styles.navSearchResultAvatar}
+							/>
+							<div className={styles.navSearchResultInfo}>
+								<div className={styles.navSearchResultName}>{user.username}</div>
+								{user.bio && <div className={styles.navSearchResultBio}>{user.bio}</div>}
+							</div>
+							{getStatusDot(user.status)}
+						</div>
+					))}
+				</div>
+			)}
+
+			{isExpanded && showResults && searchResults.length === 0 && searchQuery && (
+				<div className={`${styles.navSearchResults} ${styles.empty}`}>
+					{t('no_users_found', 'No users found')}
+				</div>
+			)}
 		</div>
 	)
 }

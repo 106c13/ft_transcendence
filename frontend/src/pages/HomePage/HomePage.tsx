@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { LayoutContextType } from '../../layouts/MainLayout'
-import PlayerSearch from '../../components/PlayerSearch/PlayerSearch'
 import GameModesGrid from '../../components/GameModesGrid/GameModesGrid'
 import ChallengeSection from '../../components/ChallengeSection/ChallengeSection'
 import type { GameModeType, ModeItem } from '../../constants/gameModeConstats'
@@ -81,8 +80,6 @@ function HomePage() {
 						{t('home_subtitle', 'Select a game mode and jump straight into a match')}
 					</p>
 				</div>
-
-				<PlayerSearch />
 
 				<ChallengeSection
 					active={challengeActive}

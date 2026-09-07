@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import NotificationBell from '../NotificationBell/NotificationBell'
+import PlayerSearch from '../PlayerSearch/PlayerSearch'
 import styles from './Navbar.module.css'
 
 type Props = {
@@ -26,6 +27,9 @@ function Navbar({ currentUser }: Props) {
 			</div>
 
 			<div className={styles.navbarActions}>
+				{/* Player Search */}
+				<PlayerSearch />
+
 				{/* Messages */}
 				<div className={styles.navActionItem} onClick={() => navigate('/chat')} title={t('chat', 'Chat')}>
 					<span className={styles.navActionIcon}>✉️</span>
