@@ -85,6 +85,29 @@ export class NotificationService {
 		return notification;
 	}
 
+	async readAllNotifications(userId: number) {
+		if (isNaN(userId))
+			throw new BadRequestException('invalid user id');
+
+		await this.notificationRepo.update(
+			{ user_id: userId, is_read: false },
+			{ is_read: true },
+		);
+
+		return { success: true };
+	}
+
+	async clearAllNotifications(userId: number) {
+		if (isNaN(userId))
+			throw new BadRequestException('invalid user id');
+
+		await this.notificationRepo.delete({
+			user_id: userId,
+		});
+
+		return { success: true };
+	}
+
 	async getUnreadCount(userId: number) {
 		if (isNaN(userId))
 			throw new BadRequestException('invalid user id');

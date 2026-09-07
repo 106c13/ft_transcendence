@@ -29,6 +29,16 @@ export class NotificationController {
 		return this.notificationService.addNotification(Number(userid), body);
 	}
 
+	@Patch('read-all/:userid')
+	readAllNotifications(@Param('userid') userid: string) {
+		return this.notificationService.readAllNotifications(Number(userid));
+	}
+
+	@Delete('clear-all/:userid')
+	clearAllNotifications(@Param('userid') userid: string) {
+		return this.notificationService.clearAllNotifications(Number(userid));
+	}
+
 	@Delete('delete/:userid/:id')
 	deleteNotification(
 		@Param('userid') userid: string,
