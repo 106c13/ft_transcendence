@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import io, { Socket } from 'socket.io-client'
 import type { ChatObject } from '../components/ChatSidebar/ChatSidebar'
@@ -6,7 +6,7 @@ import type { Message } from '../components/ChatMain/ChatMain'
 
 export function useChat(currentUserId: number | null) {
 	const navigate = useNavigate()
-	const { user_id } = useParams()
+	const { user_id } = useParams<{ user_id?: string }>()
 	const [chats, setChats] = useState<ChatObject[]>([])
 	const [selectedChat, setSelectedChat] = useState<ChatObject | null>(null)
 	const [messages, setMessages] = useState<Message[]>([])
@@ -20,6 +20,34 @@ export function useChat(currentUserId: number | null) {
 		selectedChatRef.current = selectedChat
 	}, [selectedChat])
 
+	const getOtherUser = useCallback((chat: ChatObject) => {
+		if (!currentUserId) return null
+		return chat.user1_id === currentUserId ? chat.user2 : chat.user1
+	}, [currentUserId])
+
+	// Load chat list
+	const refreshChats = useCallback(() => {
+		if (!currentUserId || !token) return
+
+		fetch('/api/chat/my-chats', {
+			headers: { Authorization: `Bearer ${token}` }
+		})
+			.then(res => {
+				if (!res.ok) throw new Error('Failed to fetch chats')
+				return res.json()
+			})
+			.then(data => {
+				if (Array.isArray(data)) {
+					setChats(data)
+				}
+			})
+			.catch(err => console.error('Error fetching chats:', err))
+	}, [currentUserId, token])
+
+	useEffect(() => {
+		refreshChats()
+	}, [refreshChats])
+
 	// Socket connection
 	useEffect(() => {
 		if (!currentUserId) return
@@ -30,122 +58,136 @@ export function useChat(currentUserId: number | null) {
 		})
 		socketRef.current = socket
 
-
 		socket.on('connect', () => {
-			console.log('Socket connected')
+			console.log('Chat socket connected')
 		})
 
 		socket.on('new_message', (data: { type: string; message: Message }) => {
-			console.log('New message received:', data)
-			const newMsg = data.message
+			const newMsg = data?.message
+			if (!newMsg) return
 
 			if (selectedChatRef.current && newMsg.chat_id === selectedChatRef.current.chat_id) {
-				setMessages(prev => [...prev, newMsg])
+				setMessages(prev => {
+					if (prev.some(m => m.id === newMsg.id)) return prev
+					return [...prev, newMsg]
+				})
 			}
+			refreshChats()
 		})
 
 		socket.on('disconnect', () => {
-			console.log('Socket disconnected')
+			console.log('Chat socket disconnected')
 		})
 
 		return () => {
 			socket.disconnect()
 		}
-	}, [currentUserId])
+	}, [currentUserId, refreshChats])
 
-	// Load chat list
-	const refreshChats = () => {
-		if (!currentUserId) return
-
-		fetch('/api/chat/my-chats', {
-			headers: { Authorization: `Bearer ${token}` }
-		})
-			.then(res => res.json())
-			.then(data => {
-				setChats(data)
-			})
-			.catch(err => console.error(err))
-	}
-
+	// Sync active chat and messages with URL param (/chat/:user_id)
 	useEffect(() => {
 		if (!currentUserId) return
-		refreshChats()
-	}, [currentUserId])
 
-	// Open chat from URL param (/chat/:user_id)
-	useEffect(() => {
-		if (!currentUserId || !user_id) return
+		// When on /chat without user_id, clear selected chat
+		if (!user_id) {
+			setSelectedChat(null)
+			setMessages([])
+			return
+		}
 
+		const targetUserId = parseInt(user_id, 10)
+		if (isNaN(targetUserId) || targetUserId === currentUserId) {
+			navigate('/chat', { replace: true })
+			return
+		}
+
+		let isMounted = true
+
+		// Optimistically select chat if it exists in current chats list
+		const existingChat = chats.find(
+			c => c.user1_id === targetUserId || c.user2_id === targetUserId
+		)
+		if (existingChat) {
+			setSelectedChat(existingChat)
+		}
+
+		// Fetch full chat object from backend
 		fetch(`/api/chat/get/${user_id}`, {
 			headers: { Authorization: `Bearer ${token}` }
 		})
-			.then(res => res.json())
+			.then(res => {
+				if (!res.ok) throw new Error('Chat not found')
+				return res.json()
+			})
 			.then(chat => {
+				if (!isMounted || !chat?.chat_id) return
+
 				setSelectedChat(chat)
+				setChats(prev => {
+					if (prev.some(c => c.chat_id === chat.chat_id)) {
+						return prev.map(c => (c.chat_id === chat.chat_id ? chat : c))
+					}
+					return [chat, ...prev]
+				})
+
 				return fetch(`/api/messages/${chat.chat_id}?limit=100`, {
 					headers: { Authorization: `Bearer ${token}` }
 				})
 			})
-			.then(res => res.json())
+			.then(res => {
+				if (!res) return
+				if (!res.ok) throw new Error('Failed to fetch messages')
+				return res.json()
+			})
 			.then(data => {
+				if (!isMounted || !data) return
 				setMessages(data.messages || [])
 			})
-			.catch(err => console.error(err))
-	}, [user_id, currentUserId])
-
-	// Load messages when chat is selected from sidebar
-	useEffect(() => {
-		if (!selectedChat || user_id) return
-
-		fetch(`/api/messages/${selectedChat.chat_id}?limit=100`, {
-			headers: { Authorization: `Bearer ${token}` }
-		})
-			.then(res => res.json())
-			.then(data => {
-				setMessages(data.messages || [])
+			.catch(err => {
+				console.error('Error opening chat:', err)
+				if (isMounted) {
+					navigate('/chat', { replace: true })
+				}
 			})
-			.catch(err => console.error(err))
-	}, [selectedChat])
 
-	const getOtherUser = (chat: ChatObject) => {
-		if (!currentUserId) return null
-		return chat.user1_id === currentUserId ? chat.user2 : chat.user1
-	}
+		return () => {
+			isMounted = false
+		}
+	}, [user_id, currentUserId, token, navigate])
 
 	const sendMessage = async () => {
-		if (!newMessage.trim() || !selectedChat) return
+		if (!newMessage.trim() || !selectedChat || !token) return
 
-		const res = await fetch('/api/messages/send', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`
-			},
-			body: JSON.stringify({
-				chat_id: selectedChat.chat_id,
-				content: newMessage
-			})
-		})
+		const content = newMessage.trim()
+		setNewMessage('')
 
-		if (res.ok) {
-			const message = await res.json()
-			setNewMessage('')
-
-			const otherUser = getOtherUser(selectedChat)
-			if (socketRef.current && otherUser) {
-				socketRef.current.emit('send_message', {
-					receiver_id: otherUser.id,
+		try {
+			const res = await fetch('/api/messages/send', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				},
+				body: JSON.stringify({
 					chat_id: selectedChat.chat_id,
-					message: message
+					content
 				})
+			})
+
+			if (!res.ok) {
+				console.error('Failed to send message')
+				setNewMessage(content)
 			}
+		} catch (err) {
+			console.error('Error sending message:', err)
+			setNewMessage(content)
 		}
 	}
 
 	const handleSelectChat = (chat: ChatObject) => {
-		setSelectedChat(chat)
-		if (user_id) {
-			navigate('/chat', { replace: true })
+		const otherUser = getOtherUser(chat)
+		if (otherUser) {
+			navigate(`/chat/${otherUser.id}`)
 		}
 	}
 
@@ -157,5 +199,6 @@ export function useChat(currentUserId: number | null) {
 		setNewMessage,
 		sendMessage,
 		handleSelectChat,
+		userIdParam: user_id ? parseInt(user_id, 10) : null,
 	}
 }

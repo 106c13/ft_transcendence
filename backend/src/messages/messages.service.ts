@@ -78,7 +78,7 @@ export class MessagesService {
 		const notification = this.notificationRepo.create({
 			user_id: receiverId,
 			message: `${sender.username} sent you a message`,
-			link: `/chat/${chatId}`,
+			link: `/chat/${sender.id}`,
 			is_read: false,
 		})
 

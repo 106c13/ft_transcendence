@@ -50,6 +50,8 @@
 	"invalid_credentials": "Invalid credentials",
 	"login_successful": "Login successful ✓ Redirecting...",
 	"select_chat": "Select a chat to start messaging",
+	"chats": "Chats",
+	"no_chats_yet": "No chats yet",
 	"type_message": "Type a message...",
 	"send": "Send",
 	"password_update_failed": "Password update failed",

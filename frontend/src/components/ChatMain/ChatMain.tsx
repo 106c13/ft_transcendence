@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { ChatObject } from '../ChatSidebar/ChatSidebar'
@@ -31,6 +32,9 @@ function ChatMain({
 }: Props) {
     const { t } = useTranslation()
     const navigate = useNavigate()
+    const messagesContainerRef = useRef<HTMLDivElement>(null)
+    const messagesEndRef = useRef<HTMLDivElement>(null)
+    const prevChatIdRef = useRef<string | null>(null)
 
     const getOtherUser = (chat: ChatObject) => {
         if (!currentUserId) return null
@@ -39,6 +43,27 @@ function ChatMain({
 
     const otherUser = selectedChat ? getOtherUser(selectedChat) : null
 
+    // Always scroll down when a new message is sent or received, or when selecting a chat
+    useEffect(() => {
+        if (!selectedChat) return
+
+        const isDifferentChat = prevChatIdRef.current !== selectedChat.chat_id
+        prevChatIdRef.current = selectedChat.chat_id
+        const behavior: ScrollBehavior = isDifferentChat ? 'auto' : 'smooth'
+
+        const timer = setTimeout(() => {
+            if (messagesContainerRef.current) {
+                messagesContainerRef.current.scrollTo({
+                    top: messagesContainerRef.current.scrollHeight,
+                    behavior,
+                })
+            }
+            messagesEndRef.current?.scrollIntoView({ behavior })
+        }, 50)
+
+        return () => clearTimeout(timer)
+    }, [messages, selectedChat?.chat_id])
+
     return (
         <div className={styles.chatMain}>
             {selectedChat ? (
@@ -46,20 +71,20 @@ function ChatMain({
                     <div
                         className={styles.chatMainHeader}
                         onClick={() => {
-                            if (otherUser) {
+                            if (otherUser?.username) {
                                 navigate(`/profile/${otherUser.username}`)
                             }
                         }}
                     >
                         <img
                             src={otherUser?.avatar ? `/uploads/${otherUser.avatar}` : '/assets/default.jpg'}
-                            alt={otherUser?.username}
+                            alt={otherUser?.username || 'User'}
                             className={styles.chatMainAvatar}
                         />
-                        <h3>{otherUser?.username}</h3>
+                        <h3>{otherUser?.username || '...'}</h3>
                     </div>
 
-                    <div className={styles.chatMessages}>
+                    <div ref={messagesContainerRef} className={styles.chatMessages}>
                         {messages.map(msg => (
                             <div
                                 key={msg.id}
@@ -71,6 +96,7 @@ function ChatMain({
                                 </div>
                             </div>
                         ))}
+                        <div ref={messagesEndRef} />
                     </div>
 
                     <div className={styles.chatInputArea}>

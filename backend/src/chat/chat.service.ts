@@ -30,15 +30,19 @@ export class ChatService {
 		return chat;
 	}
 
-	async createChat(user1Id: number, user2Id: number) {
-		const smallerId = Math.min(user1Id, user2Id);
-		const largerId = Math.max(user1Id, user2Id);
+	async createChat(currentUserId: number, otherUserId: number) {
+		const smallerId = Math.min(currentUserId, otherUserId);
+		const largerId = Math.max(currentUserId, otherUserId);
 		const chatId = `${smallerId}_${largerId}`;
 
-		const user1 = await this.userRepository.findOne({ where: { id: user1Id } });
+		const currentUser = await this.userRepository.findOne({ where: { id: currentUserId } });
+		if (!currentUser) {
+			throw new NotFoundException('Current user not found');
+		}
 
-		if (!user1) {
-			throw new NotFoundException('user not found');
+		const otherUser = await this.userRepository.findOne({ where: { id: otherUserId } });
+		if (!otherUser) {
+			throw new NotFoundException('Other user not found');
 		}
 
 		const chat = this.chatRepository.create({
@@ -50,15 +54,15 @@ export class ChatService {
 		await this.chatRepository.save(chat);
 
 		const notification = this.notificationRepo.create({
-			user_id: user2Id,
-			message: `${user1.username} started a new conversation`,
-			link: `/chat/${user1.id}`,
+			user_id: otherUserId,
+			message: `${currentUser.username} started a new conversation`,
+			link: `/chat/${currentUser.id}`,
 			is_read: false,
 		});
 
 		await this.notificationRepo.save(notification);
 
-		return chat;
+		return this.getChat(chatId);
 	}
 
 	async getUserChats(userId: number) {

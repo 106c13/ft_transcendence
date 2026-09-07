@@ -17,6 +17,7 @@ function ChatPage() {
 		setNewMessage,
 		sendMessage,
 		handleSelectChat,
+		userIdParam,
 	} = useChat(currentUserId)
 
 	if (!currentUserId) {
@@ -31,6 +32,7 @@ function ChatPage() {
 					selectedChat={selectedChat}
 					currentUserId={currentUserId}
 					onSelectChat={handleSelectChat}
+					activeUserId={userIdParam}
 				/>
 				<ChatMain
 					selectedChat={selectedChat}
