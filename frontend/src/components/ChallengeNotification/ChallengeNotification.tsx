@@ -27,8 +27,11 @@ function ChallengeNotification({ challenge, countdown, onAccept, onDecline }: Pr
 		<div className={styles.challengeOverlay}>
 			<div className={styles.challengeCard}>
 				<div className={styles.challengeHeader}>
-					<span className={styles.swordIcon}>⚔️</span>
-					<span className={styles.headerText}>{t('challenge_incoming', 'Challenge!')}</span>
+					<div className={styles.headerLeft}>
+						<span className={styles.swordIcon}>⚔️</span>
+						<span className={styles.headerText}>{t('challenge_incoming', 'Challenge!')}</span>
+					</div>
+					<span className={styles.countdownBadge}>{countdown}s</span>
 				</div>
 
 				<div className={styles.challengeBody}>
@@ -44,7 +47,6 @@ function ChallengeNotification({ challenge, countdown, onAccept, onDecline }: Pr
 						style={{ width: `${progressPercent}%` }}
 					/>
 				</div>
-				<div className={styles.countdownText}>{countdown}s</div>
 
 				<div className={styles.challengeActions}>
 					<button

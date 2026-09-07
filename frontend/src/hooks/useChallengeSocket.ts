@@ -49,6 +49,8 @@ export function useChallengeSocket(userId: number | undefined) {
             setChallengeStatus('accepted')
             setIncomingChallenge(null)
             clearCountdown()
+            // Auto-reset status after 5 seconds so it doesn't linger
+            setTimeout(() => setChallengeStatus('idle'), 5000)
             // Navigate to the game page with the challenge gameId
             navigate(`/game?mode=${encodeURIComponent(data.mode)}&challenge=${data.gameId}`)
         })

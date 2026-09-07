@@ -32,6 +32,11 @@ function HomePage() {
 	const [friends, setFriends] = useState<Friend[]>([])
 	const [errorMessage, setErrorMessage] = useState('')
 
+	// Reset challenge status when entering HomePage so returning from a game won't show stale status
+	useEffect(() => {
+		challengeSocket.resetChallengeStatus()
+	}, [])
+
 	// Load friends list
 	useEffect(() => {
 		if (!currentUser) return
@@ -79,8 +84,6 @@ function HomePage() {
 
 				<PlayerSearch />
 
-				<GameModesGrid modes={MODES} onSelectMode={handlePlayMode} />
-
 				<ChallengeSection
 					active={challengeActive}
 					onToggle={handleToggleChallenge}
@@ -90,6 +93,8 @@ function HomePage() {
 					challengeStatus={challengeSocket.challengeStatus}
 					challengeError={challengeSocket.challengeError}
 				/>
+
+				<GameModesGrid modes={MODES} onSelectMode={handlePlayMode} />
 
 				{errorMessage && (
 					<div className={styles.errorToast}>
