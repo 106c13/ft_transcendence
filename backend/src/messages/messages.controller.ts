@@ -2,6 +2,7 @@ import {
 	Controller,
 	Get,
 	Post,
+	Patch,
 	Delete,
 	Body,
 	Param,
@@ -17,6 +18,30 @@ import { MessagesService } from './messages.service'
 @Controller('messages')
 export class MessagesController {
 	constructor(private readonly messagesService: MessagesService) {}
+
+	@Get('unread/total')
+	@UseGuards(JwtAuthGuard)
+	async getUnreadCount(@Req() req) {
+		const userId = req.user.userId
+		const count = await this.messagesService.getUnreadCount(userId)
+		return { count }
+	}
+
+	@Patch('read/:chat_id')
+	@UseGuards(JwtAuthGuard)
+	async markChatAsRead(
+		@Req() req,
+		@Param('chat_id') chatId: string
+	) {
+		const userId = req.user.userId
+		const [id1, id2] = chatId.split('_').map(Number)
+
+		if (userId !== id1 && userId !== id2) {
+			throw new BadRequestException('You are not a participant of this chat')
+		}
+
+		return this.messagesService.markChatAsRead(chatId, userId)
+	}
 
 	@Get(':chat_id')
 	@UseGuards(JwtAuthGuard)

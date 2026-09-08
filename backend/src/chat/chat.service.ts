@@ -53,15 +53,6 @@ export class ChatService {
 
 		await this.chatRepository.save(chat);
 
-		const notification = this.notificationRepo.create({
-			user_id: otherUserId,
-			message: `${currentUser.username} started a new conversation`,
-			link: `/chat/${currentUser.id}`,
-			is_read: false,
-		});
-
-		await this.notificationRepo.save(notification);
-
 		return this.getChat(chatId);
 	}
 
@@ -72,23 +63,50 @@ export class ChatService {
 			.leftJoinAndSelect('chat.user1', 'user1')
 			.leftJoinAndSelect('chat.user2', 'user2')
 			.orderBy('chat.created_at', 'DESC')
-			.getMany()
+			.getMany();
 
-		return chats.map(chat => ({
-			id: chat.id,
-			chat_id: chat.chat_id,
-			user1_id: chat.user1_id,
-			user2_id: chat.user2_id,
-			user1: chat.user1 ? {
-				id: chat.user1.id,
-				username: chat.user1.username,
-				avatar: chat.user1.avatar,
-			} : null,
-			user2: chat.user2 ? {
-				id: chat.user2.id,
-				username: chat.user2.username,
-				avatar: chat.user2.avatar,
-			} : null,
-		}))
+		return Promise.all(
+			chats.map(async (chat) => {
+				const unreadCount = await this.messageRepository
+					.createQueryBuilder('message')
+					.where(
+						'message.chat_id = :chatId AND message.sender_id != :userId AND message.is_read = false',
+						{
+							chatId: chat.chat_id,
+							userId,
+						},
+					)
+					.getCount();
+
+				const lastMessage = await this.messageRepository.findOne({
+					where: { chat_id: chat.chat_id },
+					order: { created_at: 'DESC' },
+				});
+
+				return {
+					id: chat.id,
+					chat_id: chat.chat_id,
+					user1_id: chat.user1_id,
+					user2_id: chat.user2_id,
+					created_at: chat.created_at,
+					user1: chat.user1
+						? {
+								id: chat.user1.id,
+								username: chat.user1.username,
+								avatar: chat.user1.avatar,
+						  }
+						: null,
+					user2: chat.user2
+						? {
+								id: chat.user2.id,
+								username: chat.user2.username,
+								avatar: chat.user2.avatar,
+						  }
+						: null,
+					unreadCount,
+					lastMessage,
+				};
+			}),
+		);
 	}
 }

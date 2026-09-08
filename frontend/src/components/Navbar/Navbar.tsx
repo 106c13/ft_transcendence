@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import MessagesIcon from '../MessagesIcon/MessagesIcon'
 import NotificationBell from '../NotificationBell/NotificationBell'
 import PlayerSearch from '../PlayerSearch/PlayerSearch'
 import styles from './Navbar.module.css'
@@ -31,9 +32,7 @@ function Navbar({ currentUser }: Props) {
 				<PlayerSearch />
 
 				{/* Messages */}
-				<div className={styles.navActionItem} onClick={() => navigate('/chat')} title={t('chat', 'Chat')}>
-					<span className={styles.navActionIcon}>✉️</span>
-				</div>
+				{currentUser && <MessagesIcon userId={currentUser.id} />}
 
 				{/* Notifications */}
 				{currentUser && <NotificationBell userId={currentUser.id} />}

@@ -40,6 +40,8 @@ export class ChatController {
 				username: chat.user2.username,
 				avatar: chat.user2.avatar,
 			} : null,
+			unreadCount: chat.unreadCount ?? 0,
+			lastMessage: chat.lastMessage ?? null,
 		}
 	}
 
@@ -87,8 +89,8 @@ export class ChatController {
 	@Get('my-chats')
 	@UseGuards(JwtAuthGuard)
 	async getUserChats(@Req() req) {
-		const userId = req.user.userId
-		const chats = await this.chatService.getUserChats(userId)
-		return chats
+		const userId = req.user.userId;
+		const chats = await this.chatService.getUserChats(userId);
+		return chats.map((chat) => this.formatChat(chat));
 	}
 }

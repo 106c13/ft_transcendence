@@ -8,6 +8,8 @@ export type ChatObject = {
 	user2_id: number
 	user1: { id: number; username: string; avatar?: string }
 	user2: { id: number; username: string; avatar?: string }
+	unreadCount?: number
+	lastMessage?: any
 }
 
 type Props = {
@@ -50,7 +52,14 @@ function ChatSidebar({ chats, selectedChat, currentUserId, onSelectChat, activeU
 								className={styles.chatAvatar}
 							/>
 							<div className={styles.chatItemInfo}>
-								<div className={styles.chatItemName}>{otherUser?.username || 'User'}</div>
+								<div className={styles.chatItemHeader}>
+									<div className={styles.chatItemName}>{otherUser?.username || 'User'}</div>
+									{typeof chat.unreadCount === 'number' && chat.unreadCount > 0 && (
+										<span className={styles.unreadBadge}>
+											{chat.unreadCount > 99 ? '99+' : chat.unreadCount}
+										</span>
+									)}
+								</div>
 							</div>
 						</div>
 					)

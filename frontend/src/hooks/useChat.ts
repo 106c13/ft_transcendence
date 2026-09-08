@@ -48,6 +48,21 @@ export function useChat(currentUserId: number | null) {
 		refreshChats()
 	}, [refreshChats])
 
+	const markChatAsRead = useCallback((chatId: string) => {
+		if (!token) return
+		fetch(`/api/messages/read/${chatId}`, {
+			method: 'PATCH',
+			headers: { Authorization: `Bearer ${token}` }
+		})
+			.then(() => {
+				setChats(prev =>
+					prev.map(c => (c.chat_id === chatId ? { ...c, unreadCount: 0 } : c))
+				)
+				window.dispatchEvent(new CustomEvent('messages_read'))
+			})
+			.catch(err => console.error('Error marking chat read:', err))
+	}, [token])
+
 	// Socket connection
 	useEffect(() => {
 		if (!currentUserId) return
@@ -66,13 +81,41 @@ export function useChat(currentUserId: number | null) {
 			const newMsg = data?.message
 			if (!newMsg) return
 
-			if (selectedChatRef.current && newMsg.chat_id === selectedChatRef.current.chat_id) {
+			const isCurrentChat =
+				selectedChatRef.current && newMsg.chat_id === selectedChatRef.current.chat_id
+
+			if (isCurrentChat) {
 				setMessages(prev => {
 					if (prev.some(m => m.id === newMsg.id)) return prev
-					return [...prev, newMsg]
+					return [...prev, { ...newMsg, is_read: true }]
 				})
+
+				if (newMsg.sender_id !== currentUserId) {
+					markChatAsRead(newMsg.chat_id)
+				}
+
+				setChats(prev =>
+					prev.map(c =>
+						c.chat_id === newMsg.chat_id
+							? { ...c, unreadCount: 0, lastMessage: newMsg }
+							: c
+					)
+				)
+			} else {
+				refreshChats()
+				window.dispatchEvent(new CustomEvent('messages_read'))
 			}
-			refreshChats()
+		})
+
+		socket.on('messages_read', (data: { chat_id: string; reader_id: number }) => {
+			if (data?.reader_id === currentUserId) {
+				setChats(prev =>
+					prev.map(c =>
+						c.chat_id === data.chat_id ? { ...c, unreadCount: 0 } : c
+					)
+				)
+				window.dispatchEvent(new CustomEvent('messages_read'))
+			}
 		})
 
 		socket.on('disconnect', () => {
@@ -82,7 +125,7 @@ export function useChat(currentUserId: number | null) {
 		return () => {
 			socket.disconnect()
 		}
-	}, [currentUserId, refreshChats])
+	}, [currentUserId, refreshChats, markChatAsRead])
 
 	// Sync active chat and messages with URL param (/chat/:user_id)
 	useEffect(() => {
@@ -109,6 +152,7 @@ export function useChat(currentUserId: number | null) {
 		)
 		if (existingChat) {
 			setSelectedChat(existingChat)
+			markChatAsRead(existingChat.chat_id)
 		}
 
 		// Fetch full chat object from backend
@@ -123,11 +167,13 @@ export function useChat(currentUserId: number | null) {
 				if (!isMounted || !chat?.chat_id) return
 
 				setSelectedChat(chat)
+				markChatAsRead(chat.chat_id)
+
 				setChats(prev => {
 					if (prev.some(c => c.chat_id === chat.chat_id)) {
-						return prev.map(c => (c.chat_id === chat.chat_id ? chat : c))
+						return prev.map(c => (c.chat_id === chat.chat_id ? { ...chat, unreadCount: 0 } : c))
 					}
-					return [chat, ...prev]
+					return [{ ...chat, unreadCount: 0 }, ...prev]
 				})
 
 				return fetch(`/api/messages/${chat.chat_id}?limit=100`, {
@@ -142,6 +188,9 @@ export function useChat(currentUserId: number | null) {
 			.then(data => {
 				if (!isMounted || !data) return
 				setMessages(data.messages || [])
+				if (selectedChatRef.current?.chat_id) {
+					markChatAsRead(selectedChatRef.current.chat_id)
+				}
 			})
 			.catch(err => {
 				console.error('Error opening chat:', err)
@@ -153,7 +202,7 @@ export function useChat(currentUserId: number | null) {
 		return () => {
 			isMounted = false
 		}
-	}, [user_id, currentUserId, token, navigate])
+	}, [user_id, currentUserId, token, navigate, markChatAsRead])
 
 	const sendMessage = async () => {
 		if (!newMessage.trim() || !selectedChat || !token) return
@@ -185,6 +234,7 @@ export function useChat(currentUserId: number | null) {
 	}
 
 	const handleSelectChat = (chat: ChatObject) => {
+		markChatAsRead(chat.chat_id)
 		const otherUser = getOtherUser(chat)
 		if (otherUser) {
 			navigate(`/chat/${otherUser.id}`)

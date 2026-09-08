@@ -25,6 +25,11 @@ function NotificationBell({ userId }: { userId: number }) {
     const navigate = useNavigate()
     const location = useLocation()
 
+    const isChatNotification = (n: Notification) =>
+        n.link?.startsWith('/chat') ||
+        n.message.includes('sent you a message') ||
+        n.message.includes('started a new conversation')
+
     // Fetch full notification list
     const fetchNotifications = useCallback(async (showLoading = false) => {
         if (!userId) return
@@ -38,8 +43,9 @@ function NotificationBell({ userId }: { userId: number }) {
             })
             if (res.ok) {
                 const data: Notification[] = await res.json()
-                setNotifications(data)
-                setUnreadCount(data.filter((n) => !n.is_read).length)
+                const nonChat = data.filter((n) => !isChatNotification(n))
+                setNotifications(nonChat)
+                setUnreadCount(nonChat.filter((n) => !n.is_read).length)
             }
         } catch (error) {
             console.error('Error fetching notifications:', error)

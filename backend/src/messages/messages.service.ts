@@ -73,17 +73,6 @@ export class MessagesService {
 
 		await this.messageRepository.save(message)
 
-		const receiverId = chat.user1_id === senderId ? chat.user2_id : chat.user1_id
-
-		const notification = this.notificationRepo.create({
-			user_id: receiverId,
-			message: `${sender.username} sent you a message`,
-			link: `/chat/${sender.id}`,
-			is_read: false,
-		})
-
-		await this.notificationRepo.save(notification)
-
 		const messageResponse = {
 			id: message.id,
 			chat_id: message.chat_id,
@@ -110,6 +99,44 @@ export class MessagesService {
 			content: message.content,
 			created_at: message.created_at,
 		}
+	}
+
+	async getUnreadCount(userId: number): Promise<number> {
+		return this.messageRepository
+			.createQueryBuilder('message')
+			.innerJoin('chat', 'chat', 'chat.chat_id = message.chat_id')
+			.where('(chat.user1_id = :userId OR chat.user2_id = :userId)', { userId })
+			.andWhere('message.sender_id != :userId', { userId })
+			.andWhere('message.is_read = false')
+			.getCount()
+	}
+
+	async getChatUnreadCount(chatId: string, userId: number): Promise<number> {
+		return this.messageRepository
+			.createQueryBuilder('message')
+			.where('message.chat_id = :chatId', { chatId })
+			.andWhere('message.sender_id != :userId', { userId })
+			.andWhere('message.is_read = false')
+			.getCount()
+	}
+
+	async markChatAsRead(chatId: string, userId: number) {
+		await this.messageRepository
+			.createQueryBuilder()
+			.update(Message)
+			.set({ is_read: true })
+			.where('chat_id = :chatId AND sender_id != :userId AND is_read = false', {
+				chatId,
+				userId,
+			})
+			.execute()
+
+		this.chatGateway.server.emit('messages_read', {
+			chat_id: chatId,
+			reader_id: userId,
+		})
+
+		return { success: true }
 	}
 
 	async getLastMessage(chatId: string) {
