@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
+import { User } from '../users/user.entity';
 
 function isValidEmail(email: string) {
 	return (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 256);
@@ -13,6 +14,18 @@ export class AuthService {
 		private readonly usersService: UsersService,
 		private readonly jwtService: JwtService,
 	) { }
+
+	private generateToken(user: User): string {
+		const payload = {
+			sub: user.id,
+			username: user.username,
+			email: user.email,
+		};
+
+		return this.jwtService.sign(payload, {
+			expiresIn: '7d',
+		});
+	}
 
 	async test() {
 		const email = "admin@admin.com";
@@ -73,15 +86,22 @@ export class AuthService {
 			throw new BadRequestException('user_already_exists');
 		}
 
-		return this.usersService.create({
+		const user: User = await this.usersService.create({
 			email,
 			username,
 			password: hashedPassword,
 		});
+
+		const token: string = this.generateToken(user);
+
+		return {
+			message: 'account_created',
+			token,
+		}
 	}
 
 	async login({ email, password }) {
-		const user = await this.usersService.findByEmail(email);
+		const user: User | null = await this.usersService.findByEmail(email);
 
 		if (!user) {
 			throw new BadRequestException('invalid_credentials');
@@ -93,15 +113,7 @@ export class AuthService {
 			throw new BadRequestException('invalid_credentials');
 		}
 
-		const payload = {
-			sub: user.id,
-			username: user.username,
-			email: user.email,
-		};
-
-		const token = this.jwtService.sign(payload, {
-			expiresIn: '7d',
-		});
+		const token: string = this.generateToken(user);
 
 		return {
 			message: 'login_successful',

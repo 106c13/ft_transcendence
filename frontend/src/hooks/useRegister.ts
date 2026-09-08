@@ -45,11 +45,11 @@ export function useRegister() {
 				return
 			}
 
-			setMsgKey('account_created')
-			setError(false)
+			localStorage.setItem('token', result.token)
+			setMsgKey(result.message || 'account_created')
 
 			setTimeout(() => {
-				navigate('/login')
+				navigate('/home')
 			}, 800)
 
 		} catch (err) {
