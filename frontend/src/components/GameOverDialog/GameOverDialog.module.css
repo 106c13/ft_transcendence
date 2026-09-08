@@ -160,3 +160,28 @@
 .declineRematchBtn:hover {
 	background: linear-gradient(135deg, #DC2626, #B91C1C);
 }
+
+.analyzeBtn {
+	width: 100%;
+	padding: 12px;
+	margin-top: 10px;
+	border-radius: 8px;
+	border: 1px solid rgba(59, 130, 246, 0.4);
+	background: rgba(59, 130, 246, 0.12);
+	color: #60A5FA;
+	font-weight: 600;
+	font-size: 0.95rem;
+	cursor: pointer;
+	transition: all 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+}
+
+.analyzeBtn:hover {
+	background: #3B82F6;
+	color: white;
+	border-color: #3B82F6;
+}
+

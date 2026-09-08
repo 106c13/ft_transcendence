@@ -24,6 +24,7 @@ type Props = {
 	onOfferDraw: () => void
 	onAcceptDraw: () => void
 	onDeclineDraw: () => void
+	onAnalyze?: () => void
 }
 
 const modeTagClassMap: Record<string, keyof typeof styles> = {
@@ -52,6 +53,7 @@ function ChessInfoPanel({
 	onOfferDraw,
 	onAcceptDraw,
 	onDeclineDraw,
+	onAnalyze,
 }: Props) {
 	const { t } = useTranslation()
 
@@ -86,6 +88,7 @@ function ChessInfoPanel({
 				onOfferDraw={onOfferDraw}
 				onAcceptDraw={onAcceptDraw}
 				onDeclineDraw={onDeclineDraw}
+				onAnalyze={onAnalyze}
 			/>
 		</div>
 	)

@@ -170,3 +170,47 @@
 		transform: translateY(0);
 	}
 }
+
+.analyzeBtn {
+	width: 100%;
+	padding: 10px;
+	border-radius: 6px;
+	border: 1px solid rgba(59, 130, 246, 0.4);
+	background: rgba(59, 130, 246, 0.15);
+	color: #60A5FA;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+}
+
+.analyzeBtn:hover {
+	background: #3B82F6;
+	color: white;
+	border-color: #3B82F6;
+}
+
+.lobbyBtn {
+	width: 100%;
+	padding: 10px;
+	border-radius: 6px;
+	border: 1px solid rgba(148, 163, 184, 0.3);
+	background: rgba(148, 163, 184, 0.1);
+	color: #94A3B8;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+}
+
+.lobbyBtn:hover {
+	background: rgba(148, 163, 184, 0.25);
+	color: white;
+}
+

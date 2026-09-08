@@ -13,11 +13,12 @@ type Props = {
 	onRematch: () => void
 	onAcceptRematch: () => void
 	onDeclineRematch: () => void
+	onAnalyze?: () => void
 }
 
 function GameOverDialog({
 	winnerColor, playerColor, gameOverReason, onClose, onPlayAgain,
-	rematchState, onRematch, onAcceptRematch, onDeclineRematch
+	rematchState, onRematch, onAcceptRematch, onDeclineRematch, onAnalyze
 }: Props) {
 	const { t } = useTranslation()
 
@@ -88,6 +89,9 @@ function GameOverDialog({
 					</button>
 					{renderRematchButton()}
 				</div>
+				<button className={styles.analyzeBtn} onClick={onAnalyze}>
+					🔍 {t('analyze_game', 'Analyze Game')}
+				</button>
 			</div>
 		</div>
 	)

@@ -111,6 +111,7 @@ export default function GamePage() {
                             onOfferDraw={game.offerDraw}
                             onAcceptDraw={game.acceptDraw}
                             onDeclineDraw={game.declineDraw}
+                            onAnalyze={game.analyzeGame}
                         />
                     </div>
                 )}
@@ -129,6 +130,7 @@ export default function GamePage() {
                         onRematch={game.sendRematch}
                         onAcceptRematch={game.acceptRematch}
                         onDeclineRematch={game.declineRematch}
+                        onAnalyze={game.analyzeGame}
                     />
                 )}
             </main>

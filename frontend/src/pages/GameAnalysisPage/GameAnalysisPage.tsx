@@ -139,11 +139,6 @@ export default function GameAnalysisPage() {
 
 	return (
 		<div className={styles.page}>
-			<div className={styles.breadcrumb}>
-				<button className={styles.backBtn} onClick={handleBack}>
-					← {t('back_to_games', 'Back to Games')}
-				</button>
-			</div>
 
 			<GameAnalysis
 				username={targetUsername || analysis.selectedGame.white?.username || 'White'}

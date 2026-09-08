@@ -10,6 +10,7 @@ type Props = {
 	onOfferDraw: () => void
 	onAcceptDraw: () => void
 	onDeclineDraw: () => void
+	onAnalyze?: () => void
 }
 
 function GameActions({
@@ -19,6 +20,7 @@ function GameActions({
 	onOfferDraw,
 	onAcceptDraw,
 	onDeclineDraw,
+	onAnalyze,
 }: Props) {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
@@ -27,8 +29,13 @@ function GameActions({
 		return (
 			<div className={styles.gameActions}>
 				<button
-					className={styles.resignBtn}
-					style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#60A5FA', borderColor: 'rgba(96, 165, 250, 0.4)' }}
+					className={styles.analyzeBtn}
+					onClick={onAnalyze}
+				>
+					🔍 {t('analyze_game', 'Analyze Game')}
+				</button>
+				<button
+					className={styles.lobbyBtn}
 					onClick={() => navigate('/home')}
 				>
 					🏠 {t('back_to_lobby', 'Back to Lobby')}

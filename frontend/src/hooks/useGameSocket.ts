@@ -73,6 +73,9 @@ export function useGameSocket() {
     // Draw Offer States
     const [drawOfferState, setDrawOfferState] = useState<DrawOfferState>('idle')
 
+    // Finished Match Database ID
+    const [savedMatchId, setSavedMatchId] = useState<number | null>(null)
+
     // Timing States
     const [whiteTime, setWhiteTime] = useState(180000)
     const [blackTime, setBlackTime] = useState(180000)
@@ -209,6 +212,7 @@ export function useGameSocket() {
             setSelectedMode(data.mode)
             setPremoves([])
             setDrawOfferState('idle')
+            setSavedMatchId(null)
 
             const startFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
             const historyFens: string[] = [startFen]
@@ -291,11 +295,13 @@ export function useGameSocket() {
             winner: 'w' | 'b' | null
             reason: string
             fen: string
+            matchId?: number
         }) => {
             setIsGameOver(true)
             setHideGameOverModal(false)
             setWinnerColor(data.winner)
             setGameOverReason(data.reason)
+            setSavedMatchId(data.matchId || null)
             setPremoves([])
             localChess.load(data.fen)
             setBoardFen(data.fen)
@@ -554,6 +560,16 @@ export function useGameSocket() {
         }
     }
 
+    const analyzeGame = () => {
+        if (savedMatchId) {
+            navigate(`/game/analysis/${savedMatchId}`)
+        } else if (currentUser?.username) {
+            navigate(`/profile/${currentUser.username}?tab=games`)
+        } else {
+            navigate('/home')
+        }
+    }
+
     return {
         currentUser,
         gameState,
@@ -602,6 +618,8 @@ export function useGameSocket() {
         offerDraw,
         acceptDraw,
         declineDraw,
+        savedMatchId,
+        analyzeGame,
     }
 }
 

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import type { Square } from 'chess.js'
@@ -111,6 +112,164 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 
 	const ranks = isUserWhite ? ['8', '7', '6', '5', '4', '3', '2', '1'] : ['1', '2', '3', '4', '5', '6', '7', '8']
 	const files = isUserWhite ? ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] : ['h', 'g', 'f', 'e', 'd', 'c', 'b', 'a']
+
+	const getSquareCenter = (sq: string) => {
+		const file = sq[0]
+		const rank = sq[1]
+		const col = files.indexOf(file)
+		const row = ranks.indexOf(rank)
+		if (col === -1 || row === -1) return null
+		return {
+			x: col * 100 + 50,
+			y: row * 100 + 50,
+			col,
+			row,
+		}
+	}
+
+	const renderArrow = (from: string, to: string, color = '#22c55e', key = 'best-move-arrow') => {
+		const start = getSquareCenter(from)
+		const end = getSquareCenter(to)
+		if (!start || !end || from === to) return null
+
+		const dx = end.col - start.col
+		const dy = end.row - start.row
+		const isKnight =
+			(Math.abs(dx) === 1 && Math.abs(dy) === 2) ||
+			(Math.abs(dx) === 2 && Math.abs(dy) === 1)
+
+		const shaftWidth = 19
+		const headLength = 36
+		const headWidth = 28
+		const tipOffset = 15
+
+		let shaftElement: ReactNode = null
+		let tipX = 0
+		let tipY = 0
+		let wing1X = 0
+		let wing1Y = 0
+		let wing2X = 0
+		let wing2Y = 0
+
+		if (isKnight) {
+			if (Math.abs(dy) === 2) {
+				const cornerX = start.x
+				const cornerY = end.y
+				const ux = Math.sign(dx)
+				const nx = 0
+				const ny = 1
+
+				tipX = end.x - ux * tipOffset
+				tipY = end.y
+				const baseX = tipX - ux * headLength
+				const baseY = end.y
+
+				wing1X = baseX + nx * headWidth
+				wing1Y = baseY + ny * headWidth
+				wing2X = baseX - nx * headWidth
+				wing2Y = baseY - ny * headWidth
+
+				const shaftEndX = baseX + ux * 4
+				const shaftEndY = baseY
+
+				shaftElement = (
+					<path
+						d={`M ${start.x} ${start.y} L ${cornerX} ${cornerY} L ${shaftEndX} ${shaftEndY}`}
+						stroke={color}
+						strokeWidth={shaftWidth}
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						fill="none"
+					/>
+				)
+			} else {
+				const cornerX = end.x
+				const cornerY = start.y
+				const uy = Math.sign(dy)
+				const nx = -Math.sign(dy)
+				const ny = 0
+
+				tipX = end.x
+				tipY = end.y - uy * tipOffset
+				const baseX = end.x
+				const baseY = tipY - uy * headLength
+
+				wing1X = baseX + nx * headWidth
+				wing1Y = baseY + ny * headWidth
+				wing2X = baseX - nx * headWidth
+				wing2Y = baseY - ny * headWidth
+
+				const shaftEndX = baseX
+				const shaftEndY = baseY + uy * 4
+
+				shaftElement = (
+					<path
+						d={`M ${start.x} ${start.y} L ${cornerX} ${cornerY} L ${shaftEndX} ${shaftEndY}`}
+						stroke={color}
+						strokeWidth={shaftWidth}
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						fill="none"
+					/>
+				)
+			}
+		} else {
+			const deltaX = end.x - start.x
+			const deltaY = end.y - start.y
+			const len = Math.hypot(deltaX, deltaY)
+			if (len < 1) return null
+
+			const ux = deltaX / len
+			const uy = deltaY / len
+			const nx = -uy
+			const ny = ux
+
+			tipX = end.x - ux * tipOffset
+			tipY = end.y - uy * tipOffset
+			const baseX = tipX - ux * headLength
+			const baseY = tipY - uy * headLength
+
+			wing1X = baseX + nx * headWidth
+			wing1Y = baseY + ny * headWidth
+			wing2X = baseX - nx * headWidth
+			wing2Y = baseY - ny * headWidth
+
+			const shaftEndX = baseX + ux * 4
+			const shaftEndY = baseY + uy * 4
+
+			shaftElement = (
+				<line
+					x1={start.x}
+					y1={start.y}
+					x2={shaftEndX}
+					y2={shaftEndY}
+					stroke={color}
+					strokeWidth={shaftWidth}
+					strokeLinecap="round"
+				/>
+			)
+		}
+
+		return (
+			<g key={key} opacity={0.88}>
+				{shaftElement}
+				<polygon
+					points={`${tipX},${tipY} ${wing1X},${wing1Y} ${wing2X},${wing2Y}`}
+					fill={color}
+					stroke={color}
+					strokeWidth="3"
+					strokeLinejoin="round"
+				/>
+			</g>
+		)
+	}
+
+	const shouldShowBestMoveArrow = Boolean(
+		showBestMoveHint &&
+		isSuboptimalMove &&
+		currentPosition?.bestMove?.from &&
+		currentPosition?.bestMove?.to
+	)
 
 	return (
 		<div className={styles.container}>
@@ -255,8 +414,6 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 
 										const isPlayedSrc = currentPosition?.from === sq
 										const isPlayedDst = currentPosition?.to === sq
-										const isBestMoveSrc = showBestMoveHint && isSuboptimalMove && currentPosition?.bestMove?.from === sq
-										const isBestMoveDst = showBestMoveHint && isSuboptimalMove && currentPosition?.bestMove?.to === sq
 
 										const isFirstCol = fileIdx === 0
 										const isLastRow = rankIdx === ranks.length - 1
@@ -266,8 +423,6 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 											isLight ? styles.light : styles.dark,
 											isPlayedSrc ? styles.playedSrc : '',
 											isPlayedDst ? styles.playedDst : '',
-											isBestMoveSrc ? styles.bestSrc : '',
-											isBestMoveDst ? styles.bestDst : '',
 										].filter(Boolean).join(' ')
 
 										return (
@@ -297,16 +452,25 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 														{getClassificationBadge(currentPosition.classification).icon}
 													</div>
 												)}
-
-												{/* Best move target indicator */}
-												{isBestMoveDst && (
-													<div className={styles.bestMoveTargetRing} title={`Best move was to ${sq}`}>
-														⭐
-													</div>
-												)}
 											</div>
 										)
 									})
+								)}
+
+								{/* SVG Vector Annotations Overlay (Best Move Arrow) */}
+								{shouldShowBestMoveArrow && currentPosition?.bestMove && (
+									<svg
+										className={styles.annotationsOverlay}
+										viewBox="0 0 800 800"
+										preserveAspectRatio="none"
+									>
+										{renderArrow(
+											currentPosition.bestMove.from,
+											currentPosition.bestMove.to,
+											'#22c55e',
+											'best-move-arrow'
+										)}
+									</svg>
 								)}
 							</div>
 						</div>

@@ -411,11 +411,12 @@ export class GameService {
 		const winnerColor = game.white.userId === userId ? 'b' : 'w';
 		const reason = 'RESIGNATION';
 
-		this.saveMatch(game, reason, winnerColor).then(() => {
+		this.saveMatch(game, reason, winnerColor).then((savedMatch) => {
 			this.gameEventsCallback('game_over', game, {
 				winner: winnerColor,
 				reason,
 				fen: game.board.fen(),
+				matchId: savedMatch?.id,
 			});
 			this.trackFinishedGame(game);
 			this.activeGames.delete(gameId);
@@ -454,11 +455,12 @@ export class GameService {
 		game.drawOfferUserId = null;
 		const reason = 'DRAW';
 
-		this.saveMatch(game, reason, null).then(() => {
+		this.saveMatch(game, reason, null).then((savedMatch) => {
 			this.gameEventsCallback('game_over', game, {
 				winner: null,
 				reason,
 				fen: game.board.fen(),
+				matchId: savedMatch?.id,
 			});
 			this.trackFinishedGame(game);
 			this.activeGames.delete(game.gameId);
@@ -504,12 +506,14 @@ export class GameService {
 			game.disconnectTimers.clear();
 
 			const reason = 'DRAW';
-			this.saveMatch(game, reason, null).then(() => {
+			this.saveMatch(game, reason, null).then((savedMatch) => {
 				this.gameEventsCallback('game_over', game, {
 					winner: null,
 					reason,
 					fen: game.board.fen(),
+					matchId: savedMatch?.id,
 				});
+				this.trackFinishedGame(game);
 				this.activeGames.delete(game.gameId);
 			});
 			return;
@@ -544,11 +548,12 @@ export class GameService {
 			const winnerColor = game.white.userId === userId ? 'b' : 'w';
 			const reason = 'DISCONNECTION';
 
-			this.saveMatch(game, reason, winnerColor).then(() => {
+			this.saveMatch(game, reason, winnerColor).then((savedMatch) => {
 				this.gameEventsCallback('game_over', game, {
 					winner: winnerColor,
 					reason,
 					fen: game.board.fen(),
+					matchId: savedMatch?.id,
 				});
 				this.trackFinishedGame(game);
 				this.activeGames.delete(game.gameId);
@@ -619,11 +624,12 @@ export class GameService {
 
 		const reason = 'TIMEOUT';
 
-		this.saveMatch(game, reason, winnerColor).then(() => {
+		this.saveMatch(game, reason, winnerColor).then((savedMatch) => {
 			this.gameEventsCallback('game_over', game, {
 				winner: winnerColor,
 				reason,
 				fen: game.board.fen(),
+				matchId: savedMatch?.id,
 			});
 			this.trackFinishedGame(game);
 			this.activeGames.delete(game.gameId);
@@ -648,11 +654,12 @@ export class GameService {
 			reason = 'DRAW';
 		}
 
-		this.saveMatch(game, reason, winner).then(() => {
+		this.saveMatch(game, reason, winner).then((savedMatch) => {
 			this.gameEventsCallback('game_over', game, {
 				winner,
 				reason,
 				fen: game.board.fen(),
+				matchId: savedMatch?.id,
 			});
 			// Track the finished game for rematch purposes
 			this.trackFinishedGame(game);
@@ -687,9 +694,10 @@ export class GameService {
 				result: result,
 				pgn: game.board.pgn(),
 			});
-			await this.matchRepo.save(match);
+			return await this.matchRepo.save(match);
 		} catch (e) {
 			console.error('Failed to save match:', e);
+			return null;
 		}
 	}
 
