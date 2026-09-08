@@ -46,6 +46,7 @@ export interface ChessGame {
 	timer: NodeJS.Timeout | null;
 	disconnectTimers: Map<number, NodeJS.Timeout>;
 	disconnectedPlayerIds: Set<number>;
+	drawOfferUserId?: number | null;
 }
 
 @Injectable()
@@ -170,6 +171,7 @@ export class GameService {
 				timer: null,
 				disconnectTimers: new Map(),
 				disconnectedPlayerIds: new Set(),
+				drawOfferUserId: null,
 			};
 
 			this.activeGames.set(gameId, newGame);
@@ -276,6 +278,7 @@ export class GameService {
 			timer: null,
 			disconnectTimers: new Map(),
 			disconnectedPlayerIds: new Set(),
+			drawOfferUserId: null,
 		};
 
 		this.activeGames.set(gameId, newGame);
@@ -417,6 +420,67 @@ export class GameService {
 			this.trackFinishedGame(game);
 			this.activeGames.delete(gameId);
 		});
+	}
+
+	// Handle draw offer
+	offerDraw(gameId: string, userId: number): { success: boolean; opponentSocketId?: string; error?: string } {
+		const game = this.activeGames.get(gameId);
+		if (!game) return { success: false, error: 'Game not found' };
+
+		if (game.white.userId !== userId && game.black.userId !== userId) {
+			return { success: false, error: 'User not in game' };
+		}
+
+		// If opponent already offered a draw, accept it
+		if (game.drawOfferUserId && game.drawOfferUserId !== userId) {
+			this.acceptDraw(gameId, userId);
+			return { success: true };
+		}
+
+		game.drawOfferUserId = userId;
+		const opponent = game.white.userId === userId ? game.black : game.white;
+		return { success: true, opponentSocketId: opponent.socketId };
+	}
+
+	// Handle draw acceptance
+	acceptDraw(gameId: string, userId: number): { success: boolean; error?: string } {
+		const game = this.activeGames.get(gameId);
+		if (!game) return { success: false, error: 'Game not found' };
+
+		if (!game.drawOfferUserId || game.drawOfferUserId === userId) {
+			return { success: false, error: 'No draw offer to accept' };
+		}
+
+		game.drawOfferUserId = null;
+		const reason = 'DRAW';
+
+		this.saveMatch(game, reason, null).then(() => {
+			this.gameEventsCallback('game_over', game, {
+				winner: null,
+				reason,
+				fen: game.board.fen(),
+			});
+			this.trackFinishedGame(game);
+			this.activeGames.delete(game.gameId);
+		});
+
+		return { success: true };
+	}
+
+	// Handle draw decline
+	declineDraw(gameId: string, userId: number): { success: boolean; requesterSocketId?: string; error?: string } {
+		const game = this.activeGames.get(gameId);
+		if (!game) return { success: false, error: 'Game not found' };
+
+		if (!game.drawOfferUserId || game.drawOfferUserId === userId) {
+			return { success: false, error: 'No draw offer to decline' };
+		}
+
+		const requesterUserId = game.drawOfferUserId;
+		const requester = game.white.userId === requesterUserId ? game.white : game.black;
+		game.drawOfferUserId = null;
+
+		return { success: true, requesterSocketId: requester.socketId };
 	}
 
 	// Handle user disconnection from websocket

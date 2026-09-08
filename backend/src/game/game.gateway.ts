@@ -197,6 +197,62 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@SubscribeMessage('draw_offer')
+	handleDrawOffer(client: Socket, payload: { gameId: string }) {
+		const userIdStr = client.handshake.query.userId;
+		if (!userIdStr) return;
+
+		const userId = parseInt(userIdStr as string);
+		const gameId = payload?.gameId;
+		if (!gameId) return;
+
+		const result = this.gameService.offerDraw(gameId, userId);
+		if (result.success) {
+			if (result.opponentSocketId) {
+				const opponentSocket = this.server.sockets.get(result.opponentSocketId);
+				if (opponentSocket) {
+					opponentSocket.emit('draw_offered', { gameId, fromUserId: userId });
+					return;
+				}
+			}
+			client.to(gameId).emit('draw_offered', { gameId, fromUserId: userId });
+		}
+	}
+
+	@SubscribeMessage('draw_accept')
+	handleDrawAccept(client: Socket, payload: { gameId: string }) {
+		const userIdStr = client.handshake.query.userId;
+		if (!userIdStr) return;
+
+		const userId = parseInt(userIdStr as string);
+		const gameId = payload?.gameId;
+		if (!gameId) return;
+
+		this.gameService.acceptDraw(gameId, userId);
+	}
+
+	@SubscribeMessage('draw_decline')
+	handleDrawDecline(client: Socket, payload: { gameId: string }) {
+		const userIdStr = client.handshake.query.userId;
+		if (!userIdStr) return;
+
+		const userId = parseInt(userIdStr as string);
+		const gameId = payload?.gameId;
+		if (!gameId) return;
+
+		const result = this.gameService.declineDraw(gameId, userId);
+		if (result.success) {
+			if (result.requesterSocketId) {
+				const requesterSocket = this.server.sockets.get(result.requesterSocketId);
+				if (requesterSocket) {
+					requesterSocket.emit('draw_declined', { gameId });
+					return;
+				}
+			}
+			client.to(gameId).emit('draw_declined', { gameId });
+		}
+	}
+
 	@SubscribeMessage('rematch_request')
 	async handleRematchRequest(client: Socket, payload: { gameId: string }) {
 		const userIdStr = client.handshake.query.userId;

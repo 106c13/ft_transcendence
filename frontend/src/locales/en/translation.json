@@ -122,7 +122,13 @@
     "username_invalid_chars": "Username should contain only letters and numbers",
     "password_too_short": "Password must be at least 8 characters long",
     "password_complexity_error": "Password must contain at least one letter, one number, and one special character",
-    "user_already_exists": "User already exists"
+    "user_already_exists": "User already exists",
+    "offer_draw": "Offer Draw",
+    "draw_offered": "Draw Offered...",
+    "opponent_offered_draw": "Opponent offers a draw",
+    "accept_draw": "Accept",
+    "decline_draw": "Decline",
+    "draw_declined": "Opponent declined draw offer"
 }
 
 

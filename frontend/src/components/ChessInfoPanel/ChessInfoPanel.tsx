@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import CapturedPieces from '../CapturedPieces/CapturedPieces'
 import MoveHistory from '../MoveHistory/MoveHistory'
 import GameActions from '../GameActions/GameActions'
+import type { DrawOfferState } from '../../hooks/useGameSocket'
 import styles from './ChessInfoPanel.module.css'
 
 type PieceCapture = { type: string; color: 'w' | 'b' }
@@ -19,6 +20,10 @@ type Props = {
 	isGameOver: boolean
 	onSelectIndex: (idx: number) => void
 	onResign: () => void
+	drawOfferState: DrawOfferState
+	onOfferDraw: () => void
+	onAcceptDraw: () => void
+	onDeclineDraw: () => void
 }
 
 const modeTagClassMap: Record<string, keyof typeof styles> = {
@@ -43,6 +48,10 @@ function ChessInfoPanel({
 	isGameOver,
 	onSelectIndex,
 	onResign,
+	drawOfferState,
+	onOfferDraw,
+	onAcceptDraw,
+	onDeclineDraw,
 }: Props) {
 	const { t } = useTranslation()
 
@@ -70,7 +79,14 @@ function ChessInfoPanel({
 				onSelectIndex={onSelectIndex}
 			/>
 
-			<GameActions isGameOver={isGameOver} onResign={onResign} />
+			<GameActions
+				isGameOver={isGameOver}
+				onResign={onResign}
+				drawOfferState={drawOfferState}
+				onOfferDraw={onOfferDraw}
+				onAcceptDraw={onAcceptDraw}
+				onDeclineDraw={onDeclineDraw}
+			/>
 		</div>
 	)
 }

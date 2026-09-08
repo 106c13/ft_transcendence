@@ -107,6 +107,10 @@ export default function GamePage() {
                             isGameOver={game.isGameOver}
                             onSelectIndex={game.setViewIndex}
                             onResign={game.resignGame}
+                            drawOfferState={game.drawOfferState}
+                            onOfferDraw={game.offerDraw}
+                            onAcceptDraw={game.acceptDraw}
+                            onDeclineDraw={game.declineDraw}
                         />
                     </div>
                 )}

@@ -14,6 +14,8 @@ interface Premove {
     promotion?: string
 }
 
+export type DrawOfferState = 'idle' | 'sent' | 'received' | 'declined'
+
 interface User {
     id: number
     username: string
@@ -67,6 +69,9 @@ export function useGameSocket() {
     // Rematch States
     type RematchState = 'idle' | 'sent' | 'received' | 'declined' | 'opponent_left'
     const [rematchState, setRematchState] = useState<RematchState>('idle')
+
+    // Draw Offer States
+    const [drawOfferState, setDrawOfferState] = useState<DrawOfferState>('idle')
 
     // Timing States
     const [whiteTime, setWhiteTime] = useState(180000)
@@ -203,6 +208,7 @@ export function useGameSocket() {
             setIsPaused(data.isPaused || false)
             setSelectedMode(data.mode)
             setPremoves([])
+            setDrawOfferState('idle')
 
             const startFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
             const historyFens: string[] = [startFen]
@@ -296,6 +302,7 @@ export function useGameSocket() {
             setIsPaused(false)
             setPauseCountdown(null)
             setRematchState('idle')
+            setDrawOfferState('idle')
 
             setMoveHistory(prev => {
                 const last = prev[prev.length - 1]
@@ -317,6 +324,15 @@ export function useGameSocket() {
             } else {
                 setRematchState('declined')
             }
+        })
+
+        // Draw offer events
+        socket.on('draw_offered', () => {
+            setDrawOfferState('received')
+        })
+
+        socket.on('draw_declined', () => {
+            setDrawOfferState('declined')
         })
 
         socket.on('error', (err: { message: string }) => {
@@ -507,6 +523,37 @@ export function useGameSocket() {
         }
     }
 
+    // Auto-clear declined draw notice after 5 seconds
+    useEffect(() => {
+        if (drawOfferState !== 'declined') return
+        const timer = setTimeout(() => {
+            setDrawOfferState('idle')
+        }, 5000)
+        return () => clearTimeout(timer)
+    }, [drawOfferState])
+
+    // Draw actions
+    const offerDraw = () => {
+        if (socketRef.current && gameId) {
+            setDrawOfferState('sent')
+            socketRef.current.emit('draw_offer', { gameId })
+        }
+    }
+
+    const acceptDraw = () => {
+        if (socketRef.current && gameId) {
+            setDrawOfferState('idle')
+            socketRef.current.emit('draw_accept', { gameId })
+        }
+    }
+
+    const declineDraw = () => {
+        if (socketRef.current && gameId) {
+            setDrawOfferState('idle')
+            socketRef.current.emit('draw_decline', { gameId })
+        }
+    }
+
     return {
         currentUser,
         gameState,
@@ -551,6 +598,10 @@ export function useGameSocket() {
         sendRematch,
         acceptRematch,
         declineRematch,
+        drawOfferState,
+        offerDraw,
+        acceptDraw,
+        declineDraw,
     }
 }
 
