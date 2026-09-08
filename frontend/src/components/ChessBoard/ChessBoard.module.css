@@ -145,3 +145,32 @@
 	z-index: 15;
 	overflow: visible;
 }
+
+.coordRank,
+.coordFile {
+	position: absolute;
+	font-size: min(1.6vh, 11px);
+	font-weight: 700;
+	line-height: 1;
+	pointer-events: none;
+	user-select: none;
+	z-index: 5;
+}
+
+.coordRank {
+	top: 3px;
+	left: 4px;
+}
+
+.coordFile {
+	bottom: 3px;
+	right: 4px;
+}
+
+.coordOnLight {
+	color: rgba(71, 85, 105, 0.95);
+}
+
+.coordOnDark {
+	color: rgba(226, 232, 240, 0.95);
+}

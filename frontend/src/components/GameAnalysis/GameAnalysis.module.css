@@ -513,6 +513,35 @@
 	background-color: #64748B;
 }
 
+.coordRank,
+.coordFile {
+	position: absolute;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 1;
+	pointer-events: none;
+	user-select: none;
+	z-index: 5;
+}
+
+.coordRank {
+	top: 3px;
+	left: 4px;
+}
+
+.coordFile {
+	bottom: 3px;
+	right: 4px;
+}
+
+.coordOnLight {
+	color: #64748B;
+}
+
+.coordOnDark {
+	color: #E2E8F0;
+}
+
 /* Played move highlights */
 .square.playedSrc {
 	background-color: rgba(251, 191, 36, 0.4) !important;

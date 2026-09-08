@@ -258,6 +258,9 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 										const isBestMoveSrc = showBestMoveHint && isSuboptimalMove && currentPosition?.bestMove?.from === sq
 										const isBestMoveDst = showBestMoveHint && isSuboptimalMove && currentPosition?.bestMove?.to === sq
 
+										const isFirstCol = fileIdx === 0
+										const isLastRow = rankIdx === ranks.length - 1
+
 										const sqClasses = [
 											styles.square,
 											isLight ? styles.light : styles.dark,
@@ -269,6 +272,17 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 
 										return (
 											<div key={sq} className={sqClasses}>
+												{isFirstCol && (
+													<span className={`${styles.coordRank} ${isLight ? styles.coordOnLight : styles.coordOnDark}`}>
+														{rank}
+													</span>
+												)}
+												{isLastRow && (
+													<span className={`${styles.coordFile} ${isLight ? styles.coordOnLight : styles.coordOnDark}`}>
+														{file}
+													</span>
+												)}
+
 												{piece && (
 													<img
 														src={getPieceImageSrc(piece.type, piece.color)}

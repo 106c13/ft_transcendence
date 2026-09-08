@@ -515,6 +515,9 @@ function ChessBoard({
                             ? customHighlights.has(sq)
                             : Boolean(customHighlights?.[sq]))
 
+                    const isFirstCol = fileIdx === 0
+                    const isLastRow = rankIdx === ranks.length - 1
+
                     return (
                         <div
                             key={sq}
@@ -527,6 +530,17 @@ function ChessBoard({
                                 isRedHighlighted ? styles.highlightedRed : ''
                             }`}
                         >
+                            {isFirstCol && (
+                                <span className={`${styles.coordRank} ${isLight ? styles.coordOnLight : styles.coordOnDark}`}>
+                                    {rank}
+                                </span>
+                            )}
+                            {isLastRow && (
+                                <span className={`${styles.coordFile} ${isLight ? styles.coordOnLight : styles.coordOnDark}`}>
+                                    {file}
+                                </span>
+                            )}
+
                             {piece && !isPieceDraggedFromHere && (
                                 <img
                                     src={getPieceImageSrc(piece.type, piece.color)}
