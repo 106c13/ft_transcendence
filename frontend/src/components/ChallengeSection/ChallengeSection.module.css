@@ -145,8 +145,6 @@
 	backdrop-filter: blur(20px);
 	border: 1px solid rgba(245, 158, 11, 0.25);
 	border-radius: 14px;
-	max-height: 240px;
-	overflow-y: auto;
 	z-index: 50;
 	box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 158, 11, 0.08);
 	padding: 6px;
@@ -154,6 +152,24 @@
 	animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 	scrollbar-width: thin;
 	scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+/* Auto-flip upward when near bottom screen edge */
+.dropdownMenuUp {
+	top: auto;
+	bottom: calc(100% + 8px);
+	animation: dropupFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropupFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .dropdownMenu::-webkit-scrollbar {
@@ -205,11 +221,90 @@
 	color: #E2E8F0;
 	font-size: 14px;
 	font-weight: 500;
+	min-width: 0; /* Prevents long usernames from blowing out horizontal width */
 }
 
 .dropdownOption:hover {
 	background: rgba(245, 158, 11, 0.12);
 	color: #FFFFFF;
+}
+
+.searchWrapper {
+	display: flex;
+	align-items: center;
+	padding: 4px 6px 6px 6px;
+	border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+	margin-bottom: 4px;
+	gap: 6px;
+}
+
+.searchIcon {
+	color: #64748B;
+	flex-shrink: 0;
+	margin-left: 4px;
+}
+
+.searchInput {
+	flex: 1;
+	min-width: 0;
+	background: transparent;
+	border: none;
+	outline: none;
+	padding: 5px 6px;
+	color: #F8FAFC;
+	font-size: 13px;
+	box-sizing: border-box;
+}
+
+.searchInput::placeholder {
+	color: #64748B;
+	font-size: 13px;
+}
+
+.searchClearBtn {
+	background: transparent;
+	border: none;
+	color: #94A3B8;
+	cursor: pointer;
+	font-size: 12px;
+	padding: 4px 6px;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: color 0.15s ease, background 0.15s ease;
+}
+
+.searchClearBtn:hover {
+	color: #F8FAFC;
+	background: rgba(148, 163, 184, 0.15);
+}
+
+.friendsList {
+	max-height: 220px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+.friendsList::-webkit-scrollbar {
+	width: 6px;
+}
+
+.friendsList::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.friendsList::-webkit-scrollbar-thumb {
+	background: rgba(148, 163, 184, 0.3);
+	border-radius: 3px;
+}
+
+.friendsList::-webkit-scrollbar-thumb:hover {
+	background: rgba(245, 158, 11, 0.5);
 }
 
 .optionSelected {
