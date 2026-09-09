@@ -1,0 +1,78 @@
+services:
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+      - frontend
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:Z
+    networks:
+      - ft_transcendence
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app:Z
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    networks:
+      - ft_transcendence
+    restart: on-failure
+
+  backend:
+    build: ./backend
+    container_name: backend
+    command: npm run start:dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app:Z
+      - /app/node_modules
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - engine
+    networks:
+      - ft_transcendence
+    restart: on-failure
+
+  engine:
+    build: ./engine
+    container_name: engine
+    command: npm run dev
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./engine:/app:Z
+      - /app/node_modules
+    networks:
+      - ft_transcendence
+    restart: on-failure
+
+  db:
+    build: ./db
+    container_name: db
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data:Z
+    networks:
+      - ft_transcendence
+
+networks:
+  ft_transcendence:
+    driver: bridge
+
+volumes:
+  pgdata:
