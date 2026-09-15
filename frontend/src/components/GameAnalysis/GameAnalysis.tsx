@@ -21,6 +21,10 @@ export type MatchRecord = {
 	white?: { id: number; username: string; avatar?: string }
 	black?: { id: number; username: string; avatar?: string }
 	winner?: { id: number; username: string; avatar?: string }
+	white_rating_after?: number | null
+	black_rating_after?: number | null
+	white_rating_delta?: number | null
+	black_rating_delta?: number | null
 }
 
 export interface MoveAnalysis {

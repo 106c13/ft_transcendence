@@ -184,7 +184,7 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 
 		// We need game socket IDs, but these players might not be on /game yet.
 		// Create the game with placeholder socket IDs; the players will connect to /game with the challenge gameId.
-		const newGame = this.gameService.createDirectMatch(
+		const newGame = await this.gameService.createDirectMatch(
 			whiteId, '', whiteUsername,
 			blackId, '', blackUsername,
 			challenge.mode,

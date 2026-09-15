@@ -239,6 +239,38 @@
 	gap: 4px;
 }
 
+.outcomeTopRow {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.ratingDeltaBadge {
+	font-size: 11px;
+	font-weight: 700;
+	font-family: var(--mono, monospace);
+	padding: 2px 6px;
+	border-radius: 5px;
+}
+
+.deltaPositive {
+	color: #4ADE80;
+	background: rgba(34, 197, 94, 0.15);
+	border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.deltaNegative {
+	color: #F87171;
+	background: rgba(239, 68, 68, 0.15);
+	border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.deltaNeutral {
+	color: #94A3B8;
+	background: rgba(148, 163, 184, 0.15);
+	border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
 .outcomePill {
 	font-size: 12px;
 	font-weight: 700;

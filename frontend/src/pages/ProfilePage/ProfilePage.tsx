@@ -73,6 +73,7 @@ function ProfilePage({ defaultTab = 'overview' }: Props) {
                 friends={friends}
                 username={user.username}
                 isOwnProfile={user.isOwnProfile || false}
+                ratings={user.ratings}
                 onSelectTab={handleSelectTab}
                 onFriendClick={goToUserProfile}
             />

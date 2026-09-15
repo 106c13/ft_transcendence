@@ -72,6 +72,7 @@ function GamesList({
 						const isUserWhite = match.white?.username === username
 						const opponent = isUserWhite ? match.black : match.white
 						const userSide = isUserWhite ? 'White' : 'Black'
+						const ratingDelta = isUserWhite ? match.white_rating_delta : match.black_rating_delta
 
 						return (
 							<div
@@ -105,9 +106,24 @@ function GamesList({
 									</div>
 
 									<div className={styles.cardOutcome}>
-										<span className={`${styles.outcomePill} ${styles[`outcome${outcome.className.charAt(0).toUpperCase() + outcome.className.slice(1)}`]}`}>
-											{outcome.label}
-										</span>
+										<div className={styles.outcomeTopRow}>
+											<span className={`${styles.outcomePill} ${styles[`outcome${outcome.className.charAt(0).toUpperCase() + outcome.className.slice(1)}`]}`}>
+												{outcome.label}
+											</span>
+											{ratingDelta !== undefined && ratingDelta !== null && (
+												<span
+													className={`${styles.ratingDeltaBadge} ${
+														ratingDelta > 0
+															? styles.deltaPositive
+															: ratingDelta < 0
+															? styles.deltaNegative
+															: styles.deltaNeutral
+													}`}
+												>
+													{ratingDelta > 0 ? `+${ratingDelta}` : ratingDelta}
+												</span>
+											)}
+										</div>
 										<span className={styles.reasonText}>{formatReason(match.result)}</span>
 									</div>
 								</div>

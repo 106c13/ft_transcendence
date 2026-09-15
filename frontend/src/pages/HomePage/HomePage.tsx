@@ -30,15 +30,19 @@ function HomePage() {
 	const [selectedFriend, setSelectedFriend] = useState('')
 	const [friends, setFriends] = useState<Friend[]>([])
 	const [errorMessage, setErrorMessage] = useState('')
+	const [ratings, setRatings] = useState(currentUser?.ratings || null)
 
 	// Reset challenge status when entering HomePage so returning from a game won't show stale status
 	useEffect(() => {
 		challengeSocket.resetChallengeStatus()
 	}, [])
 
-	// Load friends list
+	// Load ratings & friends list
 	useEffect(() => {
 		if (!currentUser) return
+		if (currentUser.ratings) {
+			setRatings(currentUser.ratings)
+		}
 		const token = localStorage.getItem('token')
 		fetch(`/api/friends/list/${currentUser.username}`, {
 			headers: { Authorization: `Bearer ${token}` },
@@ -46,6 +50,15 @@ function HomePage() {
 			.then(res => res.json())
 			.then(data => setFriends(data))
 			.catch(err => console.error('Failed to load friends:', err))
+
+		fetch(`/api/game/ratings/${currentUser.username}`, {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+			.then(res => res.ok ? res.json() : null)
+			.then(data => {
+				if (data) setRatings(data)
+			})
+			.catch(err => console.error('Failed to load ratings:', err))
 	}, [currentUser])
 
 	const handlePlayMode = (mode: GameModeType) => {
@@ -91,7 +104,7 @@ function HomePage() {
 					challengeError={challengeSocket.challengeError}
 				/>
 
-				<GameModesGrid modes={MODES} onSelectMode={handlePlayMode} />
+				<GameModesGrid modes={MODES} ratings={ratings} onSelectMode={handlePlayMode} />
 
 				{errorMessage && (
 					<div className={styles.errorToast}>

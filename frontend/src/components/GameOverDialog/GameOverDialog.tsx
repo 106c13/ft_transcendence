@@ -7,6 +7,8 @@ type Props = {
 	winnerColor: 'w' | 'b' | null
 	playerColor: 'w' | 'b'
 	gameOverReason: string
+	ratingAfter?: number | null
+	ratingDelta?: number | null
 	onClose: () => void
 	onPlayAgain: () => void
 	rematchState: RematchState
@@ -17,7 +19,7 @@ type Props = {
 }
 
 function GameOverDialog({
-	winnerColor, playerColor, gameOverReason, onClose, onPlayAgain,
+	winnerColor, playerColor, gameOverReason, ratingAfter, ratingDelta, onClose, onPlayAgain,
 	rematchState, onRematch, onAcceptRematch, onDeclineRematch, onAnalyze
 }: Props) {
 	const { t } = useTranslation()
@@ -83,6 +85,25 @@ function GameOverDialog({
 					{gameOverReason === 'DISCONNECTION' && t('reason_disconnection', 'Opponent Disconnected')}
 					{gameOverReason === 'DRAW' && t('reason_draw', 'Draw')}
 				</div>
+				{ratingAfter !== undefined && ratingAfter !== null && (
+					<div className={styles.ratingSection}>
+						<span className={styles.ratingLabel}>{t('rating', 'Rating')}:</span>
+						<span className={styles.ratingValue}>{ratingAfter}</span>
+						{ratingDelta !== undefined && ratingDelta !== null && (
+							<span
+								className={`${styles.ratingDelta} ${
+									ratingDelta > 0
+										? styles.ratingGain
+										: ratingDelta < 0
+										? styles.ratingLoss
+										: styles.ratingEven
+								}`}
+							>
+								{ratingDelta > 0 ? `+${ratingDelta}` : ratingDelta}
+							</span>
+						)}
+					</div>
+				)}
 				<div className={styles.buttonRow}>
 					<button className={styles.playAgainBtn} onClick={onPlayAgain}>
 						{t('play_again', 'Play Again')}

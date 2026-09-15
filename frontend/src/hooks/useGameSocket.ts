@@ -8,6 +8,8 @@ import type { Square } from 'chess.js'
 import { getPieceImageSrc } from '../constants/gameConstants'
 import type { GameModeType } from '../constants/gameModeConstats'
 
+import type { User } from '../constants/profileConstants'
+
 interface Premove {
     from: string
     to: string
@@ -15,15 +17,6 @@ interface Premove {
 }
 
 export type DrawOfferState = 'idle' | 'sent' | 'received' | 'declined'
-
-interface User {
-    id: number
-    username: string
-    email: string
-    avatar?: string
-    bio?: string
-    status?: 'ONLINE' | 'OFFLINE' | 'INGAME'
-}
 
 const getSimulatedChess = (baseFen: string, color: 'w' | 'b' | null, premoveList: Premove[]) => {
     const sim = new Chess(baseFen)
@@ -75,6 +68,14 @@ export function useGameSocket() {
 
     // Finished Match Database ID
     const [savedMatchId, setSavedMatchId] = useState<number | null>(null)
+
+    // Rating States
+    const [playerRating, setPlayerRating] = useState<number | null>(null)
+    const [playerIsProvisional, setPlayerIsProvisional] = useState(false)
+    const [opponentRating, setOpponentRating] = useState<number | null>(null)
+    const [opponentIsProvisional, setOpponentIsProvisional] = useState(false)
+    const [playerRatingAfter, setPlayerRatingAfter] = useState<number | null>(null)
+    const [playerRatingDelta, setPlayerRatingDelta] = useState<number | null>(null)
 
     // Timing States
     const [whiteTime, setWhiteTime] = useState(180000)
@@ -192,10 +193,20 @@ export function useGameSocket() {
             history: string[]
             mode: GameModeType
             isPaused?: boolean
+            playerRating?: number
+            playerIsProvisional?: boolean
+            opponentRating?: number
+            opponentIsProvisional?: boolean
         }) => {
             setGameId(data.gameId)
             setPlayerColor(data.color)
             setOpponentName(data.opponentName)
+            setPlayerRating(data.playerRating ?? null)
+            setPlayerIsProvisional(data.playerIsProvisional ?? false)
+            setOpponentRating(data.opponentRating ?? null)
+            setOpponentIsProvisional(data.opponentIsProvisional ?? false)
+            setPlayerRatingAfter(null)
+            setPlayerRatingDelta(null)
             localChess.load(data.fen)
             setBoardFen(data.fen)
 
@@ -296,12 +307,26 @@ export function useGameSocket() {
             reason: string
             fen: string
             matchId?: number
+            whiteRatingAfter?: number
+            blackRatingAfter?: number
+            whiteRatingDelta?: number
+            blackRatingDelta?: number
         }) => {
             setIsGameOver(true)
             setHideGameOverModal(false)
             setWinnerColor(data.winner)
             setGameOverReason(data.reason)
             setSavedMatchId(data.matchId || null)
+
+            const isWhite = playerColorRef.current === 'w'
+            const ratingAfter = isWhite ? data.whiteRatingAfter : data.blackRatingAfter
+            const ratingDelta = isWhite ? data.whiteRatingDelta : data.blackRatingDelta
+            setPlayerRatingAfter(ratingAfter ?? null)
+            setPlayerRatingDelta(ratingDelta ?? null)
+            if (ratingAfter !== undefined && ratingAfter !== null) {
+                setPlayerRating(ratingAfter)
+            }
+
             setPremoves([])
             localChess.load(data.fen)
             setBoardFen(data.fen)
@@ -475,10 +500,24 @@ export function useGameSocket() {
     const ranks = playerColor === 'b' ? ['1', '2', '3', '4', '5', '6', '7', '8'] : ['8', '7', '6', '5', '4', '3', '2', '1']
     const files = playerColor === 'b' ? ['h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'] : ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
-    const startMatchmaking = () => {
+    const startMatchmaking = (modeOverride?: GameModeType) => {
         if (socketRef.current) {
+            const mode = modeOverride || selectedMode
             setGameState('searching')
-            socketRef.current.emit('find_match', { mode: selectedMode })
+            setIsGameOver(false)
+            setHideGameOverModal(false)
+            setGameId('')
+            setOpponentName('')
+            setSavedMatchId(null)
+            setWinnerColor(null)
+            setGameOverReason('')
+            setPlayerRatingAfter(null)
+            setPlayerRatingDelta(null)
+            setPremoves([])
+            setLastMove(null)
+            setRematchState('idle')
+            setDrawOfferState('idle')
+            socketRef.current.emit('find_match', { mode })
         }
     }
 
@@ -620,6 +659,12 @@ export function useGameSocket() {
         declineDraw,
         savedMatchId,
         analyzeGame,
+        playerRating,
+        playerIsProvisional,
+        opponentRating,
+        opponentIsProvisional,
+        playerRatingAfter,
+        playerRatingDelta,
     }
 }
 

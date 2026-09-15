@@ -5,14 +5,8 @@ import ChallengeNotification from '../components/ChallengeNotification/Challenge
 import { useChallengeSocket } from '../hooks/useChallengeSocket'
 import type { ChallengeStatus, ChallengeReceived } from '../hooks/useChallengeSocket'
 
-export type User = {
-  id: number
-  username: string
-  email: string
-  avatar?: string
-  bio?: string
-  status?: 'ONLINE' | 'OFFLINE' | 'INGAME'
-}
+import type { User } from '../constants/profileConstants'
+export type { User }
 
 export type LayoutContextType = {
   currentUser: User | null

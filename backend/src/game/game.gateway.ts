@@ -5,9 +5,10 @@ import {
 	OnGatewayConnection,
 	OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Server, Socket, Namespace } from 'socket.io';
+import { Socket, Namespace } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
+import { getRatingCategory, RatingService } from './rating.service';
 
 @WebSocketGateway({
 	namespace: '/game',
@@ -24,10 +25,54 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private gameService: GameService,
 		private usersService: UsersService,
+		private ratingService: RatingService,
 	) {
 		// Register events callback from service to notify clients
 		this.gameService.setGameEventsCallback((event, game, payload) => {
 			this.server.to(game.gameId).emit(event, payload);
+		});
+
+		this.gameService.setMatchFoundCallback(async (newGame) => {
+			const roomName = newGame.gameId;
+
+			const whiteSocket = this.server.sockets.get(newGame.white.socketId);
+			const blackSocket = this.server.sockets.get(newGame.black.socketId);
+			if (whiteSocket) whiteSocket.join(roomName);
+			if (blackSocket) blackSocket.join(roomName);
+
+			const category = getRatingCategory(newGame.mode);
+			const whiteRating = await this.ratingService.getMatchmakingRating(newGame.white.userId, category);
+			const blackRating = await this.ratingService.getMatchmakingRating(newGame.black.userId, category);
+
+			const matchHistory = newGame.board.history ? newGame.board.history() : [];
+
+			const whitePayload = {
+				gameId: newGame.gameId, color: 'w', opponentName: newGame.black.username,
+				fen: newGame.board.fen(), whiteTime: newGame.whiteTime, blackTime: newGame.blackTime,
+				turn: newGame.board.turn(), history: matchHistory, mode: newGame.mode, isPaused: false,
+				playerRating: whiteRating.rating, playerIsProvisional: whiteRating.isProvisional,
+				opponentRating: blackRating.rating, opponentIsProvisional: blackRating.isProvisional,
+			};
+
+			const blackPayload = {
+				gameId: newGame.gameId, color: 'b', opponentName: newGame.white.username,
+				fen: newGame.board.fen(), whiteTime: newGame.whiteTime, blackTime: newGame.blackTime,
+				turn: newGame.board.turn(), history: matchHistory, mode: newGame.mode, isPaused: false,
+				playerRating: blackRating.rating, playerIsProvisional: blackRating.isProvisional,
+				opponentRating: whiteRating.rating, opponentIsProvisional: whiteRating.isProvisional,
+			};
+
+			if (whiteSocket) {
+				whiteSocket.emit('match_found', whitePayload);
+			} else {
+				this.server.to(newGame.white.socketId).emit('match_found', whitePayload);
+			}
+
+			if (blackSocket) {
+				blackSocket.emit('match_found', blackPayload);
+			} else {
+				this.server.to(newGame.black.socketId).emit('match_found', blackPayload);
+			}
 		});
 	}
 
@@ -41,12 +86,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Resume match if reconnected
 		const reconnectedGame = this.gameService.handleUserReconnect(userId, client.id);
 		if (reconnectedGame) {
+			const isWhite = reconnectedGame.white.userId === userId ? true : false;
+			const color = isWhite ? 'w' : 'b';
+
+			const category = getRatingCategory(reconnectedGame.mode);
+			let playerRating = await this.ratingService.getMatchmakingRating(reconnectedGame.white.userId, category);
+			let opponentRating = await this.ratingService.getMatchmakingRating(reconnectedGame.black.userId, category);
+
+			if (!isWhite)
+				[playerRating, opponentRating] = [opponentRating, playerRating]
+
 			client.join(reconnectedGame.gameId);
 			
 			// Send full state to reconnecting player
 			client.emit('match_found', {
 				gameId: reconnectedGame.gameId,
-				color: reconnectedGame.white.userId === userId ? 'w' : 'b',
+				color: color,
 				opponentName: reconnectedGame.white.userId === userId ? reconnectedGame.black.username : reconnectedGame.white.username,
 				fen: reconnectedGame.board.fen(),
 				whiteTime: reconnectedGame.whiteTime,
@@ -55,6 +110,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				history: reconnectedGame.board.history(),
 				mode: reconnectedGame.mode,
 				isPaused: false,
+				playerRating: playerRating.rating,
+				playerIsProvisional: playerRating.isProvisional,
+				opponentRating: opponentRating.rating,
+				opponentIsProvisional: opponentRating.isProvisional,
 			});
 		}
 	}
@@ -87,7 +146,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		const mode = payload?.mode || 'blitz';
 		console.log(`Game Gateway: User ${userId} (${user.username}) searching match in mode ${mode}`);
-		const matchGame = this.gameService.addToQueue(userId, client.id, user.username, mode);
+		const matchGame = await this.gameService.addToQueue(userId, client.id, user.username, mode);
 
 		if (matchGame) {
 			console.log(`Game Gateway: Match found ${matchGame.gameId}: ${matchGame.white.username} vs ${matchGame.black.username}`);
@@ -110,6 +169,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 			const matchHistory = matchGame.board.history ? matchGame.board.history() : [];
 
+			const category = getRatingCategory(matchGame.mode);
+			const whiteRating = await this.ratingService.getMatchmakingRating(matchGame.white.userId, category);
+			const blackRating = await this.ratingService.getMatchmakingRating(matchGame.black.userId, category);
+
 			// Notify White
 			const whitePayload = {
 				gameId: matchGame.gameId,
@@ -122,6 +185,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				history: matchHistory,
 				mode: matchGame.mode,
 				isPaused: matchGame.disconnectedPlayerIds.size > 0,
+				playerRating: whiteRating.rating,
+				playerIsProvisional: whiteRating.isProvisional,
+				opponentRating: blackRating.rating,
+				opponentIsProvisional: blackRating.isProvisional,
 			};
 			if (whiteSocket) {
 				whiteSocket.emit('match_found', whitePayload);
@@ -141,6 +208,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				history: matchHistory,
 				mode: matchGame.mode,
 				isPaused: matchGame.disconnectedPlayerIds.size > 0,
+				playerRating: blackRating.rating,
+				playerIsProvisional: blackRating.isProvisional,
+				opponentRating: whiteRating.rating,
+				opponentIsProvisional: whiteRating.isProvisional,
 			};
 			if (blackSocket) {
 				blackSocket.emit('match_found', blackPayload);
@@ -373,7 +444,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const whiteUsername = await getUsername(whiteUserId);
 			const blackUsername = await getUsername(blackUserId);
 
-			const newGame = this.gameService.createDirectMatch(
+			const newGame = await this.gameService.createDirectMatch(
 				whiteUserId, whiteSocketId, whiteUsername,
 				blackUserId, blackSocketId, blackUsername,
 				rematch.mode,
@@ -384,6 +455,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			accepterSocket.join(roomName);
 
 			const matchHistory = newGame.board.history ? newGame.board.history() : [];
+
+			const category = getRatingCategory(newGame.mode);
+			const whiteRating = await this.ratingService.getMatchmakingRating(newGame.white.userId, category);
+			const blackRating = await this.ratingService.getMatchmakingRating(newGame.black.userId, category);
 
 			// Notify both players
 			const whitePayload = {
@@ -397,6 +472,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				history: matchHistory,
 				mode: newGame.mode,
 				isPaused: false,
+				playerRating: whiteRating.rating,
+				playerIsProvisional: whiteRating.isProvisional,
+				opponentRating: blackRating.rating,
+				opponentIsProvisional: blackRating.isProvisional,
 			};
 			const blackPayload = {
 				gameId: newGame.gameId,
@@ -409,6 +488,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				history: matchHistory,
 				mode: newGame.mode,
 				isPaused: false,
+				playerRating: blackRating.rating,
+				playerIsProvisional: blackRating.isProvisional,
+				opponentRating: whiteRating.rating,
+				opponentIsProvisional: whiteRating.isProvisional,
 			};
 
 			const whiteSocket = this.server.sockets.get(whiteSocketId);

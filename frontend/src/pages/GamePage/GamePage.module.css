@@ -91,6 +91,16 @@
   }
 }
 
+.searchingRating {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #94A3B8;
+}
+
+.searchingRating strong {
+  color: #60A5FA;
+}
+
 .cancelMatchBtn {
   margin-top: 30px;
   padding: 10px 24px;

@@ -128,7 +128,21 @@
     "opponent_offered_draw": "Соперник предлагает ничью",
     "accept_draw": "Принять",
     "decline_draw": "Отклонить",
-    "draw_declined": "Соперник отклонил ничью"
+    "draw_declined": "Соперник отклонил ничью",
+    "rating": "Рейтинг",
+    "calibrating": "Калибровка",
+    "not_played": "Не сыграно",
+    "unrated": "Без рейтинга",
+    "provisional": "предварительный",
+    "your_rating": "Ваш рейтинг",
+    "bullet_rating": "Пуля",
+    "blitz_rating": "Блиц",
+    "rapid_rating": "Рапид",
+    "wins_short": "В",
+    "draws_short": "Н",
+    "losses_short": "П",
+    "games_played": "партий",
+    "win_rate": "Процент побед"
 }
 
 

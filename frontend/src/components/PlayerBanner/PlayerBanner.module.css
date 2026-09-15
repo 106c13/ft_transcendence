@@ -28,6 +28,13 @@
 	color: #F8FAFC;
 }
 
+.playerRating {
+	font-size: 13px;
+	font-weight: 600;
+	color: #94A3B8;
+	font-family: var(--mono, monospace);
+}
+
 .playerColorDot {
 	width: 10px;
 	height: 10px;

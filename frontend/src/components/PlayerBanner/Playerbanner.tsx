@@ -6,6 +6,8 @@ type Props = {
 	time: number
 	isActive: boolean
 	isBottom?: boolean
+	rating?: number | null
+	isProvisional?: boolean
 }
 
 export function formatTime(timeMs: number) {
@@ -23,7 +25,7 @@ export function formatTime(timeMs: number) {
 	return `${minStr}:${secStr}`
 }
 
-function PlayerBanner({ name, color, time, isActive, isBottom = false }: Props) {
+function PlayerBanner({ name, color, time, isActive, isBottom = false, rating, isProvisional }: Props) {
 	const isLowTime = isActive && time < 15000
 
 	return (
@@ -33,6 +35,11 @@ function PlayerBanner({ name, color, time, isActive, isBottom = false }: Props) 
 			<div className={styles.playerInfo}>
 				<span className={`${styles.playerColorDot} ${color === 'w' ? styles.white : styles.black}`} />
 				<span className={styles.playerName}>{name}</span>
+				{rating !== undefined && rating !== null && (
+					<span className={styles.playerRating}>
+						({isProvisional ? `~${rating}` : rating})
+					</span>
+				)}
 			</div>
 			<div className={styles.gameClock}>{formatTime(time)}</div>
 		</div>

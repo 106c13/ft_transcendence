@@ -39,6 +39,18 @@ export class Match {
 	@Column({ type: 'jsonb', nullable: true })
 	analysis: any;
 
+	@Column({ type: 'int', nullable: true })
+	white_rating_after: number | null;
+
+	@Column({ type: 'int', nullable: true })
+	black_rating_after: number | null;
+
+	@Column({ type: 'int', nullable: true })
+	white_rating_delta: number | null;
+
+	@Column({ type: 'int', nullable: true })
+	black_rating_delta: number | null;
+
 	@CreateDateColumn()
 	played_at: Date;
 

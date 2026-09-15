@@ -18,6 +18,7 @@ import type { Express } from 'express'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { JwtService } from '@nestjs/jwt'
 import { UsersService } from './users.service'
+import { RatingService } from '@/game/rating.service';
 
 function isValidEmail(email: string) {
 	return (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 256)
@@ -28,6 +29,7 @@ export class UsersController {
 	constructor(
 		private readonly usersService: UsersService,
 		private readonly jwtService: JwtService,
+		private readonly ratingService: RatingService,
 	) {}
 
 	@Get('me')
@@ -39,6 +41,8 @@ export class UsersController {
 			throw new NotFoundException('User not found');
 		}
 
+		const ratings = await this.ratingService.getAllRatings(user.id);
+
 		return {
 			id: user.id,
 			username: user.username,
@@ -49,6 +53,7 @@ export class UsersController {
 			//last_seen: user.last_seen,
 			created_at: user.created_at,
 			isOwnProfile: true,
+			ratings,
 		}
 	}
 
@@ -82,6 +87,8 @@ export class UsersController {
 			}
 		}
 
+		const ratings = await this.ratingService.getAllRatings(user.id);
+
 		return {
 			id: user.id,
 			username: user.username,
@@ -90,6 +97,7 @@ export class UsersController {
 			bio: user.bio,
 			created_at: user.created_at,
 			isOwnProfile,
+			ratings,
 		}
 	}
 

@@ -26,6 +26,12 @@ export default function GamePage() {
         sendMove: game.sendMove,
     })
 
+    const category = (game.selectedMode.replace('+2', '') as 'bullet' | 'blitz' | 'rapid') || 'blitz'
+    const userRatingInfo = game.currentUser?.ratings?.[category]
+    const searchingRatingText = userRatingInfo
+        ? (userRatingInfo.isProvisional ? `~${userRatingInfo.rating} (${t('provisional', 'provisional')})` : `${userRatingInfo.rating}`)
+        : `~800 (${t('provisional', 'provisional')})`
+
     return (
         <div className={styles.gameContainer}>
             <main className={styles.gameMain}>
@@ -40,6 +46,9 @@ export default function GamePage() {
                         </div>
                         <h3>{t('searching_match', 'Searching for opponent...')}</h3>
                         <p>{t('searching_desc', 'Filtering by match speed: ')} <strong>{game.selectedMode}</strong></p>
+                        <p className={styles.searchingRating}>
+                            {t('your_rating', 'Your rating')}: <strong>{searchingRatingText}</strong>
+                        </p>
                         <button className={styles.cancelMatchBtn} onClick={game.cancelMatchmaking}>
                             {t('cancel', 'Cancel')}
                         </button>
@@ -60,6 +69,8 @@ export default function GamePage() {
                                 color={game.playerColor === 'w' ? 'b' : 'w'}
                                 time={game.playerColor === 'w' ? game.blackTime : game.whiteTime}
                                 isActive={game.turn !== game.playerColor}
+                                rating={game.opponentRating}
+                                isProvisional={game.opponentIsProvisional}
                             />
 
                             <ChessBoard
@@ -91,6 +102,8 @@ export default function GamePage() {
                                 time={game.playerColor === 'w' ? game.whiteTime : game.blackTime}
                                 isActive={game.turn === game.playerColor}
                                 isBottom={true}
+                                rating={game.playerRating}
+                                isProvisional={game.playerIsProvisional}
                             />
                         </div>
 
@@ -121,6 +134,8 @@ export default function GamePage() {
                         winnerColor={game.winnerColor}
                         playerColor={game.playerColor}
                         gameOverReason={game.gameOverReason}
+                        ratingAfter={game.playerRatingAfter}
+                        ratingDelta={game.playerRatingDelta}
                         onClose={() => game.setHideGameOverModal(true)}
                         onPlayAgain={() => {
                             game.setIsGameOver(false)

@@ -128,7 +128,21 @@
     "opponent_offered_draw": "Opponent offers a draw",
     "accept_draw": "Accept",
     "decline_draw": "Decline",
-    "draw_declined": "Opponent declined draw offer"
+    "draw_declined": "Opponent declined draw offer",
+    "rating": "Rating",
+    "calibrating": "Calibrating",
+    "not_played": "Not played",
+    "unrated": "Unrated",
+    "provisional": "provisional",
+    "your_rating": "Your rating",
+    "bullet_rating": "Bullet",
+    "blitz_rating": "Blitz",
+    "rapid_rating": "Rapid",
+    "wins_short": "W",
+    "draws_short": "D",
+    "losses_short": "L",
+    "games_played": "games",
+    "win_rate": "Win rate"
 }
 
 

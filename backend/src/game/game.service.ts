@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Match } from './match.entity';
 import { Chess } from 'chess.js';
+import { RatingService, getRatingCategory } from './rating.service';
 
 export type GameModeType = 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2';
 
@@ -31,6 +32,9 @@ export interface ChessPlayer {
 	userId: number;
 	socketId: string;
 	username: string;
+	rating: number;
+	isProvisional: boolean;
+	queuedAt: number;
 }
 
 export interface ChessGame {
@@ -75,14 +79,26 @@ export class GameService {
 	private pendingChallenges = new Map<string, PendingChallenge>();
 
 	// Callback to notify gateway when timers expire or game state changes
-	private gameEventsCallback: (event: string, game: ChessGame, payload: any) => void = () => {};
+	private gameEventsCallback: (event: string, game: ChessGame, payload: any) => void = () => { };
+
+	// Callback set by the gateway so we can emit match_found
+	private matchFoundCallback: (game: ChessGame) => void = () => { };
 
 	constructor(
 		@InjectRepository(Match)
 		private matchRepo: Repository<Match>,
+
 		@InjectRepository(User)
 		private userRepo: Repository<User>,
-	) {}
+
+		private ratingService: RatingService,
+	) {
+		setInterval(() => this.sweepQueues(), 5000);
+	}
+
+	setMatchFoundCallback(callback: (game: ChessGame) => void) {
+		this.matchFoundCallback = callback;
+	}
 
 	setGameEventsCallback(callback: (event: string, game: ChessGame, payload: any) => void) {
 		this.gameEventsCallback = callback;
@@ -116,12 +132,9 @@ export class GameService {
 		return undefined;
 	}
 
-	// Add player to matchmaking queue
-	addToQueue(userId: number, socketId: string, username: string, mode: GameModeType): ChessGame | null {
-		// 1. Remove from other queues first
+	async addToQueue(userId: number, socketId: string, username: string, mode: GameModeType): Promise<ChessGame | null> {
 		this.removeFromQueue(userId);
 
-		// 2. Check if player has an active game to resume
 		const existingGame = this.getGameByUserId(userId);
 		if (existingGame) {
 			if (existingGame.board.isGameOver()) {
@@ -136,53 +149,90 @@ export class GameService {
 			}
 		}
 
-		// 3. Add to the queue
+		const category = getRatingCategory(mode);
+		const { rating, isProvisional } = await this.ratingService.getMatchmakingRating(userId, category);
+
 		const validModes = ['bullet', 'blitz', 'rapid', 'bullet+2', 'blitz+2', 'rapid+2'] as const;
 		const selectedMode = validModes.includes(mode as any) ? mode : 'blitz';
 		const queue = this.queues[selectedMode];
-		queue.push({ userId, socketId, username });
+		queue.push({
+			userId,
+			socketId,
+			username,
+			rating,
+			isProvisional,
+			queuedAt: Date.now()
+		});
 
+		return this.tryMatchFromQueue(queue, selectedMode);
+	}
 
-		// 4. Pair if we have at least 2 players
-		if (queue.length >= 2) {
-			const player1 = queue.shift()!;
-			const player2 = queue.shift()!;
+	private tryMatchFromQueue(queue: ChessPlayer[], mode: GameModeType): ChessGame | null {
+		if (queue.length < 2) return null;
 
-			// Randomize colors
-			const isP1White = Math.random() < 0.5;
-			const white = isP1White ? player1 : player2;
-			const black = isP1White ? player2 : player1;
+		const now = Date.now();
+		const newPlayer = queue[queue.length - 1];
 
-			const gameId = `game_${Date.now()}_${white.userId}_${black.userId}`;
-			const baseMode = mode.replace('+2', '') as 'bullet' | 'blitz' | 'rapid';
-			const initialTime = baseMode === 'bullet' ? 60000 : baseMode === 'blitz' ? 180000 : 600000;
-			const increment = mode.endsWith('+2') ? 2000 : 0;
+		let bestIndex = -1;
+		let bestRatingDiff = Infinity;
 
-			const newGame: ChessGame = {
-				gameId,
-				white,
-				black,
-				board: new Chess(),
-				mode,
-				increment,
-				whiteTime: initialTime,
-				blackTime: initialTime,
-				lastMoveTime: Date.now(),
-				timer: null,
-				disconnectTimers: new Map(),
-				disconnectedPlayerIds: new Set(),
-				drawOfferUserId: null,
-			};
+		// Candidate must not be the new player itself
+		for (let i = 0; i < queue.length; i++) {
+			const candidate = queue[i];
+			if (candidate.userId === newPlayer.userId) continue;
 
-			this.activeGames.set(gameId, newGame);
+			const ratingDiff = Math.abs(newPlayer.rating - candidate.rating);
 
-			// Start the timer for White's turn
-			this.startTurnTimer(newGame);
+			// Calibrating players get a wider search window (+-400 vs +-200)
+			// so they can find games faster during their 5 calibration matches
+			const baseWindow = (newPlayer.isProvisional || candidate.isProvisional) ? 400 : 200;
 
-			return newGame;
+			const waitSeconds = (now - candidate.queuedAt) / 1000;
+			const expansion = Math.floor(waitSeconds / 10);
+			const maxDiff = Math.min(baseWindow + (expansion * 50), 500);
+
+			if (ratingDiff <= maxDiff && ratingDiff < bestRatingDiff) {
+				bestIndex = i;
+				bestRatingDiff = ratingDiff;
+			}
 		}
 
-		return null;
+		if (bestIndex === -1) return null;
+
+		const opponent = queue[bestIndex];
+		// Remove both players from queue safely
+		this.queues[mode] = this.queues[mode].filter(
+			p => p.userId !== newPlayer.userId && p.userId !== opponent.userId
+		);
+
+		const isP1White = Math.random() < 0.5;
+		const white = isP1White ? newPlayer : opponent;
+		const black = isP1White ? opponent : newPlayer;
+
+		const gameId = `game_${Date.now()}_${white.userId}_${black.userId}`;
+		const baseMode = mode.replace('+2', '') as 'bullet' | 'blitz' | 'rapid';
+		const initialTime = baseMode === 'bullet' ? 60000 : baseMode === 'blitz' ? 180000 : 600000;
+		const increment = mode.endsWith('+2') ? 2000 : 0;
+
+		const newGame: ChessGame = {
+			gameId,
+			white,
+			black,
+			board: new Chess(),
+			mode,
+			increment,
+			whiteTime: initialTime,
+			blackTime: initialTime,
+			lastMoveTime: Date.now(),
+			timer: null,
+			disconnectTimers: new Map(),
+			disconnectedPlayerIds: new Set(),
+			drawOfferUserId: null,
+		};
+
+		this.activeGames.set(gameId, newGame);
+		this.startTurnTimer(newGame);
+		return newGame;
 	}
 
 	// Remove player from matchmaking queue
@@ -255,20 +305,42 @@ export class GameService {
 
 	// === DIRECT MATCH (for challenges and rematches) ===
 
-	createDirectMatch(
+	async createDirectMatch(
 		whiteUserId: number, whiteSocketId: string, whiteUsername: string,
 		blackUserId: number, blackSocketId: string, blackUsername: string,
 		mode: GameModeType,
-	): ChessGame {
+	): Promise<ChessGame> {
 		const gameId = `game_${Date.now()}_${whiteUserId}_${blackUserId}`;
 		const baseMode = mode.replace('+2', '') as 'bullet' | 'blitz' | 'rapid';
 		const initialTime = baseMode === 'bullet' ? 60000 : baseMode === 'blitz' ? 180000 : 600000;
 		const increment = mode.endsWith('+2') ? 2000 : 0;
 
+		const category = getRatingCategory(mode);
+		const whiteRes = await this.ratingService.getMatchmakingRating(whiteUserId, category);
+		const blackRes = await this.ratingService.getMatchmakingRating(blackUserId, category);
+
+		const whitePlayer = {
+			userId: whiteUserId,
+			socketId: whiteSocketId,
+			username: whiteUsername,
+			rating: whiteRes.rating,
+			isProvisional: whiteRes.isProvisional,
+			queuedAt: Date.now()
+		}
+
+		const blackPlayer = {
+			userId: blackUserId,
+			socketId: blackSocketId,
+			username: blackUsername,
+			rating: blackRes.rating,
+			isProvisional: blackRes.isProvisional,
+			queuedAt: Date.now()
+		}
+
 		const newGame: ChessGame = {
 			gameId,
-			white: { userId: whiteUserId, socketId: whiteSocketId, username: whiteUsername },
-			black: { userId: blackUserId, socketId: blackSocketId, username: blackUsername },
+			white: whitePlayer,
+			black: blackPlayer,
 			board: new Chess(),
 			mode,
 			increment,
@@ -411,12 +483,17 @@ export class GameService {
 		const winnerColor = game.white.userId === userId ? 'b' : 'w';
 		const reason = 'RESIGNATION';
 
-		this.saveMatch(game, reason, winnerColor).then((savedMatch) => {
+		this.saveMatch(game, reason, winnerColor).then((result) => {
 			this.gameEventsCallback('game_over', game, {
 				winner: winnerColor,
 				reason,
 				fen: game.board.fen(),
-				matchId: savedMatch?.id,
+				matchId: result?.savedMatch?.id,
+
+				whiteRatingAfter: result?.ratingResult?.whiteRating,
+				blackRatingAfter: result?.ratingResult?.blackRating,
+				whiteRatingDelta: result?.ratingResult?.whiteDelta,
+				blackRatingDelta: result?.ratingResult?.blackDelta,
 			});
 			this.trackFinishedGame(game);
 			this.activeGames.delete(gameId);
@@ -455,12 +532,17 @@ export class GameService {
 		game.drawOfferUserId = null;
 		const reason = 'DRAW';
 
-		this.saveMatch(game, reason, null).then((savedMatch) => {
+		this.saveMatch(game, reason, null).then((result) => {
 			this.gameEventsCallback('game_over', game, {
 				winner: null,
 				reason,
 				fen: game.board.fen(),
-				matchId: savedMatch?.id,
+				matchId: result?.savedMatch?.id,
+
+				whiteRatingAfter: result?.ratingResult?.whiteRating,
+				blackRatingAfter: result?.ratingResult?.blackRating,
+				whiteRatingDelta: result?.ratingResult?.whiteDelta,
+				blackRatingDelta: result?.ratingResult?.blackDelta,
 			});
 			this.trackFinishedGame(game);
 			this.activeGames.delete(game.gameId);
@@ -506,12 +588,17 @@ export class GameService {
 			game.disconnectTimers.clear();
 
 			const reason = 'DRAW';
-			this.saveMatch(game, reason, null).then((savedMatch) => {
+			this.saveMatch(game, reason, null).then((result) => {
 				this.gameEventsCallback('game_over', game, {
 					winner: null,
 					reason,
 					fen: game.board.fen(),
-					matchId: savedMatch?.id,
+					matchId: result?.savedMatch?.id,
+
+					whiteRatingAfter: result?.ratingResult?.whiteRating,
+					blackRatingAfter: result?.ratingResult?.blackRating,
+					whiteRatingDelta: result?.ratingResult?.whiteDelta,
+					blackRatingDelta: result?.ratingResult?.blackDelta,
 				});
 				this.trackFinishedGame(game);
 				this.activeGames.delete(game.gameId);
@@ -548,12 +635,17 @@ export class GameService {
 			const winnerColor = game.white.userId === userId ? 'b' : 'w';
 			const reason = 'DISCONNECTION';
 
-			this.saveMatch(game, reason, winnerColor).then((savedMatch) => {
+			this.saveMatch(game, reason, winnerColor).then((result) => {
 				this.gameEventsCallback('game_over', game, {
 					winner: winnerColor,
 					reason,
 					fen: game.board.fen(),
-					matchId: savedMatch?.id,
+					matchId: result?.savedMatch?.id,
+
+					whiteRatingAfter: result?.ratingResult?.whiteRating,
+					blackRatingAfter: result?.ratingResult?.blackRating,
+					whiteRatingDelta: result?.ratingResult?.whiteDelta,
+					blackRatingDelta: result?.ratingResult?.blackDelta,
 				});
 				this.trackFinishedGame(game);
 				this.activeGames.delete(game.gameId);
@@ -597,6 +689,65 @@ export class GameService {
 		return game;
 	}
 
+	private sweepQueues() {
+		for (const mode of Object.keys(this.queues) as GameModeType[]) {
+			const queue = this.queues[mode];
+			if (queue.length < 2) continue;
+
+			// Keep trying to make matches until no more pairs are found
+			let matched = true;
+			while (matched && queue.length >= 2) {
+				matched = false;
+				const now = Date.now();
+
+				for (let i = 0; i < queue.length && !matched; i++) {
+					for (let j = i + 1; j < queue.length && !matched; j++) {
+						const a = queue[i];
+						const b = queue[j];
+						if (a.userId === b.userId) continue;
+						const diff = Math.abs(a.rating - b.rating);
+
+						const baseW = (a.isProvisional || b.isProvisional) ? 400 : 200;
+						const waitA = (now - a.queuedAt) / 1000;
+						const waitB = (now - b.queuedAt) / 1000;
+						const maxWait = Math.max(waitA, waitB);
+						const maxDiff = Math.min(baseW + Math.floor(maxWait / 10) * 50, 500);
+
+						if (diff <= maxDiff) {
+							// Remove both from queue and create match
+							queue.splice(j, 1);
+							queue.splice(i, 1);
+
+							const isAWhite = Math.random() < 0.5;
+							const white = isAWhite ? a : b;
+							const black = isAWhite ? b : a;
+
+							const gameId = `game_${Date.now()}_${white.userId}_${black.userId}`;
+							const baseMode = mode.replace('+2', '') as 'bullet' | 'blitz' | 'rapid';
+							const initialTime = baseMode === 'bullet' ? 60000 : baseMode === 'blitz' ? 180000 : 600000;
+							const increment = mode.endsWith('+2') ? 2000 : 0;
+
+							const newGame: ChessGame = {
+								gameId, white, black,
+								board: new Chess(), mode, increment,
+								whiteTime: initialTime, blackTime: initialTime,
+								lastMoveTime: Date.now(), timer: null,
+								disconnectTimers: new Map(),
+								disconnectedPlayerIds: new Set(),
+								drawOfferUserId: null,
+							};
+
+							this.activeGames.set(gameId, newGame);
+							this.startTurnTimer(newGame);
+							// Notify the gateway to emit match_found to both players
+							this.matchFoundCallback(newGame);
+							matched = true;
+						}
+					}
+				}
+			}
+		}
+	}
 
 	// Start standard chess clock timer for active player
 	private startTurnTimer(game: ChessGame) {
@@ -624,12 +775,17 @@ export class GameService {
 
 		const reason = 'TIMEOUT';
 
-		this.saveMatch(game, reason, winnerColor).then((savedMatch) => {
+		this.saveMatch(game, reason, winnerColor).then((result) => {
 			this.gameEventsCallback('game_over', game, {
 				winner: winnerColor,
 				reason,
 				fen: game.board.fen(),
-				matchId: savedMatch?.id,
+				matchId: result?.savedMatch?.id,
+
+				whiteRatingAfter: result?.ratingResult?.whiteRating,
+				blackRatingAfter: result?.ratingResult?.blackRating,
+				whiteRatingDelta: result?.ratingResult?.whiteDelta,
+				blackRatingDelta: result?.ratingResult?.blackDelta,
 			});
 			this.trackFinishedGame(game);
 			this.activeGames.delete(game.gameId);
@@ -654,12 +810,17 @@ export class GameService {
 			reason = 'DRAW';
 		}
 
-		this.saveMatch(game, reason, winner).then((savedMatch) => {
+		this.saveMatch(game, reason, winner).then((result) => {
 			this.gameEventsCallback('game_over', game, {
 				winner,
 				reason,
 				fen: game.board.fen(),
-				matchId: savedMatch?.id,
+				matchId: result?.savedMatch?.id,
+
+				whiteRatingAfter: result?.ratingResult?.whiteRating,
+				blackRatingAfter: result?.ratingResult?.blackRating,
+				whiteRatingDelta: result?.ratingResult?.whiteDelta,
+				blackRatingDelta: result?.ratingResult?.blackDelta,
 			});
 			// Track the finished game for rematch purposes
 			this.trackFinishedGame(game);
@@ -694,7 +855,23 @@ export class GameService {
 				result: result,
 				pgn: game.board.pgn(),
 			});
-			return await this.matchRepo.save(match);
+			const savedMatch = await this.matchRepo.save(match);
+
+			const category = getRatingCategory(game.mode);
+			const ratingResult = await this.ratingService.updateRatings(
+				game.white.userId,
+				game.black.userId,
+				winnerId,
+				category,
+			);
+
+			savedMatch.white_rating_after = ratingResult.whiteRating;
+			savedMatch.black_rating_after = ratingResult.blackRating;
+			savedMatch.white_rating_delta = ratingResult.whiteDelta;
+			savedMatch.black_rating_delta = ratingResult.blackDelta;
+			await this.matchRepo.save(savedMatch);
+
+			return { savedMatch, ratingResult };
 		} catch (e) {
 			console.error('Failed to save match:', e);
 			return null;

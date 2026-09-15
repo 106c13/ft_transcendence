@@ -128,7 +128,21 @@
     "opponent_offered_draw": "Մրցակիցը առաջարկում է ոչ-ոքի",
     "accept_draw": "Ընդունել",
     "decline_draw": "Մերժել",
-    "draw_declined": "Մրցակիցը մերժեց ոչ-ոքին"
+    "draw_declined": "Մրցակիցը մերժեց ոչ-ոքին",
+    "rating": "Վարկանիշ",
+    "calibrating": "Կարգաբերում",
+    "not_played": "Խաղացված չէ",
+    "unrated": "Առանց վարկանիշի",
+    "provisional": "ժամանակավոր",
+    "your_rating": "Ձեր վարկանիշը",
+    "bullet_rating": "Բուլետ",
+    "blitz_rating": "Բլից",
+    "rapid_rating": "Ռապիդ",
+    "wins_short": "Հ",
+    "draws_short": "Ո",
+    "losses_short": "Պ",
+    "games_played": "խաղ",
+    "win_rate": "Հաղթանակների տոկոս"
 }
 
 
