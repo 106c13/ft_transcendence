@@ -1,6 +1,9 @@
+import { useState, useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import type { MatchRecord } from '../GameAnalysis/GameAnalysis'
+import GameRow from '../GameRow/GameRow'
+import CustomSelect, { type SelectOption } from '../CustomSelect/CustomSelect'
 import styles from './GamesList.module.css'
 
 type Props = {
@@ -8,24 +11,89 @@ type Props = {
 	username: string
 	isOwnProfile: boolean
 	loading: boolean
-	getOutcome: (match: MatchRecord) => { label: string; className: string }
-	formatDate: (dateStr: string) => string
-	formatReason: (reason: string) => string
 	onSelectGame: (match: MatchRecord) => void
+	getOutcome?: (match: MatchRecord) => { label: string; className: string }
+	formatDate?: (dateStr: string) => string
+	formatReason?: (reason: string) => string
 }
 
-function GamesList({
+const GAMES_PER_PAGE = 20
+
+export default function GamesList({
 	matches,
 	username,
 	isOwnProfile,
 	loading,
-	getOutcome,
-	formatDate,
-	formatReason,
 	onSelectGame,
 }: Props) {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
+
+	// Filter states
+	const [colorFilter, setColorFilter] = useState<'all' | 'white' | 'black'>('all')
+	const [resultFilter, setResultFilter] = useState<'all' | 'win' | 'loss' | 'draw'>('all')
+	const [modeFilter, setModeFilter] = useState<'all' | 'bullet' | 'blitz' | 'rapid'>('all')
+	const [currentPage, setCurrentPage] = useState(1)
+
+	// Reset page when filters change
+	useEffect(() => {
+		setCurrentPage(1)
+	}, [colorFilter, resultFilter, modeFilter])
+
+	// Filtered matches
+	const filteredMatches = useMemo(() => {
+		return matches.filter((match) => {
+			const isWhite = match.white?.username === username
+			const isBlack = match.black?.username === username
+
+			// Color filter
+			if (colorFilter === 'white' && !isWhite) return false
+			if (colorFilter === 'black' && !isBlack) return false
+
+			// Result filter
+			if (resultFilter !== 'all') {
+				let outcome: 'win' | 'loss' | 'draw' = 'draw'
+				if (match.winner_id) {
+					outcome =
+						(isWhite && match.winner_id === match.white_id) ||
+						(!isWhite && match.winner_id === match.black_id)
+							? 'win'
+							: 'loss'
+				}
+				if (outcome !== resultFilter) return false
+			}
+
+			// Mode filter
+			if (modeFilter !== 'all') {
+				const rawMode = match.mode.toLowerCase()
+				if (!rawMode.startsWith(modeFilter)) return false
+			}
+
+			return true
+		})
+	}, [matches, username, colorFilter, resultFilter, modeFilter])
+
+	// Pagination calculations
+	const totalGames = filteredMatches.length
+	const totalPages = Math.max(1, Math.ceil(totalGames / GAMES_PER_PAGE))
+	const safePage = Math.min(currentPage, totalPages)
+
+	const paginatedMatches = useMemo(() => {
+		const startIdx = (safePage - 1) * GAMES_PER_PAGE
+		return filteredMatches.slice(startIdx, startIdx + GAMES_PER_PAGE)
+	}, [filteredMatches, safePage])
+
+	const fromIndex = totalGames > 0 ? (safePage - 1) * GAMES_PER_PAGE + 1 : 0
+	const toIndex = Math.min(safePage * GAMES_PER_PAGE, totalGames)
+
+	const hasActiveFilters =
+		colorFilter !== 'all' || resultFilter !== 'all' || modeFilter !== 'all'
+
+	const handleResetFilters = () => {
+		setColorFilter('all')
+		setResultFilter('all')
+		setModeFilter('all')
+	}
 
 	if (loading) {
 		return (
@@ -38,19 +106,9 @@ function GamesList({
 		)
 	}
 
-	return (
-		<div className={styles.container}>
-			<div className={styles.header}>
-				<div className={styles.titleGroup}>
-					<h3 className={styles.title}>{t('games', 'Games')}</h3>
-					<span className={styles.countBadge}>{matches.length}</span>
-				</div>
-				<p className={styles.subtitle}>
-					{t('choose_game_to_analyze', 'Choose a game from history to analyze.')}
-				</p>
-			</div>
-
-			{matches.length === 0 ? (
+	if (matches.length === 0) {
+		return (
+			<div className={styles.container}>
 				<div className={styles.emptyCard}>
 					<div className={styles.emptyIcon}>♟</div>
 					<h4>{t('no_games_yet', 'No games played yet')}</h4>
@@ -65,90 +123,175 @@ function GamesList({
 						</button>
 					)}
 				</div>
+			</div>
+		)
+	}
+
+	const colorOptions: SelectOption<'all' | 'white' | 'black'>[] = [
+		{ value: 'all', label: t('all_colors', 'All Colors') },
+		{ value: 'white', icon: '⚪', label: t('white', 'White') },
+		{ value: 'black', icon: '⚫', label: t('black', 'Black') },
+	]
+
+	const resultOptions: SelectOption<'all' | 'win' | 'loss' | 'draw'>[] = [
+		{ value: 'all', label: t('all_results', 'All Results') },
+		{ value: 'win', icon: '🟢', label: t('wins', 'Wins') },
+		{ value: 'loss', icon: '🔴', label: t('losses', 'Losses') },
+		{ value: 'draw', icon: '⚪', label: t('draws', 'Draws') },
+	]
+
+	const modeOptions: SelectOption<'all' | 'bullet' | 'blitz' | 'rapid'>[] = [
+		{ value: 'all', label: t('all_modes', 'All Modes') },
+		{ value: 'bullet', icon: '🔥', label: t('bullet_rating', 'Bullet') },
+		{ value: 'blitz', icon: '⚡', label: t('blitz_rating', 'Blitz') },
+		{ value: 'rapid', icon: '⏳', label: t('rapid_rating', 'Rapid') },
+	]
+
+	return (
+		<div className={styles.container}>
+			{/* Top header */}
+			<div className={styles.header}>
+				<div className={styles.titleGroup}>
+					<h3 className={styles.title}>{t('games', 'Games')}</h3>
+					<span className={styles.countBadge}>{matches.length}</span>
+				</div>
+			</div>
+
+			{/* Filter Bar */}
+			<div className={styles.filterBar}>
+				{/* Color Filter */}
+				<div className={styles.filterGroup}>
+					<label className={styles.filterLabel}>{t('filter_color', 'Color')}:</label>
+					<CustomSelect<'all' | 'white' | 'black'>
+						value={colorFilter}
+						options={colorOptions}
+						onChange={(val) => setColorFilter(val)}
+						minWidth={115}
+					/>
+				</div>
+
+				{/* Result Filter */}
+				<div className={styles.filterGroup}>
+					<label className={styles.filterLabel}>{t('filter_result', 'Result')}:</label>
+					<CustomSelect<'all' | 'win' | 'loss' | 'draw'>
+						value={resultFilter}
+						options={resultOptions}
+						onChange={(val) => setResultFilter(val)}
+						minWidth={115}
+					/>
+				</div>
+
+				{/* Game Mode Filter */}
+				<div className={styles.filterGroup}>
+					<label className={styles.filterLabel}>{t('filter_mode', 'Game Mode')}:</label>
+					<CustomSelect<'all' | 'bullet' | 'blitz' | 'rapid'>
+						value={modeFilter}
+						options={modeOptions}
+						onChange={(val) => setModeFilter(val)}
+						minWidth={120}
+					/>
+				</div>
+
+				{/* Reset Button */}
+				{hasActiveFilters && (
+					<button className={styles.resetBtn} onClick={handleResetFilters}>
+						✕ {t('clear', 'Clear Filters')}
+					</button>
+				)}
+			</div>
+
+			{/* Games List Content */}
+			{totalGames === 0 ? (
+				<div className={styles.emptyCard}>
+					<h4>{t('no_games_matching_filter', 'No games match the selected filters')}</h4>
+					<button className={styles.resetBtn} onClick={handleResetFilters}>
+						{t('clear', 'Reset Filters')}
+					</button>
+				</div>
 			) : (
-				<div className={styles.grid}>
-					{matches.map((match) => {
-						const outcome = getOutcome(match)
-						const isUserWhite = match.white?.username === username
-						const opponent = isUserWhite ? match.black : match.white
-						const userSide = isUserWhite ? 'White' : 'Black'
-						const ratingDelta = isUserWhite ? match.white_rating_delta : match.black_rating_delta
+				<div className={styles.listContainer}>
+					{/* Table Column Labels */}
+					<div className={styles.listHeader}>
+						<span>Opponent</span>
+						<span>Color</span>
+						<span>Date</span>
+						<span>Mode</span>
+						<span>Result</span>
+						<span></span>
+					</div>
 
-						return (
-							<div
-								key={match.id}
-								className={styles.gameCard}
-								onClick={() => onSelectGame(match)}
+					{paginatedMatches.map((match) => (
+						<GameRow
+							key={match.id}
+							match={match}
+							username={username}
+							onSelect={onSelectGame}
+						/>
+					))}
+				</div>
+			)}
+
+			{/* Pagination Controls (20 games per page) */}
+			{totalGames > 0 && (
+				<div className={styles.paginationBar}>
+					<div className={styles.paginationInfo}>
+						{t('showing_games', {
+							from: fromIndex,
+							to: toIndex,
+							total: totalGames,
+							defaultValue: `Showing ${fromIndex}–${toIndex} of ${totalGames} games`,
+						})}
+					</div>
+
+					{totalPages > 1 && (
+						<div className={styles.paginationControls}>
+							<button
+								className={styles.pageBtn}
+								disabled={safePage <= 1}
+								onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
 							>
-								<div className={styles.cardTop}>
-									<span className={`${styles.modeBadge} ${styles[`mode${match.mode.replace('+', 'Plus')}`] || ''}`}>
-										{match.mode}
-									</span>
-									<span className={styles.date}>{formatDate(match.played_at)}</span>
-								</div>
+								{t('previous', 'Previous')}
+							</button>
 
-								<div className={styles.matchup}>
-									<div className={styles.matchupPlayers}>
-										<div className={styles.matchupRow}>
-											<span className={`${styles.sideDot} ${styles.white}`}></span>
-											<span className={`${styles.playerLabel} ${match.white?.username === username ? styles.bold : ''}`}>
-												{match.white?.username || 'White'}
-											</span>
-											{match.winner_id === match.white_id && <span className={styles.winnerCrown}>👑</span>}
-										</div>
-										<div className={styles.matchupRow}>
-											<span className={`${styles.sideDot} ${styles.black}`}></span>
-											<span className={`${styles.playerLabel} ${match.black?.username === username ? styles.bold : ''}`}>
-												{match.black?.username || 'Black'}
-											</span>
-											{match.winner_id === match.black_id && <span className={styles.winnerCrown}>👑</span>}
-										</div>
-									</div>
+							{Array.from({ length: totalPages }, (_, i) => i + 1)
+								.filter((page) => {
+									// Show first, last, and pages around current
+									return (
+										page === 1 ||
+										page === totalPages ||
+										Math.abs(page - safePage) <= 2
+									);
+								})
+								.map((page, index, array) => {
+									const prev = array[index - 1];
+									const showEllipsis = prev && page - prev > 1;
 
-									<div className={styles.cardOutcome}>
-										<div className={styles.outcomeTopRow}>
-											<span className={`${styles.outcomePill} ${styles[`outcome${outcome.className.charAt(0).toUpperCase() + outcome.className.slice(1)}`]}`}>
-												{outcome.label}
-											</span>
-											{ratingDelta !== undefined && ratingDelta !== null && (
-												<span
-													className={`${styles.ratingDeltaBadge} ${
-														ratingDelta > 0
-															? styles.deltaPositive
-															: ratingDelta < 0
-															? styles.deltaNegative
-															: styles.deltaNeutral
-													}`}
-												>
-													{ratingDelta > 0 ? `+${ratingDelta}` : ratingDelta}
-												</span>
-											)}
-										</div>
-										<span className={styles.reasonText}>{formatReason(match.result)}</span>
-									</div>
-								</div>
+									return (
+										<span key={page} style={{ display: 'inline-flex', alignItems: 'center' }}>
+											{showEllipsis && <span style={{ color: '#64748B', padding: '0 4px' }}>...</span>}
+											<button
+												className={`${styles.pageBtn} ${
+													page === safePage ? styles.activePageBtn : ''
+												}`}
+												onClick={() => setCurrentPage(page)}
+											>
+												{page}
+											</button>
+										</span>
+									);
+								})}
 
-								<div className={styles.cardFooter}>
-									<span className={styles.userSideInfo}>
-										{t('played_as', 'Played as')} <strong>{userSide}</strong> vs <strong>{opponent?.username || 'Opponent'}</strong>
-									</span>
-									<button
-										className={styles.analyzeBtn}
-										onClick={(e) => {
-											e.stopPropagation()
-											onSelectGame(match)
-										}}
-									>
-										🔍 {t('analyze', 'Analyze')}
-									</button>
-								</div>
-							</div>
-						)
-					})}
+							<button
+								className={styles.pageBtn}
+								disabled={safePage >= totalPages}
+								onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+							>
+								{t('next', 'Next')}
+							</button>
+						</div>
+					)}
 				</div>
 			)}
 		</div>
 	)
 }
-
-export default GamesList

@@ -96,6 +96,12 @@ export function useProfile(username?: string, defaultTab: TabType = 'overview') 
 		loadProfile()
 	}, [username])
 
+	useEffect(() => {
+		if (user?.username) {
+			loadFriends()
+		}
+	}, [user?.username])
+
 	const handleSelectTab = (tab: TabType) => {
 		setActiveTab(tab)
 		if (tab === 'friends') {

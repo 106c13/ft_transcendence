@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage/HomePage'
 import ChatPage from './pages/ChatPage/ChatPage'
 import GamePage from './pages/GamePage/GamePage'
 import GameAnalysisPage from './pages/GameAnalysisPage/GameAnalysisPage'
+import RatingHistoryPage from './pages/RatingHistoryPage/RatingHistoryPage'
 
 export default function App() {
   return (
@@ -27,8 +28,10 @@ export default function App() {
         <Route element={<MainLayout />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/rating" element={<RatingHistoryPage />} />
           <Route path="/profile/settings" element={<SettingsPage />} />
           <Route path="/profile/:username" element={<ProfilePage />} />
+          <Route path="/profile/:username/rating" element={<RatingHistoryPage />} />
           <Route path="/profile/:username/games" element={<ProfilePage defaultTab="games" />} />
           <Route path="/profile/:username/analysis/:id" element={<GameAnalysisPage />} />
           <Route path="/profile/:username/games/:id" element={<GameAnalysisPage />} />

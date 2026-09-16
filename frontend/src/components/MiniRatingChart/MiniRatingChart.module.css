@@ -1,0 +1,245 @@
+.miniChartCard {
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.14);
+	border-radius: 14px;
+	padding: 18px 20px;
+	border-radius: 12px;
+	padding: 13px 15px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	gap: 10px;
+	cursor: pointer;
+	position: relative;
+	transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+	overflow: hidden;
+}
+
+.miniChartCard:hover {
+	transform: translateY(-3px);
+	transform: translateY(-2px);
+	border-color: rgba(96, 165, 250, 0.45);
+	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(96, 165, 250, 0.2);
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(96, 165, 250, 0.2);
+}
+
+.miniChartCard:active {
+	transform: translateY(-1px);
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.modeInfo {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	gap: 8px;
+}
+
+.modeIcon {
+	font-size: 22px;
+	font-size: 16px;
+	line-height: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	border-radius: 10px;
+	width: 30px;
+	height: 30px;
+	border-radius: 8px;
+	background: rgba(148, 163, 184, 0.08);
+	border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.modeText {
+	display: flex;
+	flex-direction: column;
+}
+
+.modeTitle {
+	font-size: 15px;
+	font-size: 13.5px;
+	font-weight: 700;
+	color: #F1F5F9;
+	line-height: 1.2;
+}
+
+.modeTime {
+	font-size: 11px;
+	font-size: 10.5px;
+	color: #64748B;
+	font-weight: 500;
+}
+
+.badge {
+	font-size: 10.5px;
+	font-size: 10px;
+	font-weight: 700;
+	padding: 3px 8px;
+	border-radius: 6px;
+	padding: 2px 6px;
+	border-radius: 5px;
+	letter-spacing: 0.3px;
+	text-transform: uppercase;
+}
+
+.badgeCalibrating {
+	background: rgba(245, 158, 11, 0.15);
+	color: #FBBF24;
+	border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badgeNotPlayed {
+	background: rgba(148, 163, 184, 0.08);
+	color: #64748B;
+	border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.badgeActive {
+	background: rgba(34, 197, 94, 0.14);
+	color: #4ADE80;
+	border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.valueRow {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+}
+
+.ratingNumber {
+	font-size: 32px;
+	font-size: 24px;
+	font-weight: 800;
+	color: #F8FAFC;
+	font-family: var(--mono, monospace);
+	line-height: 1;
+	letter-spacing: -0.5px;
+}
+
+.ratingNumberProvisional {
+	color: #FBBF24;
+}
+
+.ratingNumberUnrated {
+	color: #64748B;
+}
+
+.deltaBadge {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+	font-size: 12px;
+	font-size: 11px;
+	font-weight: 700;
+	padding: 3px 7px;
+	border-radius: 6px;
+	padding: 2px 6px;
+	border-radius: 5px;
+	font-family: var(--mono, monospace);
+}
+
+.deltaPos {
+	background: rgba(34, 197, 94, 0.12);
+	color: #4ADE80;
+	border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.deltaNeg {
+	background: rgba(239, 68, 68, 0.12);
+	color: #F87171;
+	border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.deltaZero {
+	background: rgba(148, 163, 184, 0.08);
+	color: #94A3B8;
+	border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.deltaLabel {
+	font-size: 10px;
+	font-size: 9.5px;
+	color: #64748B;
+	font-weight: 500;
+}
+
+.chartContainer {
+	width: 100%;
+	height: 56px;
+	height: 38px;
+	position: relative;
+	margin: 2px 0;
+}
+
+.sparklineSvg {
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+/* Active point is an exact HTML/CSS circle to avoid SVG aspect-ratio distortion */
+.activeDot {
+	position: absolute;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+.statsRow {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 12px;
+	font-size: 11px;
+	color: #94A3B8;
+	padding-top: 10px;
+	padding-top: 6px;
+	border-top: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.record {
+	display: flex;
+	gap: 5px;
+	gap: 4px;
+	font-weight: 600;
+}
+
+.wins {
+	color: #4ADE80;
+}
+
+.draws {
+	color: #94A3B8;
+}
+
+.losses {
+	color: #F87171;
+}
+
+.actionHint {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 11px;
+	gap: 3px;
+	font-size: 10.5px;
+	color: #60A5FA;
+	font-weight: 600;
+	opacity: 0.8;
+	transition: opacity 0.2s, transform 0.2s;
+}
+
+.miniChartCard:hover .actionHint {
+	opacity: 1;
+	transform: translateX(2px);
+}
+

@@ -1,0 +1,155 @@
+.pageContainer {
+	max-width: 1080px;
+	max-width: 860px;
+	margin: 0 auto;
+	padding: 32px 20px 60px;
+	padding: 92px 20px 60px;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	min-height: calc(100vh - 80px);
+	gap: 20px;
+	min-height: 100vh;
+}
+
+.topBar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 16px;
+	gap: 14px;
+}
+
+.backBtn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	gap: 6px;
+	background: rgba(148, 163, 184, 0.1);
+	border: 1px solid rgba(148, 163, 184, 0.15);
+	color: #E2E8F0;
+	padding: 8px 16px;
+	border-radius: 10px;
+	padding: 7px 14px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	text-decoration: none;
+}
+
+.backBtn:hover {
+	background: rgba(148, 163, 184, 0.18);
+	border-color: rgba(148, 163, 184, 0.3);
+	transform: translateX(-2px);
+}
+
+.modeSelectorGroup {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.modeLabel {
+	font-size: 13px;
+	font-weight: 600;
+	color: #94A3B8;
+}
+
+.modeSelect {
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.25);
+	border-radius: 10px;
+	border-radius: 8px;
+	color: #F8FAFC;
+	padding: 9px 14px;
+	font-size: 14px;
+	padding: 7px 12px;
+	font-size: 13.5px;
+	font-weight: 600;
+	cursor: pointer;
+	outline: none;
+	transition: border-color 0.2s;
+}
+
+.modeSelect:focus {
+	border-color: #3B82F6;
+	box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.modeSelect option {
+	background: #0F172A;
+	color: #F8FAFC;
+}
+
+.userHeader {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	gap: 14px;
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	border-radius: 16px;
+	padding: 18px 24px;
+	border-radius: 12px;
+	padding: 14px 18px;
+}
+
+.avatar {
+	width: 54px;
+	height: 54px;
+	width: 46px;
+	height: 46px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid rgba(148, 163, 184, 0.2);
+}
+
+.userInfo {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.userName {
+	font-size: 20px;
+	font-size: 18px;
+	font-weight: 800;
+	color: #F8FAFC;
+	letter-spacing: -0.3px;
+}
+
+.userSubtitle {
+	font-size: 13px;
+	font-size: 12px;
+	color: #94A3B8;
+}
+
+.loadingSpinner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 400px;
+	gap: 16px;
+	gap: 14px;
+	color: #94A3B8;
+}
+
+.spinnerIcon {
+	font-size: 40px;
+	font-size: 36px;
+	animation: bounce 1.4s infinite ease-in-out;
+}
+
+@keyframes bounce {
+	0%, 100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-10px);
+	}
+}
+

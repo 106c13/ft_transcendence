@@ -1,0 +1,134 @@
+.customSelect {
+	position: relative;
+	display: inline-block;
+	user-select: none;
+}
+
+.triggerButton {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	background: #0F172A;
+	border: 1px solid rgba(148, 163, 184, 0.22);
+	border-radius: 8px;
+	color: #F8FAFC;
+	padding: 6px 32px 6px 32px;
+	font-size: 12.5px;
+	font-weight: 600;
+	cursor: pointer;
+	outline: none;
+	min-width: 125px;
+	transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	line-height: 1;
+}
+
+.triggerButton:hover {
+	border-color: rgba(96, 165, 250, 0.45);
+	background: #152238;
+}
+
+.triggerOpen {
+	border-color: #3B82F6;
+	box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+	background: #152238;
+}
+
+.selectedContent {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	width: 100%;
+	text-align: center;
+	line-height: 1.2;
+}
+
+.optionIcon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 13px;
+	line-height: 1;
+}
+
+.optionLabel {
+	white-space: nowrap;
+	font-weight: 600;
+}
+
+.chevron {
+	position: absolute;
+	right: 14px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #94A3B8;
+	font-size: 11px;
+	pointer-events: none;
+	transition: transform 0.2s ease, color 0.2s ease;
+	line-height: 1;
+}
+
+.chevronOpen {
+	transform: translateY(-50%) rotate(180deg);
+	color: #60A5FA;
+}
+
+.dropdownMenu {
+	position: absolute;
+	top: calc(100% + 5px);
+	left: 50%;
+	transform: translateX(-50%);
+	min-width: 100%;
+	width: max-content;
+	background: #0F172A;
+	border: 1px solid rgba(148, 163, 184, 0.22);
+	border-radius: 8px;
+	padding: 4px;
+	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(148, 163, 184, 0.08);
+	z-index: 200;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	animation: popIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popIn {
+	from {
+		opacity: 0;
+		transform: translateX(-50%) translateY(-4px) scale(0.97);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0) scale(1);
+	}
+}
+
+.menuItem {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+	padding: 7px 14px;
+	border-radius: 6px;
+	cursor: pointer;
+	text-align: center;
+	font-size: 12.5px;
+	font-weight: 600;
+	color: #CBD5E1;
+	transition: all 0.15s ease;
+	white-space: nowrap;
+	line-height: 1.2;
+}
+
+.menuItem:hover {
+	background: #1E293B;
+	color: #F8FAFC;
+}
+
+.menuItemActive {
+	background: rgba(59, 130, 246, 0.15);
+	color: #60A5FA;
+	font-weight: 700;
+}
+

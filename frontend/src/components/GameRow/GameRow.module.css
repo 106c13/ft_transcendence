@@ -1,0 +1,274 @@
+.gameRow {
+	display: grid;
+	grid-template-columns: minmax(180px, 2fr) 110px 140px 120px 130px 40px;
+	grid-template-columns: minmax(140px, 1.8fr) 95px 120px 105px 110px 30px;
+	align-items: center;
+	gap: 14px;
+	gap: 10px;
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.1);
+	border-radius: 12px;
+	padding: 12px 18px;
+	border-radius: 10px;
+	padding: 9px 14px;
+	transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.gameRow:hover {
+	background: #243248;
+	border-color: rgba(96, 165, 250, 0.3);
+	transform: translateX(3px);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+	transform: translateX(2px);
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* Opponent column */
+.opponentCol {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	gap: 10px;
+	min-width: 0;
+}
+
+.opponentAvatar {
+	width: 38px;
+	height: 38px;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 1.5px solid rgba(148, 163, 184, 0.2);
+	flex-shrink: 0;
+}
+
+.opponentInfo {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.opponentName {
+	font-size: 14px;
+	font-size: 13.5px;
+	font-weight: 700;
+	color: #F8FAFC;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.opponentRating {
+	font-size: 11.5px;
+	font-size: 11px;
+	color: #94A3B8;
+	font-family: var(--mono, monospace);
+}
+
+/* Color column */
+.colorCol {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	font-size: 12px;
+	font-weight: 600;
+	color: #CBD5E1;
+}
+
+.colorBadge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 9px;
+	border-radius: 6px;
+	font-size: 12px;
+	gap: 5px;
+	padding: 3px 7px;
+	border-radius: 5px;
+	font-size: 11.5px;
+	font-weight: 600;
+}
+
+.colorWhite {
+	background: rgba(255, 255, 255, 0.08);
+	color: #F8FAFC;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.colorBlack {
+	background: rgba(15, 23, 42, 0.6);
+	color: #94A3B8;
+	border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.pieceIcon {
+	font-size: 14px;
+	font-size: 13px;
+	line-height: 1;
+}
+
+/* Date column */
+.dateCol {
+	display: flex;
+	flex-direction: column;
+	font-size: 12.5px;
+	font-size: 11.5px;
+	color: #94A3B8;
+}
+
+.dateFull {
+	font-weight: 500;
+	color: #CBD5E1;
+}
+
+.dateSub {
+	font-size: 11px;
+	font-size: 10.5px;
+	color: #64748B;
+}
+
+/* Mode column - NEUTRAL & DISTINCT, NEVER RED OR GREEN */
+.modeCol {
+	display: flex;
+	align-items: center;
+}
+
+.modeBadge {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 4px 10px;
+	border-radius: 6px;
+	font-size: 12px;
+	gap: 4px;
+	padding: 3px 8px;
+	border-radius: 5px;
+	font-size: 11.5px;
+	font-weight: 700;
+	letter-spacing: 0.2px;
+}
+
+/* Subtle distinct tones that don't clash with green win / red loss */
+.modeBullet {
+	background: rgba(245, 158, 11, 0.14);
+	color: #F59E0B;
+	border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.modeBlitz {
+	background: rgba(56, 189, 248, 0.14);
+	color: #38BDF8;
+	border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.modeRapid {
+	background: rgba(129, 140, 248, 0.14);
+	color: #818CF8;
+	border: 1px solid rgba(129, 140, 248, 0.35);
+}
+
+.modeDefault {
+	background: rgba(148, 163, 184, 0.1);
+	color: #CBD5E1;
+	border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* Result column - VIBRANT & HIGH CONTRAST (WIN: GREEN, LOSS: RED, DRAW: SLATE) */
+.resultCol {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	gap: 6px;
+}
+
+.resultBadge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 4px 10px;
+	border-radius: 6px;
+	font-size: 11.5px;
+	padding: 3px 8px;
+	border-radius: 5px;
+	font-size: 11px;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	min-width: 62px;
+	min-width: 54px;
+	text-align: center;
+}
+
+.resultWin {
+	background: rgba(34, 197, 94, 0.16);
+	color: #22C55E;
+	border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.resultLoss {
+	background: rgba(239, 68, 68, 0.16);
+	color: #EF4444;
+	border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.resultDraw {
+	background: rgba(148, 163, 184, 0.14);
+	color: #94A3B8;
+	border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.deltaBadge {
+	font-size: 11.5px;
+	font-size: 11px;
+	font-weight: 700;
+	font-family: var(--mono, monospace);
+}
+
+.deltaPos {
+	color: #4ADE80;
+}
+
+.deltaNeg {
+	color: #F87171;
+}
+
+.deltaZero {
+	color: #64748B;
+}
+
+/* Action arrow column */
+.arrowCol {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #64748B;
+	font-size: 14px;
+	font-size: 13px;
+	transition: color 0.2s, transform 0.2s;
+}
+
+.gameRow:hover .arrowCol {
+	color: #60A5FA;
+	transform: translateX(3px);
+	transform: translateX(2px);
+}
+
+/* Responsive collapse for small screens */
+@media (max-width: 768px) {
+	.gameRow {
+		grid-template-columns: 1fr 1fr;
+		gap: 10px;
+		padding: 12px;
+		gap: 8px;
+		padding: 10px;
+	}
+
+	.arrowCol {
+		display: none;
+	}
+}
+

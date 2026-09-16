@@ -3,8 +3,12 @@ import { useTranslation } from 'react-i18next'
 import profileStyles from './ProfileTabs.module.css'
 import type { TabType, User } from '../../constants/profileConstants'
 import { useGameHistory } from '../../hooks/useGameHistory'
+import { useRatingHistory, type RatingCategory } from '../../hooks/useRatingHistory'
 import FriendsList from '../FriendsList/FriendsList'
 import GamesList from '../GamesList/GamesList'
+import MiniRatingChart from '../MiniRatingChart/MiniRatingChart'
+import FriendsPreview from '../FriendsPreview/FriendsPreview'
+import GameRow from '../GameRow/GameRow'
 import type { MatchRecord } from '../GameAnalysis/GameAnalysis'
 
 type Props = {
@@ -17,11 +21,21 @@ type Props = {
 	onFriendClick: (targetUsername: string) => void
 }
 
-function ProfileTabs({ activeTab, username, friends, isOwnProfile, ratings, onSelectTab, onFriendClick }: Props) {
+export default function ProfileTabs({
+	activeTab,
+	username,
+	friends,
+	isOwnProfile,
+	ratings,
+	onSelectTab,
+	onFriendClick,
+}: Props) {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
 
-	const history = useGameHistory(activeTab === 'games' && username ? username : '')
+	// Load match history for games and rating computations
+	const history = useGameHistory(username || '')
+	const ratingData = useRatingHistory(history.matches, username || '', ratings)
 
 	const handleSelectGame = (match: MatchRecord) => {
 		navigate(`/game/analysis/${match.id}`, {
@@ -29,129 +43,152 @@ function ProfileTabs({ activeTab, username, friends, isOwnProfile, ratings, onSe
 		})
 	}
 
-	const categories: Array<{
-		key: 'bullet' | 'blitz' | 'rapid'
-		name: string
-		icon: string
-		time: string
-	}> = [
-		{ key: 'bullet', name: t('bullet_rating', 'Bullet'), icon: '🔥', time: '1 min' },
-		{ key: 'blitz', name: t('blitz_rating', 'Blitz'), icon: '⚡', time: '3 min' },
-		{ key: 'rapid', name: t('rapid_rating', 'Rapid'), icon: '⏳', time: '10 min' },
-	]
+	const handleChartClick = (mode: RatingCategory) => {
+		if (username) {
+			navigate(`/profile/${username}/rating?mode=${mode}`)
+		} else {
+			navigate(`/profile/rating?mode=${mode}`)
+		}
+	}
+
+	const recentMatches = history.matches.slice(0, 6)
 
 	return (
-		<>
+		<div className={profileStyles.tabsWrapper}>
+			{/* Profile Navigation Tabs */}
 			<div className={profileStyles.profileTabs}>
 				<div
 					className={`${profileStyles.tab} ${activeTab === 'overview' ? profileStyles.active : ''}`}
 					onClick={() => onSelectTab('overview')}
+					role="button"
+					tabIndex={0}
 				>
-					{t('overview')}
+					{t('overview', 'Overview')}
 				</div>
 
 				<div
 					className={`${profileStyles.tab} ${activeTab === 'games' ? profileStyles.active : ''}`}
 					onClick={() => onSelectTab('games')}
+					role="button"
+					tabIndex={0}
 				>
-					{t('games')}
+					{t('games', 'Games')}
 				</div>
 
 				<div
 					className={`${profileStyles.tab} ${activeTab === 'friends' ? profileStyles.active : ''}`}
 					onClick={() => onSelectTab('friends')}
+					role="button"
+					tabIndex={0}
 				>
-					{t('friends')}
+					{t('friends', 'Friends')}
 				</div>
 			</div>
 
+			{/* Overview Tab Content */}
 			{activeTab === 'overview' && (
 				<div className={profileStyles.overviewSection}>
+					{/* 3 Small Rating Sparkline Charts for bullet, blitz, rapid */}
 					<div className={profileStyles.ratingsGrid}>
-						{categories.map((cat) => {
-							const info = ratings ? ratings[cat.key] : null
-							const isNotPlayed = !info || info.gamesPlayed === 0
-							const isProvisional = info?.isProvisional ?? true
+						<MiniRatingChart
+							mode="bullet"
+							history={ratingData.bullet}
+							onClick={() => handleChartClick('bullet')}
+						/>
+						<MiniRatingChart
+							mode="blitz"
+							history={ratingData.blitz}
+							onClick={() => handleChartClick('blitz')}
+						/>
+						<MiniRatingChart
+							mode="rapid"
+							history={ratingData.rapid}
+							onClick={() => handleChartClick('rapid')}
+						/>
+					</div>
 
-							return (
-								<div key={cat.key} className={profileStyles.ratingCard}>
-									<div className={profileStyles.ratingCardHeader}>
-										<div className={profileStyles.ratingCategory}>
-											<span className={profileStyles.categoryIcon}>{cat.icon}</span>
-											<div>
-												<div className={profileStyles.categoryName}>{cat.name}</div>
-												<div className={profileStyles.categoryTime}>{cat.time}</div>
-											</div>
-										</div>
-										{isNotPlayed ? (
-											<span className={`${profileStyles.badge} ${profileStyles.badgeNotPlayed}`}>
-												{t('not_played', 'Not played')}
-											</span>
-										) : isProvisional ? (
-											<span className={`${profileStyles.badge} ${profileStyles.badgeCalibrating}`}>
-												{t('calibrating', 'Calibrating')} ({info.gamesPlayed}/5)
-											</span>
-										) : (
-											<span className={`${profileStyles.badge} ${profileStyles.badgeActive}`}>
-												{Math.round((info.wins / info.gamesPlayed) * 100)}% {t('win_rate', 'Win rate')}
-											</span>
-										)}
+					{/* Friends Preview Strip (up to 7 avatars horizontally) */}
+					<FriendsPreview
+						friends={friends}
+						onFriendClick={onFriendClick}
+						onSeeAll={() => onSelectTab('friends')}
+					/>
+
+					{/* Recent Games List (Last 5-7 games played) */}
+					<div className={profileStyles.recentGamesCard}>
+						<div className={profileStyles.recentGamesHeader}>
+							<div className={profileStyles.titleGroup}>
+								<h3 className={profileStyles.sectionTitle}>
+									⚔️ {t('recent_games', 'Recent Matches')}
+								</h3>
+								<span className={profileStyles.countBadge}>
+									{history.matches.length}
+								</span>
+							</div>
+						</div>
+
+						{history.loading ? (
+							<div className={profileStyles.emptyRecentGames}>
+								{t('loading', 'Loading recent games...')}
+							</div>
+						) : recentMatches.length === 0 ? (
+							<div className={profileStyles.emptyRecentGames}>
+								{t('no_games_yet', 'No games played yet')}
+							</div>
+						) : (
+							<>
+								<div className={profileStyles.gamesListRows}>
+									<div className={profileStyles.listHeader}>
+										<span>Opponent</span>
+										<span>Color</span>
+										<span>Date</span>
+										<span>Mode</span>
+										<span>Result</span>
+										<span></span>
 									</div>
 
-									<div className={profileStyles.ratingValueRow}>
-										<div
-											className={`${profileStyles.ratingNumber} ${
-												isNotPlayed
-													? profileStyles.ratingNumberUnrated
-													: isProvisional
-													? profileStyles.ratingNumberProvisional
-													: ''
-											}`}
-										>
-											{isNotPlayed ? '—' : isProvisional ? `~${info.rating}` : info.rating}
-										</div>
-									</div>
-
-									<div className={profileStyles.ratingStatsRow}>
-										<div className={profileStyles.wdlRecord}>
-											<span className={profileStyles.wins}>{info?.wins ?? 0}{t('wins_short', 'W')}</span>
-											<span>/</span>
-											<span className={profileStyles.draws}>{info?.draws ?? 0}{t('draws_short', 'D')}</span>
-											<span>/</span>
-											<span className={profileStyles.losses}>{info?.losses ?? 0}{t('losses_short', 'L')}</span>
-										</div>
-										<span className={profileStyles.gamesCount}>
-											{info?.gamesPlayed ?? 0} {t('games_played', 'games')}
-										</span>
-									</div>
+									{recentMatches.map((match) => (
+										<GameRow
+											key={match.id}
+											match={match}
+											username={username || ''}
+											onSelect={handleSelectGame}
+										/>
+									))}
 								</div>
-							)
-						})}
+
+								<div className={profileStyles.seeAllContainer}>
+									<button
+										className={profileStyles.seeAllGamesBtn}
+										onClick={() => onSelectTab('games')}
+									>
+										{t('see_all', 'See all')} ({history.matches.length}) →
+									</button>
+								</div>
+							</>
+						)}
 					</div>
 				</div>
 			)}
 
+			{/* Games Tab Content */}
 			{activeTab === 'games' && username && (
 				<GamesList
 					matches={history.matches}
 					username={username}
 					isOwnProfile={isOwnProfile}
 					loading={history.loading}
-					getOutcome={history.getOutcome}
-					formatDate={history.formatDate}
-					formatReason={history.formatReason}
 					onSelectGame={handleSelectGame}
 				/>
 			)}
 
+			{/* Friends Tab Content */}
 			{activeTab === 'friends' && (
 				<FriendsList
 					friends={friends}
 					onOpenProfile={onFriendClick}
 				/>
 			)}
-		</>
+		</div>
 	)
 }
-
-export default ProfileTabs

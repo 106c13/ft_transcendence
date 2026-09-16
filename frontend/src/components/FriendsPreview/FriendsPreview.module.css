@@ -1,0 +1,146 @@
+.friendsPreviewCard {
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	border-radius: 14px;
+	padding: 18px 22px;
+	border-radius: 12px;
+	padding: 13px 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	gap: 10px;
+	width: 100%;
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.titleGroup {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.title {
+	font-size: 16px;
+	font-size: 14.5px;
+	font-weight: 700;
+	color: #F8FAFC;
+	margin: 0;
+}
+
+.countBadge {
+	font-size: 12px;
+	font-size: 11px;
+	font-weight: 700;
+	background: rgba(148, 163, 184, 0.12);
+	color: #94A3B8;
+	padding: 2px 8px;
+	border-radius: 12px;
+	padding: 2px 7px;
+	border-radius: 10px;
+}
+
+.seeAllBtn {
+	background: none;
+	border: none;
+	color: #60A5FA;
+	font-size: 13px;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 4px 8px;
+	padding: 3px 6px;
+	border-radius: 6px;
+	transition: all 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.seeAllBtn:hover {
+	background: rgba(96, 165, 250, 0.1);
+	color: #93C5FD;
+}
+
+.avatarsList {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	gap: 10px;
+	flex-wrap: wrap;
+	padding: 4px 0;
+	padding: 2px 0;
+}
+
+.avatarItem {
+	position: relative;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.avatarImg {
+	width: 48px;
+	height: 48px;
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid rgba(148, 163, 184, 0.2);
+	transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	background: #0F172A;
+}
+
+.avatarItem:hover .avatarImg {
+	transform: scale(1.12);
+	border-color: #3B82F6;
+	box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+.tooltip {
+	position: absolute;
+	bottom: -28px;
+	bottom: -26px;
+	left: 50%;
+	transform: translateX(-50%) translateY(4px);
+	background: rgba(15, 23, 42, 0.95);
+	backdrop-filter: blur(6px);
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	color: #F8FAFC;
+	font-size: 11px;
+	font-size: 10.5px;
+	font-weight: 600;
+	padding: 3px 8px;
+	border-radius: 6px;
+	padding: 2px 7px;
+	border-radius: 5px;
+	white-space: nowrap;
+	pointer-events: none;
+	opacity: 0;
+	visibility: hidden;
+	transition: all 0.15s ease;
+	z-index: 20;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.avatarItem:hover .tooltip {
+	opacity: 1;
+	visibility: visible;
+	transform: translateX(-50%) translateY(0);
+}
+
+.emptyState {
+	font-size: 13px;
+	font-size: 12.5px;
+	color: #64748B;
+	padding: 8px 0;
+	padding: 6px 0;
+	font-style: italic;
+}
+

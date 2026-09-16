@@ -23,8 +23,6 @@ function ProfileHeader({
     user,
     isOwnProfile,
     isLoggedIn,
-    menuOpen,
-    setMenuOpen,
     friendStatus,
     onSend,
     onAccept,
@@ -43,24 +41,6 @@ function ProfileHeader({
 
     return (
         <div className={styles.profileHeader}>
-            {isOwnProfile && (
-                <div className={styles.profileActions}>
-                    <div
-                        className={styles.menuBtn}
-                        onClick={() => setMenuOpen(!menuOpen)}
-                    >
-                        ⋯
-                    </div>
-
-                    <div className={`${styles.menuDropdown} ${menuOpen ? styles.open : ''}`}>
-                        <div onClick={onSettings}>⚙️ {t('settings')}</div>
-                        <div onClick={onLogout} className={styles.danger}>
-                            🚪 {t('logout')}
-                        </div>
-                    </div>
-                </div>
-            )}
-
             <img
                 className={styles.profileAvatar}
                 src={
@@ -77,77 +57,98 @@ function ProfileHeader({
                     <div className={styles.flag}>🏳️</div>
                 </div>
 
-                <div className={styles.bio}>{user.bio || t('no_bio_yet')}</div>
+                <div className={styles.bio}>{user.bio || t('no_bio_yet', 'No bio yet')}</div>
 
                 <div className={styles.meta}>
                     <span>
-                        {t('joined')}:{' '}
+                        {t('joined', 'Joined')}:{' '}
                         {user.created_at
                             ? new Date(user.created_at).toLocaleDateString()
-                            : t('unknown')}
+                            : t('unknown', 'Unknown')}
                     </span>
-                    <span>• {t('friends_count')}: 0</span>
-                    <span>• {t('online')}</span>
+                    <span className={styles.metaDot}>•</span>
+                    <span className={styles.onlineIndicator}>
+                        <span className={styles.onlineDot}></span>
+                        {t('online', 'Online')}
+                    </span>
                 </div>
             </div>
 
-            {!isOwnProfile && isLoggedIn && (
-                <div className={styles.headerActions}>
-                    {friendStatus === 'NONE' && (
+            {/* Header Actions - Unified Style and Proportional Spacing */}
+            <div className={styles.headerActions}>
+                {isOwnProfile ? (
+                    <>
                         <button
-                            className={styles.addFriendBtn}
-                            onClick={onSend}
+                            className={`${styles.headerBtn} ${styles.secondaryBtn}`}
+                            onClick={onSettings}
                         >
-                            + {t('send_friend_request')}
+                            ⚙️ {t('settings', 'Settings')}
                         </button>
-                    )}
-
-                    {friendStatus === 'SENT' && (
                         <button
-                            className={styles.pendingBtn}
-                            onClick={onCancel}
+                            className={`${styles.headerBtn} ${styles.dangerBtn}`}
+                            onClick={onLogout}
                         >
-                            {t('request_sent')}
+                            🚪 {t('logout', 'Logout')}
                         </button>
-                    )}
-
-                    {friendStatus === 'RECEIVED' && (
-                        <>
+                    </>
+                ) : isLoggedIn ? (
+                    <>
+                        {friendStatus === 'NONE' && (
                             <button
-                                className={styles.acceptBtn}
-                                onClick={onAccept}
+                                className={`${styles.headerBtn} ${styles.primaryBtn}`}
+                                onClick={onSend}
                             >
-                                {t('accept')}
+                                + {t('send_friend_request', 'Add Friend')}
                             </button>
+                        )}
 
+                        {friendStatus === 'SENT' && (
                             <button
-                                className={styles.rejectBtn}
-                                onClick={onReject}
+                                className={`${styles.headerBtn} ${styles.pendingBtn}`}
+                                onClick={onCancel}
+                                title={t('cancel_request', 'Cancel Request')}
                             >
-                                {t('reject')}
+                                ⏳ {t('request_sent', 'Request Sent')}
                             </button>
-                        </>
-                    )}
+                        )}
 
-                    {friendStatus === 'ACCEPTED' && (
-                        <button
-                            className={styles.friendsBtn}
-                            onClick={onUnfriend}
-                        >
-                            {t('friends')} ✓
-                        </button>
-                    )}
+                        {friendStatus === 'RECEIVED' && (
+                            <>
+                                <button
+                                    className={`${styles.headerBtn} ${styles.successBtn}`}
+                                    onClick={onAccept}
+                                >
+                                    ✓ {t('accept', 'Accept')}
+                                </button>
+                                <button
+                                    className={`${styles.headerBtn} ${styles.dangerBtn}`}
+                                    onClick={onReject}
+                                >
+                                    ✕ {t('reject', 'Reject')}
+                                </button>
+                            </>
+                        )}
 
-                    {friendStatus == 'ACCEPTED' && (
-                        <button
-                            className={styles.messageBtn}
-                            onClick={handleMessageClick}
-                        >
-                            💬 {t('message')}
-                        </button>
-                    )}
-                </div>
-            )}
+                        {friendStatus === 'ACCEPTED' && (
+                            <>
+                                <button
+                                    className={`${styles.headerBtn} ${styles.friendsBtn}`}
+                                    onClick={onUnfriend}
+                                    title={t('unfriend', 'Unfriend')}
+                                >
+                                    ✓ {t('friends', 'Friends')}
+                                </button>
+                                <button
+                                    className={`${styles.headerBtn} ${styles.secondaryBtn}`}
+                                    onClick={handleMessageClick}
+                                >
+                                    💬 {t('message', 'Message')}
+                                </button>
+                            </>
+                        )}
+                    </>
+                ) : null}
+            </div>
         </div>
     )
 }

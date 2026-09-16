@@ -1,0 +1,271 @@
+.bigChartWrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	gap: 16px;
+	width: 100%;
+}
+
+.statsGrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 14px;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 10px;
+	width: 100%;
+}
+
+.statCard {
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	border-radius: 12px;
+	padding: 14px 16px;
+	border-radius: 10px;
+	padding: 11px 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	gap: 4px;
+}
+
+.statLabel {
+	font-size: 11.5px;
+	font-size: 11px;
+	font-weight: 600;
+	color: #94A3B8;
+	text-transform: uppercase;
+	letter-spacing: 0.4px;
+}
+
+.statValue {
+	font-size: 24px;
+	font-size: 20px;
+	font-weight: 800;
+	color: #F8FAFC;
+	font-family: var(--mono, monospace);
+	line-height: 1;
+}
+
+.statSub {
+	font-size: 11px;
+	font-size: 10.5px;
+	color: #64748B;
+	font-weight: 500;
+}
+
+.chartCard {
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.14);
+	border-radius: 16px;
+	padding: 24px;
+	border-radius: 14px;
+	padding: 18px 20px;
+	position: relative;
+	width: 100%;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.chartHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 20px;
+	margin-bottom: 14px;
+	flex-wrap: wrap;
+	gap: 12px;
+	gap: 10px;
+}
+
+.chartTitle {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	gap: 8px;
+}
+
+.chartModeIcon {
+	font-size: 24px;
+	font-size: 20px;
+}
+
+.chartModeTitle {
+	font-size: 18px;
+	font-size: 16px;
+	font-weight: 800;
+	color: #F8FAFC;
+	letter-spacing: -0.3px;
+}
+
+.pointsCount {
+	font-size: 12px;
+	font-size: 11px;
+	color: #94A3B8;
+	background: rgba(148, 163, 184, 0.1);
+	padding: 4px 10px;
+	border-radius: 20px;
+	padding: 3px 8px;
+	border-radius: 16px;
+	font-weight: 600;
+}
+
+.svgContainer {
+	width: 100%;
+	position: relative;
+	overflow: hidden;
+}
+
+.chartSvg {
+	width: 100%;
+	height: 320px;
+	height: auto;
+	aspect-ratio: 760 / 300;
+	display: block;
+	cursor: crosshair;
+}
+
+.gridLine {
+	stroke: rgba(148, 163, 184, 0.08);
+	stroke-width: 1;
+	stroke-dasharray: 4 4;
+}
+
+.axisText {
+	font-size: 11px;
+	font-size: 10.5px;
+	fill: #64748B;
+	font-family: var(--mono, monospace);
+	font-weight: 500;
+}
+
+.crosshairLine {
+	stroke: rgba(148, 163, 184, 0.35);
+	stroke-width: 1.5;
+	stroke-dasharray: 4 4;
+}
+
+.tooltip {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	top: 14px;
+	right: 14px;
+	background: rgba(15, 23, 42, 0.95);
+	backdrop-filter: blur(8px);
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	border-radius: 10px;
+	padding: 10px 14px;
+	border-radius: 8px;
+	padding: 8px 12px;
+	pointer-events: none;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+	min-width: 160px;
+	gap: 5px;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+	min-width: 150px;
+	z-index: 10;
+}
+
+.tooltipDate {
+	font-size: 11px;
+	font-size: 10.5px;
+	color: #94A3B8;
+	font-weight: 500;
+}
+
+.tooltipRatingRow {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.tooltipRating {
+	font-size: 20px;
+	font-size: 18px;
+	font-weight: 800;
+	color: #F8FAFC;
+	font-family: var(--mono, monospace);
+}
+
+.tooltipDelta {
+	font-size: 12px;
+	font-size: 11px;
+	font-weight: 700;
+	font-family: var(--mono, monospace);
+	padding: 2px 6px;
+	padding: 2px 5px;
+	border-radius: 4px;
+}
+
+.deltaPos {
+	color: #4ADE80;
+	background: rgba(34, 197, 94, 0.15);
+}
+
+.deltaNeg {
+	color: #F87171;
+	background: rgba(239, 68, 68, 0.15);
+}
+
+.deltaZero {
+	color: #94A3B8;
+	background: rgba(148, 163, 184, 0.15);
+}
+
+.tooltipMatch {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 11.5px;
+	font-size: 11px;
+	padding-top: 4px;
+	border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.tooltipOpponent {
+	color: #CBD5E1;
+	font-weight: 600;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 100px;
+	max-width: 90px;
+}
+
+.tooltipResultWin {
+	color: #4ADE80;
+	font-weight: 700;
+}
+
+.tooltipResultLoss {
+	color: #F87171;
+	font-weight: 700;
+}
+
+.tooltipResultDraw {
+	color: #94A3B8;
+	font-weight: 700;
+}
+
+.emptyState {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 60px 20px;
+	padding: 48px 20px;
+	color: #94A3B8;
+	text-align: center;
+	gap: 8px;
+}
+
+.emptyIcon {
+	font-size: 40px;
+	font-size: 36px;
+	opacity: 0.6;
+}
+

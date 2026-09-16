@@ -34,32 +34,32 @@
 
 .homeModeCard.homeModeBullet::before,
 .homeModeCard.homeModeBulletInc::before {
-	background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), transparent);
+	background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), transparent);
 }
 
 .homeModeCard.homeModeBullet:hover,
 .homeModeCard.homeModeBulletInc:hover {
-	border-color: rgba(220, 38, 38, 0.45);
+	border-color: rgba(245, 158, 11, 0.45);
 }
 
 .homeModeCard.homeModeBlitz::before,
 .homeModeCard.homeModeBlitzInc::before {
-	background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), transparent);
+	background: linear-gradient(135deg, rgba(56, 189, 248, 0.14), transparent);
 }
 
 .homeModeCard.homeModeBlitz:hover,
 .homeModeCard.homeModeBlitzInc:hover {
-	border-color: rgba(217, 119, 6, 0.45);
+	border-color: rgba(56, 189, 248, 0.45);
 }
 
 .homeModeCard.homeModeRapid::before,
 .homeModeCard.homeModeRapidInc::before {
-	background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), transparent);
+	background: linear-gradient(135deg, rgba(129, 140, 248, 0.14), transparent);
 }
 
 .homeModeCard.homeModeRapid:hover,
 .homeModeCard.homeModeRapidInc:hover {
-	border-color: rgba(5, 150, 105, 0.45);
+	border-color: rgba(129, 140, 248, 0.45);
 }
 
 .homeModeTop {
