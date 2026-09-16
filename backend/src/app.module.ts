@@ -10,7 +10,7 @@ import { NotificationsModule } from './notification/notification.module';
 import { ChatModule } from './chat/chat.module';
 import { MessagesModule } from './messages/messages.module';
 import { GameModule } from './game/game.module';
-
+import { PresenceModule } from './presence/presence.module';
 
 	@Module({
   imports: [
@@ -31,11 +31,12 @@ import { GameModule } from './game/game.module';
 
     UsersModule,
     AuthModule,
-	FriendsModule,
-	NotificationsModule,
-	ChatModule,
-	MessagesModule,
-	GameModule,
+    FriendsModule,
+    NotificationsModule,
+    ChatModule,
+    MessagesModule,
+    GameModule,
+    PresenceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -43,6 +43,15 @@ export default function FriendsPreview({ friends, onFriendClick, onSeeAll }: Pro
 								alt={friend.username}
 								className={styles.avatarImg}
 							/>
+							<span
+								className={`${styles.statusDot} ${
+									friend.status === 'ONLINE'
+										? styles.online
+										: friend.status === 'INGAME'
+										? styles.ingame
+										: styles.offline
+								}`}
+							/>
 							<div className={styles.tooltip}>{friend.username}</div>
 						</div>
 					))}

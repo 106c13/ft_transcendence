@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { FriendsController } from './friends.controller'
 import { FriendsService } from './friends.service'
+import { PresenceModule } from '@/presence/presence.module'
 
 import { FriendRequest } from './friend-request.entity'
 import { Friendship } from './friendship.entity'
@@ -17,6 +18,7 @@ import { Notification } from '../notification/notification.entity'
 			User,
 			Notification,
 		]),
+		PresenceModule,
 	],
 	controllers: [FriendsController],
 	providers: [FriendsService],

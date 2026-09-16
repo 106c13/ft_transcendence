@@ -80,6 +80,11 @@ export function useChallengeSocket(userId: number | undefined) {
             }, 3000)
         })
 
+        // Listen for global user presence status changes
+        socket.on('user_status_changed', (data: { userId: number; username: string; status: string }) => {
+            window.dispatchEvent(new CustomEvent('user_status_changed', { detail: data }))
+        })
+
         return () => {
             socket.disconnect()
             clearCountdown()

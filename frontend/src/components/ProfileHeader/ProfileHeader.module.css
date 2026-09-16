@@ -72,17 +72,48 @@
 .onlineIndicator {
 	display: inline-flex;
 	align-items: center;
-	gap: 4px;
+	gap: 5px;
 	color: #4ADE80;
 	font-weight: 500;
 }
 
 .onlineDot {
-	width: 6px;
-	height: 6px;
+	width: 7px;
+	height: 7px;
 	border-radius: 50%;
 	background: #4ADE80;
 	box-shadow: 0 0 6px rgba(74, 222, 128, 0.6);
+}
+
+.ingameIndicator {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	color: #A855F7;
+	font-weight: 500;
+}
+
+.ingameDot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: #A855F7;
+	box-shadow: 0 0 6px rgba(168, 85, 247, 0.6);
+}
+
+.offlineIndicator {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	color: #94A3B8;
+	font-weight: 500;
+}
+
+.offlineDot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: #64748B;
 }
 
 /* Header Actions Bar */

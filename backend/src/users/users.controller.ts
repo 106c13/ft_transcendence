@@ -19,6 +19,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { JwtService } from '@nestjs/jwt'
 import { UsersService } from './users.service'
 import { RatingService } from '@/game/rating.service';
+import { PresenceService } from '@/presence/presence.service';
 
 function isValidEmail(email: string) {
 	return (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 256)
@@ -30,6 +31,7 @@ export class UsersController {
 		private readonly usersService: UsersService,
 		private readonly jwtService: JwtService,
 		private readonly ratingService: RatingService,
+		private readonly presenceService: PresenceService,
 	) {}
 
 	@Get('me')
@@ -49,8 +51,9 @@ export class UsersController {
 			email: user.email,
 			bio: user.bio,
 			avatar: user.avatar,
-			//is_active: user.is_active,
-			//last_seen: user.last_seen,
+			status: 'ONLINE',
+			is_active: true,
+			last_seen: user.last_seen,
 			created_at: user.created_at,
 			isOwnProfile: true,
 			ratings,
@@ -63,7 +66,15 @@ export class UsersController {
 		@Req() req,
 		@Query('q') query: string
 	) {
-		return this.usersService.searchUser(query)
+		const users = await this.usersService.searchUser(query);
+		return users.map(u => ({
+			id: u.id,
+			username: u.username,
+			avatar: u.avatar,
+			bio: u.bio,
+			is_active: this.presenceService.isUserOnline(u.id),
+			status: this.presenceService.getUserStatus(u.id),
+		}));
 	}
 
 	@Get(':username')
@@ -88,12 +99,16 @@ export class UsersController {
 		}
 
 		const ratings = await this.ratingService.getAllRatings(user.id);
+		const status = isOwnProfile ? 'ONLINE' : this.presenceService.getUserStatus(user.id);
 
 		return {
 			id: user.id,
 			username: user.username,
 			email: user.email,
 			avatar: user.avatar,
+			status: status,
+			is_active: status !== 'OFFLINE',
+			last_seen: user.last_seen,
 			bio: user.bio,
 			created_at: user.created_at,
 			isOwnProfile,

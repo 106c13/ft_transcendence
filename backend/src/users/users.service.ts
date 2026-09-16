@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
 
@@ -133,7 +133,7 @@ export class UsersService {
 		return this.usersRepo
 			.createQueryBuilder('user')
 			.where('user.username ILIKE :query', { query: `%${query}%` })
-			.select(['user.username', 'user.is_active', 'user.avatar'])
+			.select(['user.id', 'user.bio', 'user.username', 'user.is_active', 'user.avatar'])
 			.limit(5)
 			.getMany()
 	}

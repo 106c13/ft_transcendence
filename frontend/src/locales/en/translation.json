@@ -48,6 +48,8 @@
 	"unknown": "unknown",
 	"friends_count": "Friends",
 	"online": "Online",
+	"offline": "Offline",
+	"in_game": "In Game",
 	"request_sent": "Request Sent",
 	"login": "Login",
 	"invalid_credentials": "Invalid credentials",

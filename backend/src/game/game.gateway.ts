@@ -9,6 +9,8 @@ import { Socket, Namespace } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 import { getRatingCategory, RatingService } from './rating.service';
+import { PresenceService } from '@/presence/presence.service';
+import { ChallengeGateway } from './challenge.gateway';
 
 @WebSocketGateway({
 	namespace: '/game',
@@ -26,10 +28,28 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private gameService: GameService,
 		private usersService: UsersService,
 		private ratingService: RatingService,
+		private presenceService: PresenceService,
+		private challengeGateway: ChallengeGateway,
 	) {
 		// Register events callback from service to notify clients
 		this.gameService.setGameEventsCallback((event, game, payload) => {
 			this.server.to(game.gameId).emit(event, payload);
+
+			if (event === 'game_over') {
+				this.presenceService.setUserInGame(game.white.userId, false);
+				this.presenceService.setUserInGame(game.black.userId, false);
+
+				this.challengeGateway.server.emit('user_status_changed', {
+					userId: game.white.userId,
+					username: game.white.username,
+					status: this.presenceService.getUserStatus(game.white.userId),
+				});
+				this.challengeGateway.server.emit('user_status_changed', {
+					userId: game.black.userId,
+					username: game.black.username,
+					status: this.presenceService.getUserStatus(game.black.userId),
+				});
+			}
 		});
 
 		this.gameService.setMatchFoundCallback(async (newGame) => {
@@ -61,6 +81,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				playerRating: blackRating.rating, playerIsProvisional: blackRating.isProvisional,
 				opponentRating: whiteRating.rating, opponentIsProvisional: whiteRating.isProvisional,
 			};
+
+			this.presenceService.setUserInGame(newGame.white.userId, true);
+			this.presenceService.setUserInGame(newGame.black.userId, true);
+
+			this.challengeGateway.server.emit('user_status_changed', {
+				userId: newGame.white.userId,
+				username: newGame.white.username,
+				status: 'INGAME',
+			});
+			this.challengeGateway.server.emit('user_status_changed', {
+				userId: newGame.black.userId,
+				username: newGame.black.username,
+				status: 'INGAME',
+			});
 
 			if (whiteSocket) {
 				whiteSocket.emit('match_found', whitePayload);
@@ -97,7 +131,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				[playerRating, opponentRating] = [opponentRating, playerRating]
 
 			client.join(reconnectedGame.gameId);
-			
+
 			// Send full state to reconnecting player
 			client.emit('match_found', {
 				gameId: reconnectedGame.gameId,

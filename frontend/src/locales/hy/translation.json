@@ -48,6 +48,8 @@
 	"unknown": "անհայտ",
 	"friends_count": "Ընկերներ",
 	"online": "Առցանց",
+	"offline": "Անցանց",
+	"in_game": "Խաղի մեջ",
 	"request_sent": "Հարցումն ուղարկված է",
 	"login": "Մուտք",
 	"invalid_credentials": "Սխալ տվյալներ",

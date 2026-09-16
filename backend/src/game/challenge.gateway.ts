@@ -5,10 +5,11 @@ import {
 	OnGatewayConnection,
 	OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Server, Socket, Namespace } from 'socket.io';
+import { Socket, Namespace } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 import { FriendsService } from '../friends/friends.service';
+import { PresenceService } from '@/presence/presence.service';
 import type { GameModeType, PendingChallenge } from './game.service';
 
 @WebSocketGateway({
@@ -22,34 +23,50 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 	@WebSocketServer()
 	server: Namespace;
 
-	// Track connected users: userId -> socketId
-	private connectedUsers = new Map<number, string>();
-
 	constructor(
 		private gameService: GameService,
 		private usersService: UsersService,
 		private friendsService: FriendsService,
+		private presenceService: PresenceService,
 	) {}
 
-	handleConnection(client: Socket) {
+	async handleConnection(client: Socket): Promise<void> {
 		const userIdStr = client.handshake.query.userId;
 		if (!userIdStr) return;
 
 		const userId = parseInt(userIdStr as string);
-		this.connectedUsers.set(userId, client.id);
-		console.log(`Challenge Gateway: User ${userId} connected (Socket: ${client.id})`);
+		client.join(`user_${userId}`);
+
+		const isFirst = await this.presenceService.handleUserConnect(userId, client.id);
+		if (isFirst) {
+			const user = await this.usersService.findById(userId);
+			if (user) {
+				this.server.emit('user_status_changed', {
+					userId: user.id,
+					username: user.username,
+					status: 'ONLINE',
+				});
+			}
+		}
 	}
 
-	handleDisconnect(client: Socket) {
+	async handleDisconnect(client: Socket) {
 		const userIdStr = client.handshake.query.userId;
 		if (!userIdStr) return;
 
 		const userId = parseInt(userIdStr as string);
-		// Only delete if it's the current socket (user might have reconnected with a new one)
-		if (this.connectedUsers.get(userId) === client.id) {
-			this.connectedUsers.delete(userId);
+		
+		const becomeOffline = await this.presenceService.handleUserDisconnect(userId, client.id);
+		if (becomeOffline) {
+			const user = await this.usersService.findById(userId);
+			if (user) {
+				this.server.emit('user_status_changed', {
+					userId: user.id,
+					username: user.username,
+					status: 'OFFLINE',
+				});
+			}
 		}
-		console.log(`Challenge Gateway: User ${userId} disconnected (Socket: ${client.id})`);
 	}
 
 	@SubscribeMessage('send_challenge')
@@ -73,29 +90,25 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 			return;
 		}
 
-		// Look up the friend
 		const receiver = await this.usersService.findByUsername(friendUsername);
 		if (!receiver) {
 			client.emit('challenge_error', { message: 'User not found' });
 			return;
 		}
 
-		// Verify they are friends
 		const friendStatus = await this.friendsService.getRequestStatusByUsername(senderId, friendUsername);
 		if (friendStatus.status !== 'ACCEPTED') {
 			client.emit('challenge_error', { message: 'You can only challenge friends' });
 			return;
 		}
 
-		// Can't challenge yourself
 		if (senderId === receiver.id) {
 			client.emit('challenge_error', { message: 'Cannot challenge yourself' });
 			return;
 		}
 
 		// Check if receiver is connected to the challenge namespace
-		const receiverSocketId = this.connectedUsers.get(receiver.id);
-		if (!receiverSocketId) {
+		if (!this.presenceService.isUserOnline(receiver.id)) {
 			client.emit('challenge_error', { message: 'Friend is not online' });
 			return;
 		}
@@ -106,22 +119,8 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 		const timer = setTimeout(() => {
 			const challenge = this.gameService.removeChallenge(challengeId);
 			if (challenge) {
-				// Notify sender
-				const senderSockId = this.connectedUsers.get(challenge.senderId);
-				if (senderSockId) {
-					const senderSocket = this.server.sockets.get(senderSockId);
-					if (senderSocket) {
-						senderSocket.emit('challenge_expired', { challengeId });
-					}
-				}
-				// Notify receiver
-				const receiverSockId = this.connectedUsers.get(challenge.receiverId);
-				if (receiverSockId) {
-					const receiverSocket = this.server.sockets.get(receiverSockId);
-					if (receiverSocket) {
-						receiverSocket.emit('challenge_expired', { challengeId });
-					}
-				}
+				this.server.to(`user_${challenge.senderId}`).emit('challenge_expired', { challengeId });
+				this.server.to(`user_${challenge.receiverId}`).emit('challenge_expired', { challengeId });
 			}
 		}, 30000);
 
@@ -137,22 +136,17 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 
 		this.gameService.addChallenge(challenge);
 
-		// Notify the sender that challenge was sent
-		client.emit('challenge_sent', {
+		this.server.to(`user_${sender.id}`).emit('challenge_sent', {
 			challengeId,
 			friendUsername,
 			mode,
 		});
 
-		// Notify the receiver
-		const receiverSocket = this.server.sockets.get(receiverSocketId);
-		if (receiverSocket) {
-			receiverSocket.emit('challenge_received', {
-				challengeId,
-				from: sender.username,
-				mode,
-			});
-		}
+		this.server.to(`user_${receiver.id}`).emit('challenge_received', {
+			challengeId,
+			from: sender.username,
+			mode,
+		});
 	}
 
 	@SubscribeMessage('accept_challenge')
@@ -169,13 +163,11 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 			return;
 		}
 
-		// Remove the challenge (clears the timer)
 		this.gameService.removeChallenge(challengeId);
 
 		// If the accepting player is in an active game, resign it
 		this.gameService.resignActiveGame(userId);
 
-		// Randomize colors
 		const isP1White = Math.random() < 0.5;
 		const whiteId = isP1White ? challenge.senderId : challenge.receiverId;
 		const blackId = isP1White ? challenge.receiverId : challenge.senderId;
@@ -190,20 +182,14 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 			challenge.mode,
 		);
 
-		// Notify both players via the challenge namespace to navigate to the game
-		const senderSocketId = this.connectedUsers.get(challenge.senderId);
-		if (senderSocketId) {
-			const senderSocket = this.server.sockets.get(senderSocketId);
-			if (senderSocket) {
-				senderSocket.emit('challenge_accepted', {
-					challengeId,
-					gameId: newGame.gameId,
-					mode: challenge.mode,
-				});
-			}
-		}
+		
+		this.server.to(`user_${challenge.senderId}`).emit('challenge_accepted', {
+			challengeId,
+			gameId: newGame.gameId,
+			mode: challenge.mode,
+		});
 
-		client.emit('challenge_accepted', {
+		this.server.to(`user_${challenge.receiverId}`).emit('challenge_accepted', {
 			challengeId,
 			gameId: newGame.gameId,
 			mode: challenge.mode,
@@ -220,13 +206,6 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 		const challenge = this.gameService.removeChallenge(challengeId);
 		if (!challenge) return;
 
-		// Notify the sender
-		const senderSocketId = this.connectedUsers.get(challenge.senderId);
-		if (senderSocketId) {
-			const senderSocket = this.server.sockets.get(senderSocketId);
-			if (senderSocket) {
-				senderSocket.emit('challenge_declined', { challengeId });
-			}
-		}
+		this.server.to(`user_${challenge.senderId}`).emit('challenge_declined', { challengeId });
 	}
 }

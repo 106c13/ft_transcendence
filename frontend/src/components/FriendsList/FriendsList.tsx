@@ -52,15 +52,33 @@ export default function FriendsList({ friends, onOpenProfile }: Props) {
 							tabIndex={0}
 						>
 							<div className={styles.friendIdentity}>
-								<img
-									className={styles.friendAvatar}
-									src={
-										friend.avatar
-											? `/uploads/${friend.avatar}`
-											: `/assets/default.jpg`
-									}
-									alt={friend.username}
-								/>
+								<div className={styles.avatarWrapper}>
+									<img
+										className={styles.friendAvatar}
+										src={
+											friend.avatar
+												? `/uploads/${friend.avatar}`
+												: `/assets/default.jpg`
+										}
+										alt={friend.username}
+									/>
+									<span
+										className={`${styles.statusDot} ${
+											friend.status === 'ONLINE'
+												? styles.online
+												: friend.status === 'INGAME'
+												? styles.ingame
+												: styles.offline
+										}`}
+										title={
+											friend.status === 'ONLINE'
+												? t('online', 'Online')
+												: friend.status === 'INGAME'
+												? t('in_game', 'In Game')
+												: t('offline', 'Offline')
+										}
+									/>
+								</div>
 								<div className={styles.friendInfo}>
 									<span className={styles.friendName}>{friend.username}</span>
 									{friend.ratings?.blitz?.rating && (

@@ -48,6 +48,8 @@
 	"unknown": "неизвестно",
 	"friends_count": "Друзья",
 	"online": "В сети",
+	"offline": "Не в сети",
+	"in_game": "В игре",
 	"request_sent": "Запрос отправлен",
 	"login": "Вход",
 	"invalid_credentials": "Неверные учетные данные",

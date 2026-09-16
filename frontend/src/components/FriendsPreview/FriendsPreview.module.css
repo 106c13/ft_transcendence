@@ -103,6 +103,31 @@
 	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
 }
 
+.statusDot {
+	position: absolute;
+	bottom: -1px;
+	right: -1px;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	border: 1.5px solid #1E293B;
+	z-index: 2;
+}
+
+.statusDot.online {
+	background: #4ADE80;
+	box-shadow: 0 0 4px rgba(74, 222, 128, 0.6);
+}
+
+.statusDot.ingame {
+	background: #A855F7;
+	box-shadow: 0 0 4px rgba(168, 85, 247, 0.6);
+}
+
+.statusDot.offline {
+	background: #64748B;
+}
+
 .tooltip {
 	position: absolute;
 	bottom: -28px;

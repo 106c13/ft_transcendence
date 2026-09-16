@@ -5,6 +5,7 @@ import { FriendRequest, FriendRequestStatus } from './friend-request.entity'
 import { Friendship } from './friendship.entity'
 import { User } from '../users/user.entity'
 import { Notification } from '../notification/notification.entity'
+import { PresenceService } from '@/presence/presence.service'
 
 @Injectable()
 export class FriendsService {
@@ -20,6 +21,8 @@ export class FriendsService {
 
 		@InjectRepository(Notification)
 		private notificationRepo: Repository<Notification>,
+
+		private readonly presenceService: PresenceService,
 	) {}
 
 	async sendRequest(senderId: number, receiverUsername: string) {
@@ -295,8 +298,10 @@ export class FriendsService {
 					: friendship.user1
 
 			return {
+				id: friend.id,
 				username: friend.username,
 				avatar: friend.avatar,
+				status: this.presenceService.getUserStatus(friend.id),
 			}
 		})
 	}

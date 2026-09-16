@@ -102,6 +102,36 @@ export function useProfile(username?: string, defaultTab: TabType = 'overview') 
 		}
 	}, [user?.username])
 
+	useEffect(() => {
+		const handleStatusChange = (e: Event) => {
+			const customEvent = e as CustomEvent<{ userId: number; username: string; status: string }>
+			const data = customEvent.detail
+			if (!data) return
+
+			setUser(prev => {
+				if (!prev) return null
+				if (prev.id === data.userId || prev.username?.toLowerCase() === data.username?.toLowerCase()) {
+					return { ...prev, status: data.status }
+				}
+				return prev
+			})
+
+			setFriends(prev =>
+				prev.map(friend => {
+					if (friend.id === data.userId || friend.username?.toLowerCase() === data.username?.toLowerCase()) {
+						return { ...friend, status: data.status }
+					}
+					return friend
+				})
+			)
+		}
+
+		window.addEventListener('user_status_changed', handleStatusChange)
+		return () => {
+			window.removeEventListener('user_status_changed', handleStatusChange)
+		}
+	}, [])
+
 	const handleSelectTab = (tab: TabType) => {
 		setActiveTab(tab)
 		if (tab === 'friends') {
