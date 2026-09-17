@@ -26,19 +26,13 @@ function ChallengeSection({
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
-	// Reset search query and direction when dropdown closes or active toggles off
-	useEffect(() => {
-		if (!active || !isOpen) {
-			setSearchQuery('')
-			setOpenUpwards(false)
-		}
-	}, [active, isOpen])
-
 	// Close dropdown when clicking outside
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
 				setIsOpen(false)
+				setSearchQuery('')
+				setOpenUpwards(false)
 			}
 		}
 
@@ -51,16 +45,34 @@ function ChallengeSection({
 	}, [isOpen])
 
 	const handleToggleDropdown = () => {
-		if (!active) return;
+		if (!active) return
 
 		if (!isOpen && dropdownRef.current) {
-			const rect = dropdownRef.current.getBoundingClientRect();
-			const spaceBellow = window.innerHeight - rect.bottom;
-			const dropdownEstHeight = 290;
+			const rect = dropdownRef.current.getBoundingClientRect()
+			const spaceBellow = window.innerHeight - rect.bottom
+			const dropdownEstHeight = 290
 
-			setOpenUpwards(spaceBellow < dropdownEstHeight && rect.top > dropdownEstHeight);
+			setOpenUpwards(spaceBellow < dropdownEstHeight && rect.top > dropdownEstHeight)
+			setIsOpen(true)
+		} else {
+			setIsOpen(false)
+			setSearchQuery('')
+			setOpenUpwards(false)
 		}
-		setIsOpen(prev => !prev);
+	}
+
+	const handleToggle = () => {
+		setIsOpen(false)
+		setSearchQuery('')
+		setOpenUpwards(false)
+		onToggle()
+	}
+
+	const handleSelect = (username: string) => {
+		onSelectFriend(username)
+		setIsOpen(false)
+		setSearchQuery('')
+		setOpenUpwards(false)
 	}
 
 	const selectedFriendObj = friends.find(f => f.username === selectedFriend)
@@ -75,7 +87,7 @@ function ChallengeSection({
 				<button
 					type="button"
 					className={`${styles.challengeToggle} ${active ? styles.challengeToggleActive : ''}`}
-					onClick={onToggle}
+					onClick={handleToggle}
 				>
 					<span className={styles.challengeIcon}>⚔️</span>
 					{t('challenge_friend', 'Challenge a Friend')}
@@ -172,10 +184,7 @@ function ChallengeSection({
 							{selectedFriend && (
 								<div
 									className={styles.dropdownClearOption}
-									onClick={() => {
-										onSelectFriend('')
-										setIsOpen(false)
-									}}
+									onClick={() => handleSelect('')}
 								>
 									<span className={styles.clearIcon}>✕</span>
 									<span>{t('deselect_friend', '— Deselect friend —')}</span>
@@ -198,10 +207,7 @@ function ChallengeSection({
 											<div
 												key={friend.username}
 												className={`${styles.dropdownOption} ${isSelected ? styles.optionSelected : ''}`}
-												onClick={() => {
-													onSelectFriend(friend.username)
-													setIsOpen(false)
-												}}
+												onClick={() => handleSelect(friend.username)}
 											>
 												<img
 													src={friend.avatar ? `/uploads/${friend.avatar}` : '/assets/default.jpg'}

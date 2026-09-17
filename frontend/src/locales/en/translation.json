@@ -70,7 +70,6 @@
 	"existing_chat": "Chatting",
 	"back_to_chats": "Back to chats",
 	"view_profile": "View Profile",
-	"online_friends": "Online Friends",
 	"password_update_failed": "Password update failed",
 	"password_updated": "Password updated ✓",
 	"image_too_big": "Image is too big",
@@ -180,7 +179,6 @@
     "next": "Next",
     "showing_games": "Showing {{from}}–{{to}} of {{total}} games",
     "no_games_matching_filter": "No games match the selected filters",
-    "back_to_profile": "Back to Profile",
     "search_friends": "Search friends...",
     "view_full_chart": "View full chart",
     "friends_title": "Friends",
@@ -211,7 +209,18 @@
     "bio_too_long": "Bio should be less than 100 characters",
     "challenge_sent": "Challenge sent! Waiting for response...",
     "challenge_accepted": "Challenge accepted! Starting game...",
-    "select_friend_error": "Please select a friend first before choosing a game mode."
+    "select_friend_error": "Please select a friend first before choosing a game mode.",
+    "play_online": "Play Online",
+    "stats_and_more": "Stats & More",
+    "review_past_game": "Review Past Game",
+    "review_game_btn": "Review Game",
+    "no_games_to_review": "Review Past Games",
+    "play_to_unlock_review": "Play a game to see your moves and analyze key moments here.",
+    "ratings_title": "Ratings",
+    "view_profile_stats": "Profile",
+    "play_a_game_hint": "Play online above to start building your match history.",
+    "suggested_review_btn": "Suggested Review",
+    "review_against_opponent": "Review against {{opponent}}"
 }
 
 

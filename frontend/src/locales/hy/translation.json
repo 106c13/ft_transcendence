@@ -70,7 +70,6 @@
 	"existing_chat": "Զրույց",
 	"back_to_chats": "Վերադառնալ զրույցներին",
 	"view_profile": "Դիտել պրոֆիլը",
-	"online_friends": "Առցանց ընկերներ",
 	"password_update_failed": "Գաղտնաբառի թարմացումը ձախողվեց",
 	"password_updated": "Գաղտնաբառը թարմացվել է ✓",
 	"image_too_big": "Նկարը չափազանց մեծ է",
@@ -180,7 +179,6 @@
     "next": "Հաջորդ",
     "showing_games": "Ցուցադրված է {{from}}–{{to}}՝ {{total}} խաղերից",
     "no_games_matching_filter": "Ընտրված զտիչներին համապատասխանող խաղեր չկան",
-    "back_to_profile": "Վերադառնալ պրոֆիլ",
     "search_friends": "Փնտրել ընկերներին...",
     "view_full_chart": "Դիտել գրաֆիկը",
     "friends_title": "Ընկերներ",
@@ -211,7 +209,18 @@
     "bio_too_long": "Կենսագրությունը պետք է պարունակի 100 նիշից պակաս",
     "challenge_sent": "Մարտահրավերն ուղարկված է: Սպասում ենք պատասխանի...",
     "challenge_accepted": "Մարտահրավերն ընդունվեց: Խաղը սկսվում է...",
-    "select_friend_error": "Խնդրում ենք նախ ընտրել ընկերոջը նախքան խաղի ռեժիմ ընտրելը:"
+    "select_friend_error": "Խնդրում ենք նախ ընտրել ընկերոջը նախքան խաղի ռեժիմ ընտրելը:",
+    "play_online": "Խաղալ առցանց",
+    "stats_and_more": "Վիճակագրություն և ավելին",
+    "review_past_game": "Դիտել խաղը",
+    "review_game_btn": "Վերլուծել խաղը",
+    "no_games_to_review": "Խաղերի դիտում",
+    "play_to_unlock_review": "Խաղացեք խաղ՝ ձեր քայլերը և կարևոր պահերը այստեղ վերլուծելու համար:",
+    "ratings_title": "Վարկանիշներ",
+    "view_profile_stats": "Պրոֆիլ",
+    "play_a_game_hint": "Խաղացեք վերևում առցանց՝ ձեր խաղերի պատմությունը ստեղծելու համար:",
+    "suggested_review_btn": "Առաջարկվող վերլուծություն",
+    "review_against_opponent": "Վերլուծել ընդդեմ {{opponent}}"
 }
 
 

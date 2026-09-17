@@ -70,7 +70,6 @@
 	"existing_chat": "Диалог",
 	"back_to_chats": "Назад к чатам",
 	"view_profile": "Профиль",
-	"online_friends": "Друзья онлайн",
 	"password_update_failed": "Ошибка обновления пароля",
 	"password_updated": "Пароль обновлен ✓",
 	"image_too_big": "Изображение слишком большое",
@@ -180,7 +179,6 @@
     "next": "Вперед",
     "showing_games": "Показано {{from}}–{{to}} из {{total}} партий",
     "no_games_matching_filter": "Нет партий, соответствующих выбранным фильтрам",
-    "back_to_profile": "Назад в профиль",
     "search_friends": "Поиск друзей...",
     "view_full_chart": "Открыть график",
     "friends_title": "Друзья",
@@ -211,7 +209,18 @@
     "bio_too_long": "Биография должна содержать менее 100 символов",
     "challenge_sent": "Вызов отправлен! Ожидание ответа...",
     "challenge_accepted": "Вызов принят! Начало игры...",
-    "select_friend_error": "Пожалуйста, выберите друга перед выбором режима игры."
+    "select_friend_error": "Пожалуйста, выберите друга перед выбором режима игры.",
+    "play_online": "Играть онлайн",
+    "stats_and_more": "Статистика и другое",
+    "review_past_game": "Обзор партии",
+    "review_game_btn": "Анализ партии",
+    "no_games_to_review": "Обзор партий",
+    "play_to_unlock_review": "Сыграйте партию, чтобы анализировать ходы и ключевые моменты здесь.",
+    "ratings_title": "Рейтинги",
+    "view_profile_stats": "Профиль",
+    "play_a_game_hint": "Сыграйте онлайн выше, чтобы начать формировать историю матчей.",
+    "suggested_review_btn": "Рекомендуемый обзор",
+    "review_against_opponent": "Анализ против {{opponent}}"
 }
 
 

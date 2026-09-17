@@ -1,0 +1,210 @@
+.reviewContainer {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+/* ── Board Card: Perfect Square ── */
+.boardCard {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.14);
+	border-radius: 12px;
+	overflow: hidden;
+	box-sizing: border-box;
+	cursor: pointer;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+	transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.boardCard:hover {
+	border-color: rgba(96, 165, 250, 0.4);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.board {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	grid-template-columns: repeat(8, 1fr);
+	grid-template-rows: repeat(8, 1fr);
+	width: 100%;
+	height: 100%;
+	user-select: none;
+}
+
+.square {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+}
+
+.square.light {
+	background-color: #E2E8F0;
+}
+
+.square.dark {
+	background-color: #64748B;
+}
+
+.square.lastMoveSrc,
+.square.lastMoveDst {
+	background-color: rgba(139, 92, 246, 0.55) !important;
+}
+
+.coord {
+	position: absolute;
+	font-size: 8px;
+	font-weight: 700;
+	line-height: 1;
+	pointer-events: none;
+	user-select: none;
+	z-index: 2;
+}
+
+.coordRank {
+	top: 2px;
+	left: 2px;
+}
+
+.coordFile {
+	bottom: 2px;
+	right: 2px;
+}
+
+.coordLight {
+	color: #64748B;
+}
+
+.coordDark {
+	color: #E2E8F0;
+}
+
+.pieceImg {
+	width: 82%;
+	height: 82%;
+	object-fit: contain;
+	pointer-events: none;
+	user-select: none;
+	z-index: 1;
+	filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.arrowOverlay {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	z-index: 3;
+}
+
+/* ── Review Button Under the Board ── */
+.reviewBtn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	height: 48px;
+	min-height: 48px;
+	padding: 0 16px;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+	color: #FFFFFF;
+	font-size: 14px;
+	font-weight: 700;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	cursor: pointer;
+	box-sizing: border-box;
+	box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
+	transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reviewBtn:hover {
+	background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+	box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+	transform: translateY(-1px);
+}
+
+.reviewBtn:active {
+	transform: translateY(0);
+}
+
+.reviewBtnIcon {
+	font-size: 15px;
+	flex-shrink: 0;
+}
+
+.reviewBtnText {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* ── Empty & Loading States ── */
+.emptyCard,
+.loadingCard {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.14);
+	border-radius: 12px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	padding: 24px 16px;
+	box-sizing: border-box;
+	color: #94A3B8;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.emptyIcon {
+	font-size: 32px;
+	margin-bottom: 8px;
+	opacity: 0.7;
+}
+
+.emptyTitle {
+	font-size: 14px;
+	font-weight: 700;
+	color: #E2E8F0;
+	margin: 0 0 6px 0;
+}
+
+.emptySubtitle {
+	font-size: 12px;
+	color: #64748B;
+	margin: 0;
+	line-height: 1.45;
+	max-width: 240px;
+}
+
+.spinnerIcon {
+	font-size: 26px;
+	animation: spin 1.8s infinite linear;
+	margin-bottom: 8px;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 960px) {
+	.reviewContainer {
+		max-width: 380px;
+		margin: 0 auto;
+	}
+}

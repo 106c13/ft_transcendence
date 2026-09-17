@@ -1,35 +1,27 @@
-import type { GameModeType, ModeItem } from '../../constants/gameModeConstats';
-import type { RatingInfo } from '../../constants/profileConstants';
+import type { GameModeType, ModeItem } from '../../constants/gameModeConstats'
 import styles from './GameModesGrid.module.css'
-import GameMode from '../GameMode/GameMode';
+import GameMode from '../GameMode/GameMode'
 
 type Props = {
 	modes: ModeItem[]
-	ratings?: Record<string, RatingInfo | null> | null
 	onSelectMode: (mode: GameModeType) => void
 }
 
-function GameModesGrid({ modes, ratings, onSelectMode }: Props) {
+function GameModesGrid({ modes, onSelectMode }: Props) {
 	return (
 		<div className={styles.homeModesGrid}>
-			{modes.map((mode) => {
-				const baseCategory = mode.id.replace('+2', '')
-				const ratingInfo = ratings ? ratings[baseCategory] : null
-
-				return (
-					<GameMode
-						key={mode.id}
-						id={mode.id}
-						emoji={mode.emoji}
-						label={mode.label}
-						time={mode.time}
-						desc={mode.desc}
-						increment={mode.increment}
-						ratingInfo={ratingInfo}
-						onSelect={onSelectMode}
-					/>
-				)
-			})}
+			{modes.map((mode) => (
+				<GameMode
+					key={mode.id}
+					id={mode.id}
+					emoji={mode.emoji}
+					label={mode.label}
+					time={mode.time}
+					desc={mode.desc}
+					increment={mode.increment}
+					onSelect={onSelectMode}
+				/>
+			))}
 		</div>
 	)
 }
