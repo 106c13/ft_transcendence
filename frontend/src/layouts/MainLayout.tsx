@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar/Navbar'
 import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification'
 import { useChallengeSocket } from '../hooks/useChallengeSocket'
-import type { ChallengeStatus, ChallengeReceived } from '../hooks/useChallengeSocket'
+import type { ChallengeStatus, ChallengeReceived, ChallengeSent } from '../hooks/useChallengeSocket'
 import { useToast } from '../context/ToastContext'
 
 import type { User } from '../constants/profileConstants'
@@ -16,7 +16,10 @@ export type LayoutContextType = {
     challengeStatus: ChallengeStatus
     challengeError: string
     incomingChallenge: ChallengeReceived | null
+    outgoingChallenge: ChallengeSent | null
     challengeCountdown: number
+    incomingCountdown: number
+    outgoingCountdown: number
     sendChallenge: (friendUsername: string, mode: string) => void
     acceptChallenge: (challengeId: string) => void
     declineChallenge: (challengeId: string) => void
@@ -50,31 +53,30 @@ export default function MainLayout() {
   }, [navigate, token])
 
   const challengeSocket = useChallengeSocket(currentUser?.id)
+  const { incomingChallenge, acceptChallenge, declineChallenge } = challengeSocket
   const { setTopSlot } = useToast()
 
   useEffect(() => {
-    if (challengeSocket.incomingChallenge) {
+    if (incomingChallenge) {
       setTopSlot(
         <ChallengeNotification
-          challenge={challengeSocket.incomingChallenge}
-          countdown={challengeSocket.challengeCountdown}
-          onAccept={challengeSocket.acceptChallenge}
-          onDecline={challengeSocket.declineChallenge}
+          key={incomingChallenge.challengeId}
+          challenge={incomingChallenge}
+          onAccept={acceptChallenge}
+          onDecline={declineChallenge}
         />
       )
     } else {
       setTopSlot(null)
     }
+  }, [incomingChallenge, acceptChallenge, declineChallenge, setTopSlot])
+
+  // Clear topSlot on unmount of MainLayout
+  useEffect(() => {
     return () => {
       setTopSlot(null)
     }
-  }, [
-    challengeSocket.incomingChallenge,
-    challengeSocket.challengeCountdown,
-    challengeSocket.acceptChallenge,
-    challengeSocket.declineChallenge,
-    setTopSlot,
-  ])
+  }, [setTopSlot])
 
   if (!currentUser) {
     return <div className="layout-loading">Loading...</div>

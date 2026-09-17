@@ -160,6 +160,7 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 		const challenge = this.gameService.getChallenge(challengeId);
 		if (!challenge || challenge.receiverId !== userId) {
 			client.emit('error', { message: 'Challenge not found or expired' });
+			client.emit('challenge_error', { message: 'Challenge not found or expired' });
 			return;
 		}
 
@@ -182,18 +183,15 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 			challenge.mode,
 		);
 
-		
-		this.server.to(`user_${challenge.senderId}`).emit('challenge_accepted', {
+		const acceptPayload = {
 			challengeId,
 			gameId: newGame.gameId,
 			mode: challenge.mode,
-		});
+		};
 
-		this.server.to(`user_${challenge.receiverId}`).emit('challenge_accepted', {
-			challengeId,
-			gameId: newGame.gameId,
-			mode: challenge.mode,
-		});
+		this.server.to(`user_${challenge.senderId}`).emit('challenge_accepted', acceptPayload);
+		this.server.to(`user_${challenge.receiverId}`).emit('challenge_accepted', acceptPayload);
+		client.emit('challenge_accepted', acceptPayload);
 	}
 
 	@SubscribeMessage('decline_challenge')

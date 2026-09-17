@@ -55,37 +55,31 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     }
   }, [showToast])
 
-  const toast = {
-    success: useCallback(
-      (msg: string, opt?: ToastOptions) => showToast('success', msg, opt),
-      [showToast]
-    ),
-    error: useCallback(
-      (msg: string, opt?: ToastOptions) => showToast('error', msg, opt),
-      [showToast]
-    ),
-    warning: useCallback(
-      (msg: string, opt?: ToastOptions) => showToast('warning', msg, opt),
-      [showToast]
-    ),
-    info: useCallback(
-      (msg: string, opt?: ToastOptions) => showToast('info', msg, opt),
-      [showToast]
-    ),
-    dismiss: removeToast,
-  }
+  const toast = React.useMemo(
+    () => ({
+      success: (msg: string, opt?: ToastOptions) => showToast('success', msg, opt),
+      error: (msg: string, opt?: ToastOptions) => showToast('error', msg, opt),
+      warning: (msg: string, opt?: ToastOptions) => showToast('warning', msg, opt),
+      info: (msg: string, opt?: ToastOptions) => showToast('info', msg, opt),
+      dismiss: removeToast,
+    }),
+    [showToast, removeToast]
+  )
+
+  const value = React.useMemo(
+    () => ({
+      toasts,
+      showToast,
+      removeToast,
+      topSlot,
+      setTopSlot,
+      toast,
+    }),
+    [toasts, showToast, removeToast, topSlot, setTopSlot, toast]
+  )
 
   return (
-    <ToastContext.Provider
-      value={{
-        toasts,
-        showToast,
-        removeToast,
-        topSlot,
-        setTopSlot,
-        toast,
-      }}
-    >
+    <ToastContext.Provider value={value}>
       {children}
     </ToastContext.Provider>
   )

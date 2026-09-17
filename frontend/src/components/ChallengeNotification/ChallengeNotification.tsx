@@ -1,16 +1,20 @@
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ChallengeReceived } from '../../hooks/useChallengeSocket'
 import styles from './ChallengeNotification.module.css'
 
 type Props = {
 	challenge: ChallengeReceived
-	countdown: number
+	countdown?: number
 	onAccept: (challengeId: string) => void
 	onDecline: (challengeId: string) => void
 }
 
-function ChallengeNotification({ challenge, countdown, onAccept, onDecline }: Props) {
+function ChallengeNotification({ challenge, countdown = 30, onAccept, onDecline }: Props) {
 	const { t } = useTranslation()
+	const totalMs = (countdown || 30) * 1000
+	const [remainingMs, setRemainingMs] = useState(totalMs)
+	const lastTickRef = useRef<number | null>(null)
 
 	const modeLabels: Record<string, string> = {
 		'bullet': 'Bullet (1 min)',
@@ -21,7 +25,30 @@ function ChallengeNotification({ challenge, countdown, onAccept, onDecline }: Pr
 		'rapid+2': 'Rapid (10|+2s)',
 	}
 
-	const progressPercent = (countdown / 30) * 100
+	useEffect(() => {
+		lastTickRef.current = Date.now()
+
+		const interval = setInterval(() => {
+			const now = Date.now()
+			const lastTick = lastTickRef.current ?? now
+			const elapsed = now - lastTick
+
+			setRemainingMs((prev) => {
+				const next = prev - elapsed
+				if (next <= 0) {
+					clearInterval(interval)
+					return 0
+				}
+				return next
+			})
+			lastTickRef.current = now
+		}, 50)
+
+		return () => clearInterval(interval)
+	}, [])
+
+	const displaySeconds = Math.max(0, Math.ceil(remainingMs / 1000))
+	const progressPercent = Math.max(0, Math.min(100, (remainingMs / totalMs) * 100))
 
 	return (
 		<div className={styles.challengeOverlay}>
@@ -31,7 +58,7 @@ function ChallengeNotification({ challenge, countdown, onAccept, onDecline }: Pr
 						<span className={styles.swordIcon}>⚔️</span>
 						<span className={styles.headerText}>{t('challenge_incoming', 'Challenge!')}</span>
 					</div>
-					<span className={styles.countdownBadge}>{countdown}s</span>
+					<span className={styles.countdownBadge}>{displaySeconds}s</span>
 				</div>
 
 				<div className={styles.challengeBody}>
