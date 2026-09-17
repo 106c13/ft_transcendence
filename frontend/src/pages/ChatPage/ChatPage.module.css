@@ -2,15 +2,50 @@
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
+	width: 100%;
 	background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
 	padding-top: 64px;
+	box-sizing: border-box;
+	overflow: hidden;
+	color: #E2E8F0;
 }
 
 .chatContent {
 	display: flex;
 	flex: 1;
 	width: 100%;
+	height: calc(100vh - 64px);
 	overflow: hidden;
-	color: #E2E8F0;
 	background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+	position: relative;
+}
+
+/* Loading state */
+.loadingContainer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+	padding-top: 64px;
+	box-sizing: border-box;
+	gap: 16px;
+	color: #94A3B8;
+	font-size: 15px;
+}
+
+.loadingSpinner {
+	width: 44px;
+	height: 44px;
+	border: 3px solid rgba(59, 130, 246, 0.2);
+	border-top-color: #3B82F6;
+	border-radius: 50%;
+	animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
 }
