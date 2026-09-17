@@ -1,13 +1,19 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import PasswordInput from '../PasswordInput/PasswordInput'
-import styles from '../../pages/Common.module.css'
+import styles from './ChangePasswordForm.module.css'
 
 function ChangePasswordForm() {
 	const { t } = useTranslation()
+
 	const [oldPassword, setOldPassword] = useState('')
 	const [newPassword, setNewPassword] = useState('')
 	const [confirmPassword, setConfirmPassword] = useState('')
+
+	const [showOld, setShowOld] = useState(false)
+	const [showNew, setShowNew] = useState(false)
+	const [showConfirm, setShowConfirm] = useState(false)
+
+	const [loading, setLoading] = useState(false)
 	const [msg, setMsg] = useState('')
 	const [error, setError] = useState(false)
 
@@ -22,6 +28,23 @@ function ChangePasswordForm() {
 			return
 		}
 
+		if (newPassword.length < 8) {
+			setMsg('password_too_short')
+			setError(true)
+			return
+		}
+
+		const hasLetter = /[a-zA-Z]/.test(newPassword)
+		const hasNumber = /[0-9]/.test(newPassword)
+		const hasSpecial = /[^a-zA-Z0-9]/.test(newPassword)
+
+		if (!hasLetter || !hasNumber || !hasSpecial) {
+			setMsg('password_complexity_error')
+			setError(true)
+			return
+		}
+
+		setLoading(true)
 		const token = localStorage.getItem('token')
 
 		try {
@@ -50,40 +73,139 @@ function ChangePasswordForm() {
 		} catch {
 			setMsg('network_error')
 			setError(true)
+		} finally {
+			setLoading(false)
 		}
 	}
 
 	return (
-		<>
-			<h1 style={{ marginTop: '30px' }}>{t('change_password')}</h1>
-			<form onSubmit={handlePasswordChange}>
-				<PasswordInput
-					placeholder={t('old_password')}
-					value={oldPassword}
-					onChange={e => setOldPassword(e.target.value)}
-				/>
-				<PasswordInput
-					placeholder={t('new_password')}
-					value={newPassword}
-					onChange={e => setNewPassword(e.target.value)}
-				/>
-				<PasswordInput
-					placeholder={t('confirm_password')}
-					value={confirmPassword}
-					onChange={e => setConfirmPassword(e.target.value)}
-				/>
+		<div className={styles.card}>
+			<div className={styles.cardHeader}>
+				<h2 className={styles.cardTitle}>
+					<span>🔒</span>
+					{t('security_title', 'Password & Security')}
+				</h2>
+				<p className={styles.cardDesc}>
+					{t('security_desc', 'Ensure your account is protected with a strong password')}
+				</p>
+			</div>
 
-				<button className={styles.button} type="submit">
-					{t('update_password')}
-				</button>
-			</form>
-
-			{msg && (
-				<div className={`${styles.msg} ${error ? styles.error : styles.success}`}>
-					{t(msg)}
+			<form className={styles.form} onSubmit={handlePasswordChange}>
+				<div className={styles.formGroup}>
+					<label className={styles.label} htmlFor="old-password">
+						{t('old_password', 'Current Password')}
+					</label>
+					<div className={styles.passwordWrapper}>
+						<input
+							id="old-password"
+							className={styles.input}
+							type={showOld ? 'text' : 'password'}
+							placeholder={t('old_password', 'Current Password')}
+							value={oldPassword}
+							onChange={e => setOldPassword(e.target.value)}
+							required
+						/>
+						<button
+							type="button"
+							className={styles.eyeBtn}
+							onClick={() => setShowOld(!showOld)}
+							aria-label={showOld ? 'Hide password' : 'Show password'}
+						>
+							<img
+								src={showOld ? '/assets/eye-off.svg' : '/assets/eye.svg'}
+								alt=""
+								width={18}
+								height={18}
+							/>
+						</button>
+					</div>
 				</div>
-			)}
-		</>
+
+				<div className={styles.formGroup}>
+					<label className={styles.label} htmlFor="new-password">
+						{t('new_password', 'New Password')}
+					</label>
+					<div className={styles.passwordWrapper}>
+						<input
+							id="new-password"
+							className={styles.input}
+							type={showNew ? 'text' : 'password'}
+							placeholder={t('new_password', 'New Password')}
+							value={newPassword}
+							onChange={e => setNewPassword(e.target.value)}
+							required
+						/>
+						<button
+							type="button"
+							className={styles.eyeBtn}
+							onClick={() => setShowNew(!showNew)}
+							aria-label={showNew ? 'Hide password' : 'Show password'}
+						>
+							<img
+								src={showNew ? '/assets/eye-off.svg' : '/assets/eye.svg'}
+								alt=""
+								width={18}
+								height={18}
+							/>
+						</button>
+					</div>
+					<p className={styles.fieldHint}>
+						{t('password_req_hint', 'Must be at least 8 characters with letters, numbers, and special symbols')}
+					</p>
+				</div>
+
+				<div className={styles.formGroup}>
+					<label className={styles.label} htmlFor="confirm-password">
+						{t('confirm_password', 'Confirm Password')}
+					</label>
+					<div className={styles.passwordWrapper}>
+						<input
+							id="confirm-password"
+							className={styles.input}
+							type={showConfirm ? 'text' : 'password'}
+							placeholder={t('confirm_password', 'Confirm Password')}
+							value={confirmPassword}
+							onChange={e => setConfirmPassword(e.target.value)}
+							required
+						/>
+						<button
+							type="button"
+							className={styles.eyeBtn}
+							onClick={() => setShowConfirm(!showConfirm)}
+							aria-label={showConfirm ? 'Hide password' : 'Show password'}
+						>
+							<img
+								src={showConfirm ? '/assets/eye-off.svg' : '/assets/eye.svg'}
+								alt=""
+								width={18}
+								height={18}
+							/>
+						</button>
+					</div>
+				</div>
+
+				{msg && (
+					<div
+						className={`${styles.alert} ${
+							error ? styles.errorAlert : styles.successAlert
+						}`}
+					>
+						<span>{error ? '⚠️' : '✓'}</span>
+						<span>{t(msg, msg)}</span>
+					</div>
+				)}
+
+				<div className={styles.actionRow}>
+					<button
+						className={styles.submitBtn}
+						type="submit"
+						disabled={loading}
+					>
+						{loading ? t('updating', 'Updating...') : t('update_password', 'Update password')}
+					</button>
+				</div>
+			</form>
+		</div>
 	)
 }
 

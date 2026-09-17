@@ -174,7 +174,21 @@
     "friends_title": "Friends",
     "no_rating_history": "No rating history recorded yet for this mode",
     "current_rating": "Current Rating",
-    "total_games": "Total Games"
+    "total_games": "Total Games",
+    "settings_subtitle": "Manage your profile details and account security",
+    "profile_tab": "Profile",
+    "security_tab": "Security",
+    "profile_info_title": "Profile Information",
+    "profile_info_desc": "Update your avatar, username, and bio details",
+    "security_title": "Password & Security",
+    "security_desc": "Ensure your account is protected with a strong password",
+    "change_avatar": "Change Avatar",
+    "avatar_hint": "Supports JPG, PNG or WebP. Max 5MB.",
+    "cancel_photo": "Cancel",
+    "username_hint": "Letters and numbers only, max 15 characters",
+    "password_req_hint": "Must be at least 8 characters with letters, numbers, and special symbols",
+    "saving": "Saving...",
+    "updating": "Updating..."
 }
 
 
