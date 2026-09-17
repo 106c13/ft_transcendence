@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import MessagesIcon from '../MessagesIcon/MessagesIcon'
@@ -15,6 +15,23 @@ function Navbar({ currentUser }: Props) {
 	const navigate = useNavigate()
 	const [showProfileMenu, setShowProfileMenu] = useState(false)
 	const [showLanguageMenu, setShowLanguageMenu] = useState(false)
+	const languageMenuRef = useRef<HTMLDivElement>(null)
+	const profileMenuRef = useRef<HTMLDivElement>(null)
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as Node
+			if (languageMenuRef.current && !languageMenuRef.current.contains(target)) {
+				setShowLanguageMenu(false)
+			}
+			if (profileMenuRef.current && !profileMenuRef.current.contains(target)) {
+				setShowProfileMenu(false)
+			}
+		}
+
+		document.addEventListener('mousedown', handleClickOutside)
+		return () => document.removeEventListener('mousedown', handleClickOutside)
+	}, [])
 
 	const changeLanguage = (lng: string) => {
 		i18n.changeLanguage(lng)
@@ -23,13 +40,13 @@ function Navbar({ currentUser }: Props) {
 
 	return (
 		<header className={styles.navbar}>
-			<div className={styles.navbarBrand} onClick={() => navigate('/home')}>
+			<div className={styles.navbarBrand} onClick={() => navigate(currentUser ? '/home' : '/login')}>
 				<h2>ft_transcendence</h2>
 			</div>
 
 			<div className={styles.navbarActions}>
 				{/* Player Search */}
-				<PlayerSearch />
+				{currentUser && <PlayerSearch />}
 
 				{/* Messages */}
 				{currentUser && <MessagesIcon userId={currentUser.id} />}
@@ -39,6 +56,7 @@ function Navbar({ currentUser }: Props) {
 
 				{/* Language Switcher */}
 				<div
+					ref={languageMenuRef}
 					className={styles.navActionItem}
 					onClick={() => {
 						setShowLanguageMenu(!showLanguageMenu)
@@ -58,39 +76,42 @@ function Navbar({ currentUser }: Props) {
 				</div>
 
 				{/* Profile Dropdown */}
-				<div
-					className={`${styles.navActionItem} ${styles.profileMenu}`}
-					onClick={() => {
-						setShowProfileMenu(!showProfileMenu)
-						setShowLanguageMenu(false)
-					}}
-				>
-					<img
-						src={currentUser?.avatar ? `/uploads/${currentUser.avatar}` : '/assets/default.jpg'}
-						alt="profile"
-						className={styles.navProfileAvatar}
-					/>
+				{currentUser && (
+					<div
+						ref={profileMenuRef}
+						className={`${styles.navActionItem} ${styles.profileMenu}`}
+						onClick={() => {
+							setShowProfileMenu(!showProfileMenu)
+							setShowLanguageMenu(false)
+						}}
+					>
+						<img
+							src={currentUser?.avatar ? `/uploads/${currentUser.avatar}` : '/assets/default.jpg'}
+							alt="profile"
+							className={styles.navProfileAvatar}
+						/>
 
-					{showProfileMenu && (
-						<div className={styles.profileDropdown}>
-							<div onClick={() => navigate(`/profile/${currentUser?.username || ''}`)}>
-								👤 {t('my_profile', 'My Profile')}
+						{showProfileMenu && (
+							<div className={styles.profileDropdown}>
+								<div onClick={() => navigate(`/profile/${currentUser?.username || ''}`)}>
+									👤 {t('my_profile', 'My Profile')}
+								</div>
+								<div onClick={() => navigate('/profile/settings')}>
+									⚙️ {t('settings', 'Settings')}
+								</div>
+								<div
+									className={styles.danger}
+									onClick={() => {
+										localStorage.removeItem('token')
+										navigate('/login')
+									}}
+								>
+									🚪 {t('logout', 'Logout')}
+								</div>
 							</div>
-							<div onClick={() => navigate('/profile/settings')}>
-								⚙️ {t('settings', 'Settings')}
-							</div>
-							<div
-								className={styles.danger}
-								onClick={() => {
-									localStorage.removeItem('token')
-									navigate('/login')
-								}}
-							>
-								🚪 {t('logout', 'Logout')}
-							</div>
-						</div>
-					)}
-				</div>
+						)}
+					</div>
+				)}
 			</div>
 		</header>
 	)

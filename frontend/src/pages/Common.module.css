@@ -8,10 +8,11 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	height: 100vh;
+	min-height: 100vh;
+	padding-top: 64px;
+	box-sizing: border-box;
 	background: radial-gradient(circle at top, #0F172A, #101A30);
 	color: #E2E8F0;
-	--notification-top: 24px;
 }
 
 .profilePage {
