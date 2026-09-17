@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import io, { Socket } from 'socket.io-client'
+import { useToast } from '../context/ToastContext'
 
 export interface ChallengeReceived {
     challengeId: string
@@ -12,6 +13,7 @@ export type ChallengeStatus = 'idle' | 'sending' | 'sent' | 'accepted' | 'declin
 
 export function useChallengeSocket(userId: number | undefined) {
     const navigate = useNavigate()
+    const { toast } = useToast()
     const socketRef = useRef<Socket | null>(null)
 
     const [challengeStatus, setChallengeStatus] = useState<ChallengeStatus>('idle')
@@ -38,6 +40,7 @@ export function useChallengeSocket(userId: number | undefined) {
             setChallengeStatus('sent')
             setChallengeError('')
             startCountdown()
+            toast.info('challenge_sent')
         })
 
         socket.on('challenge_received', (data: ChallengeReceived) => {
@@ -49,23 +52,26 @@ export function useChallengeSocket(userId: number | undefined) {
             setChallengeStatus('accepted')
             setIncomingChallenge(null)
             clearCountdown()
+            toast.success('challenge_accepted')
             // Auto-reset status after 5 seconds so it doesn't linger
             setTimeout(() => setChallengeStatus('idle'), 5000)
             // Navigate to the game page with the challenge gameId
             navigate(`/game?mode=${encodeURIComponent(data.mode)}&challenge=${data.gameId}`)
         })
 
-        socket.on('challenge_declined', (_data: { challengeId: string }) => {
+        socket.on('challenge_declined', () => {
             setChallengeStatus('declined')
             clearCountdown()
+            toast.warning('challenge_declined')
             // Auto-reset after 3 seconds
             setTimeout(() => setChallengeStatus('idle'), 3000)
         })
 
-        socket.on('challenge_expired', (_data: { challengeId: string }) => {
+        socket.on('challenge_expired', () => {
             setChallengeStatus('expired')
             setIncomingChallenge(null)
             clearCountdown()
+            toast.info('challenge_expired')
             // Auto-reset after 3 seconds
             setTimeout(() => setChallengeStatus('idle'), 3000)
         })
@@ -73,6 +79,7 @@ export function useChallengeSocket(userId: number | undefined) {
         socket.on('challenge_error', (data: { message: string }) => {
             setChallengeStatus('error')
             setChallengeError(data.message)
+            toast.error(data.message || 'challenge_error')
             // Auto-reset after 3 seconds
             setTimeout(() => {
                 setChallengeStatus('idle')

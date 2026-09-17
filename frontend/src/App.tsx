@@ -11,11 +11,15 @@ import ChatPage from './pages/ChatPage/ChatPage'
 import GamePage from './pages/GamePage/GamePage'
 import GameAnalysisPage from './pages/GameAnalysisPage/GameAnalysisPage'
 import RatingHistoryPage from './pages/RatingHistoryPage/RatingHistoryPage'
+import { ToastProvider } from './context/ToastProvider'
+import ToastContainer from './components/Toast/ToastContainer'
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
+      <ToastProvider>
+        <ToastContainer />
+        <Routes>
         <Route path="/" element={<Navigate to="/home" replace />} />
 
         {/* Guest Auth Layout */}
@@ -43,6 +47,7 @@ export default function App() {
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      </ToastProvider>
     </BrowserRouter>
   )
 }

@@ -377,34 +377,6 @@
 	animation: fadeIn 0.3s ease;
 }
 
-.statusMessage {
-	margin-top: 12px;
-	padding: 12px 16px;
-	border-radius: 10px;
-	font-size: 14px;
-	font-weight: 500;
-	text-align: center;
-	animation: slideUp 0.3s ease;
-}
-
-.statusPending {
-	background: rgba(245, 158, 11, 0.1);
-	border: 1px solid rgba(245, 158, 11, 0.3);
-	color: #F59E0B;
-}
-
-.statusSuccess {
-	background: rgba(34, 197, 94, 0.1);
-	border: 1px solid rgba(34, 197, 94, 0.3);
-	color: #22C55E;
-}
-
-.statusError {
-	background: rgba(239, 68, 68, 0.1);
-	border: 1px solid rgba(239, 68, 68, 0.3);
-	color: #EF4444;
-}
-
 @keyframes fadeIn {
 	from { opacity: 0; }
 	to { opacity: 1; }

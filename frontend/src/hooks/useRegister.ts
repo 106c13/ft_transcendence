@@ -1,25 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../context/ToastContext";
 
 export function useRegister() {
 	const [email, setEmail] = useState('')
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [repassword, setRepassword] = useState('')
-	const [msgKey, setMsgKey] = useState('')
-	const [error, setError] = useState(false)
 
 	const navigate = useNavigate()
+	const { toast } = useToast()
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 
-		setMsgKey('')
-		setError(false)
-
 		if (password !== repassword) {
-			setMsgKey('passwords_do_not_match')
-			setError(true)
+			toast.error('passwords_do_not_match')
 			return
 		}
 
@@ -40,21 +36,19 @@ export function useRegister() {
 			const result = await res.json()
 
 			if (!res.ok) {
-				setMsgKey(result.message || 'something_went_wrong')
-				setError(true)
+				toast.error(result.message || 'something_went_wrong')
 				return
 			}
 
 			localStorage.setItem('token', result.token)
-			setMsgKey(result.message || 'account_created')
+			toast.success(result.message || 'account_created')
 
 			setTimeout(() => {
 				navigate('/home')
 			}, 800)
 
-		} catch (err) {
-			setMsgKey('network_error')
-			setError(true)
+		} catch {
+			toast.error('network_error')
 		}
 	}
 
@@ -63,8 +57,6 @@ export function useRegister() {
 		username,
 		password,
 		repassword,
-		msgKey,
-		error,
 		setEmail,
 		setUsername,
 		setPassword,

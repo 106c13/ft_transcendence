@@ -1,8 +1,6 @@
 .challengeOverlay {
-	position: fixed;
-	top: 72px;
-	right: 20px;
-	z-index: 1000;
+	position: relative;
+	pointer-events: auto;
 	animation: slideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 

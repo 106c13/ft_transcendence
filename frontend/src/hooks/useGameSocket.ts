@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import io, { Socket } from 'socket.io-client'
 import { Chess } from 'chess.js'
 import type { Square } from 'chess.js'
+import { useToast } from '../context/ToastContext'
 
 import { getPieceImageSrc } from '../constants/gameConstants'
 import type { GameModeType } from '../constants/gameModeConstats'
@@ -37,6 +38,7 @@ const getSimulatedChess = (baseFen: string, color: 'w' | 'b' | null, premoveList
 
 export function useGameSocket() {
     const { t } = useTranslation()
+    const { toast } = useToast()
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
 
@@ -364,10 +366,11 @@ export function useGameSocket() {
 
         socket.on('draw_declined', () => {
             setDrawOfferState('declined')
+            toast.info('draw_declined')
         })
 
         socket.on('error', (err: { message: string }) => {
-            alert(err.message || 'Error occurred')
+            toast.error(err.message || 'something_went_wrong')
         })
 
         return () => {

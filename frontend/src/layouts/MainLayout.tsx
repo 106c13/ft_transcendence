@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar/Navbar'
 import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification'
 import { useChallengeSocket } from '../hooks/useChallengeSocket'
 import type { ChallengeStatus, ChallengeReceived } from '../hooks/useChallengeSocket'
+import { useToast } from '../context/ToastContext'
 
 import type { User } from '../constants/profileConstants'
 export type { User }
@@ -49,6 +50,31 @@ export default function MainLayout() {
   }, [navigate, token])
 
   const challengeSocket = useChallengeSocket(currentUser?.id)
+  const { setTopSlot } = useToast()
+
+  useEffect(() => {
+    if (challengeSocket.incomingChallenge) {
+      setTopSlot(
+        <ChallengeNotification
+          challenge={challengeSocket.incomingChallenge}
+          countdown={challengeSocket.challengeCountdown}
+          onAccept={challengeSocket.acceptChallenge}
+          onDecline={challengeSocket.declineChallenge}
+        />
+      )
+    } else {
+      setTopSlot(null)
+    }
+    return () => {
+      setTopSlot(null)
+    }
+  }, [
+    challengeSocket.incomingChallenge,
+    challengeSocket.challengeCountdown,
+    challengeSocket.acceptChallenge,
+    challengeSocket.declineChallenge,
+    setTopSlot,
+  ])
 
   if (!currentUser) {
     return <div className="layout-loading">Loading...</div>
@@ -61,16 +87,6 @@ export default function MainLayout() {
         {/* Child routes render here */}
         <Outlet context={{ currentUser, setCurrentUser, challengeSocket } satisfies LayoutContextType} />
       </main>
-
-      {/* Floating challenge notification */}
-      {challengeSocket.incomingChallenge && (
-        <ChallengeNotification
-          challenge={challengeSocket.incomingChallenge}
-          countdown={challengeSocket.challengeCountdown}
-          onAccept={challengeSocket.acceptChallenge}
-          onDecline={challengeSocket.declineChallenge}
-        />
-      )}
     </div>
   )
 }

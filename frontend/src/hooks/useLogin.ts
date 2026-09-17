@@ -1,19 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useToast } from '../context/ToastContext'
 
 export function useLogin() {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
-	const [msgKey, setMsgKey] = useState('')
-	const [error, setError] = useState(false)
 
 	const navigate = useNavigate()
+	const { toast } = useToast()
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-
-		setMsgKey('')
-		setError(false)
 
 		const data = { email, password }
 
@@ -27,28 +24,24 @@ export function useLogin() {
 			const result = await res.json()
 
 			if (!res.ok) {
-				setMsgKey(result.message || 'invalid_credentials')
-				setError(true)
+				toast.error(result.message || 'invalid_credentials')
 				return
 			}
 
 			localStorage.setItem('token', result.token)
-			setMsgKey(result.message || 'login_successful')
+			toast.success(result.message || 'login_successful')
 
 			setTimeout(() => {
 				navigate('/home')
 			}, 700)
 		} catch {
-			setMsgKey('network_error')
-			setError(true)
+			toast.error('network_error')
 		}
 	}
 
 	return {
 		email,
 		password,
-		msgKey,
-		error,
 		setEmail,
 		setPassword,
 		handleSubmit,

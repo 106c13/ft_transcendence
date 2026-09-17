@@ -9,8 +9,6 @@ function LoginPage() {
 	const {
 		email,
 		password,
-		msgKey,
-		error,
 		setEmail,
 		setPassword,
 		handleSubmit,
@@ -40,12 +38,6 @@ function LoginPage() {
 					{t('login')}
 				</button>
 			</form>
-
-			{msgKey && (
-				<div className={`${styles.msg} ${error ? styles.error : styles.success}`}>
-					{t(msgKey)}
-				</div>
-			)}
 
 			<Link className={styles.link} to="/register">
 				{t('create_account')}

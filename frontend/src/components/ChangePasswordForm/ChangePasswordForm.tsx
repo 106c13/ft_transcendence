@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useToast } from '../../context/ToastContext'
 import styles from './ChangePasswordForm.module.css'
 
 function ChangePasswordForm() {
 	const { t } = useTranslation()
+	const { toast } = useToast()
 
 	const [oldPassword, setOldPassword] = useState('')
 	const [newPassword, setNewPassword] = useState('')
@@ -14,23 +16,17 @@ function ChangePasswordForm() {
 	const [showConfirm, setShowConfirm] = useState(false)
 
 	const [loading, setLoading] = useState(false)
-	const [msg, setMsg] = useState('')
-	const [error, setError] = useState(false)
 
 	const handlePasswordChange = async (e: React.FormEvent) => {
 		e.preventDefault()
-		setMsg('')
-		setError(false)
 
 		if (newPassword !== confirmPassword) {
-			setMsg('passwords_do_not_match')
-			setError(true)
+			toast.error('passwords_do_not_match')
 			return
 		}
 
 		if (newPassword.length < 8) {
-			setMsg('password_too_short')
-			setError(true)
+			toast.error('password_too_short')
 			return
 		}
 
@@ -39,8 +35,7 @@ function ChangePasswordForm() {
 		const hasSpecial = /[^a-zA-Z0-9]/.test(newPassword)
 
 		if (!hasLetter || !hasNumber || !hasSpecial) {
-			setMsg('password_complexity_error')
-			setError(true)
+			toast.error('password_complexity_error')
 			return
 		}
 
@@ -60,19 +55,16 @@ function ChangePasswordForm() {
 			const result = await res.json()
 
 			if (!res.ok) {
-				setMsg(result.message || 'password_update_failed')
-				setError(true)
+				toast.error(result.message || 'password_update_failed')
 				return
 			}
 
-			setMsg('password_updated')
-			setError(false)
+			toast.success('password_updated')
 			setOldPassword('')
 			setNewPassword('')
 			setConfirmPassword('')
 		} catch {
-			setMsg('network_error')
-			setError(true)
+			toast.error('network_error')
 		} finally {
 			setLoading(false)
 		}
@@ -183,17 +175,6 @@ function ChangePasswordForm() {
 						</button>
 					</div>
 				</div>
-
-				{msg && (
-					<div
-						className={`${styles.alert} ${
-							error ? styles.errorAlert : styles.successAlert
-						}`}
-					>
-						<span>{error ? '⚠️' : '✓'}</span>
-						<span>{t(msg, msg)}</span>
-					</div>
-				)}
 
 				<div className={styles.actionRow}>
 					<button

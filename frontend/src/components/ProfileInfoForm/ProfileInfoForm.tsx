@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { User } from '../../constants/profileConstants'
+import { useToast } from '../../context/ToastContext'
 import styles from './ProfileInfoForm.module.css'
 
 type Props = {
@@ -25,10 +26,10 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 		setBio(initialUser?.bio || '')
 	}
 
+	const { toast } = useToast()
+
 	const [avatarFile, setAvatarFile] = useState<File | null>(null)
 	const [loading, setLoading] = useState(false)
-	const [msg, setMsg] = useState('')
-	const [error, setError] = useState(false)
 
 	// Compute preview URL whenever avatarFile changes
 	const previewUrl = useMemo(() => {
@@ -48,7 +49,6 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files?.[0]) {
 			setAvatarFile(e.target.files[0])
-			setMsg('')
 		}
 	}
 
@@ -61,25 +61,20 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 
 	const handleSave = async (e: React.FormEvent) => {
 		e.preventDefault()
-		setMsg('')
-		setError(false)
 
 		// Client validation
 		if (/[^a-zA-Z0-9]/.test(username)) {
-			setMsg('username_invalid_chars')
-			setError(true)
+			toast.error('username_invalid_chars')
 			return
 		}
 
 		if (username.length > 15) {
-			setMsg('username_too_long')
-			setError(true)
+			toast.error('username_too_long')
 			return
 		}
 
 		if (bio.length > 100) {
-			setMsg('Bio should be less than 100 characters')
-			setError(true)
+			toast.error('Bio should be less than 100 characters')
 			return
 		}
 
@@ -105,19 +100,16 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 			const result = await res.json()
 
 			if (res.status === 413) {
-				setMsg('image_too_big')
-				setError(true)
+				toast.error('image_too_big')
 				return
 			}
 
 			if (!res.ok) {
-				setMsg(result.message || 'update_failed')
-				setError(true)
+				toast.error(result.message || 'update_failed')
 				return
 			}
 
-			setError(false)
-			setMsg('saved')
+			toast.success('saved')
 			setAvatarFile(null)
 			if (fileInputRef.current) {
 				fileInputRef.current.value = ''
@@ -134,8 +126,7 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 				}
 			}
 		} catch {
-			setMsg('network_error')
-			setError(true)
+			toast.error('network_error')
 		} finally {
 			setLoading(false)
 		}
@@ -260,17 +251,6 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 						rows={3}
 					/>
 				</div>
-
-				{msg && (
-					<div
-						className={`${styles.alert} ${
-							error ? styles.errorAlert : styles.successAlert
-						}`}
-					>
-						<span>{error ? '⚠️' : '✓'}</span>
-						<span>{t(msg, msg)}</span>
-					</div>
-				)}
 
 				<div className={styles.actionRow}>
 					<button

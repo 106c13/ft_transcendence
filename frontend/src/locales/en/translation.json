@@ -188,7 +188,18 @@
     "username_hint": "Letters and numbers only, max 15 characters",
     "password_req_hint": "Must be at least 8 characters with letters, numbers, and special symbols",
     "saving": "Saving...",
-    "updating": "Updating..."
+    "updating": "Updating...",
+    "toast_success": "Success",
+    "toast_error": "Error",
+    "toast_warning": "Notice",
+    "toast_info": "Information",
+    "challenge_declined": "Challenge was declined.",
+    "challenge_expired": "Challenge expired. No response received.",
+    "challenge_error": "Failed to send challenge.",
+    "bio_too_long": "Bio should be less than 100 characters",
+    "challenge_sent": "Challenge sent! Waiting for response...",
+    "challenge_accepted": "Challenge accepted! Starting game...",
+    "select_friend_error": "Please select a friend first before choosing a game mode."
 }
 
 

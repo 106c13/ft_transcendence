@@ -11,8 +11,6 @@ function RegisterPage() {
 		username,
 		password,
 		repassword,
-		msgKey,
-		error,
 		setEmail,
 		setUsername,
 		setPassword,
@@ -58,12 +56,6 @@ function RegisterPage() {
 
 				<button className={styles.button} type="submit">{t('register')}</button>
 			</form>
-
-			{msgKey && (
-				<div className={`${styles.msg} ${error ? styles.error : styles.success}`}>
-					{t(msgKey)}
-				</div>
-			)}
 
 			<Link className={styles.link} to="/login">
 				{t('sign_in')}
