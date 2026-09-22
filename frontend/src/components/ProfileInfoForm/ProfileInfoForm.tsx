@@ -74,7 +74,7 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 		}
 
 		if (bio.length > 100) {
-			toast.error('Bio should be less than 100 characters')
+			toast.error('bio_too_long')
 			return
 		}
 
@@ -154,7 +154,7 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 				<div className={styles.avatarWrapper}>
 					<img
 						src={displayAvatar}
-						alt="Avatar preview"
+						alt={t('avatar_preview', 'Avatar preview')}
 						className={styles.avatarImage}
 					/>
 				</div>

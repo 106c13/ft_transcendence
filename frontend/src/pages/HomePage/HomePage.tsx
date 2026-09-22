@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import type { LayoutContextType } from '../../layouts/MainLayout'
 import { useToast } from '../../context/ToastContext'
 import { useGameHistory } from '../../hooks/useGameHistory'
+import { usePageTitle } from '../../hooks/usePageTitle'
 import GameModesGrid from '../../components/GameModesGrid/GameModesGrid'
 import ChallengeSection from '../../components/ChallengeSection/ChallengeSection'
 import GameReviewCard from '../../components/GameReviewCard/GameReviewCard'
@@ -14,17 +15,9 @@ import type { GameModeType, ModeItem } from '../../constants/gameModeConstats'
 import type { User } from '../../constants/profileConstants'
 import styles from './HomePage.module.css'
 
-const MODES: ModeItem[] = [
-	{ id: 'bullet', emoji: '🔥', label: 'Bullet', time: '1 min', desc: 'Fast and explosive' },
-	{ id: 'blitz', emoji: '⚡', label: 'Blitz', time: '3 min', desc: 'Standard rapid action' },
-	{ id: 'rapid', emoji: '⏳', label: 'Rapid', time: '10 min', desc: 'Strategic classical' },
-	{ id: 'bullet+2', emoji: '🔥', label: 'Bullet', time: '1 | +2s', desc: 'Fast with increment', increment: '+2' },
-	{ id: 'blitz+2', emoji: '⚡', label: 'Blitz', time: '3 | +2s', desc: 'Blitz with increment', increment: '+2' },
-	{ id: 'rapid+2', emoji: '⏳', label: 'Rapid', time: '10 | +2s', desc: 'Rapid with increment', increment: '+2' },
-]
-
 function HomePage() {
 	const { t } = useTranslation()
+	usePageTitle('page_title_home', 'Home')
 	const { toast } = useToast()
 	const navigate = useNavigate()
 	const { currentUser, challengeSocket } = useOutletContext<LayoutContextType>()
@@ -116,11 +109,20 @@ function HomePage() {
 
 	const effectiveRatings = ratings || currentUser?.ratings || null
 
+	const modes: ModeItem[] = [
+		{ id: 'bullet', emoji: '🔥', label: t('bullet'), time: t('time_1_min'), desc: t('bullet_desc') },
+		{ id: 'blitz', emoji: '⚡', label: t('blitz'), time: t('time_3_min'), desc: t('blitz_desc') },
+		{ id: 'rapid', emoji: '⏳', label: t('rapid'), time: t('time_10_min'), desc: t('strategic_classical') },
+		{ id: 'bullet+2', emoji: '🔥', label: t('bullet'), time: t('time_1_inc'), desc: t('bullet_inc_desc'), increment: '+2' },
+		{ id: 'blitz+2', emoji: '⚡', label: t('blitz'), time: t('time_3_inc'), desc: t('blitz_inc_desc'), increment: '+2' },
+		{ id: 'rapid+2', emoji: '⏳', label: t('rapid'), time: t('time_10_inc'), desc: t('rapid_inc_desc'), increment: '+2' },
+	]
+
 	return (
 		<div className={styles.homeContainer}>
 			<main className={styles.mainContent}>
 				<div className={styles.contentHeader}>
-					<h1>{t('welcome', { username: currentUser?.username || 'Player' })}</h1>
+					<h1>{t('welcome', { username: currentUser?.username || t('player') })}</h1>
 				</div>
 
 				{/* Section 1: Play Online */}
@@ -141,7 +143,7 @@ function HomePage() {
 								onSelectFriend={setSelectedFriend}
 								friends={challengeFriends}
 							/>
-							<GameModesGrid modes={MODES} onSelectMode={handlePlayMode} />
+							<GameModesGrid modes={modes} onSelectMode={handlePlayMode} />
 						</div>
 
 						{/* Right subsection (20-30%): Random review recommendation board */}

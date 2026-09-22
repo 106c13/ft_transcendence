@@ -73,43 +73,43 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 	async handleSendChallenge(client: Socket, payload: { friendUsername: string; mode: GameModeType }) {
 		const userIdStr = client.handshake.query.userId;
 		if (!userIdStr) {
-			client.emit('error', { message: 'Unauthorized' });
+			client.emit('error', { message: 'unauthorized' });
 			return;
 		}
 
 		const senderId = parseInt(userIdStr as string);
 		const sender = await this.usersService.findById(senderId);
 		if (!sender) {
-			client.emit('error', { message: 'User not found' });
+			client.emit('error', { message: 'user_not_found' });
 			return;
 		}
 
 		const { friendUsername, mode } = payload;
 		if (!friendUsername || !mode) {
-			client.emit('error', { message: 'Missing fields' });
+			client.emit('error', { message: 'missing_fields' });
 			return;
 		}
 
 		const receiver = await this.usersService.findByUsername(friendUsername);
 		if (!receiver) {
-			client.emit('challenge_error', { message: 'User not found' });
+			client.emit('challenge_error', { message: 'user_not_found' });
 			return;
 		}
 
 		const friendStatus = await this.friendsService.getRequestStatusByUsername(senderId, friendUsername);
 		if (friendStatus.status !== 'ACCEPTED') {
-			client.emit('challenge_error', { message: 'You can only challenge friends' });
+			client.emit('challenge_error', { message: 'can_only_challenge_friends' });
 			return;
 		}
 
 		if (senderId === receiver.id) {
-			client.emit('challenge_error', { message: 'Cannot challenge yourself' });
+			client.emit('challenge_error', { message: 'cannot_challenge_yourself' });
 			return;
 		}
 
 		// Check if receiver is connected to the challenge namespace
 		if (!this.presenceService.isUserOnline(receiver.id)) {
-			client.emit('challenge_error', { message: 'Friend is not online' });
+			client.emit('challenge_error', { message: 'friend_not_online' });
 			return;
 		}
 
@@ -159,8 +159,8 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 
 		const challenge = this.gameService.getChallenge(challengeId);
 		if (!challenge || challenge.receiverId !== userId) {
-			client.emit('error', { message: 'Challenge not found or expired' });
-			client.emit('challenge_error', { message: 'Challenge not found or expired' });
+			client.emit('error', { message: 'challenge_not_found_or_expired' });
+			client.emit('challenge_error', { message: 'challenge_not_found_or_expired' });
 			return;
 		}
 

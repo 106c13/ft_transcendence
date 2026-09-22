@@ -37,7 +37,7 @@ export class MessagesController {
 		const [id1, id2] = chatId.split('_').map(Number)
 
 		if (userId !== id1 && userId !== id2) {
-			throw new BadRequestException('You are not a participant of this chat')
+			throw new BadRequestException('not_chat_participant')
 		}
 
 		return this.messagesService.markChatAsRead(chatId, userId)
@@ -56,7 +56,7 @@ export class MessagesController {
 		const [id1, id2] = chatId.split('_').map(Number)
 
 		if (userId !== id1 && userId !== id2) {
-			throw new BadRequestException('You are not a participant of this chat')
+			throw new BadRequestException('not_chat_participant')
 		}
 
 		return this.messagesService.getMessages(chatId, {
@@ -74,17 +74,17 @@ export class MessagesController {
 		const userId = req.user.userId
 
 		if (!body.content || body.content.trim().length === 0) {
-			throw new BadRequestException('Message content cannot be empty')
+			throw new BadRequestException('message_empty')
 		}
 
 		if (body.content.length > 200) {
-			throw new BadRequestException('Message content is too long (max 200 characters)')
+			throw new BadRequestException('message_too_long')
 		}
 
 		const [id1, id2] = body.chat_id.split('_').map(Number)
 
 		if (userId !== id1 && userId !== id2) {
-			throw new BadRequestException('You are not a participant of this chat')
+			throw new BadRequestException('not_chat_participant')
 		}
 
 		return this.messagesService.sendMessage(

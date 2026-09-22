@@ -30,13 +30,13 @@ export class FriendsService {
 			where: { username: receiverUsername },
 		})
 
-		if (!receiver) throw new NotFoundException('User not found')
+		if (!receiver) throw new NotFoundException('user_not_found')
 
 		const sender = await this.userRepo.findOne({
 			where: { id: senderId },
 		})
 
-		if (!sender) throw new NotFoundException('Sender not found')
+		if (!sender) throw new NotFoundException('sender_not_found')
 
 		const existing = await this.friendRequestRepo.findOne({
 			where: [
@@ -52,7 +52,7 @@ export class FriendsService {
 		})
 
 		if (existing) {
-			throw new BadRequestException('Request already exists')
+			throw new BadRequestException('request_already_exists')
 		}
 
 		const request = this.friendRequestRepo.create({
@@ -64,7 +64,7 @@ export class FriendsService {
 		// Create notification for receiver
 		const notification = this.notificationRepo.create({
 			user_id: receiver.id,
-			message: `${sender.username} sent you a friend request`,
+			message: JSON.stringify({ key: 'notification_friend_request', username: sender.username }),
 			link: `/profile/${sender.username}`,
 			is_read: false,
 		})
@@ -79,7 +79,7 @@ export class FriendsService {
 		})
 
 		if (!sender) {
-			throw new NotFoundException('User not found')
+			throw new NotFoundException('user_not_found')
 		}
 
 		const request = await this.friendRequestRepo.findOne({
@@ -92,7 +92,7 @@ export class FriendsService {
 		})
 
 		if (!request) {
-			throw new NotFoundException('Request not found')
+			throw new NotFoundException('request_not_found')
 		}
 
 		const id1 = Math.min(request.sender.id, request.receiver.id)
@@ -123,7 +123,7 @@ export class FriendsService {
 		// Create notification for sender that request was accepted
 		const acceptedNotification = this.notificationRepo.create({
 			user_id: sender.id,
-			message: `${request.receiver.username} accepted your friend request`,
+			message: JSON.stringify({ key: 'notification_friend_accepted', username: request.receiver.username }),
 			link: `/profile/${request.receiver.username}`,
 			is_read: false,
 		})
@@ -140,7 +140,7 @@ export class FriendsService {
 		})
 
 		if (!sender) {
-			throw new NotFoundException('User not found')
+			throw new NotFoundException('user_not_found')
 		}
 
 		const request = await this.friendRequestRepo.findOne({
@@ -152,7 +152,7 @@ export class FriendsService {
 		})
 
 		if (!request) {
-			throw new NotFoundException('Request not found')
+			throw new NotFoundException('request_not_found')
 		}
 
 		// Delete the friend request notification
@@ -168,7 +168,7 @@ export class FriendsService {
 
 	async cancelRequest(senderId: number, username: string) {
 		const user = await this.userRepo.findOne({ where: { username } })
-		if (!user) throw new NotFoundException()
+		if (!user) throw new NotFoundException('user_not_found')
 
 		const request = await this.friendRequestRepo.findOne({
 			where: {
@@ -179,7 +179,7 @@ export class FriendsService {
 			relations: ['receiver'],
 		})
 
-		if (!request) throw new NotFoundException('Request not found')
+		if (!request) throw new NotFoundException('request_not_found')
 
 		// Delete the friend request notification from receiver
 		await this.notificationRepo.delete({
@@ -194,7 +194,7 @@ export class FriendsService {
 
 	async unfriend(userId: number, username: string) {
 		const user = await this.userRepo.findOne({ where: { username } })
-		if (!user) throw new NotFoundException()
+		if (!user) throw new NotFoundException('user_not_found')
 
 		const friendship = await this.friendshipRepo.findOne({
 			where: [
@@ -203,7 +203,7 @@ export class FriendsService {
 			],
 		})
 
-		if (!friendship) throw new NotFoundException('Not friends')
+		if (!friendship) throw new NotFoundException('not_friends')
 
 		await this.friendshipRepo.remove(friendship)
 
@@ -234,7 +234,7 @@ export class FriendsService {
 		})
 
 		if (!receiver) {
-			throw new NotFoundException('User not found')
+			throw new NotFoundException('user_not_found')
 		}
 
 		const id1 = Math.min(senderId, receiver.id)
@@ -280,7 +280,7 @@ export class FriendsService {
 		})
 
 		if (!user) {
-			throw new NotFoundException('User not found')
+			throw new NotFoundException('user_not_found')
 		}
 
 		const friendships = await this.friendshipRepo.find({

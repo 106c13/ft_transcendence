@@ -255,7 +255,16 @@ function NotificationBell({ userId }: { userId: number }) {
 
     // Helper to check if a notification is a friend request
     const isFriendRequest = (notif: Notification) => {
-        return notif.message.includes('sent you a friend request')
+        if (notif.message.includes('sent you a friend request') || notif.message.includes('notification_friend_request')) {
+            return true
+        }
+        if (notif.message.startsWith('{')) {
+            try {
+                const parsed = JSON.parse(notif.message)
+                return parsed.key === 'notification_friend_request'
+            } catch {}
+        }
+        return false
     }
 
     // Helper to extract username from friend request notification
@@ -264,8 +273,27 @@ function NotificationBell({ userId }: { userId: number }) {
             const parts = notif.link.replace('/profile/', '').split('/')
             if (parts[0]) return parts[0]
         }
+        if (notif.message.startsWith('{')) {
+            try {
+                const parsed = JSON.parse(notif.message)
+                if (parsed.username) return parsed.username
+            } catch {}
+        }
         const match = notif.message.match(/^(.+?)\s+sent you a friend request/)
         return match ? match[1] : null
+    }
+
+    // Helper to render notification message (either JSON key or plain text)
+    const renderNotificationMessage = (msg: string): string => {
+        if (msg.startsWith('{')) {
+            try {
+                const parsed = JSON.parse(msg)
+                if (parsed.key) {
+                    return String(t(parsed.key, parsed))
+                }
+            } catch {}
+        }
+        return String(t(msg, msg))
     }
 
     // Quick Accept friend request
@@ -363,14 +391,14 @@ function NotificationBell({ userId }: { userId: number }) {
         const now = new Date()
         const diffSecs = Math.floor((now.getTime() - date.getTime()) / 1000)
 
-        if (diffSecs < 60) return 'Just now'
+        if (diffSecs < 60) return t('just_now', 'Just now')
         const diffMins = Math.floor(diffSecs / 60)
-        if (diffMins < 60) return `${diffMins}m ago`
+        if (diffMins < 60) return t('minutes_ago', { count: diffMins, defaultValue: `${diffMins}m ago` })
         const diffHours = Math.floor(diffMins / 60)
-        if (diffHours < 24) return `${diffHours}h ago`
+        if (diffHours < 24) return t('hours_ago', { count: diffHours, defaultValue: `${diffHours}h ago` })
         const diffDays = Math.floor(diffHours / 24)
-        if (diffDays === 1) return 'Yesterday'
-        if (diffDays < 7) return `${diffDays}d ago`
+        if (diffDays === 1) return t('yesterday', 'Yesterday')
+        if (diffDays < 7) return t('days_ago', { count: diffDays, defaultValue: `${diffDays}d ago` })
 
         return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
     }
@@ -498,7 +526,7 @@ function NotificationBell({ userId }: { userId: number }) {
 
                                         <div className={styles.notificationContent}>
                                             <div className={styles.notificationMessage}>
-                                                {notif.message}
+                                                {renderNotificationMessage(notif.message)}
                                             </div>
 
                                             {/* Friend Request Quick Actions */}
@@ -548,8 +576,8 @@ function NotificationBell({ userId }: { userId: number }) {
                                         <button
                                             className={styles.deleteNotification}
                                             onClick={(e) => deleteNotification(notif.id, e)}
-                                            title="Delete"
-                                            aria-label="Delete notification"
+                                            title={t('delete', 'Delete')}
+                                            aria-label={t('delete_notification', 'Delete notification')}
                                         >
                                             ✕
                                         </button>

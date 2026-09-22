@@ -22,6 +22,8 @@ export interface MoveAnalysis {
 	continuation: string[]; // SAN list of best engine moves
 	classification: 'brilliant' | 'great' | 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder';
 	explanation: string;
+	explanationKey?: string;
+	explanationParams?: Record<string, any>;
 }
 
 export interface GameAnalysisResult {
@@ -205,6 +207,8 @@ export class GameAnalyzer {
 			// 5. Classification based on CPL and Sacrifice Detection
 			let classification: 'brilliant' | 'great' | 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder' = 'best';
 			let explanation = '';
+			let explanationKey = '';
+			let explanationParams: Record<string, any> = {};
 
 			const isSacrifice = checkSacrifice(fenBefore, fenAfter, playerColor, move);
 			const isPlayedMoveBest = bestMoveSanObj && (bestMoveSanObj.san === move.san || (bestMoveSanObj.from === move.from && bestMoveSanObj.to === move.to));
@@ -215,31 +219,53 @@ export class GameAnalyzer {
 			// - Player position is clearly winning/strong (playedEvalFromPlayer >= +150 cp or mate)
 			if (isSacrifice && centipawnLoss <= 15 && playedEvalFromPlayer >= 150) {
 				classification = 'brilliant';
+				explanationKey = 'expl_brilliant';
 				explanation = 'A brilliant move involving a tactical piece sacrifice while keeping a winning advantage!';
 			} else if (centipawnLoss <= 10 || isPlayedMoveBest) {
 				classification = 'best';
+				explanationKey = 'expl_best';
 				explanation = 'The best move in this position.';
 			} else if (centipawnLoss <= 30) {
 				classification = 'excellent';
+				explanationKey = 'expl_excellent';
 				explanation = 'An excellent and solid move.';
 			} else if (centipawnLoss <= 80) {
 				classification = 'good';
+				explanationKey = 'expl_good';
 				explanation = 'A good, natural move.';
 			} else if (centipawnLoss <= 150) {
 				classification = 'inaccuracy';
-				explanation = bestMoveSanObj
-					? `An inaccuracy (lost ${Math.round(centipawnLoss)} cp). Better was ${bestMoveSanObj.san}.`
-					: `An inaccuracy (lost ${Math.round(centipawnLoss)} cp).`;
+				if (bestMoveSanObj) {
+					explanationKey = 'expl_inaccuracy_better';
+					explanationParams = { cp: Math.round(centipawnLoss), bestSan: bestMoveSanObj.san };
+					explanation = `An inaccuracy (lost ${Math.round(centipawnLoss)} cp). Better was ${bestMoveSanObj.san}.`;
+				} else {
+					explanationKey = 'expl_inaccuracy';
+					explanationParams = { cp: Math.round(centipawnLoss) };
+					explanation = `An inaccuracy (lost ${Math.round(centipawnLoss)} cp).`;
+				}
 			} else if (centipawnLoss <= 300) {
 				classification = 'mistake';
-				explanation = bestMoveSanObj
-					? `A mistake (lost ${Math.round(centipawnLoss)} cp). The best continuation was ${bestMoveSanObj.san}.`
-					: `A mistake (lost ${Math.round(centipawnLoss)} cp) that worsens your position.`;
+				if (bestMoveSanObj) {
+					explanationKey = 'expl_mistake_better';
+					explanationParams = { cp: Math.round(centipawnLoss), bestSan: bestMoveSanObj.san };
+					explanation = `A mistake (lost ${Math.round(centipawnLoss)} cp). The best continuation was ${bestMoveSanObj.san}.`;
+				} else {
+					explanationKey = 'expl_mistake';
+					explanationParams = { cp: Math.round(centipawnLoss) };
+					explanation = `A mistake (lost ${Math.round(centipawnLoss)} cp) that worsens your position.`;
+				}
 			} else {
 				classification = 'blunder';
-				explanation = bestMoveSanObj
-					? `A blunder (lost ${Math.round(centipawnLoss)} cp). Overlooked ${bestMoveSanObj.san} which keeps the advantage.`
-					: `A critical blunder (lost ${Math.round(centipawnLoss)} cp) that loses significant advantage.`;
+				if (bestMoveSanObj) {
+					explanationKey = 'expl_blunder_better';
+					explanationParams = { cp: Math.round(centipawnLoss), bestSan: bestMoveSanObj.san };
+					explanation = `A blunder (lost ${Math.round(centipawnLoss)} cp). Overlooked ${bestMoveSanObj.san} which keeps the advantage.`;
+				} else {
+					explanationKey = 'expl_blunder';
+					explanationParams = { cp: Math.round(centipawnLoss) };
+					explanation = `A critical blunder (lost ${Math.round(centipawnLoss)} cp) that loses significant advantage.`;
+				}
 			}
 
 			if (playerColor === 'w') {
@@ -265,6 +291,8 @@ export class GameAnalyzer {
 				continuation: bestContinuationSan,
 				classification,
 				explanation,
+				explanationKey,
+				explanationParams,
 			});
 
 			console.log(

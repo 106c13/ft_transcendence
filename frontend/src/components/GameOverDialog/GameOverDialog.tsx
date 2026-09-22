@@ -69,7 +69,7 @@ function GameOverDialog({
 	return (
 		<div className={styles.gameOverModal}>
 			<div className={styles.gameOverBox}>
-				<button className={styles.closeModalX} onClick={onClose}>✕</button>
+				<button className={styles.closeModalX} onClick={onClose} aria-label={t('close', 'Close')}>✕</button>
 				<div className={styles.gameOverIcon}>
 					{winnerColor === playerColor ? '🏆' : winnerColor === null ? '🤝' : '💀'}
 				</div>

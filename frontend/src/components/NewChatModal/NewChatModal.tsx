@@ -75,7 +75,7 @@ export default function NewChatModal({
 					<button
 						className={styles.closeButton}
 						onClick={onClose}
-						aria-label="Close modal"
+						aria-label={t('close', 'Close')}
 					>
 						✕
 					</button>
@@ -111,7 +111,7 @@ export default function NewChatModal({
 				<div className={styles.friendsList}>
 					{loading ? (
 						<div className={styles.emptyState}>
-							<span>Loading...</span>
+							<span>{t('loading', 'Loading...')}</span>
 						</div>
 					) : friends.length === 0 ? (
 						<div className={styles.emptyState}>

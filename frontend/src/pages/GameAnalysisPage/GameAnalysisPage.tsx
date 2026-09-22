@@ -3,12 +3,14 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useGameHistory } from '../../hooks/useGameHistory'
 import { useGameAnalysis } from '../../hooks/useGameAnalysis'
+import { usePageTitle } from '../../hooks/usePageTitle'
 import GameAnalysis from '../../components/GameAnalysis/GameAnalysis'
 import type { MatchRecord } from '../../components/GameAnalysis/GameAnalysis'
 import styles from './GameAnalysisPage.module.css'
 
 export default function GameAnalysisPage() {
 	const { t } = useTranslation()
+	usePageTitle('page_title_game_analysis', 'Game Analysis')
 	const { id, username: routeUsername } = useParams<{ id: string; username?: string }>()
 	const navigate = useNavigate()
 	const location = useLocation()
@@ -141,7 +143,7 @@ export default function GameAnalysisPage() {
 		<div className={styles.page}>
 
 			<GameAnalysis
-				username={targetUsername || analysis.selectedGame.white?.username || 'White'}
+				username={targetUsername || analysis.selectedGame.white?.username || t('white')}
 				analysis={analysis}
 				history={history}
 				onBack={handleBack}

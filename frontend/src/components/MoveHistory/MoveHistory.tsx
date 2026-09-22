@@ -38,10 +38,10 @@ function MoveHistory({ moveHistory, moveSAN, viewIndex, isReviewing, onSelectInd
 			<div className={styles.moveHistoryHeader}>
 				<span className={styles.moveHistoryTitle}>{t('move_history', 'Move Log')}</span>
 				<div className={styles.moveNavArrows}>
-					<button title="Start" onClick={() => onSelectIndex(0)}>⇤</button>
-					<button title="Previous" onClick={() => onSelectIndex(Math.max(0, viewIndex - 1))}>◀</button>
-					<button title="Next" onClick={() => onSelectIndex(Math.min(moveHistory.length - 1, viewIndex + 1))}>▶</button>
-					<button title="Latest" onClick={() => onSelectIndex(moveHistory.length - 1)}>⇥</button>
+					<button title={t('start', 'Start')} onClick={() => onSelectIndex(0)}>⇤</button>
+					<button title={t('previous', 'Previous')} onClick={() => onSelectIndex(Math.max(0, viewIndex - 1))}>◀</button>
+					<button title={t('next', 'Next')} onClick={() => onSelectIndex(Math.min(moveHistory.length - 1, viewIndex + 1))}>▶</button>
+					<button title={t('latest', 'Latest')} onClick={() => onSelectIndex(moveHistory.length - 1)}>⇥</button>
 				</div>
 			</div>
 			<div className={styles.moveHistoryList} ref={moveListRef}>
@@ -70,7 +70,7 @@ function MoveHistory({ moveHistory, moveSAN, viewIndex, isReviewing, onSelectInd
 				})}
 			</div>
 			{isReviewing && (
-				<div className={styles.reviewingBanner}>👁 Reviewing — not live</div>
+				<div className={styles.reviewingBanner}>{t('reviewing_banner', '👁 Reviewing — not live')}</div>
 			)}
 		</div>
 	)

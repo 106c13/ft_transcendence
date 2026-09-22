@@ -2,10 +2,12 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PasswordInput from '../../components/PasswordInput/PasswordInput'
 import { useRegister } from '../../hooks/useRegister'
+import { usePageTitle } from '../../hooks/usePageTitle'
 import styles from '../Common.module.css'
 
 function RegisterPage() {
 	const { t } = useTranslation()
+	usePageTitle('page_title_register', 'Create Account')
 	const {
 		email,
 		username,

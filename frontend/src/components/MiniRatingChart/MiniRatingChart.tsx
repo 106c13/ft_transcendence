@@ -85,7 +85,9 @@ export default function MiniRatingChart({ mode, history, onClick }: Props) {
 					<span className={styles.modeIcon}>{config.icon}</span>
 					<div className={styles.modeText}>
 						<span className={styles.modeTitle}>{t(config.nameKey, config.defaultName)}</span>
-						<span className={styles.modeTime}>{config.time}</span>
+						<span className={styles.modeTime}>
+							{t(mode === 'bullet' ? 'time_1_min' : mode === 'blitz' ? 'time_3_min' : 'time_10_min', config.time)}
+						</span>
 					</div>
 				</div>
 
@@ -124,7 +126,7 @@ export default function MiniRatingChart({ mode, history, onClick }: Props) {
 						}`}
 					>
 						<span>{delta > 0 ? `+${delta}` : delta}</span>
-						<span className={styles.deltaLabel}>7d</span>
+						<span className={styles.deltaLabel}>{t('7d', '7d')}</span>
 					</div>
 				)}
 			</div>

@@ -22,7 +22,7 @@ function CapturedPieces({ captured, whiteScore, blackScore, playerColor }: Props
 					<img
 						key={idx}
 						src={getPieceImageSrc(p.type, p.color)}
-						alt={PIECE_NAME[p.type]}
+						alt={t(PIECE_NAME[p.type]?.toLowerCase() || 'pawn', PIECE_NAME[p.type])}
 						className={`${styles.capturedPiece} ${p.color === 'w' ? styles.white : styles.black}`}
 					/>
 				))}
@@ -42,7 +42,7 @@ function CapturedPieces({ captured, whiteScore, blackScore, playerColor }: Props
 					<img
 						key={idx}
 						src={getPieceImageSrc(p.type, p.color)}
-						alt={PIECE_NAME[p.type]}
+						alt={t(PIECE_NAME[p.type]?.toLowerCase() || 'pawn', PIECE_NAME[p.type])}
 						className={`${styles.capturedPiece} ${p.color === 'w' ? styles.white : styles.black}`}
 					/>
 				))}

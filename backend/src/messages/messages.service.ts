@@ -55,13 +55,13 @@ export class MessagesService {
 		})
 
 		if (!chat) {
-			throw new NotFoundException('Chat not found')
+			throw new NotFoundException('chat_not_found')
 		}
 
 		const sender = await this.userRepository.findOne({ where: { id: senderId } })
 
 		if (!sender) {
-			throw new NotFoundException('Sender not found')
+			throw new NotFoundException('sender_not_found')
 		}
 
 		const message = this.messageRepository.create({
@@ -153,11 +153,11 @@ export class MessagesService {
 		})
 
 		if (!message) {
-			throw new NotFoundException('Message not found')
+			throw new NotFoundException('message_not_found')
 		}
 
 		if (message.sender_id !== userId) {
-			throw new BadRequestException('You can only delete your own messages')
+			throw new BadRequestException('can_only_delete_own_messages')
 		}
 
 		await this.messageRepository.remove(message)

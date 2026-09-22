@@ -8,15 +8,15 @@ type Props = {
 	username?: string
 }
 
-const MODES = [
-	{ key: 'bullet', nameKey: 'bullet_rating', defaultName: 'Bullet', icon: '🔥', time: '1 min' },
-	{ key: 'blitz', nameKey: 'blitz_rating', defaultName: 'Blitz', icon: '⚡', time: '3 min' },
-	{ key: 'rapid', nameKey: 'rapid_rating', defaultName: 'Rapid', icon: '⏳', time: '10 min' },
-] as const
-
 export default function PlayerRatingsCard({ ratings, username }: Props) {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
+
+	const modes = [
+		{ key: 'bullet', nameKey: 'bullet_rating', defaultName: 'Bullet', icon: '🔥', time: t('time_1_min', '1 min') },
+		{ key: 'blitz', nameKey: 'blitz_rating', defaultName: 'Blitz', icon: '⚡', time: t('time_3_min', '3 min') },
+		{ key: 'rapid', nameKey: 'rapid_rating', defaultName: 'Rapid', icon: '⏳', time: t('time_10_min', '10 min') },
+	] as const
 
 	const handleClickMode = (modeKey: string) => {
 		if (username) {
@@ -49,7 +49,7 @@ export default function PlayerRatingsCard({ ratings, username }: Props) {
 				</div>
 
 				<div className={styles.rowsContainer}>
-					{MODES.map((mode) => {
+					{modes.map((mode) => {
 						const info = ratings ? ratings[mode.key] : null
 						const isNotPlayed = !info || info.gamesPlayed === 0
 						const isProvisional = info?.isProvisional ?? true
@@ -69,7 +69,7 @@ export default function PlayerRatingsCard({ ratings, username }: Props) {
 								<div className={styles.modeCol}>
 									<span className={styles.modeIcon}>{mode.icon}</span>
 									<div className={styles.modeMeta}>
-										<span className={styles.modeName}>{t(mode.nameKey, mode.defaultName)}</span>
+										<span className={styles.modeName}>{String(t(mode.nameKey, mode.defaultName))}</span>
 										<span className={styles.modeTime}>{mode.time}</span>
 									</div>
 								</div>
@@ -93,15 +93,15 @@ export default function PlayerRatingsCard({ ratings, username }: Props) {
 									</span>
 									{!isNotPlayed && (
 										<div className={styles.recordSub}>
-											<span className={styles.wins}>{wins}W</span>
+											<span className={styles.wins}>{wins}{t('wins_short', 'W')}</span>
 											<span>/</span>
 											{(info?.draws ?? 0) > 0 && (
 												<>
-													<span className={styles.draws}>{info?.draws}D</span>
+													<span className={styles.draws}>{info?.draws}{t('draws_short', 'D')}</span>
 													<span>/</span>
 												</>
 											)}
-											<span className={styles.losses}>{info?.losses ?? 0}L</span>
+											<span className={styles.losses}>{info?.losses ?? 0}{t('losses_short', 'L')}</span>
 										</div>
 									)}
 								</div>

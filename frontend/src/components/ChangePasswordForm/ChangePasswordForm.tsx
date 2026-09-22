@@ -101,7 +101,7 @@ function ChangePasswordForm() {
 							type="button"
 							className={styles.eyeBtn}
 							onClick={() => setShowOld(!showOld)}
-							aria-label={showOld ? 'Hide password' : 'Show password'}
+							aria-label={showOld ? t('hide_password', 'Hide password') : t('show_password', 'Show password')}
 						>
 							<img
 								src={showOld ? '/assets/eye-off.svg' : '/assets/eye.svg'}
@@ -131,7 +131,7 @@ function ChangePasswordForm() {
 							type="button"
 							className={styles.eyeBtn}
 							onClick={() => setShowNew(!showNew)}
-							aria-label={showNew ? 'Hide password' : 'Show password'}
+							aria-label={showNew ? t('hide_password', 'Hide password') : t('show_password', 'Show password')}
 						>
 							<img
 								src={showNew ? '/assets/eye-off.svg' : '/assets/eye.svg'}
@@ -164,7 +164,7 @@ function ChangePasswordForm() {
 							type="button"
 							className={styles.eyeBtn}
 							onClick={() => setShowConfirm(!showConfirm)}
-							aria-label={showConfirm ? 'Hide password' : 'Show password'}
+							aria-label={showConfirm ? t('hide_password', 'Hide password') : t('show_password', 'Show password')}
 						>
 							<img
 								src={showConfirm ? '/assets/eye-off.svg' : '/assets/eye.svg'}

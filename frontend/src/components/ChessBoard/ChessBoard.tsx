@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Chess, Square, PieceSymbol } from 'chess.js'
 import { getPieceImageSrc, PIECE_NAME } from '../../constants/gameConstants'
 import PromotionOverlay from '../PromotionOverlay/PromotionOverlay'
@@ -84,6 +85,7 @@ function ChessBoard({
     customArrows,
     customHighlights,
 }: Props) {
+    const { t } = useTranslation()
     const [dragState, setDragState] = useState<DragState | null>(null)
     const boardRef = useRef<HTMLDivElement>(null)
     const dragStateRef = useRef<DragState | null>(null)
@@ -544,7 +546,7 @@ function ChessBoard({
                             {piece && !isPieceDraggedFromHere && (
                                 <img
                                     src={getPieceImageSrc(piece.type, piece.color)}
-                                    alt={`${piece.color === 'w' ? 'White' : 'Black'} ${PIECE_NAME[piece.type]}`}
+                                    alt={`${piece.color === 'w' ? t('white', 'White') : t('black', 'Black')} ${t(PIECE_NAME[piece.type].toLowerCase(), PIECE_NAME[piece.type])}`}
                                     className={`${styles.piece} ${
                                         piece.color === 'w' ? styles.white : styles.black
                                     } ${isOwnPiece && canInteract ? styles.draggablePiece : ''} ${

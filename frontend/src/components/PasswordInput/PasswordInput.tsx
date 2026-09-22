@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import styles from './PasswordInput.module.css'
 
 type Props = {
@@ -10,6 +11,7 @@ type Props = {
 }
 
 function PasswordInput({ value, onChange, placeholder, name = 'password', required = true }: Props) {
+	const { t } = useTranslation()
 	const [showPassword, setShowPassword] = useState(false)
 
 	return (
@@ -27,10 +29,11 @@ function PasswordInput({ value, onChange, placeholder, name = 'password', requir
 				type="button"
 				className={styles.eyeBtn}
 				onClick={() => setShowPassword(prev => !prev)}
+				aria-label={showPassword ? t('hide_password', 'Hide password') : t('show_password', 'Show password')}
 			>
 				<img
 					src={showPassword ? '/assets/eye-off.svg' : '/assets/eye.svg'}
-					alt={showPassword ? 'Hide password' : 'Show password'}
+					alt={showPassword ? t('hide_password', 'Hide password') : t('show_password', 'Show password')}
 					width={18}
 					height={18}
 				/>

@@ -37,12 +37,12 @@ export class ChatService {
 
 		const currentUser = await this.userRepository.findOne({ where: { id: currentUserId } });
 		if (!currentUser) {
-			throw new NotFoundException('Current user not found');
+			throw new NotFoundException('current_user_not_found');
 		}
 
 		const otherUser = await this.userRepository.findOne({ where: { id: otherUserId } });
 		if (!otherUser) {
-			throw new NotFoundException('Other user not found');
+			throw new NotFoundException('other_user_not_found');
 		}
 
 		const chat = this.chatRepository.create({

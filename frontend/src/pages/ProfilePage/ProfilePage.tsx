@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useProfile } from '../../hooks/useProfile'
+import { usePageTitle } from '../../hooks/usePageTitle'
 import type { TabType } from '../../constants/profileConstants'
 import ProfileHeader from '../../components/ProfileHeader/ProfileHeader'
 import ProfileTabs from '../../components/ProfileTabs/ProfileTabs'
@@ -33,6 +34,12 @@ function ProfilePage({ defaultTab = 'overview' }: Props) {
         goToSettings,
         goToUserProfile,
     } = useProfile(username, defaultTab)
+
+    usePageTitle(
+        user?.isOwnProfile ? 'page_title_profile' : 'page_title_user_profile',
+        user?.isOwnProfile ? 'Profile' : `${user?.username || ''}'s Profile`,
+        { username: user?.username || '' }
+    )
 
     if (error) {
         return (

@@ -48,7 +48,7 @@ function ProfileHeader({
                         ? `/uploads/${user.avatar}`
                         : `/assets/default.jpg`
                 }
-                alt="avatar"
+                alt={user.username || t('avatar', 'Avatar')}
                 onError={(e) => {
                     const target = e.currentTarget
                     if (!target.src.endsWith('/assets/default.jpg')) {

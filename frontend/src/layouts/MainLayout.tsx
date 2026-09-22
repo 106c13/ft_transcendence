@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Navbar from '../components/Navbar/Navbar'
 import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification'
 import { useChallengeSocket } from '../hooks/useChallengeSocket'
@@ -28,6 +29,7 @@ export type LayoutContextType = {
 }
 
 export default function MainLayout() {
+  const { t } = useTranslation()
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
@@ -79,7 +81,7 @@ export default function MainLayout() {
   }, [setTopSlot])
 
   if (!currentUser) {
-    return <div className="layout-loading">Loading...</div>
+    return <div className="layout-loading">{t('loading')}</div>
   }
 
   return (

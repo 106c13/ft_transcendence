@@ -1,8 +1,10 @@
 import { useTranslation } from 'react-i18next'
+import { usePageTitle } from '../../hooks/usePageTitle'
 import styles from './NotFoundPage.module.css'
 
 function NotFoundPage() {
 	const { t } = useTranslation()
+	usePageTitle('page_title_not_found', 'Page Not Found')
 
 	return (
 		<div className={styles.notFoundContainer}>

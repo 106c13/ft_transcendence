@@ -23,7 +23,7 @@ function PromotionOverlay({ playerColor, onSelect }: Props) {
 						>
 							<img
 								src={getPieceImageSrc(code, playerColor)}
-								alt={PIECE_NAME[code]}
+								alt={t(PIECE_NAME[code].toLowerCase(), PIECE_NAME[code])}
 								className={styles.promotionPieceIcon}
 							/>
 						</button>

@@ -40,7 +40,7 @@ export class UsersController {
 		const user = await this.usersService.findById(req.user.userId)
 
 		if (!user) {
-			throw new NotFoundException('User not found');
+			throw new NotFoundException('user_not_found');
 		}
 
 		const ratings = await this.ratingService.getAllRatings(user.id);
@@ -82,7 +82,7 @@ export class UsersController {
 		const user = await this.usersService.findByUsername(username)
 
 		if (!user) {
-			throw new NotFoundException('User not found')
+			throw new NotFoundException('user_not_found')
 		}
 
 		// Manually check token
@@ -139,19 +139,19 @@ export class UsersController {
 		const userId = req.user.userId
 
 		if (/[^a-zA-Z0-9]/.test(body.username)) {
-			throw new BadRequestException('Username should contain only letters and numbers');
+			throw new BadRequestException('username_invalid_chars');
 		}
 
 		if (body.username.length > 15) {
-			throw new BadRequestException('Username should be less than 15 characters');
+			throw new BadRequestException('username_too_long');
 		}
 
 		if (body.bio.length > 100) {
-			throw new BadRequestException('Bio should be less than 100 characters');
+			throw new BadRequestException('bio_too_long');
 		}
 
 		if (body.email && !isValidEmail(body.email)) {
-			throw new BadRequestException('Invalid email format');
+			throw new BadRequestException('invalid_email_format');
 		}
 
 

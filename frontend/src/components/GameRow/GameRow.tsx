@@ -78,7 +78,7 @@ export default function GameRow({ match, username, onSelect }: Props) {
 			{/* 1. Game Mode (First) - Icon on top, mode name under icon */}
 			<div className={styles.modeCol}>
 				<span className={styles.modeIcon}>{modeIcon}</span>
-				<span className={`${styles.modeName} ${modeClass}`}>{match.mode}</span>
+				<span className={`${styles.modeName} ${modeClass}`}>{t(match.mode.toLowerCase(), match.mode)}</span>
 			</div>
 
 			{/* 2. Players Column (White on top, Black on bottom) */}
@@ -88,7 +88,7 @@ export default function GameRow({ match, username, onSelect }: Props) {
 					<div className={styles.playerRow}>
 						<img
 							src={getAvatarUrl(whitePlayer?.avatar)}
-							alt={whitePlayer?.username || 'White'}
+							alt={whitePlayer?.username || t('white', 'White')}
 							className={styles.playerAvatar}
 							onError={(e) => {
 								const target = e.currentTarget
@@ -103,7 +103,7 @@ export default function GameRow({ match, username, onSelect }: Props) {
 							aria-label={t('white', 'White')}
 						/>
 						<span className={`${styles.playerName} ${isUserWhite ? styles.currentUser : ''}`}>
-							{whitePlayer?.username || 'Unknown'}
+							{whitePlayer?.username || t('unknown', 'Unknown')}
 						</span>
 						{whiteRating !== null && whiteRating !== undefined && (
 							<span className={styles.playerRating}>({whiteRating})</span>
@@ -114,7 +114,7 @@ export default function GameRow({ match, username, onSelect }: Props) {
 					<div className={styles.playerRow}>
 						<img
 							src={getAvatarUrl(blackPlayer?.avatar)}
-							alt={blackPlayer?.username || 'Black'}
+							alt={blackPlayer?.username || t('black', 'Black')}
 							className={styles.playerAvatar}
 							onError={(e) => {
 								const target = e.currentTarget
@@ -129,7 +129,7 @@ export default function GameRow({ match, username, onSelect }: Props) {
 							aria-label={t('black', 'Black')}
 						/>
 						<span className={`${styles.playerName} ${isUserBlack ? styles.currentUser : ''}`}>
-							{blackPlayer?.username || 'Unknown'}
+							{blackPlayer?.username || t('unknown', 'Unknown')}
 						</span>
 						{blackRating !== null && blackRating !== undefined && (
 							<span className={styles.playerRating}>({blackRating})</span>

@@ -30,7 +30,7 @@ export class NotificationService implements OnModuleInit {
 
 	async getNotifications(userId: number) {
 		if (isNaN(userId))
-			throw new BadRequestException('invalid user id');
+			throw new BadRequestException('invalid_user_id');
 
 		return this.notificationRepo
 			.createQueryBuilder('notification')
@@ -45,10 +45,10 @@ export class NotificationService implements OnModuleInit {
 		body: { message: string; link: string },
 	) {
 		if (isNaN(userId))
-			throw new BadRequestException('invalid user id');
+			throw new BadRequestException('invalid_user_id');
 
 		if (!body.message || !body.link)
-			throw new BadRequestException('missing fields');
+			throw new BadRequestException('missing_fields');
 
 		const notification = this.notificationRepo.create({
 			user_id: userId,
@@ -63,7 +63,7 @@ export class NotificationService implements OnModuleInit {
 
 	async deleteNotification(userId: number, notificationId: number) {
 		if (isNaN(userId) || isNaN(notificationId))
-			throw new BadRequestException('invalid params');
+			throw new BadRequestException('invalid_params');
 
 		const notification = await this.notificationRepo.findOne({
 			where: {
@@ -73,7 +73,7 @@ export class NotificationService implements OnModuleInit {
 		});
 
 		if (!notification)
-			throw new NotFoundException('notification not found');
+			throw new NotFoundException('notification_not_found');
 
 		await this.notificationRepo.remove(notification);
 
@@ -82,7 +82,7 @@ export class NotificationService implements OnModuleInit {
 
 	async readNotification(userId: number, notificationId: number) {
 		if (isNaN(userId) || isNaN(notificationId))
-			throw new BadRequestException('invalid params');
+			throw new BadRequestException('invalid_params');
 
 		const notification = await this.notificationRepo.findOne({
 			where: {
@@ -92,7 +92,7 @@ export class NotificationService implements OnModuleInit {
 		});
 
 		if (!notification)
-			throw new NotFoundException('notification not found');
+			throw new NotFoundException('notification_not_found');
 
 		notification.is_read = true;
 
@@ -103,7 +103,7 @@ export class NotificationService implements OnModuleInit {
 
 	async readAllNotifications(userId: number) {
 		if (isNaN(userId))
-			throw new BadRequestException('invalid user id');
+			throw new BadRequestException('invalid_user_id');
 
 		await this.notificationRepo
 			.createQueryBuilder()
@@ -118,7 +118,7 @@ export class NotificationService implements OnModuleInit {
 
 	async clearAllNotifications(userId: number) {
 		if (isNaN(userId))
-			throw new BadRequestException('invalid user id');
+			throw new BadRequestException('invalid_user_id');
 
 		await this.notificationRepo
 			.createQueryBuilder()
@@ -133,7 +133,7 @@ export class NotificationService implements OnModuleInit {
 
 	async getUnreadCount(userId: number) {
 		if (isNaN(userId))
-			throw new BadRequestException('invalid user id');
+			throw new BadRequestException('invalid_user_id');
 
 		const count = await this.notificationRepo
 			.createQueryBuilder('notification')

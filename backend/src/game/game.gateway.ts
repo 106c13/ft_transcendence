@@ -167,14 +167,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleFindMatch(client: Socket, payload: { mode: 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2' }) {
 		const userIdStr = client.handshake.query.userId;
 		if (!userIdStr) {
-			client.emit('error', { message: 'Unauthorized' });
+			client.emit('error', { message: 'unauthorized' });
 			return;
 		}
 
 		const userId = parseInt(userIdStr as string);
 		const user = await this.usersService.findById(userId);
 		if (!user) {
-			client.emit('error', { message: 'User not found' });
+			client.emit('error', { message: 'user_not_found' });
 			return;
 		}
 
@@ -366,7 +366,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const userId = parseInt(userIdStr as string);
 		const gameId = payload?.gameId;
 		if (!gameId) {
-			client.emit('error', { message: 'Missing gameId' });
+			client.emit('error', { message: 'missing_game_id' });
 			return;
 		}
 
@@ -392,7 +392,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		const rematch = this.gameService.addRematchRequest(gameId, userId);
 		if (!rematch) {
-			client.emit('error', { message: 'Cannot request rematch' });
+			client.emit('error', { message: 'cannot_request_rematch' });
 			return;
 		}
 
@@ -437,7 +437,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		const result = this.gameService.acceptRematch(gameId, userId);
 		if (!result) {
-			client.emit('error', { message: 'Rematch not found or expired' });
+			client.emit('error', { message: 'rematch_not_found_or_expired' });
 			return;
 		}
 

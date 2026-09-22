@@ -87,7 +87,7 @@ function Navbar({ currentUser }: Props) {
 					>
 						<img
 							src={currentUser?.avatar && currentUser.avatar !== 'default.jpg' ? `/uploads/${currentUser.avatar}` : '/assets/default.jpg'}
-							alt="profile"
+							alt={currentUser?.username || t('profile_tab', 'Profile')}
 							className={styles.navProfileAvatar}
 							onError={(e) => {
 								const target = e.currentTarget

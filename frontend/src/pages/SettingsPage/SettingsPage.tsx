@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { LayoutContextType } from '../../layouts/MainLayout'
+import { usePageTitle } from '../../hooks/usePageTitle'
 import ProfileInfoForm from '../../components/ProfileInfoForm/ProfileInfoForm'
 import ChangePasswordForm from '../../components/ChangePasswordForm/ChangePasswordForm'
 import styles from './SettingsPage.module.css'
@@ -10,6 +11,7 @@ type SettingsTab = 'profile' | 'security'
 
 function SettingsPage() {
 	const { t } = useTranslation()
+	usePageTitle('page_title_settings', 'Settings')
 	const navigate = useNavigate()
 	const { currentUser, setCurrentUser } = useOutletContext<LayoutContextType>()
 	const [activeTab, setActiveTab] = useState<SettingsTab>('profile')

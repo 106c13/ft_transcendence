@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useGameSocket } from '../../hooks/useGameSocket'
 import { useChessBoard } from '../../hooks/useChessBoard'
+import { usePageTitle } from '../../hooks/usePageTitle'
 import { getPieceImageSrc } from '../../constants/gameConstants'
 
 import PlayerBanner from '../../components/PlayerBanner/Playerbanner'
@@ -11,6 +12,7 @@ import styles from './GamePage.module.css'
 
 export default function GamePage() {
     const { t } = useTranslation()
+    usePageTitle('page_title_game', 'Chess Arena')
 
     const game = useGameSocket()
     const board = useChessBoard({
@@ -97,7 +99,7 @@ export default function GamePage() {
                             />
 
                             <PlayerBanner
-                                name={game.currentUser?.username || 'You'}
+                                name={game.currentUser?.username || t('you')}
                                 color={game.playerColor === 'w' ? 'w' : 'b'}
                                 time={game.playerColor === 'w' ? game.whiteTime : game.blackTime}
                                 isActive={game.turn === game.playerColor}

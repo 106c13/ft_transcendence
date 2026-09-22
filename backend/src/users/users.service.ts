@@ -50,13 +50,13 @@ export class UsersService {
 
 	async updateUser(id: number, data: Partial<User>) {
 		if (data.email && !isValidEmail(data.email)) {
-			throw new BadRequestException('Invalid email format')
+			throw new BadRequestException('invalid_email_format')
 		}
 
 		const user = await this.usersRepo.findOne({ where: { id } })
 
 		if (!user) {
-			throw new BadRequestException('User not found')
+			throw new BadRequestException('user_not_found')
 		}
 
 		if (data.username && data.username !== user.username) {
@@ -65,7 +65,7 @@ export class UsersService {
 			})
 
 			if (exists) {
-				throw new BadRequestException('Username already exists')
+				throw new BadRequestException('username_already_exists')
 			}
 		}
 
@@ -75,7 +75,7 @@ export class UsersService {
 			})
 
 			if (exists) {
-				throw new BadRequestException('Email already taken')
+				throw new BadRequestException('email_already_exists')
 			}
 		}
 
@@ -95,17 +95,17 @@ export class UsersService {
 		const user = await this.usersRepo.findOne({ where: { id: userId } })
 
 		if (!user) {
-			throw new BadRequestException('User not found')
+			throw new BadRequestException('user_not_found')
 		}
 
 		const isMatch = await bcrypt.compare(data.oldPassword, user.password)
 
 		if (!isMatch) {
-			throw new BadRequestException('Old password is incorrect')
+			throw new BadRequestException('old_password_incorrect')
 		}
 
 		if (data.newPassword.length < 8) {
-			throw new BadRequestException('Password too short')
+			throw new BadRequestException('password_too_short')
 		}
 
 		const hasLetter = /[a-zA-Z]/.test(data.newPassword);
@@ -113,7 +113,7 @@ export class UsersService {
 		const hasSpecial = /[^a-zA-Z0-9]/.test(data.newPassword);
 
 		if (!hasLetter || !hasNumber || !hasSpecial) {
-			throw new BadRequestException('Password must contain at least one letter, one number, and one special character');
+			throw new BadRequestException('password_complexity_error');
 		}
 
 		const hashed = await bcrypt.hash(data.newPassword, 10)
@@ -122,7 +122,7 @@ export class UsersService {
 
 		await this.usersRepo.save(user)
 
-		return { message: 'Password updated successfully' }
+		return { message: 'password_updated' }
 	}
 
 	async searchUser(query: string) {

@@ -94,7 +94,7 @@ export default function ToastItem({ toast, onDismiss }: Props) {
           type="button"
           className={styles.closeBtn}
           onClick={() => onDismiss(toast.id)}
-          aria-label="Dismiss notification"
+          aria-label={t('dismiss_notification', 'Dismiss notification')}
         >
           ✕
         </button>

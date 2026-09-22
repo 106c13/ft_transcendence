@@ -55,11 +55,11 @@ export class ChatController {
 		const otherUserId = parseInt(userIdParam)
 		
 		if (isNaN(otherUserId)) {
-			throw new BadRequestException('Invalid user ID')
+			throw new BadRequestException('invalid_user_id')
 		}
 		
 		if (currentUserId === otherUserId) {
-			throw new BadRequestException('Cannot create chat with yourself')
+			throw new BadRequestException('cannot_chat_with_yourself')
 		}
 		
 		const id1 = Math.min(currentUserId, otherUserId)
@@ -74,13 +74,13 @@ export class ChatController {
 		
 		const otherUser = await this.usersService.findById(otherUserId)
 		if (!otherUser) {
-			throw new NotFoundException('User not found')
+			throw new NotFoundException('user_not_found')
 		}
 		
 		let newChat = await this.chatService.createChat(currentUserId, otherUserId)
 		
 		if (!newChat) {
-			throw new NotFoundException('Cant create new chat')
+			throw new NotFoundException('cannot_create_chat')
 		}
 			
 		return this.formatChat(newChat)

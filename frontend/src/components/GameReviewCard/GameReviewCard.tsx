@@ -99,7 +99,7 @@ export default function GameReviewCard({ games, currentUsername, loading }: Prop
 
 	const isWhite = selectedGame.white?.username === currentUsername
 	const opponent = isWhite ? selectedGame.black : selectedGame.white
-	const opponentName = opponent?.username || 'Opponent'
+	const opponentName = opponent?.username || t('opponent')
 
 	// Calculate arrow coordinates if lastMove exists
 	let arrowShaft: React.ReactNode = null
@@ -211,7 +211,7 @@ export default function GameReviewCard({ games, currentUsername, loading }: Prop
 									{piece && (
 										<img
 											src={getPieceImageSrc(piece.type, piece.color)}
-											alt={`${piece.color === 'w' ? 'White' : 'Black'} ${PIECE_NAME[piece.type]}`}
+											alt={`${piece.color === 'w' ? t('white') : t('black')} ${t(PIECE_NAME[piece.type].toLowerCase())}`}
 											className={styles.pieceImg}
 											draggable={false}
 										/>

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
@@ -380,18 +380,18 @@ export class GameService {
 	makeMove(gameId: string, userId: number, from: string, to: string, promotion?: string): any {
 		const game = this.activeGames.get(gameId);
 		if (!game) {
-			return { error: 'Game not found' };
+			return { error: 'game_not_found' };
 		}
 
 		if (game.disconnectedPlayerIds.size > 0) {
-			return { error: 'Game paused. Opponent is disconnected' };
+			return { error: 'game_paused_opponent_disconnected' };
 		}
 
 		const turn = game.board.turn(); // 'w' or 'b'
 		const expectedPlayer = turn === 'w' ? game.white : game.black;
 
 		if (expectedPlayer.userId !== userId) {
-			return { error: 'Not your turn' };
+			return { error: 'not_your_turn' };
 		}
 
 		// Calculate elapsed time and deduct
@@ -407,11 +407,11 @@ export class GameService {
 		// Check for timeout
 		if (turn === 'w' && game.whiteTime <= 0) {
 			this.handleTimeout(game, 'w');
-			return { error: 'Time out' };
+			return { error: 'time_out' };
 		}
 		if (turn === 'b' && game.blackTime <= 0) {
 			this.handleTimeout(game, 'b');
-			return { error: 'Time out' };
+			return { error: 'time_out' };
 		}
 
 		// Attempt to apply move
@@ -423,7 +423,7 @@ export class GameService {
 			});
 
 			if (!move) {
-				return { error: 'Invalid move' };
+				return { error: 'invalid_move' };
 			}
 
 			// Clear current turn timer
@@ -471,7 +471,7 @@ export class GameService {
 				isCheck: game.board.inCheck(),
 			};
 		} catch (e) {
-			return { error: 'Invalid move' };
+			return { error: 'invalid_move' };
 		}
 	}
 
@@ -503,10 +503,10 @@ export class GameService {
 	// Handle draw offer
 	offerDraw(gameId: string, userId: number): { success: boolean; opponentSocketId?: string; error?: string } {
 		const game = this.activeGames.get(gameId);
-		if (!game) return { success: false, error: 'Game not found' };
+		if (!game) return { success: false, error: 'game_not_found' };
 
 		if (game.white.userId !== userId && game.black.userId !== userId) {
-			return { success: false, error: 'User not in game' };
+			return { success: false, error: 'user_not_in_game' };
 		}
 
 		// If opponent already offered a draw, accept it
@@ -523,10 +523,10 @@ export class GameService {
 	// Handle draw acceptance
 	acceptDraw(gameId: string, userId: number): { success: boolean; error?: string } {
 		const game = this.activeGames.get(gameId);
-		if (!game) return { success: false, error: 'Game not found' };
+		if (!game) return { success: false, error: 'game_not_found' };
 
 		if (!game.drawOfferUserId || game.drawOfferUserId === userId) {
-			return { success: false, error: 'No draw offer to accept' };
+			return { success: false, error: 'no_draw_offer_to_accept' };
 		}
 
 		game.drawOfferUserId = null;
@@ -554,10 +554,10 @@ export class GameService {
 	// Handle draw decline
 	declineDraw(gameId: string, userId: number): { success: boolean; requesterSocketId?: string; error?: string } {
 		const game = this.activeGames.get(gameId);
-		if (!game) return { success: false, error: 'Game not found' };
+		if (!game) return { success: false, error: 'game_not_found' };
 
 		if (!game.drawOfferUserId || game.drawOfferUserId === userId) {
-			return { success: false, error: 'No draw offer to decline' };
+			return { success: false, error: 'no_draw_offer_to_decline' };
 		}
 
 		const requesterUserId = game.drawOfferUserId;
@@ -940,7 +940,7 @@ export class GameService {
 		});
 
 		if (!match) {
-			throw new Error('Match not found');
+			throw new NotFoundException('match_not_found');
 		}
 
 		if (match.analysis) {

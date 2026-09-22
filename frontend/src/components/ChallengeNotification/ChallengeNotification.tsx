@@ -17,12 +17,12 @@ function ChallengeNotification({ challenge, countdown = 30, onAccept, onDecline 
 	const lastTickRef = useRef<number | null>(null)
 
 	const modeLabels: Record<string, string> = {
-		'bullet': 'Bullet (1 min)',
-		'bullet+2': 'Bullet (1|+2s)',
-		'blitz': 'Blitz (3 min)',
-		'blitz+2': 'Blitz (3|+2s)',
-		'rapid': 'Rapid (10 min)',
-		'rapid+2': 'Rapid (10|+2s)',
+		'bullet': `${t('bullet')} (${t('time_1_min')})`,
+		'bullet+2': `${t('bullet')} (${t('time_1_inc')})`,
+		'blitz': `${t('blitz')} (${t('time_3_min')})`,
+		'blitz+2': `${t('blitz')} (${t('time_3_inc')})`,
+		'rapid': `${t('rapid')} (${t('time_10_min')})`,
+		'rapid+2': `${t('rapid')} (${t('time_10_inc')})`,
 	}
 
 	useEffect(() => {
@@ -63,8 +63,11 @@ function ChallengeNotification({ challenge, countdown = 30, onAccept, onDecline 
 
 				<div className={styles.challengeBody}>
 					<p className={styles.challengeText}>
-						<strong>{challenge.from}</strong> {t('challenges_you_to', 'challenges you to a')}{' '}
-						<strong>{modeLabels[challenge.mode] || challenge.mode}</strong> {t('game_excl', 'game!')}
+						{t('challenges_you_to_game', {
+							from: challenge.from,
+							mode: modeLabels[challenge.mode] || challenge.mode,
+							defaultValue: `${challenge.from} challenges you to a ${modeLabels[challenge.mode] || challenge.mode} game!`,
+						})}
 					</p>
 				</div>
 

@@ -3,6 +3,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useGameHistory } from '../../hooks/useGameHistory'
 import { useRatingHistory, type RatingCategory } from '../../hooks/useRatingHistory'
+import { usePageTitle } from '../../hooks/usePageTitle'
 import type { User } from '../../constants/profileConstants'
 import BigRatingChart from '../../components/BigRatingChart/BigRatingChart'
 import CustomSelect, { type SelectOption } from '../../components/CustomSelect/CustomSelect'
@@ -12,6 +13,7 @@ const VALID_MODES: RatingCategory[] = ['bullet', 'blitz', 'rapid']
 
 export default function RatingHistoryPage() {
 	const { t } = useTranslation()
+	usePageTitle('page_title_rating_history', 'Rating History')
 	const { username: paramUsername } = useParams()
 	const navigate = useNavigate()
 	const [searchParams, setSearchParams] = useSearchParams()
@@ -77,9 +79,9 @@ export default function RatingHistoryPage() {
 	const currentModeHistory = ratingData[selectedMode]
 
 	const modeOptions: SelectOption<RatingCategory>[] = [
-		{ value: 'bullet', icon: '🔥', label: `${t('bullet_rating', 'Bullet')} (1 min)` },
-		{ value: 'blitz', icon: '⚡', label: `${t('blitz_rating', 'Blitz')} (3 min)` },
-		{ value: 'rapid', icon: '⏳', label: `${t('rapid_rating', 'Rapid')} (10 min)` },
+		{ value: 'bullet', icon: '🔥', label: `${t('bullet_rating', 'Bullet')} (${t('time_1_min', '1 min')})` },
+		{ value: 'blitz', icon: '⚡', label: `${t('blitz_rating', 'Blitz')} (${t('time_3_min', '3 min')})` },
+		{ value: 'rapid', icon: '⏳', label: `${t('rapid_rating', 'Rapid')} (${t('time_10_min', '10 min')})` },
 	]
 
 	return (
