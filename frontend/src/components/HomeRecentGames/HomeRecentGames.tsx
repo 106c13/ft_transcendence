@@ -30,13 +30,12 @@ export default function HomeRecentGames({ matches, username, loading }: Props) {
 		<div className={styles.recentGamesCard}>
 			<div className={styles.header}>
 				<div className={styles.titleGroup}>
-					<span className={styles.titleIcon}>⚔️</span>
 					<h3 className={styles.cardTitle}>{t('recent_games', 'Recent Matches')}</h3>
 					<span className={styles.countBadge}>{matches.length}</span>
 				</div>
 
 				{matches.length > 0 && (
-					<button className={styles.seeAllTopBtn} onClick={handleSeeAll} type="button">
+					<button className={styles.seeAllBtn} onClick={handleSeeAll} type="button">
 						{t('see_all', 'See all')} →
 					</button>
 				)}
@@ -54,17 +53,16 @@ export default function HomeRecentGames({ matches, username, loading }: Props) {
 					<p className={styles.emptySub}>{t('play_a_game_hint', 'Play online above to start building your match history.')}</p>
 				</div>
 			) : (
-				<>
-					<div className={styles.gamesListRows}>
-						<div className={styles.listHeader}>
-							<span>Opponent</span>
-							<span>Color</span>
-							<span>Date</span>
-							<span>Mode</span>
-							<span>Result</span>
-							<span></span>
-						</div>
+				<div className={styles.gamesListRows}>
+					<div className={styles.listHeader}>
+						<span>{t('mode', 'Mode')}</span>
+						<span>{t('players', 'Players')}</span>
+						<span>{t('result', 'Result')}</span>
+						<span>{t('review', 'Review')}</span>
+						<span>{t('date', 'Date')}</span>
+					</div>
 
+					<div className={styles.rowsContainer}>
 						{recentMatches.map((match) => (
 							<GameRow
 								key={match.id}
@@ -74,15 +72,7 @@ export default function HomeRecentGames({ matches, username, loading }: Props) {
 							/>
 						))}
 					</div>
-
-					{matches.length > 6 && (
-						<div className={styles.seeAllContainer}>
-							<button className={styles.seeAllBtn} onClick={handleSeeAll} type="button">
-								{t('see_all', 'See all')} ({matches.length}) →
-							</button>
-						</div>
-					)}
-				</>
+				</div>
 			)}
 		</div>
 	)

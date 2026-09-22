@@ -1,20 +1,21 @@
 .ratingsCard {
-	background: #1E293B;
-	border: 1px solid rgba(148, 163, 184, 0.14);
-	border-radius: 14px;
-	padding: 14px 16px;
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	box-shadow: none;
+	padding: 0;
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
 	width: 100%;
 	box-sizing: border-box;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
 .cardHeader {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	padding: 0 2px;
 }
 
 .titleGroup {
@@ -23,72 +24,118 @@
 	gap: 8px;
 }
 
-.titleIcon {
-	font-size: 15px;
-}
-
 .cardTitle {
-	font-size: 14px;
+	font-size: 14.5px;
 	font-weight: 700;
 	color: #F8FAFC;
 	margin: 0;
 }
 
-.viewAllLink {
-	font-size: 12px;
-	font-weight: 600;
-	color: #3B82F6;
+.seeAllBtn {
 	background: none;
 	border: none;
-	cursor: pointer;
-	padding: 0;
-	transition: color 0.15s;
-}
-
-.viewAllLink:hover {
 	color: #60A5FA;
-	text-decoration: underline;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 3px 6px;
+	border-radius: 6px;
+	transition: all 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
 }
 
-.ratingsList {
+.seeAllBtn:hover {
+	background: rgba(96, 165, 250, 0.1);
+	color: #93C5FD;
+}
+
+.ratingsListSection {
 	display: flex;
 	flex-direction: column;
-	gap: 8px;
+	gap: 4px;
+	width: 100%;
+}
+
+.listHeader {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	padding: 2px 14px;
+	font-size: 10.5px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #64748B;
+	text-align: center;
+}
+
+.listHeader span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	line-height: 1.15;
+}
+
+.rowsContainer {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	gap: 0;
 }
 
 .ratingRow {
-	display: flex;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	align-items: center;
-	justify-content: space-between;
-	padding: 10px 12px;
-	border-radius: 10px;
-	background: rgba(15, 23, 42, 0.45);
+	padding: 9px 14px;
+	border-radius: 0;
+	background: #1E293B;
 	border: 1px solid rgba(148, 163, 184, 0.1);
+	border-bottom: none;
 	cursor: pointer;
-	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: background 0.15s ease;
+	text-decoration: none;
+}
+
+.ratingRow:first-child {
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+
+.ratingRow:last-child {
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+	border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.ratingRow:only-child {
+	border-radius: 10px;
+	border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.ratingRow:nth-child(even) {
+	background: #192335;
 }
 
 .ratingRow:hover {
-	transform: translateX(2px);
-	background: rgba(30, 41, 59, 0.8);
+	background: #253347;
 }
 
-.bulletBorder:hover {
-	border-color: rgba(245, 158, 11, 0.4);
+@media (max-width: 768px) {
+	.listHeader {
+		display: none;
+	}
 }
 
-.blitzBorder:hover {
-	border-color: rgba(56, 189, 248, 0.4);
-}
-
-.rapidBorder:hover {
-	border-color: rgba(129, 140, 248, 0.4);
-}
-
+.modeCol,
 .modeLeft {
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	justify-content: center;
+	gap: 8px;
+	text-align: center;
 }
 
 .modeIcon {
@@ -99,6 +146,8 @@
 .modeMeta {
 	display: flex;
 	flex-direction: column;
+	align-items: center;
+	text-align: center;
 }
 
 .modeName {
@@ -114,15 +163,18 @@
 	font-family: var(--mono, monospace);
 }
 
-.modeRight {
+.ratingCol {
 	display: flex;
 	flex-direction: column;
-	align-items: flex-end;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
 }
 
 .ratingValueWrapper {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 4px;
 }
 
@@ -147,9 +199,32 @@
 	border-radius: 4px;
 }
 
+.winrateCol {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	gap: 2px;
+}
+
+.winrateValue {
+	font-size: 15px;
+	font-weight: 800;
+	color: #F8FAFC;
+	font-family: var(--mono, monospace);
+	line-height: 1.2;
+}
+
+.winrateValue.unrated {
+	color: #64748B;
+	font-weight: 600;
+}
+
 .recordSub {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 3px;
 	font-size: 10.5px;
 	color: #64748B;
@@ -163,5 +238,9 @@
 
 .losses {
 	color: #F87171;
+}
+
+.draws {
+	color: #94A3B8;
 }
 

@@ -44,11 +44,17 @@ function ProfileHeader({
             <img
                 className={styles.profileAvatar}
                 src={
-                    user.avatar
+                    user.avatar && user.avatar !== 'default.jpg'
                         ? `/uploads/${user.avatar}`
                         : `/assets/default.jpg`
                 }
                 alt="avatar"
+                onError={(e) => {
+                    const target = e.currentTarget
+                    if (!target.src.endsWith('/assets/default.jpg')) {
+                        target.src = '/assets/default.jpg'
+                    }
+                }}
             />
 
             <div className={styles.profileInfo}>

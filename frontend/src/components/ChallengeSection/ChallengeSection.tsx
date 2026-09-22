@@ -108,9 +108,15 @@ function ChallengeSection({
 							{selectedFriendObj ? (
 								<>
 									<img
-										src={selectedFriendObj.avatar ? `/uploads/${selectedFriendObj.avatar}` : '/assets/default.jpg'}
+										src={selectedFriendObj.avatar && selectedFriendObj.avatar !== 'default.jpg' ? `/uploads/${selectedFriendObj.avatar}` : '/assets/default.jpg'}
 										alt={selectedFriendObj.username}
 										className={styles.triggerAvatar}
+										onError={(e) => {
+											const target = e.currentTarget
+											if (!target.src.endsWith('/assets/default.jpg')) {
+												target.src = '/assets/default.jpg'
+											}
+										}}
 									/>
 									<span className={styles.triggerSelectedName}>{selectedFriendObj.username}</span>
 								</>
@@ -210,9 +216,15 @@ function ChallengeSection({
 												onClick={() => handleSelect(friend.username)}
 											>
 												<img
-													src={friend.avatar ? `/uploads/${friend.avatar}` : '/assets/default.jpg'}
+													src={friend.avatar && friend.avatar !== 'default.jpg' ? `/uploads/${friend.avatar}` : '/assets/default.jpg'}
 													alt={friend.username}
 													className={styles.optionAvatar}
+													onError={(e) => {
+														const target = e.currentTarget
+														if (!target.src.endsWith('/assets/default.jpg')) {
+															target.src = '/assets/default.jpg'
+														}
+													}}
 												/>
 												<span className={styles.optionUsername}>{friend.username}</span>
 												{isSelected && <span className={styles.optionCheck}>✓</span>}

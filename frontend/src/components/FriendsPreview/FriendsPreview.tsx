@@ -39,9 +39,15 @@ export default function FriendsPreview({ friends, onFriendClick, onSeeAll }: Pro
 							tabIndex={0}
 						>
 							<img
-								src={friend.avatar ? `/uploads/${friend.avatar}` : '/assets/default.jpg'}
+								src={friend.avatar && friend.avatar !== 'default.jpg' ? `/uploads/${friend.avatar}` : '/assets/default.jpg'}
 								alt={friend.username}
 								className={styles.avatarImg}
+								onError={(e) => {
+									const target = e.currentTarget
+									if (!target.src.endsWith('/assets/default.jpg')) {
+										target.src = '/assets/default.jpg'
+									}
+								}}
 							/>
 							<span
 								className={`${styles.statusDot} ${

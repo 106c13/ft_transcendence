@@ -86,9 +86,15 @@ function Navbar({ currentUser }: Props) {
 						}}
 					>
 						<img
-							src={currentUser?.avatar ? `/uploads/${currentUser.avatar}` : '/assets/default.jpg'}
+							src={currentUser?.avatar && currentUser.avatar !== 'default.jpg' ? `/uploads/${currentUser.avatar}` : '/assets/default.jpg'}
 							alt="profile"
 							className={styles.navProfileAvatar}
+							onError={(e) => {
+								const target = e.currentTarget
+								if (!target.src.endsWith('/assets/default.jpg')) {
+									target.src = '/assets/default.jpg'
+								}
+							}}
 						/>
 
 						{showProfileMenu && (

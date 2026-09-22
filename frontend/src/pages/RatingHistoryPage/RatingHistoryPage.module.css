@@ -98,13 +98,14 @@
 }
 
 .avatar {
-	width: 54px;
-	height: 54px;
 	width: 46px;
 	height: 46px;
+	aspect-ratio: 1 / 1;
 	border-radius: 50%;
 	object-fit: cover;
+	display: block;
 	border: 2px solid rgba(148, 163, 184, 0.2);
+	background: #334155;
 }
 
 .userInfo {

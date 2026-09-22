@@ -8,13 +8,26 @@ type Props = {
 	onSelect: (match: MatchRecord) => void
 }
 
+function getAvatarUrl(avatar?: string | null) {
+	if (!avatar || avatar === 'default.jpg') {
+		return '/assets/default.jpg'
+	}
+	if (avatar.startsWith('http://') || avatar.startsWith('https://') || avatar.startsWith('/')) {
+		return avatar
+	}
+	return `/uploads/${avatar}`
+}
+
 export default function GameRow({ match, username, onSelect }: Props) {
 	const { t } = useTranslation()
 
-	const isWhite = match.white?.username === username
-	const opponent = isWhite ? match.black : match.white
-	const delta = isWhite ? match.white_rating_delta : match.black_rating_delta
-	const oppRating = isWhite ? match.black_rating_after : match.white_rating_after
+	const isUserWhite = match.white?.username === username
+	const isUserBlack = match.black?.username === username
+	const isWhite = isUserWhite
+	const whitePlayer = match.white
+	const blackPlayer = match.black
+	const whiteRating = match.white_rating_after
+	const blackRating = match.black_rating_after
 
 	// Determine result
 	let outcome: 'win' | 'loss' | 'draw' = 'draw'
@@ -61,57 +74,74 @@ export default function GameRow({ match, username, onSelect }: Props) {
 	const modeIcon = isBullet ? '🔥' : isBlitz ? '⚡' : isRapid ? '⏳' : '♟'
 
 	return (
-		<div
-			className={styles.gameRow}
-			onClick={() => onSelect(match)}
-			role="button"
-			tabIndex={0}
-		>
-			{/* Opponent Info */}
-			<div className={styles.opponentCol}>
-				<img
-					src={opponent?.avatar ? `/uploads/${opponent.avatar}` : '/assets/default.jpg'}
-					alt={opponent?.username || 'Opponent'}
-					className={styles.opponentAvatar}
-				/>
-				<div className={styles.opponentInfo}>
-					<span className={styles.opponentName}>{opponent?.username || 'Unknown'}</span>
-					{oppRating !== null && oppRating !== undefined && (
-						<span className={styles.opponentRating}>{oppRating}</span>
-					)}
+		<div className={styles.gameRow}>
+			{/* 1. Game Mode (First) - Icon on top, mode name under icon */}
+			<div className={styles.modeCol}>
+				<span className={styles.modeIcon}>{modeIcon}</span>
+				<span className={`${styles.modeName} ${modeClass}`}>{match.mode}</span>
+			</div>
+
+			{/* 2. Players Column (White on top, Black on bottom) */}
+			<div className={styles.playersCol}>
+				<div className={styles.playersWrapper}>
+					{/* White Player (Always on top) */}
+					<div className={styles.playerRow}>
+						<img
+							src={getAvatarUrl(whitePlayer?.avatar)}
+							alt={whitePlayer?.username || 'White'}
+							className={styles.playerAvatar}
+							onError={(e) => {
+								const target = e.currentTarget
+								if (!target.src.endsWith('/assets/default.jpg')) {
+									target.src = '/assets/default.jpg'
+								}
+							}}
+						/>
+						<span
+							className={`${styles.colorSquare} ${styles.squareWhite}`}
+							title={t('white', 'White')}
+							aria-label={t('white', 'White')}
+						/>
+						<span className={`${styles.playerName} ${isUserWhite ? styles.currentUser : ''}`}>
+							{whitePlayer?.username || 'Unknown'}
+						</span>
+						{whiteRating !== null && whiteRating !== undefined && (
+							<span className={styles.playerRating}>({whiteRating})</span>
+						)}
+					</div>
+
+					{/* Black Player (Always on bottom) */}
+					<div className={styles.playerRow}>
+						<img
+							src={getAvatarUrl(blackPlayer?.avatar)}
+							alt={blackPlayer?.username || 'Black'}
+							className={styles.playerAvatar}
+							onError={(e) => {
+								const target = e.currentTarget
+								if (!target.src.endsWith('/assets/default.jpg')) {
+									target.src = '/assets/default.jpg'
+								}
+							}}
+						/>
+						<span
+							className={`${styles.colorSquare} ${styles.squareBlack}`}
+							title={t('black', 'Black')}
+							aria-label={t('black', 'Black')}
+						/>
+						<span className={`${styles.playerName} ${isUserBlack ? styles.currentUser : ''}`}>
+							{blackPlayer?.username || 'Unknown'}
+						</span>
+						{blackRating !== null && blackRating !== undefined && (
+							<span className={styles.playerRating}>({blackRating})</span>
+						)}
+					</div>
 				</div>
 			</div>
 
-			{/* Color */}
-			<div className={styles.colorCol}>
-				<span
-					className={`${styles.colorBadge} ${
-						isWhite ? styles.colorWhite : styles.colorBlack
-					}`}
-				>
-					<span className={styles.pieceIcon}>{isWhite ? '⚪' : '⚫'}</span>
-					<span>{isWhite ? t('white', 'White') : t('black', 'Black')}</span>
-				</span>
-			</div>
-
-			{/* Date Played */}
-			<div className={styles.dateCol}>
-				<span className={styles.dateFull}>{dateStr}</span>
-				{timeStr && <span className={styles.dateSub}>{timeStr}</span>}
-			</div>
-
-			{/* Game Mode - DISTINCT NEUTRAL COLOR, NOT CONFLICTING WITH WIN/LOSS */}
-			<div className={styles.modeCol}>
-				<span className={`${styles.modeBadge} ${modeClass}`}>
-					<span>{modeIcon}</span>
-					<span>{match.mode}</span>
-				</span>
-			</div>
-
-			{/* Result */}
+			{/* 3. Result */}
 			<div className={styles.resultCol}>
 				<span
-					className={`${styles.resultBadge} ${
+					className={`${styles.resultText} ${
 						outcome === 'win'
 							? styles.resultWin
 							: outcome === 'loss'
@@ -125,27 +155,24 @@ export default function GameRow({ match, username, onSelect }: Props) {
 						? t('loss', 'LOSS')
 						: t('draw', 'DRAW')}
 				</span>
-
-				{delta !== null && delta !== undefined && (
-					<span
-						className={`${styles.deltaBadge} ${
-							delta > 0
-								? styles.deltaPos
-								: delta < 0
-								? styles.deltaNeg
-								: styles.deltaZero
-						}`}
-					>
-						{delta > 0 ? `+${delta}` : delta}
-					</span>
-				)}
 			</div>
 
-			{/* Arrow Indicator */}
-			<div className={styles.arrowCol}>
-				<span>→</span>
+			{/* 4. Review Column (To the left of Date column) */}
+			<div className={styles.reviewCol}>
+				<button
+					type="button"
+					className={styles.reviewBtn}
+					onClick={() => onSelect(match)}
+				>
+					{t('review', 'Review')}
+				</button>
+			</div>
+
+			{/* 5. Date Played (Moved to end of data columns) */}
+			<div className={styles.dateCol}>
+				<span className={styles.dateFull}>{dateStr}</span>
+				{timeStr && <span className={styles.dateSub}>{timeStr}</span>}
 			</div>
 		</div>
 	)
 }
-

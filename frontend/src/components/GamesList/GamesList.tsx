@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import type { MatchRecord } from '../GameAnalysis/GameAnalysis'
@@ -35,10 +35,20 @@ export default function GamesList({
 	const [modeFilter, setModeFilter] = useState<'all' | 'bullet' | 'blitz' | 'rapid'>('all')
 	const [currentPage, setCurrentPage] = useState(1)
 
-	// Reset page when filters change
-	useEffect(() => {
+	const handleColorChange = (val: 'all' | 'white' | 'black') => {
+		setColorFilter(val)
 		setCurrentPage(1)
-	}, [colorFilter, resultFilter, modeFilter])
+	}
+
+	const handleResultChange = (val: 'all' | 'win' | 'loss' | 'draw') => {
+		setResultFilter(val)
+		setCurrentPage(1)
+	}
+
+	const handleModeChange = (val: 'all' | 'bullet' | 'blitz' | 'rapid') => {
+		setModeFilter(val)
+		setCurrentPage(1)
+	}
 
 	// Filtered matches
 	const filteredMatches = useMemo(() => {
@@ -129,15 +139,15 @@ export default function GamesList({
 
 	const colorOptions: SelectOption<'all' | 'white' | 'black'>[] = [
 		{ value: 'all', label: t('all_colors', 'All Colors') },
-		{ value: 'white', icon: '⚪', label: t('white', 'White') },
-		{ value: 'black', icon: '⚫', label: t('black', 'Black') },
+		{ value: 'white', label: t('white', 'White') },
+		{ value: 'black', label: t('black', 'Black') },
 	]
 
 	const resultOptions: SelectOption<'all' | 'win' | 'loss' | 'draw'>[] = [
 		{ value: 'all', label: t('all_results', 'All Results') },
-		{ value: 'win', icon: '🟢', label: t('wins', 'Wins') },
-		{ value: 'loss', icon: '🔴', label: t('losses', 'Losses') },
-		{ value: 'draw', icon: '⚪', label: t('draws', 'Draws') },
+		{ value: 'win', label: t('wins', 'Wins') },
+		{ value: 'loss', label: t('losses', 'Losses') },
+		{ value: 'draw', label: t('draws', 'Draws') },
 	]
 
 	const modeOptions: SelectOption<'all' | 'bullet' | 'blitz' | 'rapid'>[] = [
@@ -165,7 +175,7 @@ export default function GamesList({
 					<CustomSelect<'all' | 'white' | 'black'>
 						value={colorFilter}
 						options={colorOptions}
-						onChange={(val) => setColorFilter(val)}
+						onChange={handleColorChange}
 						minWidth={115}
 					/>
 				</div>
@@ -176,7 +186,7 @@ export default function GamesList({
 					<CustomSelect<'all' | 'win' | 'loss' | 'draw'>
 						value={resultFilter}
 						options={resultOptions}
-						onChange={(val) => setResultFilter(val)}
+						onChange={handleResultChange}
 						minWidth={115}
 					/>
 				</div>
@@ -187,7 +197,7 @@ export default function GamesList({
 					<CustomSelect<'all' | 'bullet' | 'blitz' | 'rapid'>
 						value={modeFilter}
 						options={modeOptions}
-						onChange={(val) => setModeFilter(val)}
+						onChange={handleModeChange}
 						minWidth={120}
 					/>
 				</div>
@@ -212,22 +222,23 @@ export default function GamesList({
 				<div className={styles.listContainer}>
 					{/* Table Column Labels */}
 					<div className={styles.listHeader}>
-						<span>Opponent</span>
-						<span>Color</span>
-						<span>Date</span>
-						<span>Mode</span>
-						<span>Result</span>
-						<span></span>
+						<span>{t('mode', 'Mode')}</span>
+						<span>{t('players', 'Players')}</span>
+						<span>{t('result', 'Result')}</span>
+						<span>{t('review', 'Review')}</span>
+						<span>{t('date', 'Date')}</span>
 					</div>
 
-					{paginatedMatches.map((match) => (
-						<GameRow
-							key={match.id}
-							match={match}
-							username={username}
-							onSelect={onSelectGame}
-						/>
-					))}
+					<div className={styles.rowsContainer}>
+						{paginatedMatches.map((match) => (
+							<GameRow
+								key={match.id}
+								match={match}
+								username={username}
+								onSelect={onSelectGame}
+							/>
+						))}
+					</div>
 				</div>
 			)}
 

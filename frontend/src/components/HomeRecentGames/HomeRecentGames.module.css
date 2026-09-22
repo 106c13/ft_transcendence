@@ -1,20 +1,21 @@
 .recentGamesCard {
-	background: #1E293B;
-	border: 1px solid rgba(148, 163, 184, 0.12);
-	border-radius: 14px;
-	padding: 16px 18px;
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	box-shadow: none;
+	padding: 0;
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
 	width: 100%;
 	box-sizing: border-box;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
 .header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	padding: 0 2px;
 }
 
 .titleGroup {
@@ -23,19 +24,15 @@
 	gap: 8px;
 }
 
-.titleIcon {
-	font-size: 15px;
-}
-
 .cardTitle {
-	font-size: 15px;
+	font-size: 14.5px;
 	font-weight: 700;
 	color: #F8FAFC;
 	margin: 0;
 }
 
 .countBadge {
-	font-size: 11.5px;
+	font-size: 11px;
 	font-weight: 700;
 	background: rgba(148, 163, 184, 0.12);
 	color: #94A3B8;
@@ -43,32 +40,43 @@
 	border-radius: 10px;
 }
 
-.seeAllTopBtn {
+.seeAllBtn {
 	background: none;
 	border: none;
-	color: #3B82F6;
-	font-size: 12.5px;
+	color: #60A5FA;
+	font-size: 12px;
 	font-weight: 600;
 	cursor: pointer;
-	padding: 0;
-	transition: color 0.15s;
+	padding: 3px 6px;
+	border-radius: 6px;
+	transition: all 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
 }
 
-.seeAllTopBtn:hover {
-	color: #60A5FA;
-	text-decoration: underline;
+.seeAllBtn:hover {
+	background: rgba(96, 165, 250, 0.1);
+	color: #93C5FD;
 }
 
 .gamesListRows {
 	display: flex;
 	flex-direction: column;
-	gap: 6px;
+	gap: 4px;
 	width: 100%;
+}
+
+.rowsContainer {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	gap: 0;
 }
 
 .listHeader {
 	display: grid;
-	grid-template-columns: minmax(140px, 1.8fr) 95px 120px 105px 110px 30px;
+	grid-template-columns: 80px minmax(200px, 1fr) 85px 95px 120px;
 	gap: 10px;
 	padding: 2px 14px;
 	font-size: 10.5px;
@@ -76,6 +84,14 @@
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
 	color: #64748B;
+	text-align: center;
+}
+
+.listHeader span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
 }
 
 @media (max-width: 768px) {
@@ -84,36 +100,15 @@
 	}
 }
 
-.seeAllContainer {
-	display: flex;
-	justify-content: center;
-	padding-top: 6px;
-}
-
-.seeAllBtn {
-	background: rgba(148, 163, 184, 0.08);
-	border: 1px solid rgba(148, 163, 184, 0.16);
-	color: #94A3B8;
-	font-size: 12.5px;
-	font-weight: 600;
-	padding: 7px 18px;
-	border-radius: 8px;
-	cursor: pointer;
-	transition: all 0.2s;
-}
-
-.seeAllBtn:hover {
-	background: rgba(59, 130, 246, 0.15);
-	border-color: rgba(59, 130, 246, 0.35);
-	color: #60A5FA;
-}
-
 .emptyState {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	padding: 40px 16px;
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.1);
+	border-radius: 10px;
 	color: #64748B;
 	text-align: center;
 }

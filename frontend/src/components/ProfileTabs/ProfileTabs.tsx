@@ -119,12 +119,22 @@ export default function ProfileTabs({
 						<div className={profileStyles.recentGamesHeader}>
 							<div className={profileStyles.titleGroup}>
 								<h3 className={profileStyles.sectionTitle}>
-									⚔️ {t('recent_games', 'Recent Matches')}
+									{t('recent_games', 'Recent Matches')}
 								</h3>
 								<span className={profileStyles.countBadge}>
 									{history.matches.length}
 								</span>
 							</div>
+
+							{history.matches.length > 0 && (
+								<button
+									className={profileStyles.seeAllBtn}
+									onClick={() => onSelectTab('games')}
+									type="button"
+								>
+									{t('see_all', 'See all')} →
+								</button>
+							)}
 						</div>
 
 						{history.loading ? (
@@ -136,17 +146,16 @@ export default function ProfileTabs({
 								{t('no_games_yet', 'No games played yet')}
 							</div>
 						) : (
-							<>
-								<div className={profileStyles.gamesListRows}>
-									<div className={profileStyles.listHeader}>
-										<span>Opponent</span>
-										<span>Color</span>
-										<span>Date</span>
-										<span>Mode</span>
-										<span>Result</span>
-										<span></span>
-									</div>
+							<div className={profileStyles.gamesListRows}>
+								<div className={profileStyles.listHeader}>
+									<span>{t('mode', 'Mode')}</span>
+									<span>{t('players', 'Players')}</span>
+									<span>{t('result', 'Result')}</span>
+									<span>{t('review', 'Review')}</span>
+									<span>{t('date', 'Date')}</span>
+								</div>
 
+								<div className={profileStyles.rowsContainer}>
 									{recentMatches.map((match) => (
 										<GameRow
 											key={match.id}
@@ -156,16 +165,7 @@ export default function ProfileTabs({
 										/>
 									))}
 								</div>
-
-								<div className={profileStyles.seeAllContainer}>
-									<button
-										className={profileStyles.seeAllGamesBtn}
-										onClick={() => onSelectTab('games')}
-									>
-										{t('see_all', 'See all')} ({history.matches.length}) →
-									</button>
-								</div>
-							</>
+							</div>
 						)}
 					</div>
 				</div>

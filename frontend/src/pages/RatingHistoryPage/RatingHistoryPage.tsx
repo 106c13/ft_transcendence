@@ -107,9 +107,15 @@ export default function RatingHistoryPage() {
 			{user && (
 				<div className={styles.userHeader}>
 					<img
-						src={user.avatar ? `/uploads/${user.avatar}` : '/assets/default.jpg'}
+						src={user.avatar && user.avatar !== 'default.jpg' ? `/uploads/${user.avatar}` : '/assets/default.jpg'}
 						alt={user.username}
 						className={styles.avatar}
+						onError={(e) => {
+							const target = e.currentTarget
+							if (!target.src.endsWith('/assets/default.jpg')) {
+								target.src = '/assets/default.jpg'
+							}
+						}}
 					/>
 					<div className={styles.userInfo}>
 						<span className={styles.userName}>{user.username}</span>
