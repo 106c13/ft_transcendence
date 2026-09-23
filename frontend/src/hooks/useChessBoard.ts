@@ -193,10 +193,21 @@ export function useChessBoard({
         }
     }
 
+    const promotionSquare = (pendingMove?.to || pendingPremove?.to) ?? null
+
+    const handlePromotionCancel = () => {
+        setPendingMove(null)
+        setPendingPremove(null)
+        setShowPromotion(false)
+        setSelectedSquare(null)
+        setValidMoves([])
+    }
+
     return {
         selectedSquare,
         validMoves,
         showPromotion,
+        promotionSquare,
         handleSquareClick,
         handleSquareSelect,
         handlePieceDrop,
@@ -204,5 +215,6 @@ export function useChessBoard({
         handleDragOver,
         handleDrop,
         handlePromotionSelect,
+        handlePromotionCancel,
     }
 }

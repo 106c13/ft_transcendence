@@ -26,6 +26,7 @@ type Props = {
     turn: 'w' | 'b'
     playerColor: 'w' | 'b'
     showPromotion: boolean
+    promotionSquare?: string | null
     isPaused: boolean
     pauseCountdown: number | null
     onSquareClick: (sq: string) => void
@@ -35,6 +36,7 @@ type Props = {
     onDragOver?: (e: React.DragEvent) => void
     onDrop?: (e: React.DragEvent, sq: string) => void
     onPromotionSelect: (pieceCode: string) => void
+    onPromotionCancel?: () => void
     isGameOver?: boolean
     customArrows?: BoardArrow[]
     customHighlights?: Record<string, string> | Set<string>
@@ -75,12 +77,14 @@ function ChessBoard({
     turn,
     playerColor,
     showPromotion,
+    promotionSquare,
     isPaused,
     pauseCountdown,
     onSquareClick,
     onSquareSelect,
     onPieceDrop,
     onPromotionSelect,
+    onPromotionCancel,
     isGameOver = false,
     customArrows,
     customHighlights,
@@ -172,6 +176,10 @@ function ChessBoard({
         } else if (e.button === 2) {
             // Right click down starts annotation highlight or arrow drag
             e.preventDefault()
+            if (showPromotion) {
+                onPromotionCancel?.()
+                return
+            }
             const sq = getSquareFromCoords(e.clientX, e.clientY)
             if (sq) {
                 const initialRight: RightDragState = {
@@ -490,6 +498,10 @@ function ChessBoard({
             onPointerDown={handleBoardPointerDown}
             onContextMenu={e => {
                 e.preventDefault()
+                if (showPromotion) {
+                    onPromotionCancel?.()
+                    return
+                }
                 if (dragState) {
                     setDragState(null)
                     dragStateRef.current = null
@@ -630,7 +642,11 @@ function ChessBoard({
             {showPromotion && (
                 <PromotionOverlay
                     playerColor={playerColor}
+                    square={promotionSquare}
+                    ranks={ranks}
+                    files={files}
                     onSelect={onPromotionSelect}
+                    onCancel={onPromotionCancel || (() => {})}
                 />
             )}
 

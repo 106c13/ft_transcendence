@@ -206,12 +206,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const category = getRatingCategory(matchGame.mode);
 			const whiteRating = await this.ratingService.getMatchmakingRating(matchGame.white.userId, category);
 			const blackRating = await this.ratingService.getMatchmakingRating(matchGame.black.userId, category);
+			const whiteUser = await this.usersService.findById(matchGame.white.userId);
+			const blackUser = await this.usersService.findById(matchGame.black.userId);
 
 			// Notify White
 			const whitePayload = {
 				gameId: matchGame.gameId,
 				color: 'w',
 				opponentName: matchGame.black.username,
+				opponentAvatar: blackUser?.avatar,
+				playerAvatar: whiteUser?.avatar,
 				fen: matchGame.board.fen(),
 				whiteTime: matchGame.whiteTime,
 				blackTime: matchGame.blackTime,
@@ -235,6 +239,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				gameId: matchGame.gameId,
 				color: 'b',
 				opponentName: matchGame.white.username,
+				opponentAvatar: whiteUser?.avatar,
+				playerAvatar: blackUser?.avatar,
 				fen: matchGame.board.fen(),
 				whiteTime: matchGame.whiteTime,
 				blackTime: matchGame.blackTime,
@@ -285,6 +291,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				blackTime: result.blackTime,
 				isCheck: result.isCheck,
 				isGameOver: result.isGameOver,
+				timeSpent: result.timeSpent,
 			});
 		}
 	}
@@ -314,11 +321,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const result = this.gameService.offerDraw(gameId, userId);
 		if (result.success) {
 			if (result.opponentSocketId) {
-				const opponentSocket = this.server.sockets.get(result.opponentSocketId);
-				if (opponentSocket) {
-					opponentSocket.emit('draw_offered', { gameId, fromUserId: userId });
-					return;
-				}
+				this.server.to(result.opponentSocketId).emit('draw_offered', { gameId, fromUserId: userId });
 			}
 			client.to(gameId).emit('draw_offered', { gameId, fromUserId: userId });
 		}
@@ -348,11 +351,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const result = this.gameService.declineDraw(gameId, userId);
 		if (result.success) {
 			if (result.requesterSocketId) {
-				const requesterSocket = this.server.sockets.get(result.requesterSocketId);
-				if (requesterSocket) {
-					requesterSocket.emit('draw_declined', { gameId });
-					return;
-				}
+				this.server.to(result.requesterSocketId).emit('draw_declined', { gameId });
 			}
 			client.to(gameId).emit('draw_declined', { gameId });
 		}
@@ -416,13 +415,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Notify opponent
 		if (opponentSocketId) {
 			const user = await this.usersService.findById(userId);
-			const opponentSocket = this.server.sockets.get(opponentSocketId);
-			if (opponentSocket) {
-				opponentSocket.emit('rematch_received', {
-					gameId,
-					from: user?.username || 'Unknown',
-				});
-			}
+			this.server.to(opponentSocketId).emit('rematch_received', {
+				gameId,
+				from: user?.username || 'Unknown',
+			});
 		}
 	}
 
@@ -528,11 +524,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				opponentIsProvisional: whiteRating.isProvisional,
 			};
 
-			const whiteSocket = this.server.sockets.get(whiteSocketId);
-			const blackSocket = this.server.sockets.get(blackSocketId);
-
-			if (whiteSocket) whiteSocket.emit('match_found', whitePayload);
-			if (blackSocket) blackSocket.emit('match_found', blackPayload);
+			this.server.to(whiteSocketId).emit('match_found', whitePayload);
+			this.server.to(blackSocketId).emit('match_found', blackPayload);
 		})();
 	}
 

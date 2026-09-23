@@ -8,8 +8,8 @@ type Props = {
 	onResign: () => void
 	drawOfferState: DrawOfferState
 	onOfferDraw: () => void
-	onAcceptDraw: () => void
-	onDeclineDraw: () => void
+	onAcceptDraw?: () => void
+	onDeclineDraw?: () => void
 	onAnalyze?: () => void
 }
 
@@ -29,12 +29,14 @@ function GameActions({
 		return (
 			<div className={styles.gameActions}>
 				<button
+					type="button"
 					className={styles.analyzeBtn}
 					onClick={onAnalyze}
 				>
 					🔍 {t('analyze_game', 'Analyze Game')}
 				</button>
 				<button
+					type="button"
 					className={styles.lobbyBtn}
 					onClick={() => navigate('/home')}
 				>
@@ -44,44 +46,28 @@ function GameActions({
 		)
 	}
 
-	if (drawOfferState === 'received') {
-		return (
-			<div className={styles.gameActions}>
-				<div className={styles.drawOfferBox}>
-					<div className={styles.drawOfferPrompt}>
-						🤝 {t('opponent_offered_draw', 'Opponent offers a draw')}
-					</div>
-					<div className={styles.drawDecisionRow}>
-						<button className={styles.acceptBtn} onClick={onAcceptDraw}>
-							✓ {t('accept_draw', 'Accept')}
-						</button>
-						<button className={styles.declineBtn} onClick={onDeclineDraw}>
-							✕ {t('decline_draw', 'Decline')}
-						</button>
-					</div>
-				</div>
-			</div>
-		)
-	}
-
 	return (
 		<div className={styles.gameActions}>
-			{drawOfferState === 'declined' && (
-				<div className={styles.declinedNotice}>
-					✕ {t('draw_declined', 'Opponent declined draw offer')}
-				</div>
-			)}
 			<div className={styles.actionRow}>
-				{drawOfferState === 'sent' ? (
-					<button className={`${styles.drawBtn} ${styles.drawBtnDisabled}`} disabled>
+				{drawOfferState === 'received' ? (
+					<>
+						<button type="button" className={styles.acceptBtn} onClick={onAcceptDraw}>
+							✓ {t('accept_draw', 'Accept')}
+						</button>
+						<button type="button" className={styles.declineBtn} onClick={onDeclineDraw}>
+							✕ {t('decline_draw', 'Decline')}
+						</button>
+					</>
+				) : drawOfferState === 'sent' ? (
+					<button type="button" className={`${styles.drawBtn} ${styles.drawBtnDisabled}`} disabled>
 						⏳ {t('draw_offered', 'Draw Offered...')}
 					</button>
 				) : (
-					<button className={styles.drawBtn} onClick={onOfferDraw}>
+					<button type="button" className={styles.drawBtn} onClick={onOfferDraw}>
 						½ {t('offer_draw', 'Offer Draw')}
 					</button>
 				)}
-				<button className={styles.resignBtn} onClick={onResign}>
+				<button type="button" className={styles.resignBtn} onClick={onResign}>
 					🏳️ {t('resign', 'Resign')}
 				</button>
 			</div>

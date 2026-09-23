@@ -1,35 +1,46 @@
 .gameInfoPanel {
-	width: 320px;
-	background: rgba(30, 41, 59, 0.5);
-	backdrop-filter: blur(10px);
+	width: 380px;
+	flex: 1;
+	max-width: 420px;
+	background: rgba(30, 41, 59, 0.7);
+	backdrop-filter: blur(12px);
 	border-radius: 12px;
-	border: 1px solid rgba(148, 163, 184, 0.1);
-	padding: 24px;
+	border: 1px solid rgba(148, 163, 184, 0.15);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+	padding: 16px;
 	display: flex;
 	flex-direction: column;
-	gap: 20px;
-	height: min(78vh, 620px);
+	gap: 12px;
+	height: calc(min(72vh, 640px) + 132px);
+	max-height: calc(min(72vh, 640px) + 132px);
+	box-sizing: border-box;
 }
 
 .panelHeader {
-	border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-	padding-bottom: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+	padding-bottom: 10px;
 }
 
 .panelHeader h3 {
 	margin: 0;
-	font-size: 18px;
-	font-weight: 600;
+	font-size: 15px;
+	font-weight: 700;
+	color: #F8FAFC;
+	letter-spacing: 0.2px;
 }
 
 .gameModeTag {
-	display: inline-block;
-	padding: 4px 8px;
-	border-radius: 4px;
+	display: inline-flex;
+	align-items: center;
+	padding: 3px 8px;
+	border-radius: 6px;
 	font-size: 11px;
 	font-weight: 700;
 	text-transform: uppercase;
-	margin-top: 6px;
+	letter-spacing: 0.5px;
 }
 
 .gameModeTag.bullet,
@@ -55,7 +66,9 @@
 
 @media (max-width: 950px) {
 	.gameInfoPanel {
-		width: min(65vh, 520px);
+		width: min(72vh, 640px);
+		max-width: 100%;
 		height: auto;
+		max-height: 520px;
 	}
 }

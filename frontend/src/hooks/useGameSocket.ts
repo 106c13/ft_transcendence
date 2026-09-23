@@ -76,6 +76,7 @@ export function useGameSocket() {
     const [playerIsProvisional, setPlayerIsProvisional] = useState(false)
     const [opponentRating, setOpponentRating] = useState<number | null>(null)
     const [opponentIsProvisional, setOpponentIsProvisional] = useState(false)
+    const [opponentAvatar, setOpponentAvatar] = useState<string | null>(null)
     const [playerRatingAfter, setPlayerRatingAfter] = useState<number | null>(null)
     const [playerRatingDelta, setPlayerRatingDelta] = useState<number | null>(null)
 
@@ -105,6 +106,7 @@ export function useGameSocket() {
     const [viewIndex, setViewIndex] = useState<number>(0)
     const [displayChess] = useState(() => new Chess())
     const [moveSAN, setMoveSAN] = useState<string[]>([])
+    const [moveTimes, setMoveTimes] = useState<number[]>([])
 
     const socketRef = useRef<Socket | null>(null)
     const token = localStorage.getItem('token')
@@ -199,10 +201,12 @@ export function useGameSocket() {
             playerIsProvisional?: boolean
             opponentRating?: number
             opponentIsProvisional?: boolean
+            opponentAvatar?: string
         }) => {
             setGameId(data.gameId)
             setPlayerColor(data.color)
             setOpponentName(data.opponentName)
+            setOpponentAvatar(data.opponentAvatar ?? null)
             setPlayerRating(data.playerRating ?? null)
             setPlayerIsProvisional(data.playerIsProvisional ?? false)
             setOpponentRating(data.opponentRating ?? null)
@@ -239,6 +243,7 @@ export function useGameSocket() {
             setMoveHistory(historyFens)
             setViewIndex(historyFens.length - 1)
             setMoveSAN(data.history)
+            setMoveTimes([])
         })
 
         socket.on('move_made', (data: {
@@ -250,6 +255,7 @@ export function useGameSocket() {
             blackTime: number
             isCheck: boolean
             isGameOver: boolean
+            timeSpent?: number
         }) => {
             localChess.load(data.fen)
             setBoardFen(data.fen)
@@ -265,6 +271,7 @@ export function useGameSocket() {
                 return next
             })
             setMoveSAN(prev => [...prev, data.san])
+            setMoveTimes(prev => [...prev, data.timeSpent ?? 1000])
 
             if (data.turn === playerColorRef.current && premovesRef.current.length > 0) {
                 const nextPremove = premovesRef.current[0]
@@ -366,7 +373,6 @@ export function useGameSocket() {
 
         socket.on('draw_declined', () => {
             setDrawOfferState('declined')
-            toast.info('draw_declined')
         })
 
         socket.on('error', (err: { message: string }) => {
@@ -640,6 +646,7 @@ export function useGameSocket() {
         displayChess,
         displayFen,
         moveSAN,
+        moveTimes,
         premoveSquares,
         ranks,
         files,
@@ -666,6 +673,7 @@ export function useGameSocket() {
         playerIsProvisional,
         opponentRating,
         opponentIsProvisional,
+        opponentAvatar,
         playerRatingAfter,
         playerRatingDelta,
     }

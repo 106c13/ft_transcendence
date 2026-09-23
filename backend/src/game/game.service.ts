@@ -451,6 +451,7 @@ export class GameService {
 					whiteTime: game.whiteTime,
 					blackTime: game.blackTime,
 					isGameOver: true,
+					timeSpent: elapsed,
 				};
 			}
 
@@ -469,6 +470,7 @@ export class GameService {
 				isGameOver: false,
 				turn: game.board.turn(),
 				isCheck: game.board.inCheck(),
+				timeSpent: elapsed,
 			};
 		} catch (e) {
 			return { error: 'invalid_move' };

@@ -34,6 +34,17 @@ export default function GamePage() {
         ? (userRatingInfo.isProvisional ? `~${userRatingInfo.rating} (${t('provisional', 'provisional')})` : `${userRatingInfo.rating}`)
         : `~800 (${t('provisional', 'provisional')})`
 
+    const opponentColor = game.playerColor === 'w' ? 'b' : 'w'
+    const opponentCaptured = opponentColor === 'w' ? game.captured.b : game.captured.w
+    const opponentDiff = opponentColor === 'w'
+        ? (game.whiteScore > game.blackScore ? game.whiteScore - game.blackScore : 0)
+        : (game.blackScore > game.whiteScore ? game.blackScore - game.whiteScore : 0)
+
+    const playerCaptured = game.playerColor === 'w' ? game.captured.b : game.captured.w
+    const playerDiff = game.playerColor === 'w'
+        ? (game.whiteScore > game.blackScore ? game.whiteScore - game.blackScore : 0)
+        : (game.blackScore > game.whiteScore ? game.blackScore - game.whiteScore : 0)
+
     return (
         <div className={styles.gameContainer}>
             <main className={styles.gameMain}>
@@ -63,16 +74,25 @@ export default function GamePage() {
                             className={styles.boardContainer}
                             onContextMenu={(e) => {
                                 e.preventDefault()
+                                if (board.showPromotion) {
+                                    board.handlePromotionCancel()
+                                    return
+                                }
                                 game.setPremoves([])
                             }}
                         >
                             <PlayerBanner
-                                name={game.opponentName}
+                                name={game.opponentName || t('opponent', 'Opponent')}
+                                username={game.opponentName}
+                                avatar={game.opponentAvatar}
                                 color={game.playerColor === 'w' ? 'b' : 'w'}
                                 time={game.playerColor === 'w' ? game.blackTime : game.whiteTime}
                                 isActive={game.turn !== game.playerColor}
                                 rating={game.opponentRating}
                                 isProvisional={game.opponentIsProvisional}
+                                selectedMode={game.selectedMode}
+                                capturedPieces={opponentCaptured}
+                                materialDiff={opponentDiff}
                             />
 
                             <ChessBoard
@@ -89,23 +109,31 @@ export default function GamePage() {
                                 turn={game.turn}
                                 playerColor={game.playerColor}
                                 showPromotion={board.showPromotion}
+                                promotionSquare={board.promotionSquare}
                                 isPaused={game.isPaused}
                                 pauseCountdown={game.pauseCountdown}
                                 onSquareClick={board.handleSquareClick}
                                 onSquareSelect={board.handleSquareSelect}
                                 onPieceDrop={board.handlePieceDrop}
                                 onPromotionSelect={board.handlePromotionSelect}
+                                onPromotionCancel={board.handlePromotionCancel}
                                 isGameOver={game.isGameOver}
                             />
 
                             <PlayerBanner
                                 name={game.currentUser?.username || t('you')}
+                                username={game.currentUser?.username}
+                                avatar={game.currentUser?.avatar}
                                 color={game.playerColor === 'w' ? 'w' : 'b'}
                                 time={game.playerColor === 'w' ? game.whiteTime : game.blackTime}
                                 isActive={game.turn === game.playerColor}
                                 isBottom={true}
                                 rating={game.playerRating}
                                 isProvisional={game.playerIsProvisional}
+                                initialRatings={game.currentUser?.ratings}
+                                selectedMode={game.selectedMode}
+                                capturedPieces={playerCaptured}
+                                materialDiff={playerDiff}
                             />
                         </div>
 
@@ -117,6 +145,7 @@ export default function GamePage() {
                             playerColor={game.playerColor}
                             moveHistory={game.moveHistory}
                             moveSAN={game.moveSAN}
+                            moveTimes={game.moveTimes}
                             viewIndex={game.viewIndex}
                             isReviewing={game.isReviewing}
                             isGameOver={game.isGameOver}

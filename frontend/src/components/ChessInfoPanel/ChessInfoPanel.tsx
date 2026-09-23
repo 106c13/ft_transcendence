@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import CapturedPieces from '../CapturedPieces/CapturedPieces'
 import MoveHistory from '../MoveHistory/MoveHistory'
 import GameActions from '../GameActions/GameActions'
 import type { DrawOfferState } from '../../hooks/useGameSocket'
@@ -15,6 +14,7 @@ type Props = {
 	playerColor: 'w' | 'b'
 	moveHistory: string[]
 	moveSAN: string[]
+	moveTimes?: number[]
 	viewIndex: number
 	isReviewing: boolean
 	isGameOver: boolean
@@ -38,12 +38,13 @@ const modeTagClassMap: Record<string, keyof typeof styles> = {
 
 function ChessInfoPanel({
 	selectedMode,
-	captured,
-	whiteScore,
-	blackScore,
-	playerColor,
+	captured: _captured,
+	whiteScore: _whiteScore,
+	blackScore: _blackScore,
+	playerColor: _playerColor,
 	moveHistory,
 	moveSAN,
+	moveTimes,
 	viewIndex,
 	isReviewing,
 	isGameOver,
@@ -66,16 +67,10 @@ function ChessInfoPanel({
 				</span>
 			</div>
 
-			<CapturedPieces
-				captured={captured}
-				whiteScore={whiteScore}
-				blackScore={blackScore}
-				playerColor={playerColor}
-			/>
-
 			<MoveHistory
 				moveHistory={moveHistory}
 				moveSAN={moveSAN}
+				moveTimes={moveTimes}
 				viewIndex={viewIndex}
 				isReviewing={isReviewing}
 				onSelectIndex={onSelectIndex}
