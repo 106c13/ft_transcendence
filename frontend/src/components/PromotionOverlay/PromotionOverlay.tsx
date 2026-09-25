@@ -35,8 +35,8 @@ function PromotionOverlay({
 		left: `calc(${safeCol * 12.5}% + 6.25%)`,
 		transform: 'translateX(-50%)',
 		...(isTopRank
-			? { top: `calc(${safeRow * 12.5}%)` }
-			: { bottom: `calc(${(7 - safeRow) * 12.5}%)` }),
+			? { top: `calc(${safeRow * 12.5}% + 8px)` }
+			: { bottom: `calc(${(7 - safeRow) * 12.5}% + 8px)` }),
 	}
 
 	return (
@@ -76,7 +76,7 @@ function PromotionOverlay({
 				</button>
 
 				<div className={styles.pieceOptionsColumn}>
-					{(['q', 'n', 'r', 'b'] as const).map(code => (
+					{(['q', 'r', 'b', 'n'] as const).map(code => (
 						<button
 							key={code}
 							type="button"
