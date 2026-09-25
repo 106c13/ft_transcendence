@@ -198,7 +198,7 @@ export function useChallengeSocket(userId: number | undefined) {
                 setTimeout(() => setChallengeStatus('idle'), 3000)
             }
 
-            if (wasIncoming || wasOutgoing) {
+            if (wasOutgoing) {
                 toastRef.current.info('challenge_expired')
             }
         })

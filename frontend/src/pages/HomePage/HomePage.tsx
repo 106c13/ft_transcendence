@@ -29,11 +29,6 @@ function HomePage() {
 
 	const history = useGameHistory(currentUser?.username || '')
 
-	// Reset challenge status when entering HomePage so returning from a game won't show stale status
-	useEffect(() => {
-		challengeSocket.resetChallengeStatus()
-	}, [challengeSocket])
-
 	// Load ratings & friends list
 	useEffect(() => {
 		if (!currentUser) return
