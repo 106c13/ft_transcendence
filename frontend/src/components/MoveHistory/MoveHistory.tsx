@@ -61,51 +61,63 @@ function MoveHistory({
 			</div>
 
 			<div className={styles.moveHistoryList} ref={moveListRef}>
-				{rows.map(row => {
-					const whiteActive = viewIndex === row.whiteIdx + 1
-					const blackActive = viewIndex === row.blackIdx + 1
+				{rows.length === 0 ? (
+					<div className={styles.emptyHistory}>
+						<div className={styles.emptyHistoryIcon}>♟️</div>
+						<span className={styles.emptyHistoryTitle}>
+							{t('no_moves_yet', 'No moves played yet')}
+						</span>
+						<span className={styles.emptyHistorySubtitle}>
+							{t('moves_appear_here', 'Moves will appear here as the game progresses')}
+						</span>
+					</div>
+				) : (
+					rows.map(row => {
+						const whiteActive = viewIndex === row.whiteIdx + 1
+						const blackActive = viewIndex === row.blackIdx + 1
 
-					return (
-						<div key={row.num} className={styles.moveRow}>
-							<div className={styles.moveLeftGroup}>
-								<span className={styles.moveRowNum}>{row.num}.</span>
-								<button
-									type="button"
-									className={`${styles.moveBtn} ${whiteActive ? styles.activeMove : ''}`}
-									onClick={() => onSelectIndex(row.whiteIdx + 1)}
-								>
-									{row.whiteSan}
-								</button>
-								{row.blackSan ? (
+						return (
+							<div key={row.num} className={styles.moveRow}>
+								<div className={styles.moveLeftGroup}>
+									<span className={styles.moveRowNum}>{row.num}.</span>
 									<button
 										type="button"
-										className={`${styles.moveBtn} ${styles.blackMoveBtn} ${blackActive ? styles.activeMove : ''}`}
-										onClick={() => onSelectIndex(row.blackIdx + 1)}
+										className={`${styles.moveBtn} ${whiteActive ? styles.activeMove : ''}`}
+										onClick={() => onSelectIndex(row.whiteIdx + 1)}
 									>
-										{row.blackSan}
+										{row.whiteSan}
 									</button>
-								) : (
-									<span className={styles.emptyMoveBtn} />
-								)}
-							</div>
-
-							<div className={styles.moveTimesGroup}>
-								<div className={styles.timeItem} title={t('white_time_spent', "White's time spent")}>
-									<span className={styles.timeDotWhite} />
-									<span className={styles.timeText}>{formatMoveTime(row.whiteTime)}</span>
+									{row.blackSan ? (
+										<button
+											type="button"
+											className={`${styles.moveBtn} ${styles.blackMoveBtn} ${blackActive ? styles.activeMove : ''}`}
+											onClick={() => onSelectIndex(row.blackIdx + 1)}
+										>
+											{row.blackSan}
+										</button>
+									) : (
+										<span className={styles.emptyMoveBtn} />
+									)}
 								</div>
-								{row.blackSan ? (
-									<div className={styles.timeItem} title={t('black_time_spent', "Black's time spent")}>
-										<span className={styles.timeDotBlack} />
-										<span className={styles.timeText}>{formatMoveTime(row.blackTime)}</span>
+
+								<div className={styles.moveTimesGroup}>
+									<div className={styles.timeItem} title={t('white_time_spent', "White's time spent")}>
+										<span className={styles.timeDotWhite} />
+										<span className={styles.timeText}>{formatMoveTime(row.whiteTime)}</span>
 									</div>
-								) : (
-									<div className={styles.timeItemPlaceholder} />
-								)}
+									{row.blackSan ? (
+										<div className={styles.timeItem} title={t('black_time_spent', "Black's time spent")}>
+											<span className={styles.timeDotBlack} />
+											<span className={styles.timeText}>{formatMoveTime(row.blackTime)}</span>
+										</div>
+									) : (
+										<div className={styles.timeItemPlaceholder} />
+									)}
+								</div>
 							</div>
-						</div>
-					)
-				})}
+						)
+					})
+				)}
 			</div>
 
 			{isReviewing && (
@@ -117,6 +129,7 @@ function MoveHistory({
 					type="button"
 					className={styles.navBtn}
 					title={t('start', 'Start')}
+					disabled={halfMoves <= 0}
 					onClick={() => onSelectIndex(0)}
 				>
 					⇤
@@ -125,6 +138,7 @@ function MoveHistory({
 					type="button"
 					className={styles.navBtn}
 					title={t('previous', 'Previous')}
+					disabled={halfMoves <= 0}
 					onClick={() => onSelectIndex(Math.max(0, viewIndex - 1))}
 				>
 					◀
@@ -133,6 +147,7 @@ function MoveHistory({
 					type="button"
 					className={styles.navBtn}
 					title={t('next', 'Next')}
+					disabled={halfMoves <= 0}
 					onClick={() => onSelectIndex(Math.min(moveHistory.length - 1, viewIndex + 1))}
 				>
 					▶
@@ -141,6 +156,7 @@ function MoveHistory({
 					type="button"
 					className={styles.navBtn}
 					title={t('latest', 'Latest')}
+					disabled={halfMoves <= 0}
 					onClick={() => onSelectIndex(moveHistory.length - 1)}
 				>
 					⇥

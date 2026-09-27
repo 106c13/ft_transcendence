@@ -138,12 +138,32 @@ export default function ProfileTabs({
 						</div>
 
 						{history.loading ? (
-							<div className={profileStyles.emptyRecentGames}>
-								{t('loading', 'Loading recent games...')}
+							<div className={profileStyles.emptyCard}>
+								<span className={profileStyles.spinnerIcon}>♟</span>
+								<p className={profileStyles.emptySubtitle}>
+									{t('loading', 'Loading recent games...')}
+								</p>
 							</div>
 						) : recentMatches.length === 0 ? (
-							<div className={profileStyles.emptyRecentGames}>
-								{t('no_games_yet', 'No games played yet')}
+							<div className={profileStyles.emptyCard}>
+								<div className={profileStyles.emptyIcon}>♟️</div>
+								<h4 className={profileStyles.emptyTitle}>
+									{t('no_games_yet', 'No games played yet')}
+								</h4>
+								<p className={profileStyles.emptySubtitle}>
+									{isOwnProfile
+										? t('play_first_game_prompt', 'Play matches to build your game history and analysis log.')
+										: t('user_no_games', 'This user has not played any games yet.')}
+								</p>
+								{isOwnProfile && (
+									<button
+										className={profileStyles.playNowBtn}
+										onClick={() => navigate('/home')}
+										type="button"
+									>
+										⚔️ {t('play_now', 'Play Now')}
+									</button>
+								)}
 							</div>
 						) : (
 							<div className={profileStyles.gamesListRows}>

@@ -145,7 +145,7 @@ export default function MiniRatingChart({ mode, history, onClick }: Props) {
 						</linearGradient>
 					</defs>
 
-					{chartPoints.length > 0 && (
+					{chartPoints.length > 0 ? (
 						<>
 							{/* Fill area */}
 							<path d={areaD} fill={`url(#${gradientId})`} />
@@ -160,6 +160,16 @@ export default function MiniRatingChart({ mode, history, onClick }: Props) {
 								strokeLinejoin="round"
 							/>
 						</>
+					) : (
+						<line
+							x1={padX}
+							y1={height / 2}
+							x2={width - padX}
+							y2={height / 2}
+							stroke="rgba(148, 163, 184, 0.22)"
+							strokeWidth="1.5"
+							strokeDasharray="4 4"
+						/>
 					)}
 				</svg>
 

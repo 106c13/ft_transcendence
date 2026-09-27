@@ -389,5 +389,9 @@
     "expl_mistake": "A mistake (lost {{cp}} cp) that worsens your position.",
     "expl_blunder_better": "A blunder (lost {{cp}} cp). Overlooked {{bestSan}} which keeps the advantage.",
     "expl_blunder": "A critical blunder (lost {{cp}} cp) that loses significant advantage.",
-    "7d": "7d"
+    "7d": "7d",
+    "no_moves_yet": "No moves played yet",
+    "moves_appear_here": "Moves will appear here as the game progresses",
+    "try_adjusting_filters": "Try adjusting your color, result, or mode filters.",
+    "none_captured": "None"
 }

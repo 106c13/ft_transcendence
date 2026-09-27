@@ -38,9 +38,28 @@ export default function FriendsList({ friends, onOpenProfile }: Props) {
 			</div>
 
 			{friends.length === 0 ? (
-				<div className={styles.emptyState}>{t('no_friends_yet', 'No friends yet')}</div>
+				<div className={styles.emptyCard}>
+					<div className={styles.emptyIcon}>👥</div>
+					<h4 className={styles.emptyTitle}>{t('no_friends_yet', 'No friends yet')}</h4>
+					<p className={styles.emptySubtitle}>
+						{t('add_friends_tip', 'Visit player profiles to send friend requests.')}
+					</p>
+				</div>
 			) : filteredFriends.length === 0 ? (
-				<div className={styles.emptyState}>{t('no_friends_matching_query', 'No friends match your search')}</div>
+				<div className={styles.emptyCard}>
+					<div className={styles.emptyIcon}>🔍</div>
+					<h4 className={styles.emptyTitle}>{t('no_friends_matching_query', 'No friends match your search')}</h4>
+					<p className={styles.emptySubtitle}>
+						{t('try_different_search', 'Try searching for another username.')}
+					</p>
+					<button
+						className={styles.resetBtn}
+						onClick={() => setSearchQuery('')}
+						type="button"
+					>
+						✕ {t('clear', 'Clear Search')}
+					</button>
+				</div>
 			) : (
 				<div className={styles.friendsGrid}>
 					{filteredFriends.map((friend) => (

@@ -26,7 +26,13 @@ export default function FriendsPreview({ friends, onFriendClick, onSeeAll }: Pro
 
 			{displayedFriends.length === 0 ? (
 				<div className={styles.emptyState}>
-					{t('no_friends_yet', 'No friends yet')}
+					<span className={styles.emptyIcon}>👥</span>
+					<div className={styles.emptyTextGroup}>
+						<span className={styles.emptyTitle}>{t('no_friends_yet', 'No friends yet')}</span>
+						<span className={styles.emptySubtitle}>
+							{t('add_friends_tip', 'Visit player profiles to send friend requests.')}
+						</span>
+					</div>
 				</div>
 			) : (
 				<div className={styles.avatarsList}>

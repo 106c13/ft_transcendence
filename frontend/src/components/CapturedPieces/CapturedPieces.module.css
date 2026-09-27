@@ -30,3 +30,11 @@
 	color: #10B981;
 	margin-left: 6px;
 }
+
+.emptyCaptured {
+	font-size: 13px;
+	color: #64748B;
+	font-family: var(--mono, monospace);
+	line-height: 24px;
+	padding-left: 2px;
+}

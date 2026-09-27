@@ -120,15 +120,15 @@ export default function GamesList({
 		return (
 			<div className={styles.container}>
 				<div className={styles.emptyCard}>
-					<div className={styles.emptyIcon}>♟</div>
-					<h4>{t('no_games_yet', 'No games played yet')}</h4>
-					<p>
+					<div className={styles.emptyIcon}>♟️</div>
+					<h4 className={styles.emptyTitle}>{t('no_games_yet', 'No games played yet')}</h4>
+					<p className={styles.emptySubtitle}>
 						{isOwnProfile
 							? t('play_first_game_prompt', 'Play matches to build your game history and analysis log.')
 							: t('user_no_games', 'This user has not played any games yet.')}
 					</p>
 					{isOwnProfile && (
-						<button className={styles.playNowBtn} onClick={() => navigate('/home')}>
+						<button className={styles.playNowBtn} onClick={() => navigate('/home')} type="button">
 							⚔️ {t('play_now', 'Play Now')}
 						</button>
 					)}
@@ -213,9 +213,13 @@ export default function GamesList({
 			{/* Games List Content */}
 			{totalGames === 0 ? (
 				<div className={styles.emptyCard}>
-					<h4>{t('no_games_matching_filter', 'No games match the selected filters')}</h4>
-					<button className={styles.resetBtn} onClick={handleResetFilters}>
-						{t('clear', 'Reset Filters')}
+					<div className={styles.emptyIcon}>🔍</div>
+					<h4 className={styles.emptyTitle}>{t('no_games_matching_filter', 'No games match the selected filters')}</h4>
+					<p className={styles.emptySubtitle}>
+						{t('try_adjusting_filters', 'Try adjusting your color, result, or mode filters.')}
+					</p>
+					<button className={styles.resetBtn} onClick={handleResetFilters} type="button">
+						✕ {t('clear', 'Clear Filters')}
 					</button>
 				</div>
 			) : (

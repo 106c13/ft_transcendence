@@ -95,7 +95,7 @@
 	display: grid;
 	grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
 	gap: 18px;
-	align-items: start;
+	align-items: stretch;
 	width: 100%;
 }
 
@@ -103,6 +103,7 @@
 	display: flex;
 	flex-direction: column;
 	min-width: 0;
+	height: 100%;
 }
 
 .statsRight {
@@ -110,6 +111,7 @@
 	flex-direction: column;
 	gap: 16px;
 	min-width: 0;
+	height: 100%;
 }
 
 /* Responsive Breakpoints */
