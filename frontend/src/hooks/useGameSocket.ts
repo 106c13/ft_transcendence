@@ -111,6 +111,16 @@ export function useGameSocket() {
     const socketRef = useRef<Socket | null>(null)
     const token = localStorage.getItem('token')
 
+    const hasWarnedLowTimeRef = useRef(false)
+
+    const handleIllegalMove = () => {
+        // Handled here and triggered in Stage 2 for audio
+    }
+
+    const handleLowTimeWarning = () => {
+        // Handled here and triggered in Stage 2 for audio
+    }
+
     // Preload piece images
     useEffect(() => {
         const colors: Array<'w' | 'b'> = ['w', 'b']
@@ -230,6 +240,7 @@ export function useGameSocket() {
             setPremoves([])
             setDrawOfferState('idle')
             setSavedMatchId(null)
+            hasWarnedLowTimeRef.current = false
 
             const startFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
             const historyFens: string[] = [startFen]
@@ -273,6 +284,11 @@ export function useGameSocket() {
             setMoveSAN(prev => [...prev, data.san])
             setMoveTimes(prev => [...prev, data.timeSpent ?? 1000])
 
+            const myNewTime = playerColorRef.current === 'w' ? data.whiteTime : data.blackTime
+            if (myNewTime > 10000) {
+                hasWarnedLowTimeRef.current = false
+            }
+
             if (data.turn === playerColorRef.current && premovesRef.current.length > 0) {
                 const nextPremove = premovesRef.current[0]
                 const testChess = new Chess(data.fen)
@@ -292,10 +308,12 @@ export function useGameSocket() {
                             from: nextPremove.from,
                             to: nextPremove.to,
                             promotion: nextPremove.promotion,
+                            isPremove: true,
                         })
                     }
                     setPremoves(prev => prev.slice(1))
                 } else {
+                    handleIllegalMove()
                     setPremoves([])
                 }
             }
@@ -376,6 +394,9 @@ export function useGameSocket() {
         })
 
         socket.on('error', (err: { message: string }) => {
+            if (err.message === 'invalid_move') {
+                handleIllegalMove()
+            }
             toast.error(err.message || 'something_went_wrong')
         })
 
@@ -400,9 +421,23 @@ export function useGameSocket() {
 
         const timerInterval = setInterval(() => {
             if (turn === 'w') {
-                setWhiteTime(prev => Math.max(0, prev - 100))
+                setWhiteTime(prev => {
+                    const next = Math.max(0, prev - 100)
+                    if (playerColorRef.current === 'w' && next <= 10000 && next > 0 && !hasWarnedLowTimeRef.current) {
+                        hasWarnedLowTimeRef.current = true
+                        handleLowTimeWarning()
+                    }
+                    return next
+                })
             } else {
-                setBlackTime(prev => Math.max(0, prev - 100))
+                setBlackTime(prev => {
+                    const next = Math.max(0, prev - 100)
+                    if (playerColorRef.current === 'b' && next <= 10000 && next > 0 && !hasWarnedLowTimeRef.current) {
+                        hasWarnedLowTimeRef.current = true
+                        handleLowTimeWarning()
+                    }
+                    return next
+                })
             }
         }, 100)
 
@@ -526,6 +561,7 @@ export function useGameSocket() {
             setLastMove(null)
             setRematchState('idle')
             setDrawOfferState('idle')
+            hasWarnedLowTimeRef.current = false
             socketRef.current.emit('find_match', { mode })
         }
     }
@@ -676,6 +712,9 @@ export function useGameSocket() {
         opponentAvatar,
         playerRatingAfter,
         playerRatingDelta,
+        isLowTime: gameState === 'playing' && !isGameOver && (playerColor === 'w' ? whiteTime : blackTime) <= 10000,
+        handleIllegalMove,
+        handleLowTimeWarning,
     }
 }
 

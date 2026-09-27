@@ -265,7 +265,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('make_move')
 	handleMakeMove(
 		client: Socket,
-		payload: { gameId: string; from: string; to: string; promotion?: string }
+		payload: { gameId: string; from: string; to: string; promotion?: string; isPremove?: boolean }
 	) {
 		const userIdStr = client.handshake.query.userId;
 		if (!userIdStr) return;
@@ -276,7 +276,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			userId,
 			payload.from,
 			payload.to,
-			payload.promotion
+			payload.promotion,
+			payload.isPremove
 		);
 
 		if (result.error) {

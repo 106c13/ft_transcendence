@@ -377,7 +377,7 @@ export class GameService {
 	}
 
 	// Make a move on the board
-	makeMove(gameId: string, userId: number, from: string, to: string, promotion?: string): any {
+	makeMove(gameId: string, userId: number, from: string, to: string, promotion?: string, isPremove?: boolean): any {
 		const game = this.activeGames.get(gameId);
 		if (!game) {
 			return { error: 'game_not_found' };
@@ -394,9 +394,9 @@ export class GameService {
 			return { error: 'not_your_turn' };
 		}
 
-		// Calculate elapsed time and deduct
+		// Calculate elapsed time and deduct (premove takes exactly 100ms / 0.1s)
 		const now = Date.now();
-		const elapsed = now - game.lastMoveTime;
+		const elapsed = isPremove ? 100 : Math.max(0, now - game.lastMoveTime);
 		if (turn === 'w') {
 			game.whiteTime = Math.max(0, game.whiteTime - elapsed);
 		} else {

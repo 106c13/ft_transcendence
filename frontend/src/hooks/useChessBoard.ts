@@ -27,6 +27,7 @@ interface UseChessBoardParams {
     premoves: Premove[]
     setPremoves: React.Dispatch<React.SetStateAction<Premove[]>>
     sendMove: (from: string, to: string, promotion?: string) => void
+    onIllegalMove?: () => void
 }
 
 export function useChessBoard({
@@ -40,6 +41,7 @@ export function useChessBoard({
     premoves,
     setPremoves,
     sendMove,
+    onIllegalMove,
 }: UseChessBoardParams) {
     const [selectedSquare, setSelectedSquare] = useState<string | null>(null)
     const [validMoves, setValidMoves] = useState<string[]>([])
@@ -112,6 +114,7 @@ export function useChessBoard({
         if (targets.includes(targetSquare as Square)) {
             executeMove(sourceSquare, targetSquare)
         } else {
+            onIllegalMove?.()
             setSelectedSquare(null)
             setValidMoves([])
         }
@@ -171,7 +174,8 @@ export function useChessBoard({
 
         if (selectedSquare && validMoves.includes(square)) {
             executeMove(selectedSquare, square)
-        } else {
+        } else if (selectedSquare) {
+            onIllegalMove?.()
             setSelectedSquare(null)
             setValidMoves([])
         }

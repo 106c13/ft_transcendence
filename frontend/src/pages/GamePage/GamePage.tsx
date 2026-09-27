@@ -26,6 +26,7 @@ export default function GamePage() {
         premoves: game.premoves,
         setPremoves: game.setPremoves,
         sendMove: game.sendMove,
+        onIllegalMove: game.handleIllegalMove,
     })
 
     const category = (game.selectedMode.replace('+2', '') as 'bullet' | 'blitz' | 'rapid') || 'blitz'
