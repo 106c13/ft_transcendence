@@ -32,7 +32,7 @@ export function formatTime(timeMs: number) {
 	const minStr = mins.toString().padStart(2, '0')
 	const secStr = secs.toString().padStart(2, '0')
 
-	if (timeMs < 15000) {
+	if (timeMs < 10000) {
 		return `${mins}:${secStr}.${tenths}`
 	}
 	return `${minStr}:${secStr}`
@@ -109,7 +109,7 @@ function PlayerBanner({
 		return () => document.removeEventListener('mousedown', handleClickOutside)
 	}, [isOpen])
 
-	const isLowTime = isActive && time < 15000
+	const isLowTime = isActive && time <= 10000
 
 	const bulletInfo = ratings?.bullet
 	const blitzInfo = ratings?.blitz

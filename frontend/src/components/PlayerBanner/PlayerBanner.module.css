@@ -61,18 +61,8 @@
 .bannerBar.lowTime .gameClock {
 	border-color: #EF4444 !important;
 	color: #EF4444 !important;
-	animation: lowTimePulse 0.5s infinite alternate !important;
-}
-
-@keyframes lowTimePulse {
-	0% {
-		transform: scale(1);
-		box-shadow: 0 0 0px rgba(239, 68, 68, 0);
-	}
-	100% {
-		transform: scale(1.03);
-		box-shadow: 0 0 8px rgba(239, 68, 68, 0.35);
-	}
+	box-shadow: 0 0 8px rgba(239, 68, 68, 0.25) !important;
+	animation: none !important;
 }
 
 /* User Info Anchor: preserves exact layout flow in banner */
