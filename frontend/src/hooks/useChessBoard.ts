@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Chess } from 'chess.js'
 import type { Square } from 'chess.js'
 import { getSimulatedChess, type Premove } from './useGameSocket'
+import { playSound } from '../utils/sound'
 
 const getValidMovesForSquare = (simChess: Chess, square: string, color: 'w' | 'b') => {
     const temp = new Chess(simChess.fen())
@@ -73,6 +74,7 @@ export function useChessBoard({
                 sendMove(sourceSquare, targetSquare)
             } else {
                 setPremoves(prev => [...prev, { from: sourceSquare, to: targetSquare }])
+                playSound('premove')
             }
             setSelectedSquare(null)
             setValidMoves([])
@@ -184,6 +186,7 @@ export function useChessBoard({
     const handlePromotionSelect = (pieceCode: string) => {
         if (pendingPremove) {
             setPremoves(prev => [...prev, { ...pendingPremove, promotion: pieceCode }])
+            playSound('premove')
             setPendingPremove(null)
             setShowPromotion(false)
             setSelectedSquare(null)

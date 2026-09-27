@@ -8,6 +8,7 @@ import { useToast } from '../context/ToastContext'
 
 import { getPieceImageSrc } from '../constants/gameConstants'
 import type { GameModeType } from '../constants/gameModeConstats'
+import { playSound } from '../utils/sound'
 
 import type { User } from '../constants/profileConstants'
 
@@ -114,11 +115,11 @@ export function useGameSocket() {
     const hasWarnedLowTimeRef = useRef(false)
 
     const handleIllegalMove = () => {
-        // Handled here and triggered in Stage 2 for audio
+        playSound('illegal')
     }
 
     const handleLowTimeWarning = () => {
-        // Handled here and triggered in Stage 2 for audio
+        playSound('tenseconds')
     }
 
     // Preload piece images
@@ -241,6 +242,7 @@ export function useGameSocket() {
             setDrawOfferState('idle')
             setSavedMatchId(null)
             hasWarnedLowTimeRef.current = false
+            playSound('game-start')
 
             const startFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
             const historyFens: string[] = [startFen]
@@ -283,6 +285,22 @@ export function useGameSocket() {
             })
             setMoveSAN(prev => [...prev, data.san])
             setMoveTimes(prev => [...prev, data.timeSpent ?? 1000])
+
+            const isSelf = data.turn !== playerColorRef.current
+
+            if (data.isCheck) {
+                playSound('move-check')
+            } else if (data.san.includes('O-O')) {
+                playSound('castle')
+            } else if (data.san.includes('=')) {
+                playSound('promote')
+            } else if (data.san.includes('x')) {
+                playSound('capture')
+            } else if (isSelf) {
+                playSound('move-self')
+            } else {
+                playSound('move-opponent')
+            }
 
             const myNewTime = playerColorRef.current === 'w' ? data.whiteTime : data.blackTime
             if (myNewTime > 10000) {
@@ -361,6 +379,7 @@ export function useGameSocket() {
             setPauseCountdown(null)
             setRematchState('idle')
             setDrawOfferState('idle')
+            playSound('game-end')
 
             setMoveHistory(prev => {
                 const last = prev[prev.length - 1]
@@ -387,6 +406,7 @@ export function useGameSocket() {
         // Draw offer events
         socket.on('draw_offered', () => {
             setDrawOfferState('received')
+            playSound('drawoffer')
         })
 
         socket.on('draw_declined', () => {
