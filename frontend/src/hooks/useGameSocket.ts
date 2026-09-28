@@ -21,15 +21,29 @@ interface Premove {
 export type DrawOfferState = 'idle' | 'sent' | 'received' | 'declined'
 
 const getSimulatedChess = (baseFen: string, color: 'w' | 'b' | null, premoveList: Premove[]) => {
-    const sim = new Chess(baseFen)
+    let sim: Chess
+    try {
+        sim = new Chess(baseFen)
+    } catch {
+        return new Chess()
+    }
     if (!color || premoveList.length === 0) return sim
 
     for (const pm of premoveList) {
+        // King must never be capturable when premoving and must be considered illegal
+        const targetPiece = sim.get(pm.to as Square)
+        if (targetPiece?.type === 'k') {
+            break
+        }
+
         const tokens = sim.fen().split(' ')
         tokens[1] = color
-        sim.load(tokens.join(' '))
         try {
-            sim.move({ from: pm.from, to: pm.to, promotion: pm.promotion || 'q' })
+            sim.load(tokens.join(' '))
+            const moveRes = sim.move({ from: pm.from, to: pm.to, promotion: pm.promotion || 'q' })
+            if (!moveRes || moveRes.captured === 'k') {
+                break
+            }
         } catch {
             break
         }
@@ -312,14 +326,17 @@ export function useGameSocket() {
                 const testChess = new Chess(data.fen)
                 let validMove = null
                 try {
-                    validMove = testChess.move({
-                        from: nextPremove.from,
-                        to: nextPremove.to,
-                        promotion: nextPremove.promotion || 'q',
-                    })
+                    const targetPiece = testChess.get(nextPremove.to as Square)
+                    if (targetPiece?.type !== 'k') {
+                        validMove = testChess.move({
+                            from: nextPremove.from,
+                            to: nextPremove.to,
+                            promotion: nextPremove.promotion || 'q',
+                        })
+                    }
                 } catch { }
 
-                if (validMove) {
+                if (validMove && validMove.captured !== 'k') {
                     if (socketRef.current && gameIdRef.current) {
                         socketRef.current.emit('make_move', {
                             gameId: gameIdRef.current,
@@ -545,12 +562,22 @@ export function useGameSocket() {
     const displayFen = useMemo(() => {
         if (isReviewing) return moveHistory[viewIndex] ?? boardFen
         if (premoves.length > 0 && playerColor) {
-            return getSimulatedChess(boardFen, playerColor, premoves).fen()
+            try {
+                return getSimulatedChess(boardFen, playerColor, premoves).fen()
+            } catch {
+                return boardFen
+            }
         }
         return boardFen
     }, [isReviewing, viewIndex, moveHistory, boardFen, premoves, playerColor])
 
-    displayChess.load(displayFen)
+    try {
+        displayChess.load(displayFen)
+    } catch {
+        try {
+            displayChess.load(boardFen)
+        } catch { }
+    }
 
     const premoveSquares = useMemo(() => {
         const set = new Set<string>()

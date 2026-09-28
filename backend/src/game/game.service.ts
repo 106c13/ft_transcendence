@@ -416,13 +416,18 @@ export class GameService {
 
 		// Attempt to apply move
 		try {
+			const destPiece = game.board.get(to as any);
+			if (destPiece && destPiece.type === 'k') {
+				return { error: 'invalid_move' };
+			}
+
 			const move = game.board.move({
 				from,
 				to,
 				promotion: promotion || 'q',
 			});
 
-			if (!move) {
+			if (!move || move.captured === 'k') {
 				return { error: 'invalid_move' };
 			}
 

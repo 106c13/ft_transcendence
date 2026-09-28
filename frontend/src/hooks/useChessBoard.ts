@@ -5,13 +5,15 @@ import { getSimulatedChess, type Premove } from './useGameSocket'
 import { playSound } from '../utils/sound'
 
 const getValidMovesForSquare = (simChess: Chess, square: string, color: 'w' | 'b') => {
-    const temp = new Chess(simChess.fen())
-    const tokens = temp.fen().split(' ')
-    tokens[1] = color
-    temp.load(tokens.join(' '))
     try {
+        const temp = new Chess(simChess.fen())
+        const tokens = temp.fen().split(' ')
+        tokens[1] = color
+        temp.load(tokens.join(' '))
         const moves = temp.moves({ square: square as Square, verbose: true })
-        return moves.map(m => m.to)
+        return moves
+            .filter(m => m.captured !== 'k' && simChess.get(m.to as Square)?.type !== 'k')
+            .map(m => m.to)
     } catch {
         return []
     }
@@ -56,6 +58,14 @@ export function useChessBoard({
 
     const executeMove = (sourceSquare: string, targetSquare: string) => {
         const simChess = getSimulatedChess(boardFen, playerColor, premoves)
+        const targetPiece = simChess.get(targetSquare as Square)
+        if (targetPiece?.type === 'k') {
+            onIllegalMove?.()
+            setSelectedSquare(null)
+            setValidMoves([])
+            return
+        }
+
         const selectedPiece = simChess.get(sourceSquare as Square)
         const isPawn = selectedPiece?.type === 'p'
         const isPromotionRank = targetSquare.endsWith('8') || targetSquare.endsWith('1')
