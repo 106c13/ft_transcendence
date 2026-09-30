@@ -38,6 +38,7 @@ type Props = {
     onPromotionSelect: (pieceCode: string) => void
     onPromotionCancel?: () => void
     isGameOver?: boolean
+    isViewer?: boolean
     customArrows?: BoardArrow[]
     customHighlights?: Record<string, string> | Set<string>
 }
@@ -86,6 +87,7 @@ function ChessBoard({
     onPromotionSelect,
     onPromotionCancel,
     isGameOver = false,
+    isViewer = false,
     customArrows,
     customHighlights,
 }: Props) {
@@ -103,7 +105,7 @@ function ChessBoard({
     const rightDragRef = useRef<RightDragState | null>(null)
     rightDragRef.current = rightDrag
 
-    const canInteract = !isReviewing && !isPaused && !isGameOver
+    const canInteract = !isViewer && !isReviewing && !isPaused && !isGameOver
 
     // Clear user annotations whenever board position changes (new move played)
     useEffect(() => {

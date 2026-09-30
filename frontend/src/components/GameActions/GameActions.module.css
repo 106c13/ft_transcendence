@@ -179,3 +179,16 @@
 	color: white;
 }
 
+.viewerBadge {
+	width: 100%;
+	padding: 12px 14px;
+	border-radius: 8px;
+	background: rgba(59, 130, 246, 0.12);
+	border: 1px solid rgba(59, 130, 246, 0.3);
+	color: #93C5FD;
+	font-size: 14px;
+	font-weight: 600;
+	text-align: center;
+	box-sizing: border-box;
+}
+

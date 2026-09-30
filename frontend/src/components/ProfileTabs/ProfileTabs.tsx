@@ -182,6 +182,7 @@ export default function ProfileTabs({
 											match={match}
 											username={username || ''}
 											onSelect={handleSelectGame}
+											onRowClick={(m) => navigate(`/game/${m.id}`)}
 										/>
 									))}
 								</div>

@@ -240,6 +240,7 @@ export default function GamesList({
 								match={match}
 								username={username}
 								onSelect={onSelectGame}
+								onRowClick={(m) => navigate(`/game/${m.id}`)}
 							/>
 						))}
 					</div>

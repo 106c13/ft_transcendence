@@ -6,6 +6,7 @@ import {
 	OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Socket, Namespace } from 'socket.io';
+import { Chess } from 'chess.js';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 import { getRatingCategory, RatingService } from './rating.service';
@@ -116,51 +117,143 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		const userId = parseInt(userIdStr as string);
 		console.log(`Game Gateway: User ${userId} connected (Socket: ${client.id})`);
-
-		// Resume match if reconnected
-		const reconnectedGame = this.gameService.handleUserReconnect(userId, client.id);
-		if (reconnectedGame) {
-			const isWhite = reconnectedGame.white.userId === userId ? true : false;
-			const color = isWhite ? 'w' : 'b';
-
-			const category = getRatingCategory(reconnectedGame.mode);
-			let playerRating = await this.ratingService.getMatchmakingRating(reconnectedGame.white.userId, category);
-			let opponentRating = await this.ratingService.getMatchmakingRating(reconnectedGame.black.userId, category);
-
-			if (!isWhite)
-				[playerRating, opponentRating] = [opponentRating, playerRating]
-
-			client.join(reconnectedGame.gameId);
-
-			// Send full state to reconnecting player
-			client.emit('match_found', {
-				gameId: reconnectedGame.gameId,
-				color: color,
-				opponentName: reconnectedGame.white.userId === userId ? reconnectedGame.black.username : reconnectedGame.white.username,
-				fen: reconnectedGame.board.fen(),
-				whiteTime: reconnectedGame.whiteTime,
-				blackTime: reconnectedGame.blackTime,
-				turn: reconnectedGame.board.turn(),
-				history: reconnectedGame.board.history(),
-				mode: reconnectedGame.mode,
-				isPaused: false,
-				playerRating: playerRating.rating,
-				playerIsProvisional: playerRating.isProvisional,
-				opponentRating: opponentRating.rating,
-				opponentIsProvisional: opponentRating.isProvisional,
-			});
-		}
 	}
 
 	handleDisconnect(client: Socket) {
 		const userIdStr = client.handshake.query.userId;
 		if (!userIdStr) return;
 
-		const userId = parseInt(userIdStr as string);
+		const userId = parseInt(userIdStr as string, 10);
 		console.log(`Game Gateway: User ${userId} disconnected (Socket: ${client.id})`);
 
-		// Trigger grace period
-		this.gameService.handleUserDisconnect(userId);
+		// Trigger grace period only if this was their active socket
+		this.gameService.handleUserDisconnect(userId, client.id);
+	}
+
+	@SubscribeMessage('join_game')
+	async handleJoinGame(client: Socket, payload: { gameId: string }) {
+		const userIdStr = client.handshake.query.userId;
+		const userId = userIdStr ? parseInt(userIdStr as string, 10) : undefined;
+		const gameId = payload?.gameId;
+		if (!gameId) {
+			client.emit('error', { message: 'missing_game_id' });
+			return;
+		}
+
+		const session = await this.gameService.getGameSession(gameId, userId);
+		if (session.type === 'not_found') {
+			client.emit('error', { message: 'game_not_found' });
+			return;
+		}
+
+		client.join(gameId);
+
+		if (session.type === 'live' && session.game) {
+			const game = session.game;
+			if (session.role === 'player' && userId) {
+				this.gameService.handleUserReconnect(userId, client.id);
+			}
+
+			const category = getRatingCategory(game.mode);
+			const whiteRating = await this.ratingService.getMatchmakingRating(game.white.userId, category);
+			const blackRating = await this.ratingService.getMatchmakingRating(game.black.userId, category);
+			const whiteUser = await this.usersService.findById(game.white.userId);
+			const blackUser = await this.usersService.findById(game.black.userId);
+
+			const matchHistory = game.board.history ? game.board.history() : [];
+
+			const payloadData = {
+				gameId: game.gameId,
+				role: session.role,
+				color: session.color,
+				opponentName: session.color === 'w' ? game.black.username : game.white.username,
+				opponentAvatar: session.color === 'w' ? blackUser?.avatar : whiteUser?.avatar,
+				playerAvatar: session.color === 'w' ? whiteUser?.avatar : blackUser?.avatar,
+				fen: game.board.fen(),
+				whiteTime: game.whiteTime,
+				blackTime: game.blackTime,
+				turn: game.board.turn(),
+				history: matchHistory,
+				mode: game.mode,
+				isPaused: game.disconnectedPlayerIds.size > 0,
+				isGameOver: false,
+				playerRating: session.color === 'w' ? whiteRating.rating : blackRating.rating,
+				playerIsProvisional: session.color === 'w' ? whiteRating.isProvisional : blackRating.isProvisional,
+				opponentRating: session.color === 'w' ? blackRating.rating : whiteRating.rating,
+				opponentIsProvisional: session.color === 'w' ? blackRating.isProvisional : whiteRating.isProvisional,
+				whitePlayer: {
+					id: game.white.userId,
+					username: game.white.username,
+					avatar: whiteUser?.avatar,
+					rating: whiteRating.rating,
+					isProvisional: whiteRating.isProvisional,
+				},
+				blackPlayer: {
+					id: game.black.userId,
+					username: game.black.username,
+					avatar: blackUser?.avatar,
+					rating: blackRating.rating,
+					isProvisional: blackRating.isProvisional,
+				},
+			};
+
+			client.emit('game_state', payloadData);
+			client.emit('match_found', payloadData);
+			return;
+		}
+
+		if (session.type === 'finished' && session.match) {
+			const match = session.match;
+			const replay = new Chess();
+			if (match.pgn) {
+				try {
+					replay.loadPgn(match.pgn);
+				} catch { }
+			}
+
+			const payloadData = {
+				gameId: String(match.id),
+				role: session.role,
+				color: session.color,
+				opponentName: session.color === 'w' ? match.black?.username : match.white?.username,
+				opponentAvatar: session.color === 'w' ? match.black?.avatar : match.white?.avatar,
+				playerAvatar: session.color === 'w' ? match.white?.avatar : match.black?.avatar,
+				fen: replay.fen(),
+				whiteTime: 0,
+				blackTime: 0,
+				turn: replay.turn(),
+				history: replay.history(),
+				mode: match.mode,
+				isPaused: false,
+				isGameOver: true,
+				winner: match.winner_id === match.white_id ? 'w' : (match.winner_id === match.black_id ? 'b' : null),
+				reason: match.result,
+				savedMatchId: match.id,
+				playerRating: session.color === 'w' ? match.white_rating_after : match.black_rating_after,
+				playerIsProvisional: false,
+				opponentRating: session.color === 'w' ? match.black_rating_after : match.white_rating_after,
+				opponentIsProvisional: false,
+				whitePlayer: {
+					id: match.white?.id || match.white_id,
+					username: match.white?.username || 'White',
+					avatar: match.white?.avatar,
+					rating: match.white_rating_after,
+					isProvisional: false,
+					ratingDelta: match.white_rating_delta,
+				},
+				blackPlayer: {
+					id: match.black?.id || match.black_id,
+					username: match.black?.username || 'Black',
+					avatar: match.black?.avatar,
+					rating: match.black_rating_after,
+					isProvisional: false,
+					ratingDelta: match.black_rating_delta,
+				},
+			};
+
+			client.emit('game_state', payloadData);
+			client.emit('match_found', payloadData);
+		}
 	}
 
 	@SubscribeMessage('find_match')
@@ -297,16 +390,34 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	@SubscribeMessage('leave_game')
-	handleLeaveGame(client: Socket, payload?: { gameId?: string }) {
+	@SubscribeMessage('cancel_queue')
+	handleCancelQueue(client: Socket) {
 		const userIdStr = client.handshake.query.userId;
 		if (!userIdStr) return;
 
-		const userId = parseInt(userIdStr as string);
+		const userId = parseInt(userIdStr as string, 10);
+		console.log(`Game Gateway: User ${userId} cancelled queue`);
+		this.gameService.removeFromQueue(userId);
+	}
+
+	@SubscribeMessage('resign_game')
+	handleResignGame(client: Socket, payload: { gameId: string }) {
+		const userIdStr = client.handshake.query.userId;
+		if (!userIdStr) return;
+
+		const userId = parseInt(userIdStr as string, 10);
 		if (payload && payload.gameId) {
+			console.log(`Game Gateway: User ${userId} resigned game ${payload.gameId}`);
 			this.gameService.resign(payload.gameId, userId);
+		}
+	}
+
+	@SubscribeMessage('leave_game')
+	handleLeaveGame(client: Socket, payload?: { gameId?: string }) {
+		if (payload && payload.gameId) {
+			this.handleResignGame(client, { gameId: payload.gameId });
 		} else {
-			this.gameService.removeFromQueue(userId);
+			this.handleCancelQueue(client);
 		}
 	}
 
@@ -527,6 +638,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 			this.server.to(whiteSocketId).emit('match_found', whitePayload);
 			this.server.to(blackSocketId).emit('match_found', blackPayload);
+			this.server.to(gameId).emit('rematch_started', { newGameId: newGame.gameId });
 		})();
 	}
 

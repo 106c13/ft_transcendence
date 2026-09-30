@@ -24,6 +24,7 @@ interface UseChessBoardParams {
     isGameOver: boolean
     isPaused: boolean
     isReviewing: boolean
+    isViewer?: boolean
     boardFen: string
     playerColor: 'w' | 'b'
     turn: 'w' | 'b'
@@ -38,6 +39,7 @@ export function useChessBoard({
     isGameOver,
     isPaused,
     isReviewing,
+    isViewer = false,
     boardFen,
     playerColor,
     turn,
@@ -92,7 +94,7 @@ export function useChessBoard({
     }
 
     const handleSquareSelect = (square: string) => {
-        if (gameState !== 'playing' || isGameOver || isPaused || isReviewing) return
+        if (isViewer || gameState !== 'playing' || isGameOver || isPaused || isReviewing) return
 
         const simChess = getSimulatedChess(boardFen, playerColor, premoves)
         const piece = simChess.get(square as Square)
@@ -105,7 +107,7 @@ export function useChessBoard({
     }
 
     const handlePieceDrop = (sourceSquare: string, targetSquare: string) => {
-        if (gameState !== 'playing' || isGameOver || isPaused || isReviewing) return
+        if (isViewer || gameState !== 'playing' || isGameOver || isPaused || isReviewing) return
 
         if (!targetSquare || sourceSquare === targetSquare) {
             return
@@ -133,7 +135,7 @@ export function useChessBoard({
     }
 
     const handleDragStart = (e: React.DragEvent, square: string) => {
-        if (gameState !== 'playing' || isGameOver || isPaused || isReviewing) {
+        if (isViewer || gameState !== 'playing' || isGameOver || isPaused || isReviewing) {
             e.preventDefault()
             return
         }
@@ -167,7 +169,7 @@ export function useChessBoard({
     }
 
     const handleSquareClick = (square: string) => {
-        if (gameState !== 'playing' || isGameOver || isPaused || isReviewing) return
+        if (isViewer || gameState !== 'playing' || isGameOver || isPaused || isReviewing) return
 
         const simChess = getSimulatedChess(boardFen, playerColor, premoves)
         const piece = simChess.get(square as Square)

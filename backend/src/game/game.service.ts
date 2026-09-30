@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Not } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Match } from './match.entity';
 import { Chess } from 'chess.js';
@@ -164,10 +164,46 @@ export class GameService {
 			queuedAt: Date.now()
 		});
 
-		return this.tryMatchFromQueue(queue, selectedMode);
+		return await this.tryMatchFromQueue(queue, selectedMode);
 	}
 
-	private tryMatchFromQueue(queue: ChessPlayer[], mode: GameModeType): ChessGame | null {
+	private async createGameInstance(white: ChessPlayer, black: ChessPlayer, mode: GameModeType): Promise<ChessGame> {
+		const matchRecord = this.matchRepo.create({
+			white_id: white.userId,
+			black_id: black.userId,
+			mode,
+			result: 'IN_PROGRESS',
+			pgn: '',
+		});
+		const savedMatch = await this.matchRepo.save(matchRecord);
+		const gameId = String(savedMatch.id);
+
+		const baseMode = mode.replace('+2', '') as 'bullet' | 'blitz' | 'rapid';
+		const initialTime = baseMode === 'bullet' ? 60000 : baseMode === 'blitz' ? 180000 : 600000;
+		const increment = mode.endsWith('+2') ? 2000 : 0;
+
+		const newGame: ChessGame = {
+			gameId,
+			white,
+			black,
+			board: new Chess(),
+			mode,
+			increment,
+			whiteTime: initialTime,
+			blackTime: initialTime,
+			lastMoveTime: Date.now(),
+			timer: null,
+			disconnectTimers: new Map(),
+			disconnectedPlayerIds: new Set(),
+			drawOfferUserId: null,
+		};
+
+		this.activeGames.set(gameId, newGame);
+		this.startTurnTimer(newGame);
+		return newGame;
+	}
+
+	private async tryMatchFromQueue(queue: ChessPlayer[], mode: GameModeType): Promise<ChessGame | null> {
 		if (queue.length < 2) return null;
 
 		const now = Date.now();
@@ -209,30 +245,7 @@ export class GameService {
 		const white = isP1White ? newPlayer : opponent;
 		const black = isP1White ? opponent : newPlayer;
 
-		const gameId = `game_${Date.now()}_${white.userId}_${black.userId}`;
-		const baseMode = mode.replace('+2', '') as 'bullet' | 'blitz' | 'rapid';
-		const initialTime = baseMode === 'bullet' ? 60000 : baseMode === 'blitz' ? 180000 : 600000;
-		const increment = mode.endsWith('+2') ? 2000 : 0;
-
-		const newGame: ChessGame = {
-			gameId,
-			white,
-			black,
-			board: new Chess(),
-			mode,
-			increment,
-			whiteTime: initialTime,
-			blackTime: initialTime,
-			lastMoveTime: Date.now(),
-			timer: null,
-			disconnectTimers: new Map(),
-			disconnectedPlayerIds: new Set(),
-			drawOfferUserId: null,
-		};
-
-		this.activeGames.set(gameId, newGame);
-		this.startTurnTimer(newGame);
-		return newGame;
+		return this.createGameInstance(white, black, mode);
 	}
 
 	// Remove player from matchmaking queue
@@ -337,25 +350,7 @@ export class GameService {
 			queuedAt: Date.now()
 		}
 
-		const newGame: ChessGame = {
-			gameId,
-			white: whitePlayer,
-			black: blackPlayer,
-			board: new Chess(),
-			mode,
-			increment,
-			whiteTime: initialTime,
-			blackTime: initialTime,
-			lastMoveTime: Date.now(),
-			timer: null,
-			disconnectTimers: new Map(),
-			disconnectedPlayerIds: new Set(),
-			drawOfferUserId: null,
-		};
-
-		this.activeGames.set(gameId, newGame);
-		this.startTurnTimer(newGame);
-		return newGame;
+		return this.createGameInstance(whitePlayer, blackPlayer, mode);
 	}
 
 	// === CHALLENGE SYSTEM ===
@@ -575,7 +570,7 @@ export class GameService {
 	}
 
 	// Handle user disconnection from websocket
-	handleUserDisconnect(userId: number) {
+	handleUserDisconnect(userId: number, socketId?: string) {
 		const game = this.getGameByUserId(userId);
 		if (!game) {
 			// Just remove from matchmaking queue if there
@@ -583,37 +578,20 @@ export class GameService {
 			return;
 		}
 
+		// If a socketId was provided, only proceed if this was the player's active socket
+		if (socketId) {
+			const activeSocketId = game.white.userId === userId ? game.white.socketId : game.black.socketId;
+			if (activeSocketId && activeSocketId !== socketId) {
+				console.log(`Game Service: Ignoring disconnect from old socket ${socketId} for user ${userId} (active: ${activeSocketId})`);
+				return;
+			}
+		}
+
 		if (game.disconnectedPlayerIds.has(userId)) return;
 
 		game.disconnectedPlayerIds.add(userId);
 
-		// If both players disconnect, finish game immediately as DRAW
-		if (game.disconnectedPlayerIds.size === 2) {
-			for (const timer of game.disconnectTimers.values()) {
-				clearTimeout(timer);
-			}
-			game.disconnectTimers.clear();
-
-			const reason = 'DRAW';
-			this.saveMatch(game, reason, null).then((result) => {
-				this.gameEventsCallback('game_over', game, {
-					winner: null,
-					reason,
-					fen: game.board.fen(),
-					matchId: result?.savedMatch?.id,
-
-					whiteRatingAfter: result?.ratingResult?.whiteRating,
-					blackRatingAfter: result?.ratingResult?.blackRating,
-					whiteRatingDelta: result?.ratingResult?.whiteDelta,
-					blackRatingDelta: result?.ratingResult?.blackDelta,
-				});
-				this.trackFinishedGame(game);
-				this.activeGames.delete(game.gameId);
-			});
-			return;
-		}
-
-		// Pause turn timer if first player disconnected
+		// Pause turn timer if turn timer is running
 		if (game.timer) {
 			clearTimeout(game.timer);
 			game.timer = null;
@@ -628,7 +606,7 @@ export class GameService {
 			game.blackTime = Math.max(0, game.blackTime - elapsed);
 		}
 
-		// Notify other player
+		// Notify other player (if connected)
 		this.gameEventsCallback('opponent_disconnected', game, {
 			userId,
 			graceSeconds: this.getGraceSeconds(game.mode),
@@ -638,9 +616,22 @@ export class GameService {
 		const graceMs = this.getGraceSeconds(game.mode) * 1000;
 		const timer = setTimeout(() => {
 			game.disconnectTimers.delete(userId);
-			// Grace period expired, opponent wins
-			const winnerColor = game.white.userId === userId ? 'b' : 'w';
-			const reason = 'DISCONNECTION';
+
+			// Check if the other player is also disconnected
+			const isWhite = game.white.userId === userId;
+			const opponentId = isWhite ? game.black.userId : game.white.userId;
+			const opponentAlsoDisconnected = game.disconnectedPlayerIds.has(opponentId);
+
+			let winnerColor: 'w' | 'b' | null = null;
+			let reason = 'DISCONNECTION';
+
+			if (opponentAlsoDisconnected) {
+				// Both players disconnected and failed to reconnect within grace period
+				winnerColor = null;
+				reason = 'DRAW';
+			} else {
+				winnerColor = isWhite ? 'b' : 'w';
+			}
 
 			this.saveMatch(game, reason, winnerColor).then((result) => {
 				this.gameEventsCallback('game_over', game, {
@@ -696,7 +687,7 @@ export class GameService {
 		return game;
 	}
 
-	private sweepQueues() {
+	private async sweepQueues() {
 		for (const mode of Object.keys(this.queues) as GameModeType[]) {
 			const queue = this.queues[mode];
 			if (queue.length < 2) continue;
@@ -729,23 +720,7 @@ export class GameService {
 							const white = isAWhite ? a : b;
 							const black = isAWhite ? b : a;
 
-							const gameId = `game_${Date.now()}_${white.userId}_${black.userId}`;
-							const baseMode = mode.replace('+2', '') as 'bullet' | 'blitz' | 'rapid';
-							const initialTime = baseMode === 'bullet' ? 60000 : baseMode === 'blitz' ? 180000 : 600000;
-							const increment = mode.endsWith('+2') ? 2000 : 0;
-
-							const newGame: ChessGame = {
-								gameId, white, black,
-								board: new Chess(), mode, increment,
-								whiteTime: initialTime, blackTime: initialTime,
-								lastMoveTime: Date.now(), timer: null,
-								disconnectTimers: new Map(),
-								disconnectedPlayerIds: new Set(),
-								drawOfferUserId: null,
-							};
-
-							this.activeGames.set(gameId, newGame);
-							this.startTurnTimer(newGame);
+							const newGame = await this.createGameInstance(white, black, mode);
 							// Notify the gateway to emit match_found to both players
 							this.matchFoundCallback(newGame);
 							matched = true;
@@ -854,15 +829,20 @@ export class GameService {
 		}
 
 		try {
-			const match = this.matchRepo.create({
-				white_id: game.white.userId,
-				black_id: game.black.userId,
-				winner_id: winnerId,
-				mode: game.mode,
-				result: result,
-				pgn: game.board.pgn(),
-			});
-			const savedMatch = await this.matchRepo.save(match);
+			const matchId = parseInt(game.gameId, 10);
+			let match = !isNaN(matchId) ? await this.matchRepo.findOne({ where: { id: matchId } }) : null;
+			if (!match) {
+				match = this.matchRepo.create({
+					white_id: game.white.userId,
+					black_id: game.black.userId,
+					mode: game.mode,
+				});
+			}
+
+			match.winner_id = winnerId;
+			match.result = result;
+			match.pgn = game.board.pgn();
+			match.played_at = new Date();
 
 			const category = getRatingCategory(game.mode);
 			const ratingResult = await this.ratingService.updateRatings(
@@ -872,11 +852,11 @@ export class GameService {
 				category,
 			);
 
-			savedMatch.white_rating_after = ratingResult.whiteRating;
-			savedMatch.black_rating_after = ratingResult.blackRating;
-			savedMatch.white_rating_delta = ratingResult.whiteDelta;
-			savedMatch.black_rating_delta = ratingResult.blackDelta;
-			await this.matchRepo.save(savedMatch);
+			match.white_rating_after = ratingResult.whiteRating;
+			match.black_rating_after = ratingResult.blackRating;
+			match.white_rating_delta = ratingResult.whiteDelta;
+			match.black_rating_delta = ratingResult.blackDelta;
+			const savedMatch = await this.matchRepo.save(match);
 
 			return { savedMatch, ratingResult };
 		} catch (e) {
@@ -925,8 +905,8 @@ export class GameService {
 
 		return this.matchRepo.find({
 			where: [
-				{ white_id: user.id },
-				{ black_id: user.id },
+				{ white_id: user.id, result: Not('IN_PROGRESS') },
+				{ black_id: user.id, result: Not('IN_PROGRESS') },
 			],
 			relations: ['white', 'black', 'winner'],
 			order: { played_at: 'DESC' },
@@ -938,6 +918,47 @@ export class GameService {
 			where: { id },
 			relations: ['white', 'black', 'winner'],
 		});
+	}
+
+	async getGameSession(gameId: string, userId?: number): Promise<{
+		type: 'live' | 'finished' | 'not_found';
+		game?: ChessGame;
+		match?: Match;
+		role: 'player' | 'viewer';
+		color: 'w' | 'b';
+	}> {
+		const liveGame = this.activeGames.get(gameId);
+		if (liveGame) {
+			const isPlayer = userId === liveGame.white.userId || userId === liveGame.black.userId;
+			const color: 'w' | 'b' = userId === liveGame.black.userId ? 'b' : 'w';
+			return {
+				type: 'live',
+				game: liveGame,
+				role: isPlayer ? 'player' : 'viewer',
+				color,
+			};
+		}
+
+		const matchId = parseInt(gameId, 10);
+		if (!isNaN(matchId)) {
+			const match = await this.getMatchById(matchId);
+			if (match) {
+				const isPlayer = userId === match.white_id || userId === match.black_id;
+				const color: 'w' | 'b' = userId === match.black_id ? 'b' : 'w';
+				return {
+					type: 'finished',
+					match,
+					role: isPlayer ? 'player' : 'viewer',
+					color,
+				};
+			}
+		}
+
+		return {
+			type: 'not_found',
+			role: 'viewer',
+			color: 'w',
+		};
 	}
 
 	async analyzeMatch(id: number): Promise<any> {

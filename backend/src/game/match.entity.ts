@@ -30,10 +30,10 @@ export class Match {
 	@Column()
 	mode: 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2';
 
-	@Column()
-	result: string; // 'CHECKMATE', 'STALEMATE', 'TIMEOUT', 'RESIGNATION', 'DRAW'
+	@Column({ default: 'IN_PROGRESS' })
+	result: string; // 'IN_PROGRESS', 'CHECKMATE', 'STALEMATE', 'TIMEOUT', 'RESIGNATION', 'DRAW'
 
-	@Column({ type: 'text' })
+	@Column({ type: 'text', default: '' })
 	pgn: string;
 
 	@Column({ type: 'jsonb', nullable: true })

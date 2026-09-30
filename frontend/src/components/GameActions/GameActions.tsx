@@ -5,6 +5,7 @@ import styles from './GameActions.module.css'
 
 type Props = {
 	isGameOver: boolean
+	isViewer?: boolean
 	onResign: () => void
 	drawOfferState: DrawOfferState
 	onOfferDraw: () => void
@@ -15,6 +16,7 @@ type Props = {
 
 function GameActions({
 	isGameOver,
+	isViewer,
 	onResign,
 	drawOfferState,
 	onOfferDraw,
@@ -24,6 +26,32 @@ function GameActions({
 }: Props) {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
+
+	if (isViewer) {
+		return (
+			<div className={styles.gameActions}>
+				<div className={styles.viewerBadge}>
+					👁️ {t('viewer_mode_desc', 'You are viewing this match')}
+				</div>
+				{onAnalyze && (
+					<button
+						type="button"
+						className={styles.analyzeBtn}
+						onClick={onAnalyze}
+					>
+						🔍 {t('analyze_game', 'Analyze Game')}
+					</button>
+				)}
+				<button
+					type="button"
+					className={styles.lobbyBtn}
+					onClick={() => navigate('/home')}
+				>
+					🏠 {t('back_to_lobby', 'Back to Lobby')}
+				</button>
+			</div>
+		)
+	}
 
 	if (isGameOver) {
 		return (

@@ -18,6 +18,7 @@ type Props = {
 	viewIndex: number
 	isReviewing: boolean
 	isGameOver: boolean
+	isViewer?: boolean
 	onSelectIndex: (idx: number) => void
 	onResign: () => void
 	drawOfferState: DrawOfferState
@@ -48,6 +49,7 @@ function ChessInfoPanel({
 	viewIndex,
 	isReviewing,
 	isGameOver,
+	isViewer,
 	onSelectIndex,
 	onResign,
 	drawOfferState,
@@ -78,6 +80,7 @@ function ChessInfoPanel({
 
 			<GameActions
 				isGameOver={isGameOver}
+				isViewer={isViewer}
 				onResign={onResign}
 				drawOfferState={drawOfferState}
 				onOfferDraw={onOfferDraw}

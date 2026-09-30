@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { MatchRecord } from '../GameAnalysis/GameAnalysis'
 import styles from './GameRow.module.css'
@@ -6,6 +7,7 @@ type Props = {
 	match: MatchRecord
 	username: string
 	onSelect: (match: MatchRecord) => void
+	onRowClick?: (match: MatchRecord) => void
 }
 
 function getAvatarUrl(avatar?: string | null) {
@@ -18,8 +20,17 @@ function getAvatarUrl(avatar?: string | null) {
 	return `/uploads/${avatar}`
 }
 
-export default function GameRow({ match, username, onSelect }: Props) {
+export default function GameRow({ match, username, onSelect, onRowClick }: Props) {
 	const { t } = useTranslation()
+	const navigate = useNavigate()
+
+	const handleRowClick = () => {
+		if (onRowClick) {
+			onRowClick(match)
+		} else {
+			navigate(`/game/${match.id}`)
+		}
+	}
 
 	const isUserWhite = match.white?.username === username
 	const isUserBlack = match.black?.username === username
@@ -74,7 +85,18 @@ export default function GameRow({ match, username, onSelect }: Props) {
 	const modeIcon = isBullet ? '🔥' : isBlitz ? '⚡' : isRapid ? '⏳' : '♟'
 
 	return (
-		<div className={styles.gameRow}>
+		<div
+			className={styles.gameRow}
+			onClick={handleRowClick}
+			role="button"
+			tabIndex={0}
+			onKeyDown={(e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault()
+					handleRowClick()
+				}
+			}}
+		>
 			{/* 1. Game Mode (First) - Icon on top, mode name under icon */}
 			<div className={styles.modeCol}>
 				<span className={styles.modeIcon}>{modeIcon}</span>
@@ -162,7 +184,10 @@ export default function GameRow({ match, username, onSelect }: Props) {
 				<button
 					type="button"
 					className={styles.reviewBtn}
-					onClick={() => onSelect(match)}
+					onClick={(e) => {
+						e.stopPropagation()
+						onSelect(match)
+					}}
 				>
 					{t('review', 'Review')}
 				</button>

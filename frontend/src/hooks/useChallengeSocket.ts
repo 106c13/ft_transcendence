@@ -160,7 +160,7 @@ export function useChallengeSocket(userId: number | undefined) {
             // Auto-reset status after 5 seconds so it doesn't linger
             setTimeout(() => setChallengeStatus('idle'), 5000)
             // Navigate to the game page with the challenge gameId
-            navigateRef.current(`/game?mode=${encodeURIComponent(data.mode)}&challenge=${data.gameId}`)
+            navigateRef.current(`/game/${data.gameId}`)
         })
 
         socket.on('challenge_declined', () => {
@@ -177,11 +177,9 @@ export function useChallengeSocket(userId: number | undefined) {
         })
 
         socket.on('challenge_expired', (data?: { challengeId: string }) => {
-            let wasIncoming = false
             let wasOutgoing = false
 
             if (!data?.challengeId || data.challengeId === incomingChallengeRef.current?.challengeId) {
-                wasIncoming = true
                 setIncomingChallenge(null)
                 clearIncomingCountdownRef.current()
             }

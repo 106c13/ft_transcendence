@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef, useMemo } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import io, { Socket } from 'socket.io-client'
+import { Socket } from 'socket.io-client'
+import { getGameSocket } from '../utils/gameSocket'
 import { Chess } from 'chess.js'
 import type { Square } from 'chess.js'
 import { useToast } from '../context/ToastContext'
@@ -19,6 +20,15 @@ interface Premove {
 }
 
 export type DrawOfferState = 'idle' | 'sent' | 'received' | 'declined'
+
+export type PlayerInfo = {
+    id?: number
+    username: string
+    avatar?: string | null
+    rating?: number | null
+    isProvisional?: boolean
+    ratingDelta?: number | null
+}
 
 const getSimulatedChess = (baseFen: string, color: 'w' | 'b' | null, premoveList: Premove[]) => {
     let sim: Chess
@@ -55,18 +65,27 @@ export function useGameSocket() {
     const { t } = useTranslation()
     const { toast } = useToast()
     const navigate = useNavigate()
+    const { gameId: paramGameId } = useParams()
     const [searchParams] = useSearchParams()
 
+    const activeGameId = paramGameId || ''
     const [currentUser, setCurrentUser] = useState<User | null>(null)
 
+    // Spectator / Viewer Mode State
+    const [isViewer, setIsViewer] = useState(false)
+    const isViewerRef = useRef(false)
+    isViewerRef.current = isViewer
+    const [whitePlayer, setWhitePlayer] = useState<PlayerInfo | null>(null)
+    const [blackPlayer, setBlackPlayer] = useState<PlayerInfo | null>(null)
+
     // Matchmaking and Game States
-    const [gameState, setGameState] = useState<'searching' | 'playing'>('searching')
+    const [gameState, setGameState] = useState<'searching' | 'playing'>('playing')
     const [selectedMode, setSelectedMode] = useState<GameModeType>(
         (searchParams.get('mode') as GameModeType) || 'blitz'
     )
     const [opponentName, setOpponentName] = useState('')
     const [playerColor, setPlayerColor] = useState<'w' | 'b'>('w')
-    const [gameId, setGameId] = useState('')
+    const [gameId, setGameId] = useState(activeGameId)
     const [turn, setTurn] = useState<'w' | 'b'>('w')
     const [isCheck, setIsCheck] = useState(false)
 
@@ -174,47 +193,31 @@ export function useGameSocket() {
     }, [navigate, token])
 
     // Socket connection & game event handlers
-    const modeParam = (searchParams.get('mode') || 'blitz') as GameModeType
     const currentUserId = currentUser?.id
 
     useEffect(() => {
-        if (!currentUser) return
+        if (!currentUser || !activeGameId) return
 
-        setSelectedMode(modeParam)
-
-        const challengeGameId = searchParams.get('challenge')
-
-        const socket = io('/game', {
-            query: { userId: currentUser.id.toString() },
-            transports: ['websocket', 'polling'],
-        })
+        const socket = getGameSocket(currentUser.id)
         socketRef.current = socket
 
-        socket.on('connect', () => {
-            console.log('Game Socket connected:', socket.id)
-            if (challengeGameId) {
-                // Joining a challenge game — don't search for match
-                setGameState('searching')
-            } else {
-                setGameState('searching')
-                socket.emit('find_match', { mode: modeParam })
-            }
-        })
+        const onConnect = () => {
+            console.log('Game Arena Socket connected:', socket.id)
+            socket.emit('join_game', { gameId: activeGameId })
+        }
+        socket.on('connect', onConnect)
 
         if (socket.connected) {
-            if (challengeGameId) {
-                setGameState('searching')
-            } else {
-                setGameState('searching')
-                socket.emit('find_match', { mode: modeParam })
-            }
+            socket.emit('join_game', { gameId: activeGameId })
         }
 
-
-        socket.on('match_found', (data: {
+        const handleGameState = (data: {
             gameId: string
-            color: 'w' | 'b'
-            opponentName: string
+            role?: 'player' | 'viewer'
+            color?: 'w' | 'b'
+            opponentName?: string
+            opponentAvatar?: string
+            playerAvatar?: string
             fen: string
             whiteTime: number
             blackTime: number
@@ -222,22 +225,32 @@ export function useGameSocket() {
             history: string[]
             mode: GameModeType
             isPaused?: boolean
+            isGameOver?: boolean
+            winner?: 'w' | 'b' | null
+            reason?: string
+            savedMatchId?: number
             playerRating?: number
             playerIsProvisional?: boolean
             opponentRating?: number
             opponentIsProvisional?: boolean
-            opponentAvatar?: string
+            whitePlayer?: PlayerInfo
+            blackPlayer?: PlayerInfo
         }) => {
+            const isViewerMode = data.role === 'viewer'
+            setIsViewer(isViewerMode)
             setGameId(data.gameId)
-            setPlayerColor(data.color)
-            setOpponentName(data.opponentName)
+            setPlayerColor(data.color || 'w')
+            setOpponentName(data.opponentName || '')
             setOpponentAvatar(data.opponentAvatar ?? null)
             setPlayerRating(data.playerRating ?? null)
             setPlayerIsProvisional(data.playerIsProvisional ?? false)
             setOpponentRating(data.opponentRating ?? null)
             setOpponentIsProvisional(data.opponentIsProvisional ?? false)
+            if (data.whitePlayer) setWhitePlayer(data.whitePlayer)
+            if (data.blackPlayer) setBlackPlayer(data.blackPlayer)
             setPlayerRatingAfter(null)
             setPlayerRatingDelta(null)
+
             localChess.load(data.fen)
             setBoardFen(data.fen)
 
@@ -245,18 +258,20 @@ export function useGameSocket() {
             setBlackTime(data.blackTime)
             setTurn(data.turn)
             setGameState('playing')
-            setIsGameOver(false)
-            setHideGameOverModal(false)
-            setWinnerColor(null)
-            setGameOverReason('')
+            setIsGameOver(data.isGameOver || false)
+            setHideGameOverModal(isViewerMode)
+            setWinnerColor(data.winner ?? null)
+            setGameOverReason(data.reason ?? '')
             setLastMove(null)
             setIsPaused(data.isPaused || false)
             setSelectedMode(data.mode)
             setPremoves([])
             setDrawOfferState('idle')
-            setSavedMatchId(null)
+            setSavedMatchId(data.savedMatchId ?? (data.gameId ? parseInt(data.gameId, 10) : null))
             hasWarnedLowTimeRef.current = false
-            playSound('game-start')
+            if (!data.isGameOver) {
+                playSound('game-start')
+            }
 
             const startFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
             const historyFens: string[] = [startFen]
@@ -269,11 +284,19 @@ export function useGameSocket() {
             }
             setMoveHistory(historyFens)
             setViewIndex(historyFens.length - 1)
-            setMoveSAN(data.history)
+            setMoveSAN(data.history || [])
             setMoveTimes([])
-        })
+        }
 
-        socket.on('move_made', (data: {
+        socket.on('game_state', handleGameState)
+        socket.on('match_found', handleGameState)
+
+        const handleRematchStarted = (data: { newGameId: string }) => {
+            navigate(`/game/${data.newGameId}`)
+        }
+        socket.on('rematch_started', handleRematchStarted)
+
+        const handleMoveMade = (data: {
             fen: string
             san: string
             lastMove: { from: string; to: string }
@@ -352,19 +375,22 @@ export function useGameSocket() {
                     setPremoves([])
                 }
             }
-        })
+        }
+        socket.on('move_made', handleMoveMade)
 
-        socket.on('opponent_disconnected', (data: { userId: number; graceSeconds: number }) => {
+        const handleOpponentDisconnected = (data: { userId: number; graceSeconds: number }) => {
             setIsPaused(true)
             setPauseCountdown(data.graceSeconds)
-        })
+        }
+        socket.on('opponent_disconnected', handleOpponentDisconnected)
 
-        socket.on('opponent_reconnected', () => {
+        const handleOpponentReconnected = () => {
             setIsPaused(false)
             setPauseCountdown(null)
-        })
+        }
+        socket.on('opponent_reconnected', handleOpponentReconnected)
 
-        socket.on('game_over', (data: {
+        const handleGameOver = (data: {
             winner: 'w' | 'b' | null
             reason: string
             fen: string
@@ -375,7 +401,7 @@ export function useGameSocket() {
             blackRatingDelta?: number
         }) => {
             setIsGameOver(true)
-            setHideGameOverModal(false)
+            setHideGameOverModal(isViewerRef.current)
             setWinnerColor(data.winner)
             setGameOverReason(data.reason)
             setSavedMatchId(data.matchId || null)
@@ -405,42 +431,60 @@ export function useGameSocket() {
                 setViewIndex(next.length - 1)
                 return next
             })
-        })
+        }
+        socket.on('game_over', handleGameOver)
 
         // Rematch events
-        socket.on('rematch_received', (_data: { gameId: string; from: string }) => {
+        const handleRematchReceived = (_data: { gameId: string; from: string }) => {
             setRematchState('received')
-        })
+        }
+        socket.on('rematch_received', handleRematchReceived)
 
-        socket.on('rematch_declined', (data: { gameId: string; reason: string }) => {
+        const handleRematchDeclined = (data: { gameId: string; reason: string }) => {
             if (data.reason === 'opponent_left') {
                 setRematchState('opponent_left')
             } else {
                 setRematchState('declined')
             }
-        })
+        }
+        socket.on('rematch_declined', handleRematchDeclined)
 
         // Draw offer events
-        socket.on('draw_offered', () => {
+        const handleDrawOffered = () => {
             setDrawOfferState('received')
             playSound('drawoffer')
-        })
+        }
+        socket.on('draw_offered', handleDrawOffered)
 
-        socket.on('draw_declined', () => {
+        const handleDrawDeclined = () => {
             setDrawOfferState('declined')
-        })
+        }
+        socket.on('draw_declined', handleDrawDeclined)
 
-        socket.on('error', (err: { message: string }) => {
+        const handleError = (err: { message: string }) => {
             if (err.message === 'invalid_move') {
                 handleIllegalMove()
             }
             toast.error(err.message || 'something_went_wrong')
-        })
+        }
+        socket.on('error', handleError)
 
         return () => {
-            socket.disconnect()
+            socket.off('connect', onConnect)
+            socket.off('game_state', handleGameState)
+            socket.off('match_found', handleGameState)
+            socket.off('rematch_started', handleRematchStarted)
+            socket.off('move_made', handleMoveMade)
+            socket.off('opponent_disconnected', handleOpponentDisconnected)
+            socket.off('opponent_reconnected', handleOpponentReconnected)
+            socket.off('game_over', handleGameOver)
+            socket.off('rematch_received', handleRematchReceived)
+            socket.off('rematch_declined', handleRematchDeclined)
+            socket.off('draw_offered', handleDrawOffered)
+            socket.off('draw_declined', handleDrawDeclined)
+            socket.off('error', handleError)
         }
-    }, [currentUserId, modeParam])
+    }, [currentUserId, activeGameId, navigate])
 
 
     // Pause countdown timer
@@ -592,44 +636,24 @@ export function useGameSocket() {
     const files = playerColor === 'b' ? ['h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'] : ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
     const startMatchmaking = (modeOverride?: GameModeType) => {
-        if (socketRef.current) {
-            const mode = modeOverride || selectedMode
-            setGameState('searching')
-            setIsGameOver(false)
-            setHideGameOverModal(false)
-            setGameId('')
-            setOpponentName('')
-            setSavedMatchId(null)
-            setWinnerColor(null)
-            setGameOverReason('')
-            setPlayerRatingAfter(null)
-            setPlayerRatingDelta(null)
-            setPremoves([])
-            setLastMove(null)
-            setRematchState('idle')
-            setDrawOfferState('idle')
-            hasWarnedLowTimeRef.current = false
-            socketRef.current.emit('find_match', { mode })
-        }
+        const mode = modeOverride || selectedMode
+        navigate(`/game?mode=${encodeURIComponent(mode)}`)
     }
 
     const cancelMatchmaking = () => {
-        if (socketRef.current) {
-            socketRef.current.emit('leave_game')
-        }
         navigate('/home')
     }
 
     const resignGame = () => {
-        if (socketRef.current && gameId) {
+        if (socketRef.current && gameId && !isViewerRef.current) {
             if (confirm(t('confirm_resign', 'Are you sure you want to resign?'))) {
-                socketRef.current.emit('leave_game', { gameId })
+                socketRef.current.emit('resign_game', { gameId })
             }
         }
     }
 
     const sendMove = (from: string, to: string, promotion?: string) => {
-        if (socketRef.current && gameId) {
+        if (socketRef.current && gameId && !isViewerRef.current) {
             socketRef.current.emit('make_move', {
                 gameId,
                 from,
@@ -641,20 +665,20 @@ export function useGameSocket() {
 
     // Rematch actions
     const sendRematch = () => {
-        if (socketRef.current && gameId) {
+        if (socketRef.current && gameId && !isViewerRef.current) {
             setRematchState('sent')
             socketRef.current.emit('rematch_request', { gameId })
         }
     }
 
     const acceptRematch = () => {
-        if (socketRef.current && gameId) {
+        if (socketRef.current && gameId && !isViewerRef.current) {
             socketRef.current.emit('rematch_accept', { gameId })
         }
     }
 
     const declineRematch = () => {
-        if (socketRef.current && gameId) {
+        if (socketRef.current && gameId && !isViewerRef.current) {
             setRematchState('idle')
             socketRef.current.emit('rematch_decline', { gameId })
         }
@@ -671,21 +695,21 @@ export function useGameSocket() {
 
     // Draw actions
     const offerDraw = () => {
-        if (socketRef.current && gameId) {
+        if (socketRef.current && gameId && !isViewerRef.current) {
             setDrawOfferState('sent')
             socketRef.current.emit('draw_offer', { gameId })
         }
     }
 
     const acceptDraw = () => {
-        if (socketRef.current && gameId) {
+        if (socketRef.current && gameId && !isViewerRef.current) {
             setDrawOfferState('idle')
             socketRef.current.emit('draw_accept', { gameId })
         }
     }
 
     const declineDraw = () => {
-        if (socketRef.current && gameId) {
+        if (socketRef.current && gameId && !isViewerRef.current) {
             setDrawOfferState('idle')
             socketRef.current.emit('draw_decline', { gameId })
         }
@@ -703,6 +727,9 @@ export function useGameSocket() {
 
     return {
         currentUser,
+        isViewer,
+        whitePlayer,
+        blackPlayer,
         gameState,
         selectedMode,
         opponentName,
@@ -759,7 +786,7 @@ export function useGameSocket() {
         opponentAvatar,
         playerRatingAfter,
         playerRatingDelta,
-        isLowTime: gameState === 'playing' && !isGameOver && (playerColor === 'w' ? whiteTime : blackTime) <= 10000,
+        isLowTime: !isViewer && gameState === 'playing' && !isGameOver && (playerColor === 'w' ? whiteTime : blackTime) <= 10000,
         handleIllegalMove,
         handleLowTimeWarning,
     }

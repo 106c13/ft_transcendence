@@ -69,6 +69,7 @@ export default function HomeRecentGames({ matches, username, loading }: Props) {
 								match={match}
 								username={username}
 								onSelect={handleSelectGame}
+								onRowClick={(m) => navigate(`/game/${m.id}`)}
 							/>
 						))}
 					</div>
