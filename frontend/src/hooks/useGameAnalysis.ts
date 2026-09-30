@@ -1,6 +1,16 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { Chess } from 'chess.js'
 import type { MatchRecord, GameAnalysisResult, MoveAnalysis } from '../components/GameAnalysis/GameAnalysis'
+import { playSound, type SoundType } from '../utils/sound'
+
+function getSoundForSan(san?: string): SoundType {
+	if (!san) return 'move-self'
+	if (san.includes('+') || san.includes('#')) return 'move-check'
+	if (san.includes('O-O')) return 'castle'
+	if (san.includes('=')) return 'promote'
+	if (san.includes('x')) return 'capture'
+	return 'move-self'
+}
 
 export function useGameAnalysis() {
 	const [selectedGame, setSelectedGame] = useState<MatchRecord | null>(null)
@@ -94,6 +104,29 @@ export function useGameAnalysis() {
 			}
 		}
 	}, [currentPly])
+
+	const prevPlyRef = useRef<number | null>(null)
+
+	// Play move sounds when stepping through plies
+	useEffect(() => {
+		if (prevPlyRef.current === null) {
+			prevPlyRef.current = currentPly
+			return
+		}
+		if (prevPlyRef.current === currentPly) return
+
+		prevPlyRef.current = currentPly
+		if (currentPly === -1) {
+			playSound('move-self')
+			return
+		}
+
+		const pos = analysisData?.positions[currentPly]
+		if (pos) {
+			const sound = getSoundForSan(pos.san)
+			playSound(sound)
+		}
+	}, [currentPly, analysisData])
 
 	// Derived state
 	const currentPosition: MoveAnalysis | null = useMemo(() => {

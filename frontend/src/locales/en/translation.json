@@ -332,6 +332,7 @@
     "rapid_inc_desc": "Rapid with increment",
     "strategic_classical": "Strategic classical",
     "game_not_found": "Game not found",
+    "viewer_mode_desc": "You are viewing this match live",
     "back": "Back",
     "invalid_user_id": "Invalid user ID",
     "cannot_chat_with_yourself": "Cannot create chat with yourself",

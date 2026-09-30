@@ -48,7 +48,7 @@ export default function GamePage() {
         avatar: game.blackPlayer?.avatar ?? (game.playerColor === 'w' ? game.opponentAvatar : game.currentUser?.avatar),
         time: game.blackTime,
         color: 'b' as const,
-        isActive: game.turn === 'b' && !game.isGameOver,
+        isActive: game.turn === 'b' && !game.isGameOver && game.gameState === 'playing',
         rating: game.blackPlayer?.rating ?? (game.playerColor === 'w' ? game.opponentRating : game.playerRating),
         isProvisional: game.blackPlayer?.isProvisional ?? (game.playerColor === 'w' ? game.opponentIsProvisional : game.playerIsProvisional),
         captured: game.captured.w,
@@ -61,7 +61,7 @@ export default function GamePage() {
         avatar: game.whitePlayer?.avatar ?? (game.playerColor === 'w' ? game.currentUser?.avatar : game.opponentAvatar),
         time: game.whiteTime,
         color: 'w' as const,
-        isActive: game.turn === 'w' && !game.isGameOver,
+        isActive: game.turn === 'w' && !game.isGameOver && game.gameState === 'playing',
         rating: game.whitePlayer?.rating ?? (game.playerColor === 'w' ? game.playerRating : game.opponentRating),
         isProvisional: game.whitePlayer?.isProvisional ?? (game.playerColor === 'w' ? game.playerIsProvisional : game.opponentIsProvisional),
         captured: game.captured.b,
@@ -107,7 +107,7 @@ export default function GamePage() {
                                 avatar={game.opponentAvatar}
                                 color={opponentColor}
                                 time={game.playerColor === 'w' ? game.blackTime : game.whiteTime}
-                                isActive={game.turn !== game.playerColor && !game.isGameOver}
+                                isActive={game.turn !== game.playerColor && !game.isGameOver && game.gameState === 'playing'}
                                 rating={game.opponentRating}
                                 isProvisional={game.opponentIsProvisional}
                                 selectedMode={game.selectedMode}
@@ -165,7 +165,7 @@ export default function GamePage() {
                                 avatar={game.currentUser?.avatar}
                                 color={game.playerColor === 'w' ? 'w' : 'b'}
                                 time={game.playerColor === 'w' ? game.whiteTime : game.blackTime}
-                                isActive={game.turn === game.playerColor && !game.isGameOver}
+                                isActive={game.turn === game.playerColor && !game.isGameOver && game.gameState === 'playing'}
                                 isBottom={true}
                                 rating={game.playerRating}
                                 isProvisional={game.playerIsProvisional}

@@ -9,7 +9,24 @@ import { useToast } from '../context/ToastContext'
 
 import { getPieceImageSrc } from '../constants/gameConstants'
 import type { GameModeType } from '../constants/gameModeConstats'
-import { playSound } from '../utils/sound'
+import { playSound, type SoundType } from '../utils/sound'
+
+function getSoundForSan(san?: string, isSelf = false): SoundType {
+    if (!san) return isSelf ? 'move-self' : 'move-opponent'
+    if (san.includes('+') || san.includes('#')) {
+        return 'move-check'
+    }
+    if (san.includes('O-O')) {
+        return 'castle'
+    }
+    if (san.includes('=')) {
+        return 'promote'
+    }
+    if (san.includes('x')) {
+        return 'capture'
+    }
+    return isSelf ? 'move-self' : 'move-opponent'
+}
 
 import type { User } from '../constants/profileConstants'
 
@@ -79,7 +96,7 @@ export function useGameSocket() {
     const [blackPlayer, setBlackPlayer] = useState<PlayerInfo | null>(null)
 
     // Matchmaking and Game States
-    const [gameState, setGameState] = useState<'searching' | 'playing'>('playing')
+    const [gameState, setGameState] = useState<'searching' | 'playing'>('searching')
     const [selectedMode, setSelectedMode] = useState<GameModeType>(
         (searchParams.get('mode') as GameModeType) || 'blitz'
     )
@@ -146,6 +163,8 @@ export function useGameSocket() {
     const token = localStorage.getItem('token')
 
     const hasWarnedLowTimeRef = useRef(false)
+    const isLiveMoveRef = useRef(false)
+    const prevViewIndexRef = useRef<number | null>(null)
 
     const handleIllegalMove = () => {
         playSound('illegal')
@@ -191,6 +210,13 @@ export function useGameSocket() {
         }
         loadCurrentUser()
     }, [navigate, token])
+
+    useEffect(() => {
+        if (!activeGameId) {
+            toast.error(t('game_not_found', 'Game not found'))
+            navigate('/home', { replace: true })
+        }
+    }, [activeGameId, navigate, t, toast])
 
     // Socket connection & game event handlers
     const currentUserId = currentUser?.id
@@ -283,6 +309,8 @@ export function useGameSocket() {
                 }
             }
             setMoveHistory(historyFens)
+            isLiveMoveRef.current = true
+            prevViewIndexRef.current = historyFens.length - 1
             setViewIndex(historyFens.length - 1)
             setMoveSAN(data.history || [])
             setMoveTimes([])
@@ -307,6 +335,7 @@ export function useGameSocket() {
             isGameOver: boolean
             timeSpent?: number
         }) => {
+            isLiveMoveRef.current = true
             localChess.load(data.fen)
             setBoardFen(data.fen)
             setTurn(data.turn)
@@ -428,6 +457,7 @@ export function useGameSocket() {
                 const last = prev[prev.length - 1]
                 if (last === data.fen) return prev
                 const next = [...prev, data.fen]
+                isLiveMoveRef.current = true
                 setViewIndex(next.length - 1)
                 return next
             })
@@ -464,8 +494,13 @@ export function useGameSocket() {
         const handleError = (err: { message: string }) => {
             if (err.message === 'invalid_move') {
                 handleIllegalMove()
+            } else if (err.message === 'game_not_found' || err.message === 'missing_game_id') {
+                toast.error(t('game_not_found', 'Game not found'))
+                navigate('/home', { replace: true })
+                return
+            } else {
+                toast.error(err.message || 'something_went_wrong')
             }
-            toast.error(err.message || 'something_went_wrong')
         }
         socket.on('error', handleError)
 
@@ -547,6 +582,37 @@ export function useGameSocket() {
         window.addEventListener('keydown', handleKey)
         return () => window.removeEventListener('keydown', handleKey)
     }, [gameState, moveHistory.length])
+
+    // Play move sounds when scrolling through move history (both during and after match)
+    useEffect(() => {
+        if (prevViewIndexRef.current === null) {
+            prevViewIndexRef.current = viewIndex
+            return
+        }
+
+        if (isLiveMoveRef.current) {
+            isLiveMoveRef.current = false
+            prevViewIndexRef.current = viewIndex
+            return
+        }
+
+        if (prevViewIndexRef.current === viewIndex) return
+
+        prevViewIndexRef.current = viewIndex
+
+        if (viewIndex === 0) {
+            playSound('move-self')
+            return
+        }
+
+        const san = moveSAN[viewIndex - 1]
+        const isWhiteMove = viewIndex % 2 === 1
+        const isSelf = (playerColorRef.current === 'w' && isWhiteMove) ||
+                       (playerColorRef.current === 'b' && !isWhiteMove)
+
+        const sound = getSoundForSan(san, isSelf)
+        playSound(sound)
+    }, [viewIndex, moveSAN])
 
     // Captured pieces calculation
     const { captured, whiteScore, blackScore } = (() => {

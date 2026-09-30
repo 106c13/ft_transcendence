@@ -30,25 +30,31 @@ function GameActions({
 	if (isViewer) {
 		return (
 			<div className={styles.gameActions}>
-				<div className={styles.viewerBadge}>
-					👁️ {t('viewer_mode_desc', 'You are viewing this match')}
-				</div>
-				{onAnalyze && (
-					<button
-						type="button"
-						className={styles.analyzeBtn}
-						onClick={onAnalyze}
-					>
-						🔍 {t('analyze_game', 'Analyze Game')}
-					</button>
+				{!isGameOver && (
+					<div className={styles.viewerBadge}>
+						👁️ {t('viewer_mode_desc', 'You are viewing this match live')}
+					</div>
 				)}
-				<button
-					type="button"
-					className={styles.lobbyBtn}
-					onClick={() => navigate('/home')}
-				>
-					🏠 {t('back_to_lobby', 'Back to Lobby')}
-				</button>
+				{isGameOver && (
+					<>
+						{onAnalyze && (
+							<button
+								type="button"
+								className={styles.analyzeBtn}
+								onClick={onAnalyze}
+							>
+								🔍 {t('analyze_game', 'Analyze Game')}
+							</button>
+						)}
+						<button
+							type="button"
+							className={styles.lobbyBtn}
+							onClick={() => navigate('/home')}
+						>
+							🏠 {t('back_to_lobby', 'Back to Lobby')}
+						</button>
+					</>
+				)}
 			</div>
 		)
 	}
