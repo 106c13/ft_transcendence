@@ -1,12 +1,12 @@
-import { useEffect, useState, useRef } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
+import { useNavigate, useSearchParams, useOutletContext } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Socket } from 'socket.io-client'
-import { getGameSocket } from '../../utils/gameSocket'
+import { useGameSocketContext } from '../../context/GameSocketContext'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import { getPieceImageSrc } from '../../constants/gameConstants'
 import type { GameModeType } from '../../constants/gameModeConstats'
-import type { User } from '../../constants/profileConstants'
+import type { LayoutContextType } from '../../layouts/MainLayout'
 import styles from './MatchmakingPage.module.css'
 
 export default function MatchmakingPage() {
@@ -16,42 +16,16 @@ export default function MatchmakingPage() {
     const [searchParams] = useSearchParams()
 
     const modeParam = (searchParams.get('mode') || 'blitz') as GameModeType
-    const [currentUser, setCurrentUser] = useState<User | null>(null)
+    const { currentUser } = useOutletContext<LayoutContextType>()
+    const { socket } = useGameSocketContext()
     const socketRef = useRef<Socket | null>(null)
     const matchFoundRef = useRef(false)
-    const token = localStorage.getItem('token')
-
-    // Load current user
-    useEffect(() => {
-        const loadCurrentUser = async () => {
-            if (!token) {
-                navigate('/login')
-                return
-            }
-            try {
-                const res = await fetch('/api/users/me', {
-                    headers: { Authorization: `Bearer ${token}` },
-                })
-                if (res.ok) {
-                    const data = await res.json()
-                    setCurrentUser(data)
-                } else {
-                    localStorage.removeItem('token')
-                    navigate('/login')
-                }
-            } catch (error) {
-                console.error('Error loading user:', error)
-            }
-        }
-        loadCurrentUser()
-    }, [navigate, token])
 
     // Matchmaking socket connection
     useEffect(() => {
-        if (!currentUser) return
+        if (!currentUser || !socket) return
 
         matchFoundRef.current = false
-        const socket = getGameSocket(currentUser.id)
         socketRef.current = socket
 
         const onConnect = () => {
@@ -84,11 +58,12 @@ export default function MatchmakingPage() {
             }
             socketRef.current = null
         }
-    }, [currentUser, modeParam, navigate])
+    }, [socket, currentUser, modeParam, navigate])
 
     const handleCancel = () => {
-        if (socketRef.current?.connected) {
-            socketRef.current.emit('cancel_queue')
+        const activeSocket = socketRef.current || socket
+        if (activeSocket?.connected) {
+            activeSocket.emit('cancel_queue')
         }
         navigate('/home')
     }

@@ -8,6 +8,7 @@ import SettingsPage from './pages/SettingsPage/SettingsPage'
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage'
 import HomePage from './pages/HomePage/HomePage'
 import ChatPage from './pages/ChatPage/ChatPage'
+import GameLayout from './layouts/GameLayout'
 import GamePage from './pages/GamePage/GamePage'
 import MatchmakingPage from './pages/MatchmakingPage/MatchmakingPage'
 import GameAnalysisPage from './pages/GameAnalysisPage/GameAnalysisPage'
@@ -43,8 +44,12 @@ export default function App() {
           <Route path="/game/analysis/:id" element={<GameAnalysisPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/chat/:user_id" element={<ChatPage />} />
-          <Route path="/game" element={<MatchmakingPage />} />
-          <Route path="/game/:gameId" element={<GamePage />} />
+          
+          {/* Game Socket Scoped Routes */}
+          <Route element={<GameLayout />}>
+            <Route path="/game" element={<MatchmakingPage />} />
+            <Route path="/game/:gameId" element={<GamePage />} />
+          </Route>
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

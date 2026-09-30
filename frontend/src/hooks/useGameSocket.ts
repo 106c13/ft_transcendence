@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef, useMemo } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams, useOutletContext } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Socket } from 'socket.io-client'
-import { getGameSocket } from '../utils/gameSocket'
+import { useGameSocketContext } from '../context/GameSocketContext'
 import { Chess } from 'chess.js'
 import type { Square } from 'chess.js'
 import { useToast } from '../context/ToastContext'
@@ -28,7 +28,7 @@ function getSoundForSan(san?: string, isSelf = false): SoundType {
     return isSelf ? 'move-self' : 'move-opponent'
 }
 
-import type { User } from '../constants/profileConstants'
+import type { LayoutContextType } from '../layouts/MainLayout'
 
 interface Premove {
     from: string
@@ -86,7 +86,8 @@ export function useGameSocket() {
     const [searchParams] = useSearchParams()
 
     const activeGameId = paramGameId || ''
-    const [currentUser, setCurrentUser] = useState<User | null>(null)
+    const { currentUser } = useOutletContext<LayoutContextType>()
+    const { socket } = useGameSocketContext()
 
     // Spectator / Viewer Mode State
     const [isViewer, setIsViewer] = useState(false)
@@ -160,7 +161,6 @@ export function useGameSocket() {
     const [moveTimes, setMoveTimes] = useState<number[]>([])
 
     const socketRef = useRef<Socket | null>(null)
-    const token = localStorage.getItem('token')
 
     const hasWarnedLowTimeRef = useRef(false)
     const isLiveMoveRef = useRef(false)
@@ -186,31 +186,6 @@ export function useGameSocket() {
         }
     }, [])
 
-    // Load current user
-    useEffect(() => {
-        const loadCurrentUser = async () => {
-            if (!token) {
-                navigate('/login')
-                return
-            }
-            try {
-                const res = await fetch('/api/users/me', {
-                    headers: { Authorization: `Bearer ${token}` },
-                })
-                if (res.ok) {
-                    const data = await res.json()
-                    setCurrentUser(data)
-                } else {
-                    localStorage.removeItem('token')
-                    navigate('/login')
-                }
-            } catch (error) {
-                console.error('Error loading user:', error)
-            }
-        }
-        loadCurrentUser()
-    }, [navigate, token])
-
     useEffect(() => {
         if (!activeGameId) {
             toast.error(t('game_not_found', 'Game not found'))
@@ -222,9 +197,8 @@ export function useGameSocket() {
     const currentUserId = currentUser?.id
 
     useEffect(() => {
-        if (!currentUser || !activeGameId) return
+        if (!socket || !currentUser || !activeGameId) return
 
-        const socket = getGameSocket(currentUser.id)
         socketRef.current = socket
 
         const onConnect = () => {
@@ -518,8 +492,9 @@ export function useGameSocket() {
             socket.off('draw_offered', handleDrawOffered)
             socket.off('draw_declined', handleDrawDeclined)
             socket.off('error', handleError)
+            socketRef.current = null
         }
-    }, [currentUserId, activeGameId, navigate])
+    }, [socket, currentUserId, activeGameId, navigate])
 
 
     // Pause countdown timer
@@ -711,16 +686,18 @@ export function useGameSocket() {
     }
 
     const resignGame = () => {
-        if (socketRef.current && gameId && !isViewerRef.current) {
+        const activeSocket = socketRef.current || socket
+        if (activeSocket && gameId && !isViewerRef.current) {
             if (confirm(t('confirm_resign', 'Are you sure you want to resign?'))) {
-                socketRef.current.emit('resign_game', { gameId })
+                activeSocket.emit('resign_game', { gameId })
             }
         }
     }
 
     const sendMove = (from: string, to: string, promotion?: string) => {
-        if (socketRef.current && gameId && !isViewerRef.current) {
-            socketRef.current.emit('make_move', {
+        const activeSocket = socketRef.current || socket
+        if (activeSocket && gameId && !isViewerRef.current) {
+            activeSocket.emit('make_move', {
                 gameId,
                 from,
                 to,
@@ -731,22 +708,25 @@ export function useGameSocket() {
 
     // Rematch actions
     const sendRematch = () => {
-        if (socketRef.current && gameId && !isViewerRef.current) {
+        const activeSocket = socketRef.current || socket
+        if (activeSocket && gameId && !isViewerRef.current) {
             setRematchState('sent')
-            socketRef.current.emit('rematch_request', { gameId })
+            activeSocket.emit('rematch_request', { gameId })
         }
     }
 
     const acceptRematch = () => {
-        if (socketRef.current && gameId && !isViewerRef.current) {
-            socketRef.current.emit('rematch_accept', { gameId })
+        const activeSocket = socketRef.current || socket
+        if (activeSocket && gameId && !isViewerRef.current) {
+            activeSocket.emit('rematch_accept', { gameId })
         }
     }
 
     const declineRematch = () => {
-        if (socketRef.current && gameId && !isViewerRef.current) {
+        const activeSocket = socketRef.current || socket
+        if (activeSocket && gameId && !isViewerRef.current) {
             setRematchState('idle')
-            socketRef.current.emit('rematch_decline', { gameId })
+            activeSocket.emit('rematch_decline', { gameId })
         }
     }
 
@@ -761,23 +741,26 @@ export function useGameSocket() {
 
     // Draw actions
     const offerDraw = () => {
-        if (socketRef.current && gameId && !isViewerRef.current) {
+        const activeSocket = socketRef.current || socket
+        if (activeSocket && gameId && !isViewerRef.current) {
             setDrawOfferState('sent')
-            socketRef.current.emit('draw_offer', { gameId })
+            activeSocket.emit('draw_offer', { gameId })
         }
     }
 
     const acceptDraw = () => {
-        if (socketRef.current && gameId && !isViewerRef.current) {
+        const activeSocket = socketRef.current || socket
+        if (activeSocket && gameId && !isViewerRef.current) {
             setDrawOfferState('idle')
-            socketRef.current.emit('draw_accept', { gameId })
+            activeSocket.emit('draw_accept', { gameId })
         }
     }
 
     const declineDraw = () => {
-        if (socketRef.current && gameId && !isViewerRef.current) {
+        const activeSocket = socketRef.current || socket
+        if (activeSocket && gameId && !isViewerRef.current) {
             setDrawOfferState('idle')
-            socketRef.current.emit('draw_decline', { gameId })
+            activeSocket.emit('draw_decline', { gameId })
         }
     }
 
