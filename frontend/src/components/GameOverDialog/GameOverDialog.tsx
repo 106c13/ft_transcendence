@@ -1,8 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import styles from './GameOverDialog.module.css'
 
-type RematchState = 'idle' | 'sent' | 'received' | 'declined' | 'opponent_left'
-
 type Props = {
 	winnerColor: 'w' | 'b' | null
 	playerColor: 'w' | 'b'
@@ -11,60 +9,17 @@ type Props = {
 	ratingDelta?: number | null
 	onClose: () => void
 	onPlayAgain: () => void
-	rematchState: RematchState
+	rematchState?: 'idle' | 'sent'
 	onRematch: () => void
-	onAcceptRematch: () => void
-	onDeclineRematch: () => void
 	onAnalyze?: () => void
 }
 
 function GameOverDialog({
 	winnerColor, playerColor, gameOverReason, ratingAfter, ratingDelta, onClose, onPlayAgain,
-	rematchState, onRematch, onAcceptRematch, onDeclineRematch, onAnalyze
+	rematchState = 'idle', onRematch, onAnalyze
 }: Props) {
 	const { t } = useTranslation()
-
-	const renderRematchButton = () => {
-		switch (rematchState) {
-			case 'idle':
-				return (
-					<button className={styles.rematchBtn} onClick={onRematch}>
-						{t('rematch', 'Rematch')}
-					</button>
-				)
-			case 'sent':
-				return (
-					<button className={`${styles.rematchBtn} ${styles.rematchBtnDisabled}`} disabled>
-						{t('rematch_waiting', 'Waiting...')}
-					</button>
-				)
-			case 'received':
-				return (
-					<div className={styles.rematchReceivedRow}>
-						<button className={styles.acceptRematchBtn} onClick={onAcceptRematch}>
-							{t('accept_rematch', '✓ Accept')}
-						</button>
-						<button className={styles.declineRematchBtn} onClick={onDeclineRematch}>
-							{t('decline_rematch', '✗ Decline')}
-						</button>
-					</div>
-				)
-			case 'declined':
-				return (
-					<button className={`${styles.rematchBtn} ${styles.rematchBtnDisabled}`} disabled>
-						{t('rematch_declined', 'Declined')}
-					</button>
-				)
-			case 'opponent_left':
-				return (
-					<button className={`${styles.rematchBtn} ${styles.rematchBtnDisabled}`} disabled title={t('opponent_left_hint', 'Opponent has left the game page')}>
-						{t('opponent_left', 'Opponent Left')}
-					</button>
-				)
-			default:
-				return null
-		}
-	}
+	const isWaiting = rematchState === 'sent'
 
 	return (
 		<div className={styles.gameOverModal}>
@@ -108,7 +63,13 @@ function GameOverDialog({
 					<button className={styles.playAgainBtn} onClick={onPlayAgain}>
 						{t('play_again', 'Play Again')}
 					</button>
-					{renderRematchButton()}
+					<button
+						className={`${styles.rematchBtn} ${isWaiting ? styles.rematchBtnDisabled : ''}`}
+						onClick={onRematch}
+						disabled={isWaiting}
+					>
+						{isWaiting ? t('rematch_waiting', 'Waiting...') : t('rematch', 'Rematch')}
+					</button>
 				</div>
 				<button className={styles.analyzeBtn} onClick={onAnalyze}>
 					🔍 {t('analyze_game', 'Analyze Game')}

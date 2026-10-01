@@ -174,44 +174,6 @@
 	cursor: not-allowed;
 }
 
-.rematchReceivedRow {
-	flex: 1;
-	display: flex;
-	gap: 8px;
-}
-
-.acceptRematchBtn {
-	flex: 1;
-	padding: 12px;
-	border-radius: 8px;
-	border: none;
-	background: linear-gradient(135deg, #22C55E, #16A34A);
-	color: white;
-	font-weight: 600;
-	cursor: pointer;
-	transition: all 0.2s;
-}
-
-.acceptRematchBtn:hover {
-	background: linear-gradient(135deg, #16A34A, #15803D);
-}
-
-.declineRematchBtn {
-	flex: 1;
-	padding: 12px;
-	border-radius: 8px;
-	border: none;
-	background: linear-gradient(135deg, #EF4444, #DC2626);
-	color: white;
-	font-weight: 600;
-	cursor: pointer;
-	transition: all 0.2s;
-}
-
-.declineRematchBtn:hover {
-	background: linear-gradient(135deg, #DC2626, #B91C1C);
-}
-
 .analyzeBtn {
 	width: 100%;
 	padding: 12px;

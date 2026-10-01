@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next'
+import { useOutletContext } from 'react-router-dom'
+import type { LayoutContextType } from '../../layouts/MainLayout'
 import { useGameSocket } from '../../hooks/useGameSocket'
 import { useChessBoard } from '../../hooks/useChessBoard'
 import { usePageTitle } from '../../hooks/usePageTitle'
@@ -12,6 +14,11 @@ import styles from './GamePage.module.css'
 export default function GamePage() {
     const { t } = useTranslation()
     usePageTitle('page_title_game', 'Chess Arena')
+
+    const layoutContext = useOutletContext<LayoutContextType | undefined>()
+    const challengeSocket = layoutContext?.challengeSocket
+
+    const rematchState: 'idle' | 'sent' = challengeSocket?.outgoingChallenge?.isRematch ? 'sent' : 'idle'
 
     const game = useGameSocket()
     const board = useChessBoard({
@@ -212,10 +219,14 @@ export default function GamePage() {
                             game.setIsGameOver(false)
                             game.startMatchmaking()
                         }}
-                        rematchState={game.rematchState}
-                        onRematch={game.sendRematch}
-                        onAcceptRematch={game.acceptRematch}
-                        onDeclineRematch={game.declineRematch}
+                        rematchState={rematchState}
+                        onRematch={() => {
+                            if (challengeSocket?.incomingChallenge?.isRematch) {
+                                challengeSocket.acceptChallenge(challengeSocket.incomingChallenge.challengeId)
+                            } else if (game.gameId && challengeSocket) {
+                                challengeSocket.sendRematch(game.gameId)
+                            }
+                        }}
                         onAnalyze={game.analyzeGame}
                     />
                 )}

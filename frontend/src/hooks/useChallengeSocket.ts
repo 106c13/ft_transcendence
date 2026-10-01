@@ -7,12 +7,14 @@ export interface ChallengeReceived {
     challengeId: string
     from: string
     mode: string
+    isRematch?: boolean
 }
 
 export interface ChallengeSent {
     challengeId: string
     friendUsername: string
     mode: string
+    isRematch?: boolean
 }
 
 export type ChallengeStatus = 'idle' | 'sending' | 'sent' | 'accepted' | 'declined' | 'expired' | 'error'
@@ -135,7 +137,7 @@ export function useChallengeSocket(userId: number | undefined) {
             }
             const toastId = `outgoing_challenge_${data.challengeId}`
             outgoingToastIdRef.current = toastId
-            toastRef.current.info('challenge_sent', { id: toastId, duration: 30000 })
+            toastRef.current.info(data.isRematch ? 'rematch_sent' : 'challenge_sent', { id: toastId, duration: 30000 })
         })
 
         socket.on('challenge_received', (data: ChallengeReceived) => {
@@ -143,7 +145,7 @@ export function useChallengeSocket(userId: number | undefined) {
             startIncomingCountdownRef.current()
         })
 
-        socket.on('challenge_accepted', (data: { challengeId: string; gameId: string; mode: string }) => {
+        socket.on('challenge_accepted', (data: { challengeId: string; gameId: string; mode: string; isRematch?: boolean }) => {
             if (acceptedGameIdRef.current === data.gameId) return
             acceptedGameIdRef.current = data.gameId
 
@@ -156,14 +158,14 @@ export function useChallengeSocket(userId: number | undefined) {
                 toastRef.current.dismiss(outgoingToastIdRef.current)
                 outgoingToastIdRef.current = null
             }
-            toastRef.current.success('challenge_accepted')
+            toastRef.current.success(data.isRematch ? 'rematch_accepted' : 'challenge_accepted')
             // Auto-reset status after 5 seconds so it doesn't linger
             setTimeout(() => setChallengeStatus('idle'), 5000)
             // Navigate to the game page with the challenge gameId
             navigateRef.current(`/game/${data.gameId}`)
         })
 
-        socket.on('challenge_declined', () => {
+        socket.on('challenge_declined', (data?: { challengeId?: string; isRematch?: boolean }) => {
             setChallengeStatus('declined')
             clearOutgoingCountdownRef.current()
             setOutgoingChallenge(null)
@@ -171,12 +173,12 @@ export function useChallengeSocket(userId: number | undefined) {
                 toastRef.current.dismiss(outgoingToastIdRef.current)
                 outgoingToastIdRef.current = null
             }
-            toastRef.current.warning('challenge_declined')
+            toastRef.current.warning(data?.isRematch ? 'rematch_rejected' : 'challenge_declined')
             // Auto-reset after 3 seconds
             setTimeout(() => setChallengeStatus('idle'), 3000)
         })
 
-        socket.on('challenge_expired', (data?: { challengeId: string }) => {
+        socket.on('challenge_expired', (data?: { challengeId?: string; isRematch?: boolean }) => {
             let wasOutgoing = false
 
             if (!data?.challengeId || data.challengeId === incomingChallengeRef.current?.challengeId) {
@@ -197,7 +199,7 @@ export function useChallengeSocket(userId: number | undefined) {
             }
 
             if (wasOutgoing) {
-                toastRef.current.info('challenge_expired')
+                toastRef.current.info(data?.isRematch ? 'rematch_expired' : 'challenge_expired')
             }
         })
 
@@ -242,6 +244,14 @@ export function useChallengeSocket(userId: number | undefined) {
         }
     }, [])
 
+    const sendRematch = useCallback((previousGameId: string) => {
+        if (socketRef.current) {
+            setChallengeStatus('sending')
+            setChallengeError('')
+            socketRef.current.emit('send_rematch', { previousGameId })
+        }
+    }, [])
+
     const acceptChallenge = useCallback((challengeId: string) => {
         if (socketRef.current) {
             setIncomingChallenge(null)
@@ -278,6 +288,7 @@ export function useChallengeSocket(userId: number | undefined) {
         incomingCountdown,
         outgoingCountdown,
         sendChallenge,
+        sendRematch,
         acceptChallenge,
         declineChallenge,
         resetChallengeStatus,

@@ -113,10 +113,6 @@ export function useGameSocket() {
     const [winnerColor, setWinnerColor] = useState<'w' | 'b' | null>(null)
     const [gameOverReason, setGameOverReason] = useState('')
 
-    // Rematch States
-    type RematchState = 'idle' | 'sent' | 'received' | 'declined' | 'opponent_left'
-    const [rematchState, setRematchState] = useState<RematchState>('idle')
-
     // Draw Offer States
     const [drawOfferState, setDrawOfferState] = useState<DrawOfferState>('idle')
 
@@ -293,11 +289,6 @@ export function useGameSocket() {
         socket.on('game_state', handleGameState)
         socket.on('match_found', handleGameState)
 
-        const handleRematchStarted = (data: { newGameId: string }) => {
-            navigate(`/game/${data.newGameId}`)
-        }
-        socket.on('rematch_started', handleRematchStarted)
-
         const handleMoveMade = (data: {
             fen: string
             san: string
@@ -423,7 +414,6 @@ export function useGameSocket() {
             setBoardFen(data.fen)
             setIsPaused(false)
             setPauseCountdown(null)
-            setRematchState('idle')
             setDrawOfferState('idle')
             playSound('game-end')
 
@@ -437,21 +427,6 @@ export function useGameSocket() {
             })
         }
         socket.on('game_over', handleGameOver)
-
-        // Rematch events
-        const handleRematchReceived = (_data: { gameId: string; from: string }) => {
-            setRematchState('received')
-        }
-        socket.on('rematch_received', handleRematchReceived)
-
-        const handleRematchDeclined = (data: { gameId: string; reason: string }) => {
-            if (data.reason === 'opponent_left') {
-                setRematchState('opponent_left')
-            } else {
-                setRematchState('declined')
-            }
-        }
-        socket.on('rematch_declined', handleRematchDeclined)
 
         // Draw offer events
         const handleDrawOffered = () => {
@@ -482,13 +457,10 @@ export function useGameSocket() {
             socket.off('connect', onConnect)
             socket.off('game_state', handleGameState)
             socket.off('match_found', handleGameState)
-            socket.off('rematch_started', handleRematchStarted)
             socket.off('move_made', handleMoveMade)
             socket.off('opponent_disconnected', handleOpponentDisconnected)
             socket.off('opponent_reconnected', handleOpponentReconnected)
             socket.off('game_over', handleGameOver)
-            socket.off('rematch_received', handleRematchReceived)
-            socket.off('rematch_declined', handleRematchDeclined)
             socket.off('draw_offered', handleDrawOffered)
             socket.off('draw_declined', handleDrawDeclined)
             socket.off('error', handleError)
@@ -706,30 +678,6 @@ export function useGameSocket() {
         }
     }
 
-    // Rematch actions
-    const sendRematch = () => {
-        const activeSocket = socketRef.current || socket
-        if (activeSocket && gameId && !isViewerRef.current) {
-            setRematchState('sent')
-            activeSocket.emit('rematch_request', { gameId })
-        }
-    }
-
-    const acceptRematch = () => {
-        const activeSocket = socketRef.current || socket
-        if (activeSocket && gameId && !isViewerRef.current) {
-            activeSocket.emit('rematch_accept', { gameId })
-        }
-    }
-
-    const declineRematch = () => {
-        const activeSocket = socketRef.current || socket
-        if (activeSocket && gameId && !isViewerRef.current) {
-            setRematchState('idle')
-            activeSocket.emit('rematch_decline', { gameId })
-        }
-    }
-
     // Auto-clear declined draw notice after 5 seconds
     useEffect(() => {
         if (drawOfferState !== 'declined') return
@@ -818,10 +766,6 @@ export function useGameSocket() {
         resignGame,
         sendMove,
         setIsGameOver,
-        rematchState,
-        sendRematch,
-        acceptRematch,
-        declineRematch,
         drawOfferState,
         offerDraw,
         acceptDraw,

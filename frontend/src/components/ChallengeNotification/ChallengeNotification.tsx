@@ -55,19 +55,27 @@ function ChallengeNotification({ challenge, countdown = 30, onAccept, onDecline 
 			<div className={styles.challengeCard}>
 				<div className={styles.challengeHeader}>
 					<div className={styles.headerLeft}>
-						<span className={styles.swordIcon}>⚔️</span>
-						<span className={styles.headerText}>{t('challenge_incoming', 'Challenge!')}</span>
+						<span className={styles.swordIcon}>{challenge.isRematch ? '🔄' : '⚔️'}</span>
+						<span className={styles.headerText}>
+							{challenge.isRematch ? t('rematch_incoming', 'Rematch!') : t('challenge_incoming', 'Challenge!')}
+						</span>
 					</div>
 					<span className={styles.countdownBadge}>{displaySeconds}s</span>
 				</div>
 
 				<div className={styles.challengeBody}>
 					<p className={styles.challengeText}>
-						{t('challenges_you_to_game', {
-							from: challenge.from,
-							mode: modeLabels[challenge.mode] || challenge.mode,
-							defaultValue: `${challenge.from} challenges you to a ${modeLabels[challenge.mode] || challenge.mode} game!`,
-						})}
+						{challenge.isRematch
+							? t('rematches_you_to_game', {
+									from: challenge.from,
+									mode: modeLabels[challenge.mode] || challenge.mode,
+									defaultValue: `${challenge.from} offers a rematch in ${modeLabels[challenge.mode] || challenge.mode}!`,
+							  })
+							: t('challenges_you_to_game', {
+									from: challenge.from,
+									mode: modeLabels[challenge.mode] || challenge.mode,
+									defaultValue: `${challenge.from} challenges you to a ${modeLabels[challenge.mode] || challenge.mode} game!`,
+							  })}
 					</p>
 				</div>
 

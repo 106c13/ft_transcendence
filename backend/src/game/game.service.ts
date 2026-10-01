@@ -8,16 +8,6 @@ import { RatingService, getRatingCategory } from './rating.service';
 
 export type GameModeType = 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2';
 
-export interface PendingRematch {
-	gameId: string; // original game id
-	requesterId: number;
-	opponentId: number;
-	mode: GameModeType;
-	// Colors from the original game (will be swapped for the new game)
-	requesterWasWhite: boolean;
-	timer: NodeJS.Timeout;
-}
-
 export interface PendingChallenge {
 	challengeId: string;
 	senderId: number;
@@ -26,6 +16,10 @@ export interface PendingChallenge {
 	receiverUsername: string;
 	mode: GameModeType;
 	timer: NodeJS.Timeout;
+	isRematch?: boolean;
+	previousGameId?: string;
+	whiteUserId?: number;
+	blackUserId?: number;
 }
 
 export interface ChessPlayer {
@@ -67,13 +61,6 @@ export class GameService {
 		'blitz+2': [],
 		'rapid+2': [],
 	};
-
-	// Pending rematch requests keyed by original gameId
-	private pendingRematches = new Map<string, PendingRematch>();
-
-	// Recently finished games: tracks which players were in which game
-	// Keyed by gameId, stores player IDs and mode. Cleaned after 5 minutes.
-	private recentlyFinishedGames = new Map<string, { whiteUserId: number; blackUserId: number; mode: GameModeType; whiteUsername: string; blackUsername: string }>();
 
 	// Pending challenge requests keyed by challengeId
 	private pendingChallenges = new Map<string, PendingChallenge>();
@@ -253,67 +240,6 @@ export class GameService {
 		for (const mode of ['bullet', 'blitz', 'rapid', 'bullet+2', 'blitz+2', 'rapid+2'] as const) {
 			this.queues[mode] = this.queues[mode].filter(p => p.userId !== userId);
 		}
-	}
-
-	// Check if a player is still connected to the game page (has an active socket in the game namespace)
-	isPlayerInFinishedGame(gameId: string, userId: number): boolean {
-		const finished = this.recentlyFinishedGames.get(gameId);
-		if (!finished) return false;
-		return finished.whiteUserId === userId || finished.blackUserId === userId;
-	}
-
-	// === REMATCH SYSTEM ===
-
-	addRematchRequest(gameId: string, requesterId: number): PendingRematch | null {
-		// Check if the game recently finished
-		const finished = this.recentlyFinishedGames.get(gameId);
-		if (!finished) return null;
-
-		// Don't allow duplicate rematches
-		if (this.pendingRematches.has(gameId)) return null;
-
-		const opponentId = finished.whiteUserId === requesterId ? finished.blackUserId : finished.whiteUserId;
-		const requesterWasWhite = finished.whiteUserId === requesterId;
-
-		const timer = setTimeout(() => {
-			this.declineRematch(gameId);
-		}, 30000);
-
-		const rematch: PendingRematch = {
-			gameId,
-			requesterId,
-			opponentId,
-			mode: finished.mode,
-			requesterWasWhite,
-			timer,
-		};
-
-		this.pendingRematches.set(gameId, rematch);
-		return rematch;
-	}
-
-	acceptRematch(gameId: string, userId: number): { rematch: PendingRematch; newGame: ChessGame } | null {
-		const rematch = this.pendingRematches.get(gameId);
-		if (!rematch || rematch.opponentId !== userId) return null;
-
-		clearTimeout(rematch.timer);
-		this.pendingRematches.delete(gameId);
-		this.recentlyFinishedGames.delete(gameId);
-
-		return { rematch, newGame: null as any }; // newGame created by gateway with socket IDs
-	}
-
-	declineRematch(gameId: string): PendingRematch | null {
-		const rematch = this.pendingRematches.get(gameId);
-		if (!rematch) return null;
-
-		clearTimeout(rematch.timer);
-		this.pendingRematches.delete(gameId);
-		return rematch;
-	}
-
-	getPendingRematch(gameId: string): PendingRematch | undefined {
-		return this.pendingRematches.get(gameId);
 	}
 
 	// === DIRECT MATCH (for challenges and rematches) ===
@@ -497,7 +423,6 @@ export class GameService {
 				whiteRatingDelta: result?.ratingResult?.whiteDelta,
 				blackRatingDelta: result?.ratingResult?.blackDelta,
 			});
-			this.trackFinishedGame(game);
 			this.activeGames.delete(gameId);
 		});
 	}
@@ -546,7 +471,6 @@ export class GameService {
 				whiteRatingDelta: result?.ratingResult?.whiteDelta,
 				blackRatingDelta: result?.ratingResult?.blackDelta,
 			});
-			this.trackFinishedGame(game);
 			this.activeGames.delete(game.gameId);
 		});
 
@@ -645,7 +569,6 @@ export class GameService {
 					whiteRatingDelta: result?.ratingResult?.whiteDelta,
 					blackRatingDelta: result?.ratingResult?.blackDelta,
 				});
-				this.trackFinishedGame(game);
 				this.activeGames.delete(game.gameId);
 			});
 		}, graceMs);
@@ -769,7 +692,6 @@ export class GameService {
 				whiteRatingDelta: result?.ratingResult?.whiteDelta,
 				blackRatingDelta: result?.ratingResult?.blackDelta,
 			});
-			this.trackFinishedGame(game);
 			this.activeGames.delete(game.gameId);
 		});
 	}
@@ -804,8 +726,6 @@ export class GameService {
 				whiteRatingDelta: result?.ratingResult?.whiteDelta,
 				blackRatingDelta: result?.ratingResult?.blackDelta,
 			});
-			// Track the finished game for rematch purposes
-			this.trackFinishedGame(game);
 			this.activeGames.delete(game.gameId);
 		});
 	}
@@ -874,21 +794,6 @@ export class GameService {
 			case 'rapid':
 			case 'rapid+2': return 60;
 		}
-	}
-
-	// Track a finished game for rematch. Auto-cleanup after 5 minutes.
-	private trackFinishedGame(game: ChessGame) {
-		this.recentlyFinishedGames.set(game.gameId, {
-			whiteUserId: game.white.userId,
-			blackUserId: game.black.userId,
-			mode: game.mode,
-			whiteUsername: game.white.username,
-			blackUsername: game.black.username,
-		});
-		setTimeout(() => {
-			this.recentlyFinishedGames.delete(game.gameId);
-			this.pendingRematches.delete(game.gameId);
-		}, 5 * 60 * 1000);
 	}
 
 	// Resign a player's active game (used when accepting a challenge while in-game)

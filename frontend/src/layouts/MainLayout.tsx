@@ -22,6 +22,7 @@ export type LayoutContextType = {
     incomingCountdown: number
     outgoingCountdown: number
     sendChallenge: (friendUsername: string, mode: string) => void
+    sendRematch: (previousGameId: string) => void
     acceptChallenge: (challengeId: string) => void
     declineChallenge: (challengeId: string) => void
     resetChallengeStatus: () => void

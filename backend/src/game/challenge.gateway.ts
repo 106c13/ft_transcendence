@@ -149,6 +149,100 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 		});
 	}
 
+	@SubscribeMessage('send_rematch')
+	async handleSendRematch(client: Socket, payload: { previousGameId: string }) {
+		const userIdStr = client.handshake.query.userId;
+		if (!userIdStr) {
+			client.emit('error', { message: 'unauthorized' });
+			return;
+		}
+
+		const senderId = parseInt(userIdStr as string, 10);
+		const previousGameId = payload?.previousGameId;
+		if (!previousGameId) {
+			client.emit('challenge_error', { message: 'missing_game_id' });
+			return;
+		}
+
+		const matchId = parseInt(previousGameId, 10);
+		if (isNaN(matchId)) {
+			client.emit('challenge_error', { message: 'invalid_game_id' });
+			return;
+		}
+
+		const match = await this.gameService.getMatchById(matchId);
+		if (!match) {
+			client.emit('challenge_error', { message: 'match_not_found' });
+			return;
+		}
+
+		const isWhite = match.white_id === senderId;
+		const isBlack = match.black_id === senderId;
+		if (!isWhite && !isBlack) {
+			client.emit('challenge_error', { message: 'not_a_player_in_game' });
+			return;
+		}
+
+		const receiverId = isWhite ? match.black_id : match.white_id;
+		const receiver = await this.usersService.findById(receiverId);
+		const sender = await this.usersService.findById(senderId);
+		if (!receiver || !sender) {
+			client.emit('challenge_error', { message: 'user_not_found' });
+			return;
+		}
+
+		// Check if receiver is online
+		if (!this.presenceService.isUserOnline(receiver.id)) {
+			client.emit('challenge_error', { message: 'opponent_not_online' });
+			return;
+		}
+
+		// Pre-swap colors from previous game
+		const whiteUserId = isWhite ? receiver.id : sender.id;
+		const blackUserId = isWhite ? sender.id : receiver.id;
+
+		const mode = match.mode as GameModeType;
+		const challengeId = `rematch_${Date.now()}_${senderId}_${receiver.id}`;
+
+		const timer = setTimeout(() => {
+			const challenge = this.gameService.removeChallenge(challengeId);
+			if (challenge) {
+				this.server.to(`user_${challenge.senderId}`).emit('challenge_expired', { challengeId, isRematch: true });
+				this.server.to(`user_${challenge.receiverId}`).emit('challenge_expired', { challengeId, isRematch: true });
+			}
+		}, 30000);
+
+		const challenge: PendingChallenge = {
+			challengeId,
+			senderId,
+			senderUsername: sender.username,
+			receiverId: receiver.id,
+			receiverUsername: receiver.username,
+			mode,
+			isRematch: true,
+			previousGameId,
+			whiteUserId,
+			blackUserId,
+			timer,
+		};
+
+		this.gameService.addChallenge(challenge);
+
+		this.server.to(`user_${sender.id}`).emit('challenge_sent', {
+			challengeId,
+			friendUsername: receiver.username,
+			mode,
+			isRematch: true,
+		});
+
+		this.server.to(`user_${receiver.id}`).emit('challenge_received', {
+			challengeId,
+			from: sender.username,
+			mode,
+			isRematch: true,
+		});
+	}
+
 	@SubscribeMessage('accept_challenge')
 	async handleAcceptChallenge(client: Socket, payload: { challengeId: string }) {
 		const userIdStr = client.handshake.query.userId;
@@ -169,14 +263,25 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 		// If the accepting player is in an active game, resign it
 		this.gameService.resignActiveGame(userId);
 
-		const isP1White = Math.random() < 0.5;
-		const whiteId = isP1White ? challenge.senderId : challenge.receiverId;
-		const blackId = isP1White ? challenge.receiverId : challenge.senderId;
-		const whiteUsername = isP1White ? challenge.senderUsername : challenge.receiverUsername;
-		const blackUsername = isP1White ? challenge.receiverUsername : challenge.senderUsername;
+		let whiteId: number;
+		let blackId: number;
+		let whiteUsername: string;
+		let blackUsername: string;
 
-		// We need game socket IDs, but these players might not be on /game yet.
-		// Create the game with placeholder socket IDs; the players will connect to /game with the challenge gameId.
+		if (challenge.isRematch && challenge.whiteUserId && challenge.blackUserId) {
+			whiteId = challenge.whiteUserId;
+			blackId = challenge.blackUserId;
+			whiteUsername = whiteId === challenge.senderId ? challenge.senderUsername : challenge.receiverUsername;
+			blackUsername = blackId === challenge.senderId ? challenge.senderUsername : challenge.receiverUsername;
+		} else {
+			const isP1White = Math.random() < 0.5;
+			whiteId = isP1White ? challenge.senderId : challenge.receiverId;
+			blackId = isP1White ? challenge.receiverId : challenge.senderId;
+			whiteUsername = isP1White ? challenge.senderUsername : challenge.receiverUsername;
+			blackUsername = isP1White ? challenge.receiverUsername : challenge.senderUsername;
+		}
+
+		// Create the game with placeholder socket IDs; players will connect to /game with the challenge gameId
 		const newGame = await this.gameService.createDirectMatch(
 			whiteId, '', whiteUsername,
 			blackId, '', blackUsername,
@@ -187,6 +292,7 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 			challengeId,
 			gameId: newGame.gameId,
 			mode: challenge.mode,
+			isRematch: challenge.isRematch,
 		};
 
 		this.server.to(`user_${challenge.senderId}`).emit('challenge_accepted', acceptPayload);
@@ -204,6 +310,6 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 		const challenge = this.gameService.removeChallenge(challengeId);
 		if (!challenge) return;
 
-		this.server.to(`user_${challenge.senderId}`).emit('challenge_declined', { challengeId });
+		this.server.to(`user_${challenge.senderId}`).emit('challenge_declined', { challengeId, isRematch: challenge.isRematch });
 	}
 }
