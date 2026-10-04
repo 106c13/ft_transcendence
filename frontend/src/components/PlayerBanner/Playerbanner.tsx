@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { RatingInfo } from '../../constants/profileConstants'
 import { getAvatarUrl, getModeColor, getPieceImageSrc } from '../../constants/gameConstants'
@@ -54,7 +53,6 @@ function PlayerBanner({
 	materialDiff,
 }: Props) {
 	const { t } = useTranslation()
-	const navigate = useNavigate()
 	const [isOpen, setIsOpen] = useState(false)
 	const [ratings, setRatings] = useState<Record<string, RatingInfo | null> | null>(initialRatings || null)
 	const [userAvatar, setUserAvatar] = useState<string | null>(avatar || null)
@@ -97,7 +95,7 @@ function PlayerBanner({
 		}
 	}, [isOpen, actualUsername, ratings, userAvatar])
 
-	// Close on outside click
+	// Close on outside click or Escape
 	useEffect(() => {
 		if (!isOpen) return
 		const handleClickOutside = (e: MouseEvent) => {
@@ -105,15 +103,34 @@ function PlayerBanner({
 				setIsOpen(false)
 			}
 		}
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				setIsOpen(false)
+			}
+		}
 		document.addEventListener('mousedown', handleClickOutside)
-		return () => document.removeEventListener('mousedown', handleClickOutside)
+		document.addEventListener('keydown', handleKeyDown)
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside)
+			document.removeEventListener('keydown', handleKeyDown)
+		}
 	}, [isOpen])
 
 	const isLowTime = isActive && time <= 10000
 
-	const bulletInfo = ratings?.bullet
-	const blitzInfo = ratings?.blitz
-	const rapidInfo = ratings?.rapid
+	const getDisplayRating = (mode: 'bullet' | 'blitz' | 'rapid') => {
+		const info = ratings?.[mode]
+		if (info) {
+			return info.isProvisional ? `~${info.rating}` : `${info.rating}`
+		}
+		if (mode === selectedMode && rating !== undefined && rating !== null) {
+			return isProvisional ? `~${rating}` : `${rating}`
+		}
+		if (isLoadingDetails) {
+			return '···'
+		}
+		return '—'
+	}
 
 	return (
 		<div
@@ -127,12 +144,18 @@ function PlayerBanner({
 				{/* Left Group: User info + Captured pieces right beside it */}
 				<div className={styles.leftGroup}>
 					<div className={styles.userInfoAnchor} ref={wrapperRef}>
-						{/* In-flow stationary user row */}
+						{/* User row: click avatar or name to toggle minimalistic ratings popup */}
 						<div
-							className={styles.userMainRow}
+							className={`${styles.userMainRow} ${isOpen ? styles.userMainRowActive : ''}`}
 							onClick={() => setIsOpen(prev => !prev)}
 							role="button"
 							tabIndex={0}
+							onKeyDown={e => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault()
+									setIsOpen(prev => !prev)
+								}
+							}}
 							title={isOpen ? t('click_to_collapse', 'Click to collapse') : t('click_to_view_ratings', 'Click to view player ratings')}
 						>
 							<img
@@ -157,123 +180,52 @@ function PlayerBanner({
 									</span>
 								)}
 							</div>
+
+							{/* Minimalistic Ratings Popup */}
+							{isOpen && (
+								<div
+									className={`${styles.ratingPopup} ${isBottom ? styles.popupAbove : styles.popupBelow}`}
+									onClick={e => e.stopPropagation()}
+									role="dialog"
+									aria-label={t('player_ratings', 'Player Ratings')}
+								>
+									<div className={styles.ratingPopupGrid}>
+										<div className={`${styles.ratingPopupItem} ${selectedMode === 'bullet' ? styles.ratingItemActive : ''}`}>
+											<div className={styles.ratingPopupHeader}>
+												<span className={styles.ratingPopupIcon}>🔥</span>
+												<span className={styles.ratingPopupMode}>{t('bullet_rating', 'Bullet')}</span>
+											</div>
+											<span className={styles.ratingPopupValue} style={{ color: getModeColor('bullet') }}>
+												{getDisplayRating('bullet')}
+											</span>
+										</div>
+
+										<div className={`${styles.ratingPopupItem} ${selectedMode === 'blitz' ? styles.ratingItemActive : ''}`}>
+											<div className={styles.ratingPopupHeader}>
+												<span className={styles.ratingPopupIcon}>⚡</span>
+												<span className={styles.ratingPopupMode}>{t('blitz_rating', 'Blitz')}</span>
+											</div>
+											<span className={styles.ratingPopupValue} style={{ color: getModeColor('blitz') }}>
+												{getDisplayRating('blitz')}
+											</span>
+										</div>
+
+										<div className={`${styles.ratingPopupItem} ${selectedMode === 'rapid' ? styles.ratingItemActive : ''}`}>
+											<div className={styles.ratingPopupHeader}>
+												<span className={styles.ratingPopupIcon}>⏳</span>
+												<span className={styles.ratingPopupMode}>{t('rapid_rating', 'Rapid')}</span>
+											</div>
+											<span className={styles.ratingPopupValue} style={{ color: getModeColor('rapid') }}>
+												{getDisplayRating('rapid')}
+											</span>
+										</div>
+									</div>
+
+									{/* Pointer pointing at the center of the user row */}
+									<div className={isBottom ? styles.pointerDown : styles.pointerUp} />
+								</div>
+							)}
 						</div>
-
-						{/* Expanded Modal Card: Mounted strictly when isOpen */}
-						{isOpen && (
-							<div
-								className={`${styles.modalCard} ${isBottom ? styles.modalBottom : styles.modalTop}`}
-								onClick={e => e.stopPropagation()}
-							>
-								{/* Modal Header: matches exact avatar/nick/rating position + actions */}
-								<div className={styles.modalHeaderRow}>
-									<div
-										className={styles.modalUserMeta}
-										onClick={() => setIsOpen(false)}
-										role="button"
-										tabIndex={0}
-										title={t('click_to_collapse', 'Click to collapse')}
-									>
-										<img
-											src={getAvatarUrl(userAvatar)}
-											alt={name}
-											className={styles.profilePic}
-											onError={e => {
-												const target = e.currentTarget
-												if (!target.src.endsWith('/assets/default.jpg')) {
-													target.src = '/assets/default.jpg'
-												}
-											}}
-										/>
-										<div className={styles.playerTextStack}>
-											<span className={styles.nickname}>{name}</span>
-											{rating !== undefined && rating !== null && (
-												<span
-													className={styles.ratingText}
-													style={{ color: modeColor }}
-												>
-													{isProvisional ? `~${rating}` : rating}
-												</span>
-											)}
-										</div>
-									</div>
-
-									<div className={styles.modalActions}>
-										{actualUsername && actualUsername !== 'Opponent' && (
-											<button
-												type="button"
-												className={styles.seeProfileBtn}
-												onClick={e => {
-													e.stopPropagation()
-													setIsOpen(false)
-													navigate(`/profile/${actualUsername}`)
-												}}
-											>
-												{t('see_profile', 'See profile')}
-											</button>
-										)}
-										<button
-											type="button"
-											className={styles.closeBtn}
-											onClick={e => {
-												e.stopPropagation()
-												setIsOpen(false)
-											}}
-											aria-label="Close"
-										>
-											✕
-										</button>
-									</div>
-								</div>
-
-								{/* Ratings Grid */}
-								<div className={styles.modalRatingsSection}>
-									<div className={styles.ratingsHorizontalGrid}>
-										<div className={styles.ratingCard}>
-											<div className={styles.ratingCardHeader}>
-												<span className={styles.modeIcon}>🔥</span>
-												<span className={styles.modeName}>{t('bullet_rating', 'Bullet')}</span>
-											</div>
-											<span className={styles.modeRating}>
-												{bulletInfo
-													? bulletInfo.isProvisional
-														? `~${bulletInfo.rating}`
-														: bulletInfo.rating
-													: (rating && !isLoadingDetails ? `~${rating}` : '—')}
-											</span>
-										</div>
-
-										<div className={styles.ratingCard}>
-											<div className={styles.ratingCardHeader}>
-												<span className={styles.modeIcon}>⚡</span>
-												<span className={styles.modeName}>{t('blitz_rating', 'Blitz')}</span>
-											</div>
-											<span className={styles.modeRating}>
-												{blitzInfo
-													? blitzInfo.isProvisional
-														? `~${blitzInfo.rating}`
-														: blitzInfo.rating
-													: (rating && !isLoadingDetails ? `~${rating}` : '—')}
-											</span>
-										</div>
-
-										<div className={styles.ratingCard}>
-											<div className={styles.ratingCardHeader}>
-												<span className={styles.modeIcon}>⏳</span>
-												<span className={styles.modeName}>{t('rapid_rating', 'Rapid')}</span>
-											</div>
-											<span className={styles.modeRating}>
-												{rapidInfo
-													? rapidInfo.isProvisional
-														? `~${rapidInfo.rating}`
-														: rapidInfo.rating
-													: (rating && !isLoadingDetails ? `~${rating}` : '—')}
-											</span>
-										</div>
-									</div>
-								</div>
-							</div>
-						)}
 					</div>
 
 					{/* Captured Pieces: right beside user info */}

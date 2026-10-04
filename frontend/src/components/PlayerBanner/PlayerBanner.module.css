@@ -15,7 +15,7 @@
 	margin-top: 10px;
 }
 
-/* Elevate slot above chess board and pieces when modal is open */
+/* Elevate slot above chess board and pieces when popup is open */
 .slotOpen {
 	z-index: 150;
 }
@@ -65,7 +65,6 @@
 	animation: none !important;
 }
 
-/* User Info Anchor: preserves exact layout flow in banner */
 /* Left Group: user info + captured pieces right beside it */
 .leftGroup {
 	display: flex;
@@ -84,21 +83,29 @@
 	flex-shrink: 0;
 }
 
-/* Main user info row: avatar, nickname, rating (STAYS IN EXACT SAME PLACE) */
+/* Main user info row: avatar, nickname, rating (click to view ratings popup) */
 .userMainRow {
+	position: relative;
 	display: flex;
 	align-items: center;
 	gap: 10px;
 	cursor: pointer;
 	user-select: none;
 	border-radius: 6px;
-	padding: 2px 4px;
-	margin: -2px -4px;
-	transition: background 0.15s ease;
+	padding: 2px 6px;
+	margin: -2px -6px;
+	transition: background 0.15s ease, border-color 0.15s ease;
+	border: 1px solid transparent;
 }
 
 .userMainRow:hover {
 	background: rgba(255, 255, 255, 0.08);
+	border-color: rgba(148, 163, 184, 0.15);
+}
+
+.userMainRowActive {
+	background: rgba(255, 255, 255, 0.12) !important;
+	border-color: rgba(96, 165, 250, 0.35) !important;
 }
 
 .profilePic {
@@ -140,202 +147,142 @@
 	line-height: 1;
 }
 
-/* Expanded Modal Card: Mounted strictly when isOpen, perfectly matching banner corners */
-.modalCard {
+/* Minimalistic Ratings Popup */
+.ratingPopup {
 	position: absolute;
-	left: -1px;
-	width: 320px;
-	background: rgba(30, 41, 59, 0.98);
-	backdrop-filter: blur(20px);
-	border: 1px solid rgba(148, 163, 184, 0.35);
-	border-radius: 8px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.25);
+	border-radius: 10px;
+	padding: 8px 10px;
+	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 16px rgba(59, 130, 246, 0.15);
+	display: flex;
+	align-items: center;
+	width: max-content;
 	z-index: 160;
 	box-sizing: border-box;
-	box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.4);
-	animation: modalFadeIn 0.15s ease;
+	cursor: default;
 }
 
-@keyframes modalFadeIn {
+.popupAbove {
+	bottom: calc(100% + 11px);
+	animation: popupPopInAbove 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.popupBelow {
+	top: calc(100% + 11px);
+	animation: popupPopInBelow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popupPopInAbove {
 	from {
 		opacity: 0;
+		transform: translate(-50%, 6px) scale(0.95);
 	}
 	to {
 		opacity: 1;
+		transform: translate(-50%, 0) scale(1);
 	}
 }
 
-.modalTop {
-	top: -1px;
-	padding: 8px 10px 10px 10px;
-}
-
-.modalBottom {
-	bottom: -1px;
-	padding: 10px 10px 8px 10px;
-	display: flex;
-	flex-direction: column-reverse;
-}
-
-.modalTop .modalRatingsSection {
-	animation: expandRatingsDown 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-	transform-origin: top center;
-}
-
-.modalBottom .modalRatingsSection {
-	animation: expandRatingsUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-	transform-origin: bottom center;
-}
-
-@keyframes expandRatingsDown {
+@keyframes popupPopInBelow {
 	from {
 		opacity: 0;
-		transform: translateY(-8px);
+		transform: translate(-50%, -6px) scale(0.95);
 	}
 	to {
 		opacity: 1;
-		transform: translateY(0);
+		transform: translate(-50%, 0) scale(1);
 	}
 }
 
-@keyframes expandRatingsUp {
-	from {
-		opacity: 0;
-		transform: translateY(8px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
+/* Pointer pointing DOWN at the center of the user row (for bottom banner) */
+.pointerDown {
+	position: absolute;
+	bottom: -5px;
+	left: 50%;
+	transform: translateX(-50%) rotate(45deg);
+	width: 10px;
+	height: 10px;
+	background: #1E293B;
+	border-right: 1px solid rgba(148, 163, 184, 0.25);
+	border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+	z-index: 1;
+	pointer-events: none;
 }
 
-.modalHeaderRow {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	width: 100%;
+/* Pointer pointing UP at the center of the user row (for top banner) */
+.pointerUp {
+	position: absolute;
+	top: -5px;
+	left: 50%;
+	transform: translateX(-50%) rotate(45deg);
+	width: 10px;
+	height: 10px;
+	background: #1E293B;
+	border-left: 1px solid rgba(148, 163, 184, 0.25);
+	border-top: 1px solid rgba(148, 163, 184, 0.25);
+	z-index: 1;
+	pointer-events: none;
 }
 
-.modalTop .modalHeaderRow {
-	padding-bottom: 8px;
-	border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-	margin-bottom: 8px;
-}
-
-.modalBottom .modalHeaderRow {
-	padding-top: 8px;
-	border-top: 1px solid rgba(148, 163, 184, 0.12);
-	margin-top: 8px;
-}
-
-.modalUserMeta {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	cursor: pointer;
-	user-select: none;
-}
-
-.modalActions {
+.ratingPopupGrid {
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	margin-left: auto;
 }
 
-.seeProfileBtn {
-	padding: 3px 8px;
-	font-size: 11px;
-	font-weight: 600;
+.ratingPopupItem {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 5px 8px;
+	background: rgba(15, 23, 42, 0.6);
 	border-radius: 6px;
-	background: rgba(59, 130, 246, 0.15);
-	border: 1px solid rgba(59, 130, 246, 0.35);
-	color: #60A5FA;
-	cursor: pointer;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	min-width: 54px;
+	gap: 2px;
 	transition: all 0.15s ease;
-	line-height: 1.3;
-	white-space: nowrap;
 }
 
-.seeProfileBtn:hover {
-	background: rgba(59, 130, 246, 0.28);
-	border-color: #3B82F6;
-	color: #93C5FD;
+.ratingPopupItem:hover {
+	background: rgba(15, 23, 42, 0.85);
+	border-color: rgba(148, 163, 184, 0.25);
 }
 
-.closeBtn {
-	background: none;
-	border: none;
-	color: #94A3B8;
-	font-size: 13px;
-	cursor: pointer;
-	padding: 2px 6px;
-	border-radius: 4px;
-	transition: color 0.15s, background 0.15s;
-	line-height: 1;
+.ratingItemActive {
+	background: rgba(59, 130, 246, 0.12);
+	border-color: rgba(96, 165, 250, 0.35);
+	box-shadow: 0 0 8px rgba(59, 130, 246, 0.15);
+}
+
+.ratingPopupHeader {
 	display: flex;
 	align-items: center;
-	justify-content: center;
-}
-
-.closeBtn:hover {
-	color: #F8FAFC;
-	background: rgba(255, 255, 255, 0.1);
-}
-
-.modalRatingsSection {
-	width: 100%;
-}
-
-/* Horizontal Ratings Layout */
-.ratingsHorizontalGrid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 8px;
-}
-
-.ratingCard {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	padding: 6px 4px;
-	background: rgba(15, 23, 42, 0.55);
-	border-radius: 8px;
-	border: 1px solid rgba(148, 163, 184, 0.1);
-	text-align: center;
 	gap: 3px;
-	transition: border-color 0.15s, background 0.15s;
 }
 
-.ratingCard:hover {
-	background: rgba(15, 23, 42, 0.75);
-	border-color: rgba(148, 163, 184, 0.2);
-}
-
-.ratingCardHeader {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 1px;
-}
-
-.modeIcon {
-	font-size: 14px;
+.ratingPopupIcon {
+	font-size: 11px;
 	line-height: 1;
 }
 
-.modeName {
+.ratingPopupMode {
 	font-size: 10px;
 	font-weight: 600;
 	color: #94A3B8;
 	text-transform: capitalize;
+	letter-spacing: 0.2px;
 }
 
-.modeRating {
+.ratingPopupValue {
 	font-size: 13px;
 	font-weight: 700;
-	color: #60A5FA;
 	font-family: var(--mono, monospace);
+	letter-spacing: 0.3px;
+	line-height: 1.2;
 }
 
 /* Captured Pieces: directly beside User Info */
