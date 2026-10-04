@@ -52,9 +52,9 @@ export default function MiniRatingChart({ mode, history, onClick, compact = fals
 	// SVG Sparkline calculation
 	const points = history?.last7Days ?? []
 	const width = 240
-	const height = 50
+	const height = compact ? 50 : 68
 	const padX = 6
-	const padY = 6
+	const padY = compact ? 6 : 8
 
 	const ratings = points.map(p => p.rating)
 	const rawMin = ratings.length > 0 ? Math.min(...ratings) : 800
@@ -258,6 +258,22 @@ export default function MiniRatingChart({ mode, history, onClick, compact = fals
 								strokeLinecap="round"
 								strokeLinejoin="round"
 							/>
+
+							{/* Data point dots */}
+							{!isNotPlayed &&
+								chartPoints.map((pt, idx) => (
+									<circle
+										key={idx}
+										cx={pt.x}
+										cy={pt.y}
+										r={idx === chartPoints.length - 1 ? 3.5 : 2.5}
+										fill={strokeColor}
+										stroke="#1E293B"
+										strokeWidth="1.5"
+									>
+										{pt.label && <title>{`${pt.label}: ${pt.rating}`}</title>}
+									</circle>
+								))}
 						</>
 					) : (
 						<line
@@ -273,7 +289,7 @@ export default function MiniRatingChart({ mode, history, onClick, compact = fals
 				</svg>
 
 				{/* Active end point - rendered as a pure CSS circle to prevent any oval distortion */}
-				{lastPt && (
+				{!isNotPlayed && lastPt && (
 					<div
 						className={styles.activeDot}
 						style={{
@@ -284,19 +300,6 @@ export default function MiniRatingChart({ mode, history, onClick, compact = fals
 						}}
 					/>
 				)}
-			</div>
-
-			<div className={styles.statsRow}>
-				<div className={styles.record}>
-					<span className={styles.wins}>{history?.wins ?? 0}{t('wins_short', 'W')}</span>
-					<span>/</span>
-					<span className={styles.draws}>{history?.draws ?? 0}{t('draws_short', 'D')}</span>
-					<span>/</span>
-					<span className={styles.losses}>{history?.losses ?? 0}{t('losses_short', 'L')}</span>
-				</div>
-				<span className={styles.actionHint}>
-					{t('view_full_chart', 'View chart')} ↗
-				</span>
 			</div>
 		</div>
 	)

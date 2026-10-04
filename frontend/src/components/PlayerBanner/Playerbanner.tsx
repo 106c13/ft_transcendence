@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { RatingInfo } from '../../constants/profileConstants'
 import { getAvatarUrl, getModeColor, getPieceImageSrc } from '../../constants/gameConstants'
@@ -53,6 +54,7 @@ function PlayerBanner({
 	materialDiff,
 }: Props) {
 	const { t } = useTranslation()
+	const navigate = useNavigate()
 	const [isOpen, setIsOpen] = useState(false)
 	const [ratings, setRatings] = useState<Record<string, RatingInfo | null> | null>(initialRatings || null)
 	const [userAvatar, setUserAvatar] = useState<string | null>(avatar || null)
@@ -61,6 +63,25 @@ function PlayerBanner({
 
 	const actualUsername = username || name
 	const modeColor = getModeColor(selectedMode)
+
+	const canViewProfile = Boolean(
+		actualUsername &&
+		actualUsername !== 'Opponent' &&
+		actualUsername !== t('opponent', 'Opponent') &&
+		actualUsername !== 'AI'
+	)
+
+	const handleSeeProfile = (e: React.MouseEvent) => {
+		e.stopPropagation()
+		setIsOpen(false)
+		if (canViewProfile) {
+			if (actualUsername === 'You' || actualUsername === t('you')) {
+				navigate('/profile')
+			} else {
+				navigate(`/profile/${actualUsername}`)
+			}
+		}
+	}
 
 	// Update local state when props change
 	useEffect(() => {
@@ -220,6 +241,18 @@ function PlayerBanner({
 											</span>
 										</div>
 									</div>
+
+									{canViewProfile && (
+										<div className={styles.ratingPopupFooter}>
+											<button
+												type="button"
+												className={styles.seeProfileBtn}
+												onClick={handleSeeProfile}
+											>
+												{t('see_profile', 'See profile')} →
+											</button>
+										</div>
+									)}
 
 									{/* Pointer pointing at the center of the user row */}
 									<div className={isBottom ? styles.pointerDown : styles.pointerUp} />
