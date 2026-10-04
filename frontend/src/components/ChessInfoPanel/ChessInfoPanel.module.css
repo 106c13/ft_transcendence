@@ -2,17 +2,18 @@
 	width: 380px;
 	flex: 1;
 	max-width: 420px;
+	min-width: 320px;
 	background: rgba(30, 41, 59, 0.7);
 	backdrop-filter: blur(12px);
 	border-radius: 12px;
 	border: 1px solid rgba(148, 163, 184, 0.15);
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-	padding: 16px;
+	padding: 14px;
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
-	height: calc(min(72vh, 640px) + 132px);
-	max-height: calc(min(72vh, 640px) + 132px);
+	gap: 10px;
+	height: var(--game-content-h, calc(min(72vh, 640px) + 132px));
+	max-height: var(--game-content-h, calc(min(72vh, 640px) + 132px));
 	box-sizing: border-box;
 }
 
@@ -66,7 +67,7 @@
 
 @media (max-width: 950px) {
 	.gameInfoPanel {
-		width: min(72vh, 640px);
+		width: min(92vw, 480px);
 		max-width: 100%;
 		height: auto;
 		max-height: 520px;

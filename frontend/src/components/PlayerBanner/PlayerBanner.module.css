@@ -1,18 +1,18 @@
 .bannerSlot {
 	position: relative;
 	width: 100%;
-	height: 56px;
-	min-height: 56px;
+	height: var(--banner-h, 56px);
+	min-height: var(--banner-h, 56px);
 	box-sizing: border-box;
 	z-index: 20;
 }
 
 .slotTop {
-	margin-bottom: 10px;
+	margin-bottom: var(--banner-gap, 8px);
 }
 
 .slotBottom {
-	margin-top: 10px;
+	margin-top: var(--banner-gap, 8px);
 }
 
 /* Elevate slot above chess board and pieces when popup is open */
@@ -26,7 +26,7 @@
 	align-items: center;
 	justify-content: space-between;
 	width: 100%;
-	height: 56px;
+	height: var(--banner-h, 56px);
 	padding: 8px 10px;
 	background: rgba(30, 41, 59, 0.7);
 	backdrop-filter: blur(12px);

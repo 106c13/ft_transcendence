@@ -3,8 +3,8 @@
 	display: grid;
 	grid-template-columns: repeat(8, 1fr);
 	grid-template-rows: repeat(8, 1fr);
-	width: min(72vh, 640px);
-	height: min(72vh, 640px);
+	width: var(--board-size, min(72vh, 640px));
+	height: var(--board-size, min(72vh, 640px));
 	aspect-ratio: 1 / 1;
 	border-radius: 8px;
 	overflow: hidden;
@@ -13,10 +13,6 @@
 	box-sizing: border-box;
 	touch-action: none;
 	user-select: none;
-}
-
-.chessBoard.reviewing {
-	/* No darkening filter when reviewing previous positions */
 }
 
 .chessBoard.isDragging,
@@ -185,4 +181,11 @@
 
 .coordOnDark {
 	color: rgba(226, 232, 240, 0.95);
+}
+
+@media (max-width: 950px) {
+	.chessBoard {
+		width: min(92vw, 480px);
+		height: min(92vw, 480px);
+	}
 }
