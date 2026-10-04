@@ -95,13 +95,27 @@ export function useGameAnalysis() {
 		return () => window.removeEventListener('keydown', handleKeyDown)
 	}, [selectedGame, analysisData])
 
-	// Scroll active move into view
+	// Scroll active move into view without scrolling the browser window
 	useEffect(() => {
-		if (moveListRef.current) {
-			const activeCell = moveListRef.current.querySelector('[data-active="true"]')
-			if (activeCell) {
-				activeCell.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
-			}
+		const container = moveListRef.current
+		if (!container) return
+
+		const activeCell = container.querySelector('[data-active="true"]') as HTMLElement | null
+		if (!activeCell) return
+
+		const containerRect = container.getBoundingClientRect()
+		const activeRect = activeCell.getBoundingClientRect()
+
+		const relativeTop = activeRect.top - containerRect.top + container.scrollTop
+		const relativeBottom = relativeTop + activeRect.height
+
+		const currentScroll = container.scrollTop
+		const viewHeight = container.clientHeight
+
+		if (relativeTop < currentScroll) {
+			container.scrollTo({ top: Math.max(0, relativeTop - 4), behavior: 'smooth' })
+		} else if (relativeBottom > currentScroll + viewHeight) {
+			container.scrollTo({ top: relativeBottom - viewHeight + 4, behavior: 'smooth' })
 		}
 	}, [currentPly])
 

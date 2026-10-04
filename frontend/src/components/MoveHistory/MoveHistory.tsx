@@ -34,9 +34,26 @@ function MoveHistory({
 	const moveListRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
-		if (moveListRef.current) {
-			const active = moveListRef.current.querySelector(`.${styles.moveBtn}.${styles.activeMove}`)
-			if (active) active.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+		const container = moveListRef.current
+		if (!container) return
+
+		const active = container.querySelector(`.${styles.moveBtn}.${styles.activeMove}`) as HTMLElement | null
+		if (!active) return
+
+		// Scroll ONLY the moveListRef container, never the browser window or parent page
+		const containerRect = container.getBoundingClientRect()
+		const activeRect = active.getBoundingClientRect()
+
+		const relativeTop = activeRect.top - containerRect.top + container.scrollTop
+		const relativeBottom = relativeTop + activeRect.height
+
+		const currentScroll = container.scrollTop
+		const viewHeight = container.clientHeight
+
+		if (relativeTop < currentScroll) {
+			container.scrollTo({ top: Math.max(0, relativeTop - 4), behavior: 'smooth' })
+		} else if (relativeBottom > currentScroll + viewHeight) {
+			container.scrollTo({ top: relativeBottom - viewHeight + 4, behavior: 'smooth' })
 		}
 	}, [viewIndex])
 
@@ -78,27 +95,27 @@ function MoveHistory({
 
 						return (
 							<div key={row.num} className={styles.moveRow}>
-								<div className={styles.moveLeftGroup}>
-									<span className={styles.moveRowNum}>{row.num}.</span>
+								<span className={styles.moveRowNum}>{row.num}.</span>
+
+								<button
+									type="button"
+									className={`${styles.moveBtn} ${whiteActive ? styles.activeMove : ''}`}
+									onClick={() => onSelectIndex(row.whiteIdx + 1)}
+								>
+									{row.whiteSan}
+								</button>
+
+								{row.blackSan ? (
 									<button
 										type="button"
-										className={`${styles.moveBtn} ${whiteActive ? styles.activeMove : ''}`}
-										onClick={() => onSelectIndex(row.whiteIdx + 1)}
+										className={`${styles.moveBtn} ${blackActive ? styles.activeMove : ''}`}
+										onClick={() => onSelectIndex(row.blackIdx + 1)}
 									>
-										{row.whiteSan}
+										{row.blackSan}
 									</button>
-									{row.blackSan ? (
-										<button
-											type="button"
-											className={`${styles.moveBtn} ${styles.blackMoveBtn} ${blackActive ? styles.activeMove : ''}`}
-											onClick={() => onSelectIndex(row.blackIdx + 1)}
-										>
-											{row.blackSan}
-										</button>
-									) : (
-										<span className={styles.emptyMoveBtn} />
-									)}
-								</div>
+								) : (
+									<span className={styles.emptyMoveBtn} />
+								)}
 
 								<div className={styles.moveTimesGroup}>
 									<div className={styles.timeItem} title={t('white_time_spent', "White's time spent")}>
