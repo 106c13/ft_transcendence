@@ -1,6 +1,6 @@
 .gameRow {
 	display: grid;
-	grid-template-columns: 80px minmax(200px, 1fr) 85px 95px 120px;
+	grid-template-columns: 80px minmax(180px, 1fr) 70px 85px 95px 120px;
 	align-items: center;
 	gap: 10px;
 	background: #1E293B;
@@ -173,7 +173,22 @@
 	flex-shrink: 0;
 }
 
-/* 3. Result column */
+/* 3. Moves column */
+.movesCol {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+}
+
+.movesCount {
+	font-size: 12.5px;
+	font-weight: 600;
+	color: #CBD5E1;
+	font-family: var(--mono, monospace);
+}
+
+/* 4. Result column */
 .resultCol {
 	display: flex;
 	align-items: center;
@@ -256,7 +271,7 @@
 /* Responsive collapse for small screens */
 @media (max-width: 768px) {
 	.gameRow {
-		grid-template-columns: 70px 1fr 75px 85px;
+		grid-template-columns: 70px 1fr 50px 75px 85px;
 		gap: 8px;
 		padding: 10px;
 	}

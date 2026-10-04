@@ -57,6 +57,7 @@ export default function HomeRecentGames({ matches, username, loading }: Props) {
 					<div className={styles.listHeader}>
 						<span>{t('mode', 'Mode')}</span>
 						<span>{t('players', 'Players')}</span>
+						<span>{t('moves', 'Moves')}</span>
 						<span>{t('result', 'Result')}</span>
 						<span>{t('review', 'Review')}</span>
 						<span>{t('date', 'Date')}</span>

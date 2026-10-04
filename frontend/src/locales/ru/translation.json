@@ -232,6 +232,8 @@
     "suggested_review_btn": "Рекомендуемый обзор",
     "review_against_opponent": "Анализ против {{opponent}}",
     "players": "Игроки",
+    "move": "Ход",
+    "moves": "Ходы",
     "review": "Обзор",
     "page_title_home": "Главная",
     "page_title_game": "Шахматная арена",
