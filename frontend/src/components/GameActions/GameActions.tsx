@@ -13,6 +13,7 @@ type Props = {
 	onAcceptDraw?: () => void
 	onDeclineDraw?: () => void
 	onAnalyze?: () => void
+	movesCount?: number
 }
 
 function GameActions({
@@ -24,11 +25,13 @@ function GameActions({
 	onAcceptDraw,
 	onDeclineDraw,
 	onAnalyze,
+	movesCount,
 }: Props) {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
 	const [showResignModal, setShowResignModal] = useState(false)
 	const resignContainerRef = useRef<HTMLDivElement>(null)
+	const isAbandon = (movesCount ?? 0) < 2
 
 	useEffect(() => {
 		if (!showResignModal) return
@@ -136,21 +139,21 @@ function GameActions({
 				<div className={styles.resignContainer} ref={resignContainerRef}>
 					<button
 						type="button"
-						className={`${styles.resignBtn} ${showResignModal ? styles.resignBtnActive : ''}`}
+						className={`${styles.resignBtn} ${isAbandon ? styles.abandonBtn : ''} ${showResignModal ? (isAbandon ? styles.abandonBtnActive : styles.resignBtnActive) : ''}`}
 						onClick={() => setShowResignModal((prev) => !prev)}
 						aria-expanded={showResignModal}
 					>
-						🏳️ {t('resign', 'Resign')}
+						{isAbandon ? `🚫 ${t('abandon', 'Abandon')}` : `🏳️ ${t('resign', 'Resign')}`}
 					</button>
 
 					{showResignModal && (
 						<div
-							className={styles.resignModal}
+							className={`${styles.resignModal} ${isAbandon ? styles.abandonModal : ''}`}
 							role="dialog"
-							aria-label={t('confirm_resign_short', 'Resign game?')}
+							aria-label={isAbandon ? t('confirm_abandon_short', 'Abandon game?') : t('confirm_resign_short', 'Resign game?')}
 						>
 							<span className={styles.modalPrompt}>
-								{t('confirm_resign_short', 'Resign game?')}
+								{isAbandon ? t('confirm_abandon_short', 'Abandon game?') : t('confirm_resign_short', 'Resign game?')}
 							</span>
 							<div className={styles.modalButtons}>
 								<button
@@ -162,17 +165,17 @@ function GameActions({
 								</button>
 								<button
 									type="button"
-									className={styles.modalResignBtn}
+									className={`${styles.modalResignBtn} ${isAbandon ? styles.modalAbandonBtn : ''}`}
 									onClick={() => {
 										setShowResignModal(false)
 										onResign()
 									}}
 								>
-									🏳️ {t('resign', 'Resign')}
+									{isAbandon ? `🚫 ${t('abandon', 'Abandon')}` : `🏳️ ${t('resign', 'Resign')}`}
 								</button>
 							</div>
 							{/* Pointer pointing right at the center of the original button */}
-							<div className={styles.modalPointer} />
+							<div className={`${styles.modalPointer} ${isAbandon ? styles.abandonModalPointer : ''}`} />
 						</div>
 					)}
 				</div>

@@ -26,13 +26,26 @@ function GameOverDialog({
 			<div className={styles.gameOverBox}>
 				<button className={styles.closeModalX} onClick={onClose} aria-label={t('close', 'Close')}>✕</button>
 				<div className={styles.gameOverIcon}>
-					{winnerColor === playerColor ? '🏆' : winnerColor === null ? '🤝' : '💀'}
+					{gameOverReason === 'ABANDONED'
+						? '🚫'
+						: winnerColor === playerColor
+						? '🏆'
+						: winnerColor === null
+						? '🤝'
+						: '💀'}
 				</div>
 				<h2>{t('game_over', 'Game Over')}</h2>
 				<div className={styles.gameOverResult}>
-					{winnerColor === playerColor ? t('victory', 'Victory!') : winnerColor === null ? t('draw', 'Draw') : t('defeat', 'Defeat')}
+					{gameOverReason === 'ABANDONED'
+						? t('reason_abandoned', 'Game Abandoned')
+						: winnerColor === playerColor
+						? t('victory', 'Victory!')
+						: winnerColor === null
+						? t('draw', 'Draw')
+						: t('defeat', 'Defeat')}
 				</div>
 				<div className={styles.gameOverReason}>
+					{gameOverReason === 'ABANDONED' && t('reason_abandoned_desc', 'Game was abandoned before both players made a move')}
 					{gameOverReason === 'CHECKMATE' && t('reason_checkmate', 'Checkmate')}
 					{gameOverReason === 'STALEMATE' && t('reason_stalemate', 'Stalemate')}
 					{gameOverReason === 'TIMEOUT' && t('reason_timeout', 'Time Out')}
@@ -40,7 +53,7 @@ function GameOverDialog({
 					{gameOverReason === 'DISCONNECTION' && t('reason_disconnection', 'Opponent Disconnected')}
 					{gameOverReason === 'DRAW' && t('reason_draw', 'Draw')}
 				</div>
-				{ratingAfter !== undefined && ratingAfter !== null && (
+				{gameOverReason !== 'ABANDONED' && ratingAfter !== undefined && ratingAfter !== null && (
 					<div className={styles.ratingSection}>
 						<span className={styles.ratingLabel}>{t('rating', 'Rating')}:</span>
 						<span className={styles.ratingValue}>{ratingAfter}</span>
@@ -63,17 +76,21 @@ function GameOverDialog({
 					<button className={styles.playAgainBtn} onClick={onPlayAgain}>
 						{t('play_again', 'Play Again')}
 					</button>
-					<button
-						className={`${styles.rematchBtn} ${isWaiting ? styles.rematchBtnDisabled : ''}`}
-						onClick={onRematch}
-						disabled={isWaiting}
-					>
-						{isWaiting ? t('rematch_waiting', 'Waiting...') : t('rematch', 'Rematch')}
-					</button>
+					{gameOverReason !== 'ABANDONED' && (
+						<button
+							className={`${styles.rematchBtn} ${isWaiting ? styles.rematchBtnDisabled : ''}`}
+							onClick={onRematch}
+							disabled={isWaiting}
+						>
+							{isWaiting ? t('rematch_waiting', 'Waiting...') : t('rematch', 'Rematch')}
+						</button>
+					)}
 				</div>
-				<button className={styles.analyzeBtn} onClick={onAnalyze}>
-					🔍 {t('analyze_game', 'Analyze Game')}
-				</button>
+				{gameOverReason !== 'ABANDONED' && onAnalyze && (
+					<button className={styles.analyzeBtn} onClick={onAnalyze}>
+						🔍 {t('analyze_game', 'Analyze Game')}
+					</button>
+				)}
 			</div>
 		</div>
 	)

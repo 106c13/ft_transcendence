@@ -426,6 +426,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@SubscribeMessage('abandon_game')
+	handleAbandonGame(client: Socket, payload: { gameId: string }) {
+		const userIdStr = client.handshake.query.userId;
+		if (!userIdStr) return;
+
+		const userId = parseInt(userIdStr as string, 10);
+		if (payload && payload.gameId) {
+			console.log(`Game Gateway: User ${userId} abandoned game ${payload.gameId}`);
+			this.gameService.resign(payload.gameId, userId);
+		}
+	}
+
 	@SubscribeMessage('leave_game')
 	handleLeaveGame(client: Socket, payload?: { gameId?: string }) {
 		if (payload && payload.gameId) {

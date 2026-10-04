@@ -87,6 +87,7 @@ function ChessInfoPanel({
 				onAcceptDraw={onAcceptDraw}
 				onDeclineDraw={onDeclineDraw}
 				onAnalyze={onAnalyze}
+				movesCount={moveSAN.length}
 			/>
 		</div>
 	)

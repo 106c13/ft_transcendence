@@ -483,10 +483,48 @@ export class GameService {
 		}
 	}
 
-	// Handle resignation
+	async abandonGame(game: ChessGame) {
+		if (game.timer) {
+			clearTimeout(game.timer);
+			game.timer = null;
+		}
+		for (const timer of game.disconnectTimers.values()) {
+			clearTimeout(timer);
+		}
+		game.disconnectTimers.clear();
+
+		try {
+			const matchId = parseInt(game.gameId, 10);
+			if (!isNaN(matchId)) {
+				await this.matchRepo.delete(matchId);
+			}
+		} catch (e) {
+			console.error('Failed to delete abandoned match from DB:', e);
+		}
+
+		this.activeGames.delete(game.gameId);
+		this.gameEventsCallback('game_over', game, {
+			winner: null,
+			reason: 'ABANDONED',
+			fen: game.board.fen(),
+			matchId: null,
+			whiteRatingAfter: game.white.rating,
+			blackRatingAfter: game.black.rating,
+			whiteRatingDelta: 0,
+			blackRatingDelta: 0,
+		});
+	}
+
+	// Handle resignation / abandon
 	resign(gameId: string, userId: number) {
 		const game = this.activeGames.get(gameId);
 		if (!game) return;
+
+		if (game.board.history().length < 2) {
+			console.log(`Game ${gameId}: Abandoning game (< 2 moves made)`);
+			this.abandonGame(game);
+			return;
+		}
 
 		const winnerColor = game.white.userId === userId ? 'b' : 'w';
 		const reason = 'RESIGNATION';
@@ -537,6 +575,13 @@ export class GameService {
 		}
 
 		game.drawOfferUserId = null;
+
+		if (game.board.history().length < 2) {
+			console.log(`Game ${gameId}: Abandoning game on draw (< 2 moves made)`);
+			this.abandonGame(game);
+			return { success: true };
+		}
+
 		const reason = 'DRAW';
 
 		this.saveMatch(game, reason, null).then((result) => {
@@ -620,6 +665,12 @@ export class GameService {
 		const graceMs = this.getGraceSeconds(game.mode) * 1000;
 		const timer = setTimeout(() => {
 			game.disconnectTimers.delete(userId);
+
+			if (game.board.history().length < 2) {
+				console.log(`Game ${game.gameId}: Abandoning game on disconnect (< 2 moves made)`);
+				this.abandonGame(game);
+				return;
+			}
 
 			// Check if the other player is also disconnected
 			const isWhite = game.white.userId === userId;
@@ -751,6 +802,12 @@ export class GameService {
 
 	// Time runs out
 	private handleTimeout(game: ChessGame, turn: 'w' | 'b') {
+		if (game.board.history().length < 2) {
+			console.log(`Game ${game.gameId}: Abandoning game on timeout (< 2 moves made)`);
+			this.abandonGame(game);
+			return;
+		}
+
 		const winnerColor = turn === 'w' ? 'b' : 'w';
 		if (turn === 'w') {
 			game.whiteTime = 0;
@@ -812,6 +869,11 @@ export class GameService {
 
 	// Save to DB
 	private async saveMatch(game: ChessGame, result: string, winnerColor: 'w' | 'b' | null) {
+		if (game.board.history().length < 2) {
+			await this.abandonGame(game);
+			return null;
+		}
+
 		if (game.timer) {
 			clearTimeout(game.timer);
 			game.timer = null;
