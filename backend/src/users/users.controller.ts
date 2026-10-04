@@ -44,6 +44,8 @@ export class UsersController {
 		}
 
 		const ratings = await this.ratingService.getAllRatings(user.id);
+		const userStatus = this.presenceService.getUserStatus(user.id);
+		const status = userStatus === 'OFFLINE' ? 'ONLINE' : userStatus;
 
 		return {
 			id: user.id,
@@ -51,7 +53,7 @@ export class UsersController {
 			email: user.email,
 			bio: user.bio,
 			avatar: user.avatar,
-			status: 'ONLINE',
+			status,
 			is_active: true,
 			last_seen: user.last_seen,
 			created_at: user.created_at,
@@ -99,7 +101,8 @@ export class UsersController {
 		}
 
 		const ratings = await this.ratingService.getAllRatings(user.id);
-		const status = isOwnProfile ? 'ONLINE' : this.presenceService.getUserStatus(user.id);
+		const userStatus = this.presenceService.getUserStatus(user.id);
+		const status = (isOwnProfile && userStatus === 'OFFLINE') ? 'ONLINE' : userStatus;
 
 		return {
 			id: user.id,

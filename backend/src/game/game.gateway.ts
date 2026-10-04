@@ -32,6 +32,28 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private presenceService: PresenceService,
 		private challengeGateway: ChallengeGateway,
 	) {
+		// Provide active games checker to presence service
+		this.presenceService.setInGameChecker((userId: number) => {
+			return !!this.gameService.getGameByUserId(userId);
+		});
+
+		// Track every game creation (matchmaking queue, direct challenge, rematch)
+		this.gameService.setGameCreatedCallback((newGame) => {
+			this.presenceService.setUserInGame(newGame.white.userId, true);
+			this.presenceService.setUserInGame(newGame.black.userId, true);
+
+			this.challengeGateway.server.emit('user_status_changed', {
+				userId: newGame.white.userId,
+				username: newGame.white.username,
+				status: 'INGAME',
+			});
+			this.challengeGateway.server.emit('user_status_changed', {
+				userId: newGame.black.userId,
+				username: newGame.black.username,
+				status: 'INGAME',
+			});
+		});
+
 		// Register events callback from service to notify clients
 		this.gameService.setGameEventsCallback((event, game, payload) => {
 			this.server.to(game.gameId).emit(event, payload);
@@ -83,20 +105,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				opponentRating: whiteRating.rating, opponentIsProvisional: whiteRating.isProvisional,
 			};
 
-			this.presenceService.setUserInGame(newGame.white.userId, true);
-			this.presenceService.setUserInGame(newGame.black.userId, true);
-
-			this.challengeGateway.server.emit('user_status_changed', {
-				userId: newGame.white.userId,
-				username: newGame.white.username,
-				status: 'INGAME',
-			});
-			this.challengeGateway.server.emit('user_status_changed', {
-				userId: newGame.black.userId,
-				username: newGame.black.username,
-				status: 'INGAME',
-			});
-
 			if (whiteSocket) {
 				whiteSocket.emit('match_found', whitePayload);
 			} else {
@@ -117,15 +125,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		const userId = parseInt(userIdStr as string);
 		console.log(`Game Gateway: User ${userId} connected (Socket: ${client.id})`);
+		await this.presenceService.handleUserConnect(userId, client.id);
 	}
 
-	handleDisconnect(client: Socket) {
+	async handleDisconnect(client: Socket) {
 		const userIdStr = client.handshake.query.userId;
 		if (!userIdStr) return;
 
 		const userId = parseInt(userIdStr as string, 10);
 		console.log(`Game Gateway: User ${userId} disconnected (Socket: ${client.id})`);
 
+		await this.presenceService.handleUserDisconnect(userId, client.id);
 		// Trigger grace period only if this was their active socket
 		this.gameService.handleUserDisconnect(userId, client.id);
 	}

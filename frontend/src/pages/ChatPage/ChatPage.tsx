@@ -80,6 +80,29 @@ function ChatPage() {
 		}
 	}, [currentUsername])
 
+	// Listen to real-time friend status updates
+	useEffect(() => {
+		const handleStatusChange = (e: Event) => {
+			const customEvent = e as CustomEvent<{ userId: number; username: string; status: string }>
+			const data = customEvent.detail
+			if (!data) return
+
+			setFriends((prev) =>
+				prev.map((friend) => {
+					if (friend.id === data.userId || friend.username?.toLowerCase() === data.username?.toLowerCase()) {
+						return { ...friend, status: data.status }
+					}
+					return friend
+				})
+			)
+		}
+
+		window.addEventListener('user_status_changed', handleStatusChange)
+		return () => {
+			window.removeEventListener('user_status_changed', handleStatusChange)
+		}
+	}, [])
+
 	// Create a fast lookup map for friend presence statuses (ONLINE / INGAME / OFFLINE)
 	const friendStatusMap = useMemo(() => {
 		const map = new Map<number, string>()

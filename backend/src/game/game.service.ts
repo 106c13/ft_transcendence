@@ -71,6 +71,9 @@ export class GameService {
 	// Callback set by the gateway so we can emit match_found
 	private matchFoundCallback: (game: ChessGame) => void = () => { };
 
+	// Callback set by the gateway so presence can track every game creation
+	private gameCreatedCallback: (game: ChessGame) => void = () => { };
+
 	constructor(
 		@InjectRepository(Match)
 		private matchRepo: Repository<Match>,
@@ -89,6 +92,10 @@ export class GameService {
 
 	setGameEventsCallback(callback: (event: string, game: ChessGame, payload: any) => void) {
 		this.gameEventsCallback = callback;
+	}
+
+	setGameCreatedCallback(callback: (game: ChessGame) => void) {
+		this.gameCreatedCallback = callback;
 	}
 
 	getActiveGamesCount() {
@@ -187,6 +194,7 @@ export class GameService {
 
 		this.activeGames.set(gameId, newGame);
 		this.startTurnTimer(newGame);
+		this.gameCreatedCallback(newGame);
 		return newGame;
 	}
 
@@ -412,6 +420,7 @@ export class GameService {
 		const reason = 'RESIGNATION';
 
 		this.saveMatch(game, reason, winnerColor).then((result) => {
+			this.activeGames.delete(gameId);
 			this.gameEventsCallback('game_over', game, {
 				winner: winnerColor,
 				reason,
@@ -423,7 +432,6 @@ export class GameService {
 				whiteRatingDelta: result?.ratingResult?.whiteDelta,
 				blackRatingDelta: result?.ratingResult?.blackDelta,
 			});
-			this.activeGames.delete(gameId);
 		});
 	}
 
@@ -460,6 +468,7 @@ export class GameService {
 		const reason = 'DRAW';
 
 		this.saveMatch(game, reason, null).then((result) => {
+			this.activeGames.delete(game.gameId);
 			this.gameEventsCallback('game_over', game, {
 				winner: null,
 				reason,
@@ -471,7 +480,6 @@ export class GameService {
 				whiteRatingDelta: result?.ratingResult?.whiteDelta,
 				blackRatingDelta: result?.ratingResult?.blackDelta,
 			});
-			this.activeGames.delete(game.gameId);
 		});
 
 		return { success: true };
@@ -558,6 +566,7 @@ export class GameService {
 			}
 
 			this.saveMatch(game, reason, winnerColor).then((result) => {
+				this.activeGames.delete(game.gameId);
 				this.gameEventsCallback('game_over', game, {
 					winner: winnerColor,
 					reason,
@@ -569,7 +578,6 @@ export class GameService {
 					whiteRatingDelta: result?.ratingResult?.whiteDelta,
 					blackRatingDelta: result?.ratingResult?.blackDelta,
 				});
-				this.activeGames.delete(game.gameId);
 			});
 		}, graceMs);
 
@@ -681,6 +689,7 @@ export class GameService {
 		const reason = 'TIMEOUT';
 
 		this.saveMatch(game, reason, winnerColor).then((result) => {
+			this.activeGames.delete(game.gameId);
 			this.gameEventsCallback('game_over', game, {
 				winner: winnerColor,
 				reason,
@@ -692,7 +701,6 @@ export class GameService {
 				whiteRatingDelta: result?.ratingResult?.whiteDelta,
 				blackRatingDelta: result?.ratingResult?.blackDelta,
 			});
-			this.activeGames.delete(game.gameId);
 		});
 	}
 
@@ -715,6 +723,7 @@ export class GameService {
 		}
 
 		this.saveMatch(game, reason, winner).then((result) => {
+			this.activeGames.delete(game.gameId);
 			this.gameEventsCallback('game_over', game, {
 				winner,
 				reason,
@@ -726,7 +735,6 @@ export class GameService {
 				whiteRatingDelta: result?.ratingResult?.whiteDelta,
 				blackRatingDelta: result?.ratingResult?.blackDelta,
 			});
-			this.activeGames.delete(game.gameId);
 		});
 	}
 

@@ -44,7 +44,7 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 				this.server.emit('user_status_changed', {
 					userId: user.id,
 					username: user.username,
-					status: 'ONLINE',
+					status: this.presenceService.getUserStatus(user.id),
 				});
 			}
 		}

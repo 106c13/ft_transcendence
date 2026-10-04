@@ -9,6 +9,7 @@ export type UserOnlineStatus = 'ONLINE' | 'INGAME' | 'OFFLINE';
 export class PresenceService implements OnApplicationBootstrap {
     private userSockets = new Map<number, Set<string>>();
     private inGameUsers = new Set<number>();
+    private inGameChecker?: (userId: number) => boolean;
 
     constructor(
         @InjectRepository(User)
@@ -76,6 +77,10 @@ export class PresenceService implements OnApplicationBootstrap {
         return false;
     }
 
+    setInGameChecker(checker: (userId: number) => boolean): void {
+        this.inGameChecker = checker;
+    }
+
     setUserInGame(userId: number, inGame: boolean): void {
         if (inGame) {
             this.inGameUsers.add(userId);
@@ -84,19 +89,26 @@ export class PresenceService implements OnApplicationBootstrap {
         }
     }
 
+    isUserInGame(userId: number): boolean {
+        return this.inGameUsers.has(userId) || !!(this.inGameChecker && this.inGameChecker(userId));
+    }
+
     getUserStatus(userId: number): UserOnlineStatus {
+        if (this.isUserInGame(userId)) {
+            return 'INGAME';
+        }
+
         const sockets = this.userSockets.get(userId);
-        if (sockets && sockets.size > 0)
-        {
-            if (this.inGameUsers.has(userId)) {
-                return 'INGAME';
-            }
+        if (sockets && sockets.size > 0) {
             return 'ONLINE';
         }
         return 'OFFLINE';
     }
 
     isUserOnline(userId: number): boolean {
+        if (this.isUserInGame(userId)) {
+            return true;
+        }
         const sockets = this.userSockets.get(userId);
         return !!(sockets && sockets.size > 0);
     }

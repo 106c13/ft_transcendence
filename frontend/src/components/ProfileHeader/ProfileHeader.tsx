@@ -73,15 +73,15 @@ function ProfileHeader({
                             : t('unknown', 'Unknown')}
                     </span>
                     <span className={styles.metaDot}>•</span>
-                    {isOwnProfile || user.status === 'ONLINE' ? (
-                        <span className={styles.onlineIndicator}>
-                            <span className={styles.onlineDot}></span>
-                            {t('online', 'Online')}
-                        </span>
-                    ) : user.status === 'INGAME' ? (
+                    {user.status === 'INGAME' ? (
                         <span className={styles.ingameIndicator}>
                             <span className={styles.ingameDot}></span>
                             {t('in_game', 'In Game')}
+                        </span>
+                    ) : isOwnProfile || user.status === 'ONLINE' ? (
+                        <span className={styles.onlineIndicator}>
+                            <span className={styles.onlineDot}></span>
+                            {t('online', 'Online')}
                         </span>
                     ) : (
                         <span className={styles.offlineIndicator}>
