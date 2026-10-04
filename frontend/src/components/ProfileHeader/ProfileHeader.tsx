@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import type { User, FriendStatus } from '../../constants/profileConstants'
+import type { User, FriendStatus, TabType } from '../../constants/profileConstants'
 import styles from './ProfileHeader.module.css'
 
 type Props = {
@@ -10,6 +10,9 @@ type Props = {
     menuOpen: boolean
     setMenuOpen: (value: boolean) => void
     friendStatus: FriendStatus
+    isLiveGame?: boolean
+    activeTab?: TabType
+    onSelectTab?: (tab: TabType) => void
     onSend: () => void
     onAccept: () => void
     onReject: () => void
@@ -24,6 +27,9 @@ function ProfileHeader({
     isOwnProfile,
     isLoggedIn,
     friendStatus,
+    isLiveGame = false,
+    activeTab = 'overview',
+    onSelectTab,
     onSend,
     onAccept,
     onReject,
@@ -41,59 +47,50 @@ function ProfileHeader({
 
     return (
         <div className={styles.profileHeader}>
-            <img
-                className={styles.profileAvatar}
-                src={
-                    user.avatar && user.avatar !== 'default.jpg'
-                        ? `/uploads/${user.avatar}`
-                        : `/assets/default.jpg`
-                }
-                alt={user.username || t('avatar', 'Avatar')}
-                onError={(e) => {
-                    const target = e.currentTarget
-                    if (!target.src.endsWith('/assets/default.jpg')) {
-                        target.src = '/assets/default.jpg'
-                    }
-                }}
-            />
+            {/* Top Section: Avatar, Nickname & Status, Bio, Action Buttons */}
+            <div className={styles.topSection}>
+                <div className={styles.identityGroup}>
+                    <img
+                        className={styles.profileAvatar}
+                        src={
+                            user.avatar && user.avatar !== 'default.jpg'
+                                ? `/uploads/${user.avatar}`
+                                : `/assets/default.jpg`
+                        }
+                        alt={user.username || t('avatar', 'Avatar')}
+                        onError={(e) => {
+                            const target = e.currentTarget
+                            if (!target.src.endsWith('/assets/default.jpg')) {
+                                target.src = '/assets/default.jpg'
+                            }
+                        }}
+                    />
 
-            <div className={styles.profileInfo}>
-                <div className={styles.topRow}>
-                    <div className={styles.username}>{user.username}</div>
-                    <div className={styles.flag}>🏳️</div>
+                    <div className={styles.profileInfo}>
+                        <h2 className={styles.username}>{user.username}</h2>
+                        <div className={styles.statusRow}>
+                            {isLiveGame || user.status === 'INGAME' ? (
+                                <span className={styles.ingameIndicator}>
+                                    <span className={styles.ingameDot}></span>
+                                    {t('in_game', 'In Game')}
+                                </span>
+                            ) : isOwnProfile || user.status === 'ONLINE' ? (
+                                <span className={styles.onlineIndicator}>
+                                    <span className={styles.onlineDot}></span>
+                                    {t('online', 'Online')}
+                                </span>
+                            ) : (
+                                <span className={styles.offlineIndicator}>
+                                    <span className={styles.offlineDot}></span>
+                                    {t('offline', 'Offline')}
+                                </span>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
-                <div className={styles.bio}>{user.bio || t('no_bio_yet', 'No bio yet')}</div>
-
-                <div className={styles.meta}>
-                    <span>
-                        {t('joined', 'Joined')}:{' '}
-                        {user.created_at
-                            ? new Date(user.created_at).toLocaleDateString()
-                            : t('unknown', 'Unknown')}
-                    </span>
-                    <span className={styles.metaDot}>•</span>
-                    {user.status === 'INGAME' ? (
-                        <span className={styles.ingameIndicator}>
-                            <span className={styles.ingameDot}></span>
-                            {t('in_game', 'In Game')}
-                        </span>
-                    ) : isOwnProfile || user.status === 'ONLINE' ? (
-                        <span className={styles.onlineIndicator}>
-                            <span className={styles.onlineDot}></span>
-                            {t('online', 'Online')}
-                        </span>
-                    ) : (
-                        <span className={styles.offlineIndicator}>
-                            <span className={styles.offlineDot}></span>
-                            {t('offline', 'Offline')}
-                        </span>
-                    )}
-                </div>
-            </div>
-
-            {/* Header Actions - Unified Style and Proportional Spacing */}
-            <div className={styles.headerActions}>
+                {/* Header Actions - Unified Style and Proportional Spacing */}
+                <div className={styles.headerActions}>
                 {isOwnProfile ? (
                     <>
                         <button
@@ -166,6 +163,57 @@ function ProfileHeader({
                         )}
                     </>
                 ) : null}
+                </div>
+            </div>
+
+            {/* Bio Section */}
+            <div className={styles.bioSection}>
+                <p className={styles.bio}>{user.bio || t('no_bio_yet', 'No bio yet')}</p>
+            </div>
+
+            {/* Meta Row: Joined Date */}
+            <div className={styles.metaRow}>
+                <div className={styles.joinedAt}>
+                    <span>{t('joined', 'Joined')}: </span>
+                    <span className={styles.joinedDate}>
+                        {user.created_at
+                            ? new Date(user.created_at).toLocaleDateString()
+                            : t('unknown', 'Unknown')}
+                    </span>
+                </div>
+            </div>
+
+            {/* Connected Tabs Header inside Profile Header Card */}
+            <div className={styles.tabsHeader} role="tablist">
+                <button
+                    className={`${styles.tab} ${activeTab === 'overview' ? styles.activeTab : ''}`}
+                    onClick={() => onSelectTab?.('overview')}
+                    role="tab"
+                    aria-selected={activeTab === 'overview'}
+                    type="button"
+                >
+                    {t('overview', 'Overview')}
+                </button>
+
+                <button
+                    className={`${styles.tab} ${activeTab === 'games' ? styles.activeTab : ''}`}
+                    onClick={() => onSelectTab?.('games')}
+                    role="tab"
+                    aria-selected={activeTab === 'games'}
+                    type="button"
+                >
+                    {t('games', 'Games')}
+                </button>
+
+                <button
+                    className={`${styles.tab} ${activeTab === 'friends' ? styles.activeTab : ''}`}
+                    onClick={() => onSelectTab?.('friends')}
+                    role="tab"
+                    aria-selected={activeTab === 'friends'}
+                    type="button"
+                >
+                    {t('friends', 'Friends')}
+                </button>
             </div>
         </div>
     )

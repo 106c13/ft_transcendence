@@ -1,4 +1,3 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import profileStyles from './ProfileTabs.module.css'
@@ -8,7 +7,6 @@ import { useRatingHistory, type RatingCategory } from '../../hooks/useRatingHist
 import FriendsList from '../FriendsList/FriendsList'
 import GamesList from '../GamesList/GamesList'
 import MiniRatingChart from '../MiniRatingChart/MiniRatingChart'
-import OngoingGameCard, { type LiveGameData } from '../OngoingGameCard/OngoingGameCard'
 import FriendsPreview from '../FriendsPreview/FriendsPreview'
 import GameRow from '../GameRow/GameRow'
 import type { MatchRecord } from '../GameAnalysis/GameAnalysis'
@@ -19,7 +17,7 @@ type Props = {
 	username?: string
 	isOwnProfile: boolean
 	ratings?: User['ratings']
-	currentUserId?: number | null
+	historyData?: ReturnType<typeof useGameHistory>
 	onSelectTab: (tab: TabType) => void
 	onFriendClick: (targetUsername: string) => void
 }
@@ -30,109 +28,17 @@ export default function ProfileTabs({
 	friends,
 	isOwnProfile,
 	ratings,
-	currentUserId,
+	historyData,
 	onSelectTab,
 	onFriendClick,
 }: Props) {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
 
-	const [liveGame, setLiveGame] = useState<LiveGameData | null>(null)
-	const [boardSize, setBoardSize] = useState<number | null>(null)
-	const [isExitingLive, setIsExitingLive] = useState(false)
-	const leftBodyRef = useRef<HTMLDivElement>(null)
-
-	const isLiveActive = !!liveGame && !isExitingLive
-
-	const handleStartExit = useCallback(() => {
-		setIsExitingLive(true)
-	}, [])
-
-	const handleDoneExit = useCallback(() => {
-		setLiveGame(null)
-		setIsExitingLive(false)
-	}, [])
-
-	// Measure left content (stats list + margin + friends container) to size board 1:1
-	useEffect(() => {
-		if (!leftBodyRef.current || !liveGame) return
-
-		const updateSize = () => {
-			if (leftBodyRef.current) {
-				const height = leftBodyRef.current.offsetHeight
-				if (height > 0) {
-					setBoardSize((prev) => {
-						if (prev !== null && Math.abs(prev - height) <= 2) {
-							return prev
-						}
-						return height
-					})
-				}
-			}
-		}
-
-		updateSize()
-
-		const ro = new ResizeObserver(() => {
-			updateSize()
-		})
-		ro.observe(leftBodyRef.current)
-
-		return () => ro.disconnect()
-	}, [liveGame, isExitingLive, ratings, friends])
-
 	// Load match history for games and rating computations
-	const history = useGameHistory(username || '')
+	const internalHistory = useGameHistory(username || '')
+	const history = historyData || internalHistory
 	const ratingData = useRatingHistory(history.matches, username || '', ratings)
-
-	const fetchLiveGame = useCallback(async () => {
-		if (!username) return
-		try {
-			const token = localStorage.getItem('token')
-			const res = await fetch(`/api/game/live/${username}`, {
-				headers: token ? { Authorization: `Bearer ${token}` } : {},
-			})
-			if (res.ok) {
-				const data = await res.json()
-				if (data?.gameId) {
-					setLiveGame(data)
-					return
-				}
-			}
-			setLiveGame(null)
-		} catch {
-			setLiveGame(null)
-		}
-	}, [username])
-
-	useEffect(() => {
-		fetchLiveGame()
-	}, [fetchLiveGame])
-
-	// Listen for live presence changes to automatically detect game start
-	useEffect(() => {
-		const handleStatusChange = (e: Event) => {
-			const customEvent = e as CustomEvent<{
-				userId: number
-				username: string
-				status: string
-				gameId?: string
-			}>
-			const data = customEvent.detail
-			if (!data || !username) return
-
-			if (data.username?.toLowerCase() === username.toLowerCase()) {
-				if (data.status === 'INGAME') {
-					fetchLiveGame()
-				}
-			}
-		}
-
-		window.addEventListener('user_status_changed', handleStatusChange)
-		return () => {
-			window.removeEventListener('user_status_changed', handleStatusChange)
-		}
-	}, [username, fetchLiveGame])
 
 	const handleSelectGame = (match: MatchRecord) => {
 		navigate(`/game/analysis/${match.id}`, {
@@ -143,150 +49,47 @@ export default function ProfileTabs({
 	const handleChartClick = (mode: RatingCategory) => {
 		if (username) {
 			navigate(`/profile/${username}/rating?mode=${mode}`)
-		} else {
-			navigate(`/profile/rating?mode=${mode}`)
 		}
 	}
-
-	const isProfileBlack = username?.toLowerCase() === liveGame?.blackPlayer.username.toLowerCase()
-	const opponentName = liveGame
-		? (isProfileBlack ? liveGame.whitePlayer.username : liveGame.blackPlayer.username)
-		: ''
 
 	const recentMatches = history.matches.slice(0, 6)
 
 	return (
 		<div className={profileStyles.tabsWrapper}>
-			{/* Profile Navigation Tabs */}
-			<div className={profileStyles.profileTabs}>
-				<div
-					className={`${profileStyles.tab} ${activeTab === 'overview' ? profileStyles.active : ''}`}
-					onClick={() => onSelectTab('overview')}
-					role="button"
-					tabIndex={0}
-				>
-					{t('overview', 'Overview')}
-				</div>
-
-				<div
-					className={`${profileStyles.tab} ${activeTab === 'games' ? profileStyles.active : ''}`}
-					onClick={() => onSelectTab('games')}
-					role="button"
-					tabIndex={0}
-				>
-					{t('games', 'Games')}
-				</div>
-
-				<div
-					className={`${profileStyles.tab} ${activeTab === 'friends' ? profileStyles.active : ''}`}
-					onClick={() => onSelectTab('friends')}
-					role="button"
-					tabIndex={0}
-				>
-					{t('friends', 'Friends')}
-				</div>
-			</div>
-
 			{/* Overview Tab Content */}
 			{activeTab === 'overview' && (
 				<div className={profileStyles.overviewSection}>
-					<div
-						className={`${profileStyles.overviewLayout} ${
-							isLiveActive ? profileStyles.hasLiveGame : ''
-						} ${isExitingLive ? profileStyles.isExitingLive : ''}`}
-						style={
-							boardSize && liveGame
-								? ({ '--board-size': `${boardSize}px` } as React.CSSProperties)
-								: undefined
-						}
-					>
-						{/* Left column: charts list on top, friends on bottom */}
-						<div className={profileStyles.leftColumn}>
-							<div className={profileStyles.sectionHeader}>
-								<h3 className={profileStyles.sectionTitle}>
-									{t('rating_overview_header', 'Rating Overview')}
-								</h3>
-							</div>
-
-							{isLiveActive && (
-								<div className={profileStyles.statsHeaderRow}>
-									<span>{t('mode', 'Mode')}</span>
-									<span>{t('record', 'W / D / L')}</span>
-									<span>{t('trend_7d', '7D Trend')}</span>
-									<span>{t('rating', 'Rating')}</span>
-								</div>
-							)}
-
-							<div ref={leftBodyRef} className={profileStyles.leftBody}>
-								<div
-									className={
-										isLiveActive
-											? profileStyles.compactRatingsList
-											: profileStyles.ratingsGrid
-									}
-								>
-									<MiniRatingChart
-										mode="bullet"
-										history={ratingData.bullet}
-										onClick={() => handleChartClick('bullet')}
-										compact={isLiveActive}
-									/>
-									<MiniRatingChart
-										mode="blitz"
-										history={ratingData.blitz}
-										onClick={() => handleChartClick('blitz')}
-										compact={isLiveActive}
-									/>
-									<MiniRatingChart
-										mode="rapid"
-										history={ratingData.rapid}
-										onClick={() => handleChartClick('rapid')}
-										compact={isLiveActive}
-									/>
-								</div>
-
-								<FriendsPreview
-									friends={friends}
-									onFriendClick={onFriendClick}
-									onSeeAll={() => onSelectTab('friends')}
-								/>
-							</div>
+					<div className={profileStyles.ratingsSection}>
+						<div className={profileStyles.sectionHeader}>
+							<h3 className={profileStyles.sectionTitle}>
+								{t('rating_overview_header', 'Rating Overview')}
+							</h3>
 						</div>
 
-						{/* Right column: live ongoing game */}
-						{liveGame && (
-							<div
-								className={`${profileStyles.rightColumn} ${
-									isExitingLive ? profileStyles.rightColumnExiting : ''
-								}`}
-							>
-								<div className={profileStyles.sectionHeader}>
-									<h3 className={profileStyles.sectionTitle}>
-										{t('live_match', 'Live Match')}
-									</h3>
-								</div>
-
-								<div className={profileStyles.opponentHeaderRow}>
-									<span>
-										{t('playing_against', 'Playing against {{opponent}}', {
-											opponent: opponentName,
-										})}
-									</span>
-								</div>
-
-								<div className={profileStyles.rightBody}>
-									<OngoingGameCard
-										gameData={liveGame}
-										profileUsername={username || ''}
-										currentUserId={currentUserId}
-										size={boardSize}
-										onGameOverStartExit={handleStartExit}
-										onGameOverDone={handleDoneExit}
-									/>
-								</div>
-							</div>
-						)}
+						<div className={profileStyles.ratingsGrid}>
+							<MiniRatingChart
+								mode="bullet"
+								history={ratingData.bullet}
+								onClick={() => handleChartClick('bullet')}
+							/>
+							<MiniRatingChart
+								mode="blitz"
+								history={ratingData.blitz}
+								onClick={() => handleChartClick('blitz')}
+							/>
+							<MiniRatingChart
+								mode="rapid"
+								history={ratingData.rapid}
+								onClick={() => handleChartClick('rapid')}
+							/>
+						</div>
 					</div>
+
+					<FriendsPreview
+						friends={friends}
+						onFriendClick={onFriendClick}
+						onSeeAll={() => onSelectTab('friends')}
+					/>
 
 					{/* Recent Games List (Last 5-7 games played) */}
 					<div className={profileStyles.recentGamesCard}>

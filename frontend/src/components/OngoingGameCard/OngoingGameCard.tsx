@@ -69,11 +69,16 @@ export default function OngoingGameCard({
 	const [isExiting, setIsExiting] = useState(false)
 
 	const prevGameIdRef = useRef<string>(gameData.gameId)
+	const exitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	// If gameData changes to another game (e.g. rematch or next match)
 	useEffect(() => {
 		if (prevGameIdRef.current !== gameData.gameId) {
 			prevGameIdRef.current = gameData.gameId
+			if (exitTimeoutRef.current) {
+				clearTimeout(exitTimeoutRef.current)
+				exitTimeoutRef.current = null
+			}
 			setIsExiting(false)
 			setFen(gameData.fen)
 			setTurn(gameData.turn)
@@ -189,16 +194,22 @@ export default function OngoingGameCard({
 					clearInterval(timer)
 					setIsExiting(true)
 					onGameOverStartExit?.()
-					setTimeout(() => {
+					exitTimeoutRef.current = setTimeout(() => {
 						onGameOverDone()
-					}, 350)
+					}, 450)
 					return 0
 				}
 				return prev - 1
 			})
 		}, 1000)
 
-		return () => clearInterval(timer)
+		return () => {
+			clearInterval(timer)
+			if (exitTimeoutRef.current) {
+				clearTimeout(exitTimeoutRef.current)
+				exitTimeoutRef.current = null
+			}
+		}
 	}, [gameOverResult, onGameOverDone, onGameOverStartExit])
 
 	// Orientation: Profile user is hero at bottom
