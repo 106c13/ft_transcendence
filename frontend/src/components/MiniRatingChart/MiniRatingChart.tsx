@@ -6,6 +6,7 @@ type Props = {
 	mode: RatingCategory
 	history?: ModeRatingHistory
 	onClick: () => void
+	compact?: boolean
 }
 
 const MODE_CONFIG: Record<
@@ -35,7 +36,7 @@ const MODE_CONFIG: Record<
 	},
 }
 
-export default function MiniRatingChart({ mode, history, onClick }: Props) {
+export default function MiniRatingChart({ mode, history, onClick, compact = false }: Props) {
 	const { t } = useTranslation()
 	const config = MODE_CONFIG[mode]
 
@@ -43,6 +44,10 @@ export default function MiniRatingChart({ mode, history, onClick }: Props) {
 	const isProvisional = history?.isProvisional ?? true
 	const current = history?.current ?? 800
 	const delta = history?.delta7Days ?? 0
+
+	const wins = history?.wins ?? 0
+	const draws = history?.draws ?? 0
+	const losses = history?.losses ?? 0
 
 	// SVG Sparkline calculation
 	const points = history?.last7Days ?? []
@@ -77,6 +82,100 @@ export default function MiniRatingChart({ mode, history, onClick }: Props) {
 	const lastPt = chartPoints[chartPoints.length - 1]
 	const strokeColor = delta > 0 ? '#34D399' : delta < 0 ? '#F87171' : config.color
 	const gradientId = `mini-grad-${mode}`
+
+	if (compact) {
+		return (
+			<div
+				className={`${styles.miniChartCard} ${styles.compactCard}`}
+				onClick={onClick}
+				role="button"
+				tabIndex={0}
+			>
+				<div className={styles.compactRow}>
+					<div className={styles.modeInfo}>
+						<span className={styles.modeIcon}>{config.icon}</span>
+						<div className={styles.modeText}>
+							<span className={styles.modeTitle}>{t(config.nameKey, config.defaultName)}</span>
+							<span className={styles.modeTime}>
+								{t(mode === 'bullet' ? 'time_1_min' : mode === 'blitz' ? 'time_3_min' : 'time_10_min', config.time)}
+							</span>
+						</div>
+					</div>
+
+					<div className={styles.compactRecord}>
+						<span className={styles.compactWins}>{wins}{t('wins_short', 'W')}</span>
+						<span className={styles.compactSep}>/</span>
+						<span className={styles.compactDraws}>{draws}{t('draws_short', 'D')}</span>
+						<span className={styles.compactSep}>/</span>
+						<span className={styles.compactLosses}>{losses}{t('losses_short', 'L')}</span>
+					</div>
+
+					<div className={styles.compactChartContainer}>
+						<svg
+							viewBox={`0 0 ${width} ${height}`}
+							className={styles.sparklineSvg}
+							preserveAspectRatio="none"
+						>
+							<defs>
+								<linearGradient id={`${gradientId}-c`} x1="0" y1="0" x2="0" y2="1">
+									<stop offset="0%" stopColor={strokeColor} stopOpacity="0.3" />
+									<stop offset="100%" stopColor={strokeColor} stopOpacity="0.0" />
+								</linearGradient>
+							</defs>
+
+							{chartPoints.length > 0 ? (
+								<>
+									<path d={areaD} fill={`url(#${gradientId}-c)`} />
+									<path
+										d={pathD}
+										fill="none"
+										stroke={strokeColor}
+										strokeWidth="2.2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+								</>
+							) : (
+								<line
+									x1={padX}
+									y1={height / 2}
+									x2={width - padX}
+									y2={height / 2}
+									stroke="rgba(148, 163, 184, 0.22)"
+									strokeWidth="1.5"
+									strokeDasharray="4 4"
+								/>
+							)}
+						</svg>
+					</div>
+
+					<div className={styles.compactValueGroup}>
+						<div
+							className={`${styles.ratingNumber} ${
+								isNotPlayed
+									? styles.ratingNumberUnrated
+									: isProvisional
+									? styles.ratingNumberProvisional
+									: ''
+							}`}
+						>
+							{isNotPlayed ? '—' : isProvisional ? `~${current}` : current}
+						</div>
+
+						{!isNotPlayed && (
+							<div
+								className={`${styles.deltaBadge} ${
+									delta > 0 ? styles.deltaPos : delta < 0 ? styles.deltaNeg : styles.deltaZero
+								}`}
+							>
+								<span>{delta > 0 ? `+${delta}` : delta}</span>
+							</div>
+						)}
+					</div>
+				</div>
+			</div>
+		)
+	}
 
 	return (
 		<div className={styles.miniChartCard} onClick={onClick} role="button" tabIndex={0}>

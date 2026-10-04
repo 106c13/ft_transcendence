@@ -7,6 +7,8 @@
 	flex-direction: column;
 	gap: 10px;
 	width: 100%;
+	box-sizing: border-box;
+	transition: all 0.38s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .header {
@@ -60,11 +62,10 @@
 .avatarsList {
 	display: flex;
 	align-items: center;
-	gap: 14px;
 	gap: 10px;
 	flex-wrap: wrap;
-	padding: 4px 0;
 	padding: 2px 0;
+	transition: all 0.38s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .avatarItem {
@@ -73,6 +74,8 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+	            opacity 0.25s ease;
 }
 
 .avatarImg {

@@ -221,7 +221,7 @@ export function useChallengeSocket(userId: number | undefined) {
         })
 
         // Listen for global user presence status changes
-        socket.on('user_status_changed', (data: { userId: number; username: string; status: string }) => {
+        socket.on('user_status_changed', (data: { userId: number; username: string; status: string; gameId?: string }) => {
             window.dispatchEvent(new CustomEvent('user_status_changed', { detail: data }))
         })
 

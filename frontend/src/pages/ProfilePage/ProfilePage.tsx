@@ -1,8 +1,9 @@
-import { useParams } from 'react-router-dom'
+import { useParams, useOutletContext } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useProfile } from '../../hooks/useProfile'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import type { TabType } from '../../constants/profileConstants'
+import type { LayoutContextType } from '../../layouts/MainLayout'
 import ProfileHeader from '../../components/ProfileHeader/ProfileHeader'
 import ProfileTabs from '../../components/ProfileTabs/ProfileTabs'
 import styles from '../Common.module.css'
@@ -14,6 +15,8 @@ type Props = {
 function ProfilePage({ defaultTab = 'overview' }: Props) {
     const { t } = useTranslation()
     const { username } = useParams()
+    const layoutContext = useOutletContext<LayoutContextType | undefined>()
+    const currentUserId = layoutContext?.currentUser?.id ?? null
 
     const {
         user,
@@ -81,6 +84,7 @@ function ProfilePage({ defaultTab = 'overview' }: Props) {
                 username={user.username}
                 isOwnProfile={user.isOwnProfile || false}
                 ratings={user.ratings}
+                currentUserId={currentUserId}
                 onSelectTab={handleSelectTab}
                 onFriendClick={goToUserProfile}
             />

@@ -126,6 +126,71 @@ export class GameService {
 		return undefined;
 	}
 
+	async getLiveGameByUsername(username: string) {
+		let liveGame: ChessGame | undefined;
+		for (const game of this.activeGames.values()) {
+			if (
+				game.white.username.toLowerCase() === username.toLowerCase() ||
+				game.black.username.toLowerCase() === username.toLowerCase()
+			) {
+				liveGame = game;
+				break;
+			}
+		}
+		if (!liveGame) {
+			return null;
+		}
+
+		const category = getRatingCategory(liveGame.mode);
+		const whiteRating = await this.ratingService.getMatchmakingRating(liveGame.white.userId, category);
+		const blackRating = await this.ratingService.getMatchmakingRating(liveGame.black.userId, category);
+		const whiteUser = await this.userRepo.findOne({ where: { id: liveGame.white.userId } });
+		const blackUser = await this.userRepo.findOne({ where: { id: liveGame.black.userId } });
+
+		const historyVerbose = (liveGame.board as any).history ? (liveGame.board as any).history({ verbose: true }) : [];
+		const lastMove = historyVerbose.length > 0
+			? { from: historyVerbose[historyVerbose.length - 1].from, to: historyVerbose[historyVerbose.length - 1].to }
+			: null;
+
+		const now = Date.now();
+		const elapsed = liveGame.disconnectedPlayerIds.size > 0 ? 0 : now - liveGame.lastMoveTime;
+		let currentWhiteTime = liveGame.whiteTime;
+		let currentBlackTime = liveGame.blackTime;
+		if (liveGame.board.turn() === 'w') {
+			currentWhiteTime = Math.max(0, currentWhiteTime - elapsed);
+		} else {
+			currentBlackTime = Math.max(0, currentBlackTime - elapsed);
+		}
+
+		return {
+			gameId: liveGame.gameId,
+			fen: liveGame.board.fen(),
+			turn: liveGame.board.turn(),
+			mode: liveGame.mode,
+			whiteTime: currentWhiteTime,
+			blackTime: currentBlackTime,
+			lastMoveTime: liveGame.lastMoveTime,
+			lastMove,
+			isCheck: liveGame.board.inCheck(),
+			isPaused: liveGame.disconnectedPlayerIds.size > 0,
+			isGameOver: false,
+			whitePlayer: {
+				id: liveGame.white.userId,
+				username: liveGame.white.username,
+				avatar: whiteUser?.avatar || null,
+				rating: whiteRating.rating,
+				isProvisional: whiteRating.isProvisional,
+			},
+			blackPlayer: {
+				id: liveGame.black.userId,
+				username: liveGame.black.username,
+				avatar: blackUser?.avatar || null,
+				rating: blackRating.rating,
+				isProvisional: blackRating.isProvisional,
+			},
+		};
+	}
+
 	async addToQueue(userId: number, socketId: string, username: string, mode: GameModeType): Promise<ChessGame | null> {
 		this.removeFromQueue(userId);
 

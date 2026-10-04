@@ -26,6 +26,12 @@ export class GameController {
 		return this.ratingService.getAllRatingsByUsername(username);
 	}
 
+	@Get('live/:username')
+	async getLiveGame(@Param('username') username: string) {
+		const liveGame = await this.gameService.getLiveGameByUsername(username);
+		return liveGame ?? { live: false };
+	}
+
 	@Get(':id')
 	async getMatch(@Param('id') id: string) {
 		return this.gameService.getMatchById(parseInt(id, 10));

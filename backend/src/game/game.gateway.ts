@@ -46,11 +46,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				userId: newGame.white.userId,
 				username: newGame.white.username,
 				status: 'INGAME',
+				gameId: newGame.gameId,
 			});
 			this.challengeGateway.server.emit('user_status_changed', {
 				userId: newGame.black.userId,
 				username: newGame.black.username,
 				status: 'INGAME',
+				gameId: newGame.gameId,
 			});
 		});
 
@@ -141,7 +143,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('join_game')
-	async handleJoinGame(client: Socket, payload: { gameId: string }) {
+	async handleJoinGame(client: Socket, payload: { gameId: string; preview?: boolean }) {
 		const userIdStr = client.handshake.query.userId;
 		const userId = userIdStr ? parseInt(userIdStr as string, 10) : undefined;
 		const gameId = payload?.gameId;
@@ -160,7 +162,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		if (session.type === 'live' && session.game) {
 			const game = session.game;
-			if (session.role === 'player' && userId) {
+			if (session.role === 'player' && userId && !payload?.preview) {
 				this.gameService.handleUserReconnect(userId, client.id);
 			}
 

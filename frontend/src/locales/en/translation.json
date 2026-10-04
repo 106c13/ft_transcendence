@@ -401,5 +401,14 @@
     "no_moves_yet": "No moves played yet",
     "moves_appear_here": "Moves will appear here as the game progresses",
     "try_adjusting_filters": "Try adjusting your color, result, or mode filters.",
-    "none_captured": "None"
+    "none_captured": "None",
+    "click_to_spectate": "Click to spectate the game",
+    "live_match": "Live Match",
+    "rating_overview_header": "Rating Overview",
+    "live": "LIVE",
+    "new_match_started": "New Match Started",
+    "match_finished": "Match Finished",
+    "playing_against": "Playing against {{opponent}}",
+    "trend_7d": "7D Trend",
+    "record": "W / D / L"
 }

@@ -401,5 +401,14 @@
     "no_moves_yet": "Ходов пока нет",
     "moves_appear_here": "Ходы появятся здесь по ходу партии",
     "try_adjusting_filters": "Попробуйте изменить фильтры по цвету, результату или режиму.",
-    "none_captured": "Нет"
+    "none_captured": "Нет",
+    "click_to_spectate": "Нажмите, чтобы наблюдать за игрой",
+    "live_match": "Текущий матч",
+    "rating_overview_header": "Обзор рейтинга",
+    "live": "В ЭФИРЕ",
+    "new_match_started": "Началась новая игра",
+    "match_finished": "Матч завершен",
+    "playing_against": "Игра против {{opponent}}",
+    "trend_7d": "Тренд (7 дн)",
+    "record": "В / Н / П"
 }

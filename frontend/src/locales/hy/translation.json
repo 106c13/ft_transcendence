@@ -401,5 +401,14 @@
     "no_moves_yet": "Քայլեր դեռ չկան",
     "moves_appear_here": "Քայլերը կհայտնվեն այստեղ խաղի ընթացքում",
     "try_adjusting_filters": "Փորձեք փոխել գույնի, արդյունքի կամ ռեժիմի ֆիլտրերը:",
-    "none_captured": "Չկա"
+    "none_captured": "Չկա",
+    "click_to_spectate": "Սեղմեք խաղը դիտելու համար",
+    "live_match": "Ընթացիկ խաղ",
+    "rating_overview_header": "Վարկանիշի ակնարկ",
+    "live": "ՈՒՂԻՂ",
+    "new_match_started": "Նոր խաղ է սկսվել",
+    "match_finished": "Խաղն ավարտվեց",
+    "playing_against": "Խաղ {{opponent}}-ի դեմ",
+    "trend_7d": "7 օրվա միտում",
+    "record": "Հ / Ո / Պ"
 }

@@ -1,25 +1,36 @@
 .miniChartCard {
 	background: #1E293B;
 	border: 1px solid rgba(148, 163, 184, 0.14);
-	border-radius: 14px;
-	padding: 18px 20px;
 	border-radius: 12px;
 	padding: 13px 15px;
 	display: flex;
 	flex-direction: column;
-	gap: 14px;
 	gap: 10px;
 	cursor: pointer;
 	position: relative;
-	transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+	transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+	            box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+	            border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+	            background 0.25s ease,
+	            padding 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 	overflow: hidden;
+	animation: standardCardEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes standardCardEnter {
+	from {
+		opacity: 0.3;
+		transform: translateY(6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .miniChartCard:hover {
-	transform: translateY(-3px);
 	transform: translateY(-2px);
 	border-color: rgba(96, 165, 250, 0.45);
-	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(96, 165, 250, 0.2);
 	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(96, 165, 250, 0.2);
 }
 
@@ -242,4 +253,132 @@
 	opacity: 1;
 	transform: translateX(2px);
 }
+
+/* Compact Mode Styles for Live Overview */
+.miniChartCard.compactCard {
+	padding: 8px 14px;
+	gap: 0;
+	min-height: 48px;
+	border-radius: 10px;
+	width: 100%;
+	box-sizing: border-box;
+	animation: compactCardEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes compactCardEnter {
+	from {
+		opacity: 0.3;
+		transform: translateY(6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.compactRow {
+	display: grid;
+	grid-template-columns: 105px 90px 1fr 85px;
+	gap: 10px;
+	align-items: center;
+	width: 100%;
+}
+
+.compactRow .modeInfo {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+	overflow: hidden;
+}
+
+.compactRow .modeIcon {
+	width: 28px;
+	height: 28px;
+	font-size: 14px;
+	border-radius: 7px;
+	flex-shrink: 0;
+}
+
+.compactRow .modeTitle {
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1.15;
+	white-space: nowrap;
+}
+
+.compactRow .modeTime {
+	font-size: 10px;
+	white-space: nowrap;
+}
+
+.compactRecord {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 3px;
+	font-size: 10.5px;
+	font-weight: 600;
+	font-family: var(--mono, monospace);
+	padding: 2px 6px;
+	background: rgba(148, 163, 184, 0.08);
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	border-radius: 6px;
+	justify-self: center;
+	white-space: nowrap;
+}
+
+.compactWins {
+	color: #4ADE80;
+}
+
+.compactSep {
+	color: #64748B;
+	font-size: 9.5px;
+}
+
+.compactDraws {
+	color: #94A3B8;
+}
+
+.compactLosses {
+	color: #F87171;
+}
+
+.compactChartContainer {
+	width: 100%;
+	height: 26px;
+	position: relative;
+	margin: 0;
+	justify-self: center;
+}
+
+.compactChartContainer .sparklineSvg {
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
+.compactValueGroup {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 6px;
+	justify-self: end;
+}
+
+.compactValueGroup .ratingNumber {
+	font-size: 16.5px;
+	font-weight: 800;
+	color: #F8FAFC;
+	font-family: var(--mono, monospace);
+	line-height: 1;
+}
+
+.compactValueGroup .deltaBadge {
+	font-size: 10.5px;
+	padding: 2px 6px;
+	border-radius: 4px;
+}
+
 

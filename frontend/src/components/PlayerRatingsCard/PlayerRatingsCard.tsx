@@ -6,9 +6,18 @@ import styles from './PlayerRatingsCard.module.css'
 type Props = {
 	ratings?: Record<string, RatingInfo | null> | null
 	username?: string
+	showHeader?: boolean
+	hideSeeAll?: boolean
+	hideListHeader?: boolean
 }
 
-export default function PlayerRatingsCard({ ratings, username }: Props) {
+export default function PlayerRatingsCard({
+	ratings,
+	username,
+	showHeader = true,
+	hideSeeAll = false,
+	hideListHeader = false,
+}: Props) {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
 
@@ -28,25 +37,31 @@ export default function PlayerRatingsCard({ ratings, username }: Props) {
 
 	return (
 		<div className={styles.ratingsCard}>
-			<div className={styles.cardHeader}>
-				<div className={styles.titleGroup}>
-					<h3 className={styles.cardTitle}>{t('ratings_title', 'Ratings')}</h3>
+			{showHeader && (
+				<div className={styles.cardHeader}>
+					<div className={styles.titleGroup}>
+						<h3 className={styles.cardTitle}>{t('ratings_title', 'Ratings')}</h3>
+					</div>
+					{!hideSeeAll && (
+						<button
+							className={styles.seeAllBtn}
+							onClick={() => username ? navigate(`/profile/${username}`) : navigate('/profile')}
+							type="button"
+						>
+							{t('see_all', 'See all')} →
+						</button>
+					)}
 				</div>
-				<button
-					className={styles.seeAllBtn}
-					onClick={() => username ? navigate(`/profile/${username}`) : navigate('/profile')}
-					type="button"
-				>
-					{t('see_all', 'See all')} →
-				</button>
-			</div>
+			)}
 
 			<div className={styles.ratingsListSection}>
-				<div className={styles.listHeader}>
-					<span>{t('mode', 'Mode')}</span>
-					<span>{t('rating', 'Rating')}</span>
-					<span>{t('win_rate', 'Win Rate')}</span>
-				</div>
+				{!hideListHeader && (
+					<div className={styles.listHeader}>
+						<span>{t('mode', 'Mode')}</span>
+						<span>{t('rating', 'Rating')}</span>
+						<span>{t('win_rate', 'Win Rate')}</span>
+					</div>
+				)}
 
 				<div className={styles.rowsContainer}>
 					{modes.map((mode) => {
