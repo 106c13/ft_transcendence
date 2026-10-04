@@ -41,6 +41,7 @@ export interface ChessGame {
 	whiteTime: number; // Remaining time in ms
 	blackTime: number; // Remaining time in ms
 	lastMoveTime: number; // timestamp
+	moveTimes: number[]; // ms spent on each half-move
 	timer: NodeJS.Timeout | null;
 	disconnectTimers: Map<number, NodeJS.Timeout>;
 	disconnectedPlayerIds: Set<number>;
@@ -251,6 +252,7 @@ export class GameService {
 			whiteTime: initialTime,
 			blackTime: initialTime,
 			lastMoveTime: Date.now(),
+			moveTimes: [],
 			timer: null,
 			disconnectTimers: new Map(),
 			disconnectedPlayerIds: new Set(),
@@ -430,6 +432,11 @@ export class GameService {
 				clearTimeout(game.timer);
 				game.timer = null;
 			}
+
+			if (!game.moveTimes) {
+				game.moveTimes = [];
+			}
+			game.moveTimes.push(elapsed);
 
 			const addIncrement = () => {
 				if (turn === 'w') {
@@ -835,6 +842,7 @@ export class GameService {
 			match.winner_id = winnerId;
 			match.result = result;
 			match.pgn = game.board.pgn();
+			match.move_times = game.moveTimes && game.moveTimes.length > 0 ? game.moveTimes : null;
 			match.played_at = new Date();
 
 			const category = getRatingCategory(game.mode);

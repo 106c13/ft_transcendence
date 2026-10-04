@@ -39,6 +39,9 @@ export class Match {
 	@Column({ type: 'jsonb', nullable: true })
 	analysis: any;
 
+	@Column({ type: 'jsonb', nullable: true })
+	move_times: number[] | null;
+
 	@Column({ type: 'int', nullable: true })
 	white_rating_after: number | null;
 

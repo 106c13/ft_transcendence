@@ -16,6 +16,7 @@ export type MatchRecord = {
 	mode: 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2'
 	result: string
 	pgn: string
+	move_times?: number[] | null
 	played_at: string
 	analysis?: GameAnalysisResult
 	white?: { id: number; username: string; avatar?: string }
@@ -498,7 +499,7 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 
 										<p className={styles.assessmentExplanation}>
 											{currentPosition.explanationKey
-												? t(currentPosition.explanationKey, currentPosition.explanationParams)
+												? (t(currentPosition.explanationKey, currentPosition.explanationParams) as string)
 												: currentPosition.explanation}
 										</p>
 

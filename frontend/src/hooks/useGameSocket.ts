@@ -219,6 +219,7 @@ export function useGameSocket() {
             blackTime: number
             turn: 'w' | 'b'
             history: string[]
+            moveTimes?: number[]
             mode: GameModeType
             isPaused?: boolean
             isGameOver?: boolean
@@ -283,7 +284,7 @@ export function useGameSocket() {
             prevViewIndexRef.current = historyFens.length - 1
             setViewIndex(historyFens.length - 1)
             setMoveSAN(data.history || [])
-            setMoveTimes([])
+            setMoveTimes(data.moveTimes || [])
         }
 
         socket.on('game_state', handleGameState)
