@@ -68,18 +68,10 @@ export default function GameRow({ match, username, onSelect, onRowClick }: Props
 		// fallback
 	}
 
-	// Move count
-	let moveCount = 0
-	if (match.move_times && match.move_times.length > 0) {
-		moveCount = Math.ceil(match.move_times.length / 2)
-	} else if (match.pgn) {
-		const moveMatches = match.pgn.match(/(\d+)\.\s/g)
-		if (moveMatches && moveMatches.length > 0) {
-			const last = moveMatches[moveMatches.length - 1]
-			const num = parseInt(last.replace('.', '').trim(), 10)
-			if (!isNaN(num)) moveCount = num
-		}
-	}
+	// Move count (from saved move times)
+	const moveCount = match.move_times && match.move_times.length > 0
+		? Math.ceil(match.move_times.length / 2)
+		: null
 
 	// Mode badge details
 	const rawMode = match.mode.toLowerCase()
@@ -177,9 +169,9 @@ export default function GameRow({ match, username, onSelect, onRowClick }: Props
 			<div className={styles.movesCol}>
 				<span
 					className={styles.movesCount}
-					title={moveCount > 0 ? `${moveCount} ${moveCount === 1 ? t('move', 'move') : t('moves', 'moves')}` : undefined}
+					title={moveCount ? `${moveCount} ${moveCount === 1 ? t('move', 'move') : t('moves', 'moves')}` : undefined}
 				>
-					{moveCount > 0 ? moveCount : '—'}
+					{moveCount ?? '-'}
 				</span>
 			</div>
 
