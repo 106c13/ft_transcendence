@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { DrawOfferState } from '../../hooks/useGameSocket'
@@ -26,6 +27,37 @@ function GameActions({
 }: Props) {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
+	const [showResignModal, setShowResignModal] = useState(false)
+	const resignContainerRef = useRef<HTMLDivElement>(null)
+
+	useEffect(() => {
+		if (!showResignModal) return
+
+		const handleClickOutside = (e: MouseEvent) => {
+			if (resignContainerRef.current && !resignContainerRef.current.contains(e.target as Node)) {
+				setShowResignModal(false)
+			}
+		}
+
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				setShowResignModal(false)
+			}
+		}
+
+		document.addEventListener('mousedown', handleClickOutside)
+		document.addEventListener('keydown', handleKeyDown)
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside)
+			document.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [showResignModal])
+
+	useEffect(() => {
+		if (isGameOver) {
+			setShowResignModal(false)
+		}
+	}, [isGameOver])
 
 	if (isViewer) {
 		return (
@@ -101,9 +133,49 @@ function GameActions({
 						½ {t('offer_draw', 'Offer Draw')}
 					</button>
 				)}
-				<button type="button" className={styles.resignBtn} onClick={onResign}>
-					🏳️ {t('resign', 'Resign')}
-				</button>
+				<div className={styles.resignContainer} ref={resignContainerRef}>
+					<button
+						type="button"
+						className={`${styles.resignBtn} ${showResignModal ? styles.resignBtnActive : ''}`}
+						onClick={() => setShowResignModal((prev) => !prev)}
+						aria-expanded={showResignModal}
+					>
+						🏳️ {t('resign', 'Resign')}
+					</button>
+
+					{showResignModal && (
+						<div
+							className={styles.resignModal}
+							role="dialog"
+							aria-label={t('confirm_resign_short', 'Resign game?')}
+						>
+							<span className={styles.modalPrompt}>
+								{t('confirm_resign_short', 'Resign game?')}
+							</span>
+							<div className={styles.modalButtons}>
+								<button
+									type="button"
+									className={styles.modalCancelBtn}
+									onClick={() => setShowResignModal(false)}
+								>
+									{t('cancel_action', 'Cancel')}
+								</button>
+								<button
+									type="button"
+									className={styles.modalResignBtn}
+									onClick={() => {
+										setShowResignModal(false)
+										onResign()
+									}}
+								>
+									🏳️ {t('resign', 'Resign')}
+								</button>
+							</div>
+							{/* Pointer pointing right at the center of the original button */}
+							<div className={styles.modalPointer} />
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	)

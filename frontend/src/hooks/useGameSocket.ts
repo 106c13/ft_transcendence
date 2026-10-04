@@ -660,9 +660,7 @@ export function useGameSocket() {
     const resignGame = () => {
         const activeSocket = socketRef.current || socket
         if (activeSocket && gameId && !isViewerRef.current) {
-            if (confirm(t('confirm_resign', 'Are you sure you want to resign?'))) {
-                activeSocket.emit('resign_game', { gameId })
-            }
+            activeSocket.emit('resign_game', { gameId })
         }
     }
 

@@ -11,7 +11,14 @@
 	width: 100%;
 }
 
+.resignContainer {
+	position: relative;
+	flex: 1;
+	display: flex;
+}
+
 .resignBtn {
+	width: 100%;
 	flex: 1;
 	padding: 10px;
 	border-radius: 6px;
@@ -25,11 +32,129 @@
 	align-items: center;
 	justify-content: center;
 	gap: 6px;
+	outline: none;
 }
 
 .resignBtn:hover {
 	background: #EF4444;
 	color: white;
+}
+
+.resignBtnActive {
+	background: rgba(239, 68, 68, 0.25) !important;
+	border-color: #EF4444 !important;
+	color: #F87171 !important;
+	box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+}
+
+/* Resignation Confirmation Popup */
+.resignModal {
+	position: absolute;
+	bottom: calc(100% + 11px);
+	left: 50%;
+	transform: translateX(-50%);
+	background: #1E293B;
+	border: 1px solid rgba(239, 68, 68, 0.4);
+	border-radius: 10px;
+	padding: 10px 14px 12px;
+	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 16px rgba(239, 68, 68, 0.2);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	width: max-content;
+	min-width: 180px;
+	z-index: 100;
+	animation: modalPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	box-sizing: border-box;
+}
+
+/* Pointer at the bottom pointing right at the center of the original button */
+.modalPointer {
+	position: absolute;
+	bottom: -5px;
+	left: 50%;
+	transform: translateX(-50%) rotate(45deg);
+	width: 10px;
+	height: 10px;
+	background: #1E293B;
+	border-right: 1px solid rgba(239, 68, 68, 0.4);
+	border-bottom: 1px solid rgba(239, 68, 68, 0.4);
+	z-index: 1;
+	pointer-events: none;
+}
+
+.modalPrompt {
+	font-size: 12.5px;
+	font-weight: 700;
+	color: #F8FAFC;
+	letter-spacing: 0.2px;
+	white-space: nowrap;
+}
+
+.modalButtons {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+}
+
+.modalCancelBtn {
+	flex: 1;
+	padding: 6px 12px;
+	border-radius: 6px;
+	border: 1px solid rgba(148, 163, 184, 0.25);
+	background: rgba(148, 163, 184, 0.12);
+	color: #CBD5E1;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	white-space: nowrap;
+	outline: none;
+}
+
+.modalCancelBtn:hover {
+	background: rgba(148, 163, 184, 0.22);
+	color: #FFFFFF;
+	border-color: rgba(148, 163, 184, 0.4);
+}
+
+.modalResignBtn {
+	flex: 1;
+	padding: 6px 12px;
+	border-radius: 6px;
+	border: 1px solid #DC2626;
+	background: #EF4444;
+	color: #FFFFFF;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	white-space: nowrap;
+	outline: none;
+	box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+}
+
+.modalResignBtn:hover {
+	background: #DC2626;
+	box-shadow: 0 4px 12px rgba(239, 68, 68, 0.6);
+	transform: translateY(-1px);
+}
+
+@keyframes modalPopIn {
+	from {
+		opacity: 0;
+		transform: translate(-50%, 6px) scale(0.94);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, 0) scale(1);
+	}
 }
 
 .drawBtn {
