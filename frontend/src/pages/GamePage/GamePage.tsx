@@ -56,7 +56,8 @@ export default function GamePage() {
         time: game.blackTime,
         color: 'b' as const,
         isActive: game.turn === 'b' && !game.isGameOver && game.gameState === 'playing',
-        rating: game.blackPlayer?.rating ?? (game.playerColor === 'w' ? game.opponentRating : game.playerRating),
+        rating: game.blackRatingAfter ?? game.blackPlayer?.rating ?? (game.playerColor === 'w' ? game.opponentRating : game.playerRating),
+        ratingDelta: game.blackRatingDelta ?? game.blackPlayer?.ratingDelta ?? null,
         isProvisional: game.blackPlayer?.isProvisional ?? (game.playerColor === 'w' ? game.opponentIsProvisional : game.playerIsProvisional),
         captured: game.captured.w,
         diff: game.blackScore > game.whiteScore ? game.blackScore - game.whiteScore : 0,
@@ -69,7 +70,8 @@ export default function GamePage() {
         time: game.whiteTime,
         color: 'w' as const,
         isActive: game.turn === 'w' && !game.isGameOver && game.gameState === 'playing',
-        rating: game.whitePlayer?.rating ?? (game.playerColor === 'w' ? game.playerRating : game.opponentRating),
+        rating: game.whiteRatingAfter ?? game.whitePlayer?.rating ?? (game.playerColor === 'w' ? game.playerRating : game.opponentRating),
+        ratingDelta: game.whiteRatingDelta ?? game.whitePlayer?.ratingDelta ?? null,
         isProvisional: game.whitePlayer?.isProvisional ?? (game.playerColor === 'w' ? game.playerIsProvisional : game.opponentIsProvisional),
         captured: game.captured.b,
         diff: game.whiteScore > game.blackScore ? game.whiteScore - game.blackScore : 0,
@@ -102,6 +104,8 @@ export default function GamePage() {
                                 time={topViewerPlayer.time}
                                 isActive={topViewerPlayer.isActive}
                                 rating={topViewerPlayer.rating}
+                                ratingDelta={topViewerPlayer.ratingDelta}
+                                isGameOver={game.isGameOver}
                                 isProvisional={topViewerPlayer.isProvisional}
                                 selectedMode={game.selectedMode}
                                 capturedPieces={topViewerPlayer.captured}
@@ -116,6 +120,8 @@ export default function GamePage() {
                                 time={game.playerColor === 'w' ? game.blackTime : game.whiteTime}
                                 isActive={game.turn !== game.playerColor && !game.isGameOver && game.gameState === 'playing'}
                                 rating={game.opponentRating}
+                                ratingDelta={game.playerColor === 'w' ? game.blackRatingDelta : game.whiteRatingDelta}
+                                isGameOver={game.isGameOver}
                                 isProvisional={game.opponentIsProvisional}
                                 selectedMode={game.selectedMode}
                                 capturedPieces={opponentCaptured}
@@ -147,6 +153,7 @@ export default function GamePage() {
                             onPromotionCancel={board.handlePromotionCancel}
                             isGameOver={game.isGameOver}
                             isViewer={game.isViewer}
+                            winnerColor={game.isGameOver && game.viewIndex === game.moveHistory.length - 1 ? game.winnerColor : null}
                         />
 
                         {/* Bottom Banner: White in viewer mode, or Current User in player mode */}
@@ -160,6 +167,8 @@ export default function GamePage() {
                                 isActive={bottomViewerPlayer.isActive}
                                 isBottom={true}
                                 rating={bottomViewerPlayer.rating}
+                                ratingDelta={bottomViewerPlayer.ratingDelta}
+                                isGameOver={game.isGameOver}
                                 isProvisional={bottomViewerPlayer.isProvisional}
                                 selectedMode={game.selectedMode}
                                 capturedPieces={bottomViewerPlayer.captured}
@@ -175,6 +184,8 @@ export default function GamePage() {
                                 isActive={game.turn === game.playerColor && !game.isGameOver && game.gameState === 'playing'}
                                 isBottom={true}
                                 rating={game.playerRating}
+                                ratingDelta={game.playerRatingDelta ?? (game.playerColor === 'w' ? game.whiteRatingDelta : game.blackRatingDelta)}
+                                isGameOver={game.isGameOver}
                                 isProvisional={game.playerIsProvisional}
                                 initialRatings={game.currentUser?.ratings}
                                 selectedMode={game.selectedMode}
@@ -207,13 +218,16 @@ export default function GamePage() {
                     />
                 </div>
 
-                {game.isGameOver && !game.hideGameOverModal && !game.isViewer && (
+                {game.isGameOver && !game.hideGameOverModal && (
                     <GameOverDialog
                         winnerColor={game.winnerColor}
                         playerColor={game.playerColor}
                         gameOverReason={game.gameOverReason}
                         ratingAfter={game.playerRatingAfter}
                         ratingDelta={game.playerRatingDelta}
+                        isViewer={game.isViewer}
+                        showConfetti={game.showConfetti}
+                        onConfettiComplete={() => game.setShowConfetti(false)}
                         onClose={() => game.setHideGameOverModal(true)}
                         onPlayAgain={() => {
                             game.setIsGameOver(false)

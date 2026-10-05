@@ -116,6 +116,10 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 	const userColor = isUserWhite ? 'white' : 'black'
 	const opponentColor = isUserWhite ? 'black' : 'white'
 	const outcome = history.getOutcome(selectedGame)
+	const winnerColor: 'w' | 'b' | null = selectedGame.winner_id
+		? (selectedGame.winner_id === selectedGame.white_id ? 'w' : 'b')
+		: null
+	const isFinalPosition = !analysisData || currentPly === analysisData.positions.length - 1
 
 	const ranks = isUserWhite ? ['8', '7', '6', '5', '4', '3', '2', '1'] : ['1', '2', '3', '4', '5', '6', '7', '8']
 	const files = isUserWhite ? ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] : ['h', 'g', 'f', 'e', 'd', 'c', 'b', 'a']
@@ -451,6 +455,33 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 														alt={`${piece.color === 'w' ? t('white', 'White') : t('black', 'Black')} ${t(PIECE_NAME[piece.type].toLowerCase(), PIECE_NAME[piece.type])}`}
 														className={`${styles.pieceImg} ${piece.color === 'w' ? styles.whitePiece : styles.blackPiece}`}
 													/>
+												)}
+
+												{/* King Win / Loss Indicators */}
+												{isFinalPosition && winnerColor && piece?.type === 'k' && piece.color === winnerColor && (
+													<div className={styles.kingBadgeWinner} title={t('winner', 'Winner')}>
+														<svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
+															<path
+																fill="currentColor"
+																d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"
+															/>
+														</svg>
+													</div>
+												)}
+
+												{isFinalPosition && winnerColor && piece?.type === 'k' && piece.color !== winnerColor && (
+													<div className={styles.kingBadgeLoser} title={t('loser', 'Defeated')}>
+														<svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
+															<path
+																fill="none"
+																stroke="currentColor"
+																strokeWidth="3.2"
+																strokeLinecap="round"
+																strokeLinejoin="round"
+																d="M10 4L8 20M16 4l-2 20M4 9.5h16M3.5 14.5h16"
+															/>
+														</svg>
+													</div>
 												)}
 
 												{/* Classification marker on played move destination */}

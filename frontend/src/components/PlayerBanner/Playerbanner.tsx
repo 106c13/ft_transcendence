@@ -16,6 +16,8 @@ type Props = {
 	isActive: boolean
 	isBottom?: boolean
 	rating?: number | null
+	ratingDelta?: number | null
+	isGameOver?: boolean
 	isProvisional?: boolean
 	initialRatings?: Record<string, RatingInfo | null> | null
 	selectedMode?: string
@@ -47,6 +49,8 @@ function PlayerBanner({
 	isActive,
 	isBottom = false,
 	rating,
+	ratingDelta,
+	isGameOver = false,
 	isProvisional,
 	initialRatings,
 	selectedMode = 'blitz',
@@ -192,14 +196,29 @@ function PlayerBanner({
 							/>
 							<div className={styles.playerTextStack}>
 								<span className={styles.nickname}>{name}</span>
-								{rating !== undefined && rating !== null && (
-									<span
-										className={styles.ratingText}
-										style={{ color: modeColor }}
-									>
-										{isProvisional ? `~${rating}` : rating}
-									</span>
-								)}
+								<div className={styles.ratingRow}>
+									{rating !== undefined && rating !== null && (
+										<span
+											className={styles.ratingText}
+											style={{ color: modeColor }}
+										>
+											{isProvisional ? `~${rating}` : rating}
+										</span>
+									)}
+									{isGameOver && ratingDelta !== undefined && ratingDelta !== null && (
+										<span
+											className={`${styles.ratingDeltaBadge} ${
+												ratingDelta > 0
+													? styles.deltaPositive
+													: ratingDelta < 0
+													? styles.deltaNegative
+													: styles.deltaNeutral
+											}`}
+										>
+											{ratingDelta > 0 ? `↑${ratingDelta}` : ratingDelta < 0 ? `↓${Math.abs(ratingDelta)}` : '0'}
+										</span>
+									)}
+								</div>
 							</div>
 
 							{/* Minimalistic Ratings Popup */}

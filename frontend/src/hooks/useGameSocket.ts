@@ -127,6 +127,11 @@ export function useGameSocket() {
     const [opponentAvatar, setOpponentAvatar] = useState<string | null>(null)
     const [playerRatingAfter, setPlayerRatingAfter] = useState<number | null>(null)
     const [playerRatingDelta, setPlayerRatingDelta] = useState<number | null>(null)
+    const [whiteRatingAfter, setWhiteRatingAfter] = useState<number | null>(null)
+    const [blackRatingAfter, setBlackRatingAfter] = useState<number | null>(null)
+    const [whiteRatingDelta, setWhiteRatingDelta] = useState<number | null>(null)
+    const [blackRatingDelta, setBlackRatingDelta] = useState<number | null>(null)
+    const [showConfetti, setShowConfetti] = useState(false)
 
     // Timing States
     const [whiteTime, setWhiteTime] = useState(180000)
@@ -227,11 +232,17 @@ export function useGameSocket() {
             reason?: string
             savedMatchId?: number
             playerRating?: number
+            playerRatingDelta?: number
             playerIsProvisional?: boolean
             opponentRating?: number
+            opponentRatingDelta?: number
             opponentIsProvisional?: boolean
             whitePlayer?: PlayerInfo
             blackPlayer?: PlayerInfo
+            whiteRatingAfter?: number
+            blackRatingAfter?: number
+            whiteRatingDelta?: number
+            blackRatingDelta?: number
         }) => {
             const isViewerMode = data.role === 'viewer'
             setIsViewer(isViewerMode)
@@ -245,8 +256,21 @@ export function useGameSocket() {
             setOpponentIsProvisional(data.opponentIsProvisional ?? false)
             if (data.whitePlayer) setWhitePlayer(data.whitePlayer)
             if (data.blackPlayer) setBlackPlayer(data.blackPlayer)
-            setPlayerRatingAfter(null)
-            setPlayerRatingDelta(null)
+
+            const wRatingDelta = data.whiteRatingDelta ?? data.whitePlayer?.ratingDelta ?? null
+            const bRatingDelta = data.blackRatingDelta ?? data.blackPlayer?.ratingDelta ?? null
+            const wRatingAfter = data.whiteRatingAfter ?? data.whitePlayer?.rating ?? null
+            const bRatingAfter = data.blackRatingAfter ?? data.blackPlayer?.rating ?? null
+            setWhiteRatingDelta(wRatingDelta)
+            setBlackRatingDelta(bRatingDelta)
+            setWhiteRatingAfter(wRatingAfter)
+            setBlackRatingAfter(bRatingAfter)
+
+            const isWhite = (data.color || 'w') === 'w'
+            const myDelta = data.playerRatingDelta ?? (isWhite ? wRatingDelta : bRatingDelta)
+            const myAfter = data.playerRating ?? (isWhite ? wRatingAfter : bRatingAfter)
+            setPlayerRatingDelta(myDelta ?? null)
+            setPlayerRatingAfter(myAfter ?? null)
 
             localChess.load(data.fen)
             setBoardFen(data.fen)
@@ -256,7 +280,8 @@ export function useGameSocket() {
             setTurn(data.turn)
             setGameState('playing')
             setIsGameOver(data.isGameOver || false)
-            setHideGameOverModal(isViewerMode)
+            setHideGameOverModal(false)
+            setShowConfetti(false)
             setWinnerColor(data.winner ?? null)
             setGameOverReason(data.reason ?? '')
             setLastMove(null)
@@ -396,18 +421,31 @@ export function useGameSocket() {
             blackRatingDelta?: number
         }) => {
             setIsGameOver(true)
-            setHideGameOverModal(isViewerRef.current)
+            setHideGameOverModal(false)
             setWinnerColor(data.winner)
             setGameOverReason(data.reason)
             setSavedMatchId(data.matchId || null)
 
+            setWhiteRatingAfter(data.whiteRatingAfter ?? null)
+            setBlackRatingAfter(data.blackRatingAfter ?? null)
+            setWhiteRatingDelta(data.whiteRatingDelta ?? null)
+            setBlackRatingDelta(data.blackRatingDelta ?? null)
+
+            if (data.reason !== 'ABANDONED') {
+                setShowConfetti(true)
+            }
+
             const isWhite = playerColorRef.current === 'w'
             const ratingAfter = isWhite ? data.whiteRatingAfter : data.blackRatingAfter
             const ratingDelta = isWhite ? data.whiteRatingDelta : data.blackRatingDelta
+            const oppRatingAfter = isWhite ? data.blackRatingAfter : data.whiteRatingAfter
             setPlayerRatingAfter(ratingAfter ?? null)
             setPlayerRatingDelta(ratingDelta ?? null)
             if (ratingAfter !== undefined && ratingAfter !== null) {
                 setPlayerRating(ratingAfter)
+            }
+            if (oppRatingAfter !== undefined && oppRatingAfter !== null) {
+                setOpponentRating(oppRatingAfter)
             }
 
             setPremoves([])
@@ -778,6 +816,12 @@ export function useGameSocket() {
         opponentAvatar,
         playerRatingAfter,
         playerRatingDelta,
+        whiteRatingAfter,
+        blackRatingAfter,
+        whiteRatingDelta,
+        blackRatingDelta,
+        showConfetti,
+        setShowConfetti,
         isLowTime: !isViewer && gameState === 'playing' && !isGameOver && (playerColor === 'w' ? whiteTime : blackTime) <= 10000,
         handleIllegalMove,
         handleLowTimeWarning,

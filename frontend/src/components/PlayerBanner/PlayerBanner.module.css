@@ -139,12 +139,46 @@
 }
 
 /* Borderless rating with game mode color applied via inline style */
+.ratingRow {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
 .ratingText {
 	font-size: 13px;
 	font-weight: 700;
 	font-family: var(--mono, monospace);
 	letter-spacing: 0.3px;
 	line-height: 1;
+}
+
+.ratingDeltaBadge {
+	font-size: 12px;
+	font-weight: 700;
+	font-family: var(--mono, monospace);
+	line-height: 1;
+	border: none;
+	background: transparent;
+	padding: 0;
+}
+
+.deltaPositive {
+	color: #4ADE80;
+	background: transparent;
+	border: none;
+}
+
+.deltaNegative {
+	color: #F87171;
+	background: transparent;
+	border: none;
+}
+
+.deltaNeutral {
+	color: #94A3B8;
+	background: transparent;
+	border: none;
 }
 
 /* Minimalistic Ratings Popup */

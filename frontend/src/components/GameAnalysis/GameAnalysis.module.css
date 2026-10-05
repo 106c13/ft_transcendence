@@ -888,3 +888,68 @@
 		grid-template-columns: 1fr;
 	}
 }
+
+/* King Win / Loss Indicators */
+.kingBadgeWinner,
+.kingBadgeLoser {
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	width: clamp(16px, 24%, 24px);
+	height: clamp(16px, 24%, 24px);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 10;
+	pointer-events: none;
+	border: 1.5px solid #FFFFFF;
+}
+
+.kingBadgeWinner {
+	background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+	color: #FFFFFF;
+	box-shadow: 0 0 8px rgba(16, 185, 129, 0.7), 0 2px 6px rgba(0, 0, 0, 0.4);
+	animation: kingBadgePop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) both,
+	           winnerGlow 2s ease-in-out infinite alternate 0.45s;
+}
+
+.kingBadgeLoser {
+	background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+	color: #FFFFFF;
+	box-shadow: 0 0 8px rgba(239, 68, 68, 0.7), 0 2px 6px rgba(0, 0, 0, 0.4);
+	animation: kingBadgePop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+.kingBadgeIcon {
+	width: 62%;
+	height: 62%;
+}
+
+@keyframes kingBadgePop {
+	0% {
+		opacity: 0;
+		transform: scale(0) rotate(-45deg);
+	}
+	65% {
+		opacity: 1;
+		transform: scale(1.22) rotate(10deg);
+	}
+	85% {
+		transform: scale(0.92) rotate(-3deg);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1) rotate(0deg);
+	}
+}
+
+@keyframes winnerGlow {
+	0% {
+		box-shadow: 0 0 6px rgba(16, 185, 129, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
+	}
+	100% {
+		box-shadow: 0 0 14px rgba(16, 185, 129, 0.95), 0 0 4px #34D399, 0 2px 6px rgba(0, 0, 0, 0.4);
+	}
+}
+

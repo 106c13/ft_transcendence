@@ -39,6 +39,7 @@ type Props = {
     onPromotionCancel?: () => void
     isGameOver?: boolean
     isViewer?: boolean
+    winnerColor?: 'w' | 'b' | null
     customArrows?: BoardArrow[]
     customHighlights?: Record<string, string> | Set<string>
 }
@@ -88,6 +89,7 @@ function ChessBoard({
     onPromotionCancel,
     isGameOver = false,
     isViewer = false,
+    winnerColor = null,
     customArrows,
     customHighlights,
 }: Props) {
@@ -524,6 +526,9 @@ function ChessBoard({
 
                     const isPieceDraggedFromHere = dragState?.isDragging && dragState.fromSquare === sq
                     const isOwnPiece = piece?.color === playerColor
+                    const isKingPiece = piece?.type === 'k'
+                    const isWinnerKing = Boolean(winnerColor && isKingPiece && piece?.color === winnerColor)
+                    const isLoserKing = Boolean(winnerColor && isKingPiece && piece?.color !== winnerColor)
 
                     const isRedHighlighted =
                         userHighlights.has(sq) ||
@@ -569,6 +574,33 @@ function ChessBoard({
                                     draggable={false}
                                     onPointerDown={e => handlePiecePointerDown(e, sq, piece)}
                                 />
+                            )}
+
+                            {/* King Win / Loss Indicators */}
+                            {isWinnerKing && (
+                                <div className={styles.kingBadgeWinner} title={t('winner', 'Winner')}>
+                                    <svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
+                                        <path
+                                            fill="currentColor"
+                                            d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"
+                                        />
+                                    </svg>
+                                </div>
+                            )}
+
+                            {isLoserKing && (
+                                <div className={styles.kingBadgeLoser} title={t('loser', 'Defeated')}>
+                                    <svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
+                                        <path
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="3.2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M10 4L8 20M16 4l-2 20M4 9.5h16M3.5 14.5h16"
+                                        />
+                                    </svg>
+                                </div>
                             )}
 
                             {isValid && !piece && <div className={styles.validMoveDot} />}
