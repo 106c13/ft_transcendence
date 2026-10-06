@@ -427,5 +427,17 @@
     "match_finished": "Матч завершен",
     "playing_against": "Игра против {{opponent}}",
     "trend_7d": "Тренд (7 дн)",
-    "record": "В / Н / П"
+    "record": "В / Н / П",
+    "about": "О проекте",
+    "page_title_about": "О проекте",
+    "about_project_title": "О проекте ft_transcendence",
+    "about_curriculum_badge": "Выпускной проект программы 42",
+    "about_lead": "Этот проект был создан в рамках учебной программы 42 Арманом Аракеляном (@armarake), Нареком Саргсяном (@nasargsy) и Акопом Агаджаняном (@haaghaja).",
+    "about_board_title": "Интерактивная доска 42",
+    "about_board_subtitle": "Выберите разработчика или фигуру, чтобы изучить ходы и технические роли",
+    "about_reset_board": "Сбросить доску",
+    "about_view_intra": "Профиль на 42 Intra",
+    "role_architecture_gameplay": "Архитектура проекта и геймплей",
+    "role_analysis_leaderboard": "Анализ партий и лидерборд",
+    "role_auth_messages_translations": "Аутентификация, сообщения и переводы"
 }

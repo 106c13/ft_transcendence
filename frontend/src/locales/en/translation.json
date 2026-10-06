@@ -427,5 +427,17 @@
     "match_finished": "Match Finished",
     "playing_against": "Playing against {{opponent}}",
     "trend_7d": "7D Trend",
-    "record": "W / D / L"
+    "record": "W / D / L",
+    "about": "About",
+    "page_title_about": "About",
+    "about_project_title": "About ft_transcendence",
+    "about_curriculum_badge": "42 Curriculum Capstone Project",
+    "about_lead": "This project has been created as part of the 42 curriculum by Arman Arakelyan (@armarake), Narek Sargsyan (@nasargsy) and Hakob Aghajanyan (@haaghaja).",
+    "about_board_title": "Interactive 42 Board",
+    "about_board_subtitle": "Select a contributor or piece to explore moves and technical roles",
+    "about_reset_board": "Reset Board",
+    "about_view_intra": "View 42 Profile",
+    "role_architecture_gameplay": "Project Structure & Gameplay",
+    "role_analysis_leaderboard": "Game Analysis & Leaderboard",
+    "role_auth_messages_translations": "Auth, Messages & Translations"
 }

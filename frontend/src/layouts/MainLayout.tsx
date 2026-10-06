@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Navbar from '../components/Navbar/Navbar'
 import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification'
@@ -33,11 +33,15 @@ export default function MainLayout() {
   const { t } = useTranslation()
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const navigate = useNavigate()
+  const location = useLocation()
   const token = localStorage.getItem('token')
+  const isPublicRoute = location.pathname === '/about'
 
   useEffect(() => {
     if (!token) {
-      navigate('/login')
+      if (!isPublicRoute) {
+        navigate('/login')
+      }
       return
     }
 
@@ -51,9 +55,11 @@ export default function MainLayout() {
       .then((data) => setCurrentUser(data))
       .catch(() => {
         localStorage.removeItem('token')
-        navigate('/login')
+        if (!isPublicRoute) {
+          navigate('/login')
+        }
       })
-  }, [navigate, token])
+  }, [navigate, token, isPublicRoute])
 
   const challengeSocket = useChallengeSocket(currentUser?.id)
   const { incomingChallenge, acceptChallenge, declineChallenge } = challengeSocket
@@ -81,7 +87,7 @@ export default function MainLayout() {
     }
   }, [setTopSlot])
 
-  if (!currentUser) {
+  if (!currentUser && !isPublicRoute) {
     return <div className="layout-loading">{t('loading')}</div>
   }
 

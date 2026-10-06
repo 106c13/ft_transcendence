@@ -427,5 +427,17 @@
     "match_finished": "Խաղն ավարտվեց",
     "playing_against": "Խաղ {{opponent}}-ի դեմ",
     "trend_7d": "7 օրվա միտում",
-    "record": "Հ / Ո / Պ"
+    "record": "Հ / Ո / Պ",
+    "about": "Մեր մասին",
+    "page_title_about": "Մեր մասին",
+    "about_project_title": "ft_transcendence նախագծի մասին",
+    "about_curriculum_badge": "42 ծրագրի ավարտական նախագիծ",
+    "about_lead": "Այս նախագիծը ստեղծվել է 42 ծրագրի շրջանակներում Արման Առաքելյանի (@armarake), Նարեկ Սարգսյանի (@nasargsy) և Հակոբ Աղաջանյանի (@haaghaja) կողմից:",
+    "about_board_title": "Ինտերակտիվ 42 տախտակ",
+    "about_board_subtitle": "Ընտրեք ծրագրավորողի կամ ֆիգուրի՝ քայլերը և տեխնիկական դերերը դիտելու համար",
+    "about_reset_board": "Վերականգնել տախտակը",
+    "about_view_intra": "Դիտել 42 պրոֆիլը",
+    "role_architecture_gameplay": "Նախագծի կառուցվածք և գեյմփլեյ",
+    "role_analysis_leaderboard": "Խաղի վերլուծություն և առաջատարներ",
+    "role_auth_messages_translations": "Նույնականացում, նամակներ և թարգմանություններ"
 }

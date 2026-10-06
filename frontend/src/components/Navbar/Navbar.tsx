@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import MessagesIcon from '../MessagesIcon/MessagesIcon'
 import NotificationBell from '../NotificationBell/NotificationBell'
@@ -13,6 +13,7 @@ type Props = {
 function Navbar({ currentUser }: Props) {
 	const { t, i18n } = useTranslation()
 	const navigate = useNavigate()
+	const location = useLocation()
 	const [showProfileMenu, setShowProfileMenu] = useState(false)
 	const [showLanguageMenu, setShowLanguageMenu] = useState(false)
 	const languageMenuRef = useRef<HTMLDivElement>(null)
@@ -38,6 +39,8 @@ function Navbar({ currentUser }: Props) {
 		setShowLanguageMenu(false)
 	}
 
+	const isAboutActive = location.pathname === '/about'
+
 	return (
 		<header className={styles.navbar}>
 			<div className={styles.navbarBrand} onClick={() => navigate(currentUser ? '/home' : '/login')}>
@@ -53,6 +56,29 @@ function Navbar({ currentUser }: Props) {
 
 				{/* Notifications */}
 				{currentUser && <NotificationBell userId={currentUser.id} />}
+
+				{/* About Info */}
+				<div
+					className={`${styles.navActionItem} ${isAboutActive ? styles.activeNavAction : ''}`}
+					onClick={() => navigate('/about')}
+					title={t('about', 'About')}
+				>
+					<svg
+						className={styles.infoIconSvg}
+						viewBox="0 0 24 24"
+						width="20"
+						height="20"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+					>
+						<circle cx="12" cy="12" r="10" />
+						<line x1="12" y1="16" x2="12" y2="12" />
+						<line x1="12" y1="8" x2="12.01" y2="8" />
+					</svg>
+				</div>
 
 				{/* Language Switcher */}
 				<div
