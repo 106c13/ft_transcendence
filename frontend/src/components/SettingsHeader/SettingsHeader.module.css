@@ -1,0 +1,154 @@
+.settingsHeader {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	background: #1E293B;
+	padding: 24px 24px 0;
+	border-radius: 14px;
+	position: relative;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+	box-sizing: border-box;
+}
+
+.topSection {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+.titleGroup {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+.iconBadge {
+	font-size: 26px;
+	width: 48px;
+	height: 48px;
+	border-radius: 12px;
+	background: rgba(59, 130, 246, 0.12);
+	border: 1px solid rgba(96, 165, 250, 0.25);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.textGroup {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.pageTitle {
+	font-size: 22px;
+	font-weight: 800;
+	color: #F8FAFC;
+	margin: 0;
+	letter-spacing: -0.4px;
+	line-height: 1.2;
+}
+
+.pageSubtitle {
+	font-size: 13px;
+	color: #94A3B8;
+	margin: 0;
+	line-height: 1.4;
+}
+
+/* Connected Tabs Header matching Profile Header card */
+.tabsHeader {
+	display: flex;
+	align-items: stretch;
+	gap: 4px;
+	width: 100%;
+	box-sizing: border-box;
+	position: relative;
+	min-height: 44px;
+	border-top: none;
+}
+
+.tab {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 0 18px;
+	height: 44px;
+	cursor: pointer;
+	color: #94A3B8;
+	font-weight: 500;
+	font-size: 14px;
+	letter-spacing: 0.2px;
+	transition: color 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+	background: transparent;
+	border: none;
+	user-select: none;
+	outline: none;
+}
+
+.tab:hover {
+	color: #F1F5F9;
+	background: rgba(255, 255, 255, 0.03);
+	border-radius: 6px 6px 0 0;
+}
+
+.tab.activeTab {
+	color: #FFFFFF;
+	font-weight: 600;
+	background: transparent;
+}
+
+.tabIcon {
+	font-size: 15px;
+	line-height: 1;
+}
+
+/* Blue underline at the bottom of the container for selected tab (identical to Profile Header) */
+.tab.activeTab::after {
+	content: '';
+	position: absolute;
+	bottom: 0px;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: #3B82F6;
+	border-radius: 3px 3px 0 0;
+	box-shadow: 0 -1px 8px rgba(59, 130, 246, 0.8), 0 0 12px rgba(59, 130, 246, 0.4);
+	animation: tabUnderlineIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	z-index: 2;
+}
+
+@keyframes tabUnderlineIn {
+	from {
+		opacity: 0;
+		transform: scaleX(0.7);
+	}
+	to {
+		opacity: 1;
+		transform: scaleX(1);
+	}
+}
+
+@media (max-width: 640px) {
+	.settingsHeader {
+		padding: 18px 16px 0;
+	}
+
+	.topSection {
+		margin-bottom: 16px;
+	}
+
+	.pageTitle {
+		font-size: 20px;
+	}
+
+	.tab {
+		padding: 0 14px;
+		font-size: 13px;
+	}
+}

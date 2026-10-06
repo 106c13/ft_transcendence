@@ -67,7 +67,7 @@ export default function RatingHistoryPage() {
 
 	if (loadingUser && !user) {
 		return (
-			<div className={styles.pageContainer}>
+			<div className={styles.ratingHistoryPage}>
 				<div className={styles.loadingSpinner}>
 					<span className={styles.spinnerIcon}>📈</span>
 					<p>{t('loading', 'Loading rating history...')}</p>
@@ -85,51 +85,53 @@ export default function RatingHistoryPage() {
 	]
 
 	return (
-		<div className={styles.pageContainer}>
-			{/* Top bar with back button & game mode dropdown */}
-			<div className={styles.topBar}>
-				<button className={styles.backBtn} onClick={handleBack}>
-					← {t('back_to_profile', 'Back to Profile')}
-				</button>
+		<div className={styles.ratingHistoryPage}>
+			<div className={styles.contentWrapper}>
+				{/* Top bar with back button & game mode dropdown */}
+				<div className={styles.topBar}>
+					<button className={styles.backBtn} onClick={handleBack}>
+						← {t('back_to_profile', 'Back to Profile')}
+					</button>
 
-				<div className={styles.modeSelectorGroup}>
-					<label className={styles.modeLabel}>
-						{t('filter_mode', 'Game Mode')}:
-					</label>
-					<CustomSelect<RatingCategory>
-						value={selectedMode}
-						options={modeOptions}
-						onChange={handleModeChange}
-						minWidth={165}
-					/>
-				</div>
-			</div>
-
-			{/* User header */}
-			{user && (
-				<div className={styles.userHeader}>
-					<img
-						src={user.avatar && user.avatar !== 'default.jpg' ? `/uploads/${user.avatar}` : '/assets/default.jpg'}
-						alt={user.username}
-						className={styles.avatar}
-						onError={(e) => {
-							const target = e.currentTarget
-							if (!target.src.endsWith('/assets/default.jpg')) {
-								target.src = '/assets/default.jpg'
-							}
-						}}
-					/>
-					<div className={styles.userInfo}>
-						<span className={styles.userName}>{user.username}</span>
-						<span className={styles.userSubtitle}>
-							{t('rating_overview', 'Rating Overview & Progression')}
-						</span>
+					<div className={styles.modeSelectorGroup}>
+						<label className={styles.modeLabel}>
+							{t('filter_mode', 'Game Mode')}:
+						</label>
+						<CustomSelect<RatingCategory>
+							value={selectedMode}
+							options={modeOptions}
+							onChange={handleModeChange}
+							minWidth={165}
+						/>
 					</div>
 				</div>
-			)}
 
-			{/* Main Big Rating Chart */}
-			<BigRatingChart mode={selectedMode} history={currentModeHistory} />
+				{/* User header */}
+				{user && (
+					<div className={styles.userHeader}>
+						<img
+							src={user.avatar && user.avatar !== 'default.jpg' ? `/uploads/${user.avatar}` : '/assets/default.jpg'}
+							alt={user.username}
+							className={styles.avatar}
+							onError={(e) => {
+								const target = e.currentTarget
+								if (!target.src.endsWith('/assets/default.jpg')) {
+									target.src = '/assets/default.jpg'
+								}
+							}}
+						/>
+						<div className={styles.userInfo}>
+							<span className={styles.userName}>{user.username}</span>
+							<span className={styles.userSubtitle}>
+								{t('rating_overview', 'Rating Overview & Progression')}
+							</span>
+						</div>
+					</div>
+				)}
+
+				{/* Main Big Rating Chart */}
+				<BigRatingChart mode={selectedMode} history={currentModeHistory} />
+			</div>
 		</div>
 	)
 }

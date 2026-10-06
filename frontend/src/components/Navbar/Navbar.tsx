@@ -59,13 +59,15 @@ function Navbar({ currentUser }: Props) {
 				{currentUser && <NotificationBell userId={currentUser.id} />}
 
 				{/* Leaderboard */}
-				<div
-					className={`${styles.navActionItem} ${isLeaderboardActive ? styles.activeNavAction : ''}`}
-					onClick={() => navigate('/leaderboard')}
-					title={t('leaderboard', 'Leaderboard')}
-				>
-					<span className={styles.navActionIcon}>🏆</span>
-				</div>
+				{currentUser && (
+					<div
+						className={`${styles.navActionItem} ${isLeaderboardActive ? styles.activeNavAction : ''}`}
+						onClick={() => navigate('/leaderboard')}
+						title={t('leaderboard', 'Leaderboard')}
+					>
+						<span className={styles.navActionIcon}>🏆</span>
+					</div>
+				)}
 
 				{/* About Info */}
 				<div

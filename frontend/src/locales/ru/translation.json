@@ -463,5 +463,19 @@
     "showing_range": "Показано {{start}}–{{end}} из {{total}} игроков",
     "no_players_found": "Игроки не найдены",
     "no_players_filter_desc": "Попробуйте изменить или сбросить фильтры.",
-    "peak_elo": "Пиковый Elo"
+    "peak_elo": "Пиковый Elo",
+    "footer_tagline": "Соревновательная шахматная онлайн-платформа в рамках учебной программы 42. Играйте в реальном времени, анализируйте партии со Stockfish и покоряйте глобальный рейтинг.",
+    "footer_play_title": "Игра и турниры",
+    "footer_platform_title": "Платформа",
+    "footer_about_title": "О проекте и 42",
+    "footer_bullet_1m": "Пуля (1 мин)",
+    "footer_blitz_3m": "Блиц (3 мин)",
+    "footer_rapid_10m": "Рапид (10 мин)",
+    "footer_status_operational": "Все системы работают",
+    "footer_capstone_badge": "Выпускной проект 42 Yerevan",
+    "footer_back_to_top": "Наверх",
+    "footer_school_network": "Официальная сеть 42",
+    "footer_all_rights": "Все права защищены.",
+    "footer_made_by": "Создано с душой в 42 Yerevan",
+    "footer_access_title": "Начало работы"
 }

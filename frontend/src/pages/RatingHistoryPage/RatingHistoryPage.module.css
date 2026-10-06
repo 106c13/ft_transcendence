@@ -1,15 +1,31 @@
-.pageContainer {
-	max-width: 1080px;
-	max-width: 860px;
-	margin: 0 auto;
-	padding: 32px 20px 60px;
-	padding: 92px 20px 60px;
+.ratingHistoryPage {
 	display: flex;
 	flex-direction: column;
-	gap: 24px;
-	min-height: calc(100vh - 80px);
-	gap: 20px;
+	align-items: center;
+	padding: 84px 40px 40px;
+	color: #E2E8F0;
 	min-height: 100vh;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.contentWrapper {
+	width: 100%;
+	max-width: 860px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+/* Backward compatibility */
+.pageContainer {
+	width: 100%;
+	max-width: 860px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
 }
 
 .topBar {
@@ -17,20 +33,17 @@
 	align-items: center;
 	justify-content: space-between;
 	flex-wrap: wrap;
-	gap: 16px;
 	gap: 14px;
+	width: 100%;
 }
 
 .backBtn {
 	display: inline-flex;
 	align-items: center;
-	gap: 8px;
 	gap: 6px;
 	background: rgba(148, 163, 184, 0.1);
 	border: 1px solid rgba(148, 163, 184, 0.15);
 	color: #E2E8F0;
-	padding: 8px 16px;
-	border-radius: 10px;
 	padding: 7px 14px;
 	border-radius: 8px;
 	font-size: 13px;
@@ -58,43 +71,16 @@
 	color: #94A3B8;
 }
 
-.modeSelect {
-	background: #1E293B;
-	border: 1px solid rgba(148, 163, 184, 0.25);
-	border-radius: 10px;
-	border-radius: 8px;
-	color: #F8FAFC;
-	padding: 9px 14px;
-	font-size: 14px;
-	padding: 7px 12px;
-	font-size: 13.5px;
-	font-weight: 600;
-	cursor: pointer;
-	outline: none;
-	transition: border-color 0.2s;
-}
-
-.modeSelect:focus {
-	border-color: #3B82F6;
-	box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-.modeSelect option {
-	background: #0F172A;
-	color: #F8FAFC;
-}
-
 .userHeader {
 	display: flex;
 	align-items: center;
-	gap: 16px;
 	gap: 14px;
 	background: #1E293B;
 	border: 1px solid rgba(148, 163, 184, 0.12);
-	border-radius: 16px;
-	padding: 18px 24px;
 	border-radius: 12px;
 	padding: 14px 18px;
+	width: 100%;
+	box-sizing: border-box;
 }
 
 .avatar {
@@ -106,6 +92,7 @@
 	display: block;
 	border: 2px solid rgba(148, 163, 184, 0.2);
 	background: #334155;
+	flex-shrink: 0;
 }
 
 .userInfo {
@@ -115,7 +102,6 @@
 }
 
 .userName {
-	font-size: 20px;
 	font-size: 18px;
 	font-weight: 800;
 	color: #F8FAFC;
@@ -123,7 +109,6 @@
 }
 
 .userSubtitle {
-	font-size: 13px;
 	font-size: 12px;
 	color: #94A3B8;
 }
@@ -134,13 +119,12 @@
 	align-items: center;
 	justify-content: center;
 	min-height: 400px;
-	gap: 16px;
 	gap: 14px;
 	color: #94A3B8;
+	width: 100%;
 }
 
 .spinnerIcon {
-	font-size: 40px;
 	font-size: 36px;
 	animation: bounce 1.4s infinite ease-in-out;
 }
@@ -154,3 +138,8 @@
 	}
 }
 
+@media (max-width: 768px) {
+	.ratingHistoryPage {
+		padding: 72px 16px 30px;
+	}
+}

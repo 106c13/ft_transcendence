@@ -463,5 +463,19 @@
     "showing_range": "Showing {{start}}–{{end}} of {{total}} players",
     "no_players_found": "No players found",
     "no_players_filter_desc": "Try clearing or loosening your filters to see more players.",
-    "peak_elo": "Peak Elo"
+    "peak_elo": "Peak Elo",
+    "footer_tagline": "A real-time competitive chess platform built for the 42 curriculum. Play live matches, analyze positions with Stockfish, and climb the global ladder.",
+    "footer_play_title": "Play & Compete",
+    "footer_platform_title": "Platform",
+    "footer_about_title": "About & 42",
+    "footer_bullet_1m": "Bullet (1 min)",
+    "footer_blitz_3m": "Blitz (3 min)",
+    "footer_rapid_10m": "Rapid (10 min)",
+    "footer_status_operational": "Systems Operational",
+    "footer_capstone_badge": "42 Yerevan Capstone",
+    "footer_back_to_top": "Back to top",
+    "footer_school_network": "42 Network Official",
+    "footer_all_rights": "All rights reserved.",
+    "footer_made_by": "Crafted with passion at 42 Yerevan",
+    "footer_access_title": "Get Started"
 }

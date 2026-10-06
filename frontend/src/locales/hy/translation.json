@@ -463,5 +463,19 @@
     "showing_range": "Ցուցադրված է {{start}}–{{end}} / {{total}} խաղացողներից",
     "no_players_found": "Խաղացողներ չեն գտնվել",
     "no_players_filter_desc": "Փորձեք փոխել կամ մաքրել ֆիլտրերը:",
-    "peak_elo": "Պիկային Էլո"
+    "peak_elo": "Պիկային Էլո",
+    "footer_tagline": "Իրական ժամանակում մրցակցային շախմատային հարթակ՝ ստեղծված 42 ծրագրի շրջանակներում: Խաղացեք օնլայն, վերլուծեք խաղերը Stockfish-ով և բարձրացեք վարկանիշային աղյուսակում:",
+    "footer_play_title": "Խաղալ և մրցել",
+    "footer_platform_title": "Հարթակ",
+    "footer_about_title": "Նախագծի մասին և 42",
+    "footer_bullet_1m": "Բուլետ (1 րոպե)",
+    "footer_blitz_3m": "Բլից (3 րոպե)",
+    "footer_rapid_10m": "Ռապիդ (10 րոպե)",
+    "footer_status_operational": "Բոլոր համակարգերը գործում են",
+    "footer_capstone_badge": "42 Yerevan-ի ավարտական նախագիծ",
+    "footer_back_to_top": "Դեպի վեր",
+    "footer_school_network": "42 ցանցի պաշտոնական կայք",
+    "footer_all_rights": "Բոլոր իրավունքները պաշտպանված են:",
+    "footer_made_by": "Ստեղծված է 42 Yerevan-ում",
+    "footer_access_title": "Մուտք և գրանցում"
 }

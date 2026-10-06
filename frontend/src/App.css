@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 html, body, #root {
   overflow-anchor: none !important;
 }
@@ -10,6 +14,25 @@ body {
 
 .profile-page {
   background: transparent;
+}
+
+/* Shared layout containers */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layout-body {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* optional shared layout helper */

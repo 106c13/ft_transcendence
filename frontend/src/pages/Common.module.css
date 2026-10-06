@@ -8,8 +8,9 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	min-height: 100vh;
-	padding-top: 64px;
+	flex: 1;
+	min-height: calc(100vh - 64px);
+	padding: 80px 20px 40px;
 	box-sizing: border-box;
 	background: radial-gradient(circle at top, #0F172A, #101A30);
 	color: #E2E8F0;

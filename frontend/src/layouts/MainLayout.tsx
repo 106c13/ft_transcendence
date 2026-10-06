@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Navbar from '../components/Navbar/Navbar'
+import Footer from '../components/Footer/Footer'
 import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification'
 import { useChallengeSocket } from '../hooks/useChallengeSocket'
 import type { ChallengeStatus, ChallengeReceived, ChallengeSent } from '../hooks/useChallengeSocket'
@@ -91,6 +92,10 @@ export default function MainLayout() {
     return <div className="layout-loading">{t('loading')}</div>
   }
 
+  const isChatRoute = location.pathname.startsWith('/chat')
+  const isGameRoute = location.pathname.startsWith('/game') && !location.pathname.startsWith('/game/analysis')
+  const showFooter = !isChatRoute && !isGameRoute
+
   return (
     <div className="app-layout">
       <Navbar currentUser={currentUser} />
@@ -98,6 +103,7 @@ export default function MainLayout() {
         {/* Child routes render here */}
         <Outlet context={{ currentUser, setCurrentUser, challengeSocket } satisfies LayoutContextType} />
       </main>
+      {showFooter && <Footer currentUser={currentUser} />}
     </div>
   )
 }
