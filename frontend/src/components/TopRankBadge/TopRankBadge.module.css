@@ -1,0 +1,53 @@
+.badgeWrapper {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	vertical-align: middle;
+	line-height: 1;
+	user-select: none;
+}
+
+.sizeSm {
+	width: 18px;
+	height: 18px;
+}
+
+.sizeMd {
+	width: 24px;
+	height: 24px;
+}
+
+.sizeLg {
+	width: 32px;
+	height: 32px;
+}
+
+.sizeXl {
+	width: 44px;
+	height: 44px;
+}
+
+.badgeSvg {
+	width: 100%;
+	height: 100%;
+	display: block;
+	filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+}
+
+.goldBadge .badgeSvg {
+	filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.45));
+}
+
+.silverBadge .badgeSvg {
+	filter: drop-shadow(0 2px 6px rgba(148, 163, 184, 0.45));
+}
+
+.bronzeBadge .badgeSvg {
+	filter: drop-shadow(0 2px 6px rgba(217, 119, 6, 0.45));
+}
+
+.rankNumberText {
+	font-weight: 800;
+	font-family: inherit;
+}

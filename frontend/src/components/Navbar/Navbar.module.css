@@ -30,23 +30,14 @@
 	letter-spacing: -0.5px;
 }
 
-.infoIconSvg {
-	stroke: #94A3B8;
-	display: block;
-	transition: stroke 0.2s ease, transform 0.2s ease;
-}
-
-.navActionItem:hover .infoIconSvg {
-	stroke: #F8FAFC;
-	transform: scale(1.1);
-}
-
 .activeNavAction {
-	background: rgba(96, 165, 250, 0.16) !important;
+	background: rgba(96, 165, 250, 0.18) !important;
+	border: 1px solid rgba(96, 165, 250, 0.35);
 }
 
-.activeNavAction .infoIconSvg {
-	stroke: #60A5FA !important;
+.activeNavAction .navActionIcon {
+	transform: scale(1.1);
+	filter: drop-shadow(0 2px 8px rgba(96, 165, 250, 0.4));
 }
 
 .navbarActions {

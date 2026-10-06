@@ -1,13 +1,18 @@
 import { useTranslation } from 'react-i18next'
 import ModalConfetti from '../ModalConfetti/ModalConfetti'
+import TopRankBadge from '../TopRankBadge/TopRankBadge'
 import styles from './GameOverDialog.module.css'
 
 type Props = {
 	winnerColor: 'w' | 'b' | null
 	playerColor: 'w' | 'b'
 	gameOverReason: string
+	mode?: string
 	ratingAfter?: number | null
 	ratingDelta?: number | null
+	leaderboardRating?: number | null
+	leaderboardRank?: number | null
+	leaderboardRankDelta?: number | null
 	onClose: () => void
 	onPlayAgain: () => void
 	rematchState?: 'idle' | 'sent'
@@ -22,8 +27,12 @@ function GameOverDialog({
 	winnerColor,
 	playerColor,
 	gameOverReason,
+	mode,
 	ratingAfter,
 	ratingDelta,
+	leaderboardRating: _leaderboardRating,
+	leaderboardRank,
+	leaderboardRankDelta,
 	onClose,
 	onPlayAgain,
 	rematchState = 'idle',
@@ -69,11 +78,16 @@ function GameOverDialog({
 		}
 	}
 
+	const modeLabel = mode ? mode.replace('+2', ' +2').toUpperCase() : t('format', 'FORMAT')
+
+	const isWinner = winnerColor !== null && winnerColor === playerColor && !isViewer
+	const isAbandoned = gameOverReason === 'ABANDONED'
+
 	return (
 		<div className={styles.gameOverModal}>
-			{showConfetti && <ModalConfetti onComplete={onConfettiComplete} />}
+			{showConfetti && isWinner && <ModalConfetti onComplete={onConfettiComplete} />}
 
-			<div className={styles.gameOverBox}>
+			<div className={`${styles.gameOverBox} ${isAbandoned ? styles.gameOverBoxAbandoned : ''}`}>
 				<button className={styles.closeModalX} onClick={onClose} aria-label={t('close', 'Close')}>✕</button>
 
 				<div className={`${styles.modalBody} ${isViewer ? styles.modalBodyViewer : ''}`}>
@@ -83,24 +97,58 @@ function GameOverDialog({
 						{getReasonText() && <div className={styles.gameOverReason}>{getReasonText()}</div>}
 					</div>
 
-					{/* Player Rating Section: borderless, big rating with colored delta at right aligned to top */}
-					{!isViewer && gameOverReason !== 'ABANDONED' && (ratingDelta !== null || ratingAfter !== null) && (
-						<div className={styles.ratingSection}>
-							<div className={styles.ratingDisplay}>
-								<span className={styles.bigRatingValue}>{ratingAfter ?? '—'}</span>
-								{ratingDelta !== undefined && ratingDelta !== null && (
-									<span
-										className={`${styles.ratingDeltaInline} ${
-											ratingDelta > 0
-												? styles.deltaPositive
-												: ratingDelta < 0
-												? styles.deltaNegative
-												: styles.deltaNeutral
-										}`}
-									>
-										{ratingDelta > 0 ? `↑${ratingDelta}` : ratingDelta < 0 ? `↓${Math.abs(ratingDelta)}` : '0'}
+					{/* Dual Rating Display: Format rating on Left, Leaderboard Place & Position Delta on Right */}
+					{!isViewer && !isAbandoned && (ratingDelta !== null || ratingAfter !== null || leaderboardRank !== null) && (
+						<div className={styles.ratingsComparisonSection}>
+							{/* Left: Format Elo */}
+							<div className={styles.ratingCard}>
+								<div className={styles.ratingCategoryTitle}>
+									{modeLabel} {t('rating_label', 'ELO')}
+								</div>
+								<div className={styles.ratingDisplay}>
+									<span className={styles.bigRatingValue}>{ratingAfter ?? '—'}</span>
+									{ratingDelta !== undefined && ratingDelta !== null && ratingDelta !== 0 && (
+										<span
+											className={`${styles.ratingDeltaInline} ${
+												ratingDelta > 0
+													? styles.deltaPositive
+													: styles.deltaNegative
+											}`}
+										>
+											{ratingDelta > 0 ? `↑${ratingDelta}` : `↓${Math.abs(ratingDelta)}`}
+										</span>
+									)}
+								</div>
+							</div>
+
+							<div className={styles.ratingsDivider} />
+
+							{/* Right: Leaderboard Place & Position Delta */}
+							<div className={styles.ratingCard}>
+								<div className={styles.ratingCategoryTitle}>
+									{t('leaderboard', 'LEADERBOARD')}
+								</div>
+								<div className={styles.ratingDisplay}>
+									<span className={styles.bigRatingValue}>
+										#{leaderboardRank ?? '—'}
 									</span>
-								)}
+									{leaderboardRank !== undefined && leaderboardRank !== null && leaderboardRank <= 3 && (
+										<TopRankBadge rank={leaderboardRank} size="sm" className={styles.dialogTopBadge} />
+									)}
+									{leaderboardRankDelta !== undefined && leaderboardRankDelta !== null && leaderboardRankDelta !== 0 && (
+										<span
+											className={`${styles.positionDeltaInline} ${
+												leaderboardRankDelta > 0
+													? styles.posDeltaGain
+													: styles.posDeltaLoss
+											}`}
+										>
+											{leaderboardRankDelta > 0
+												? `↑${leaderboardRankDelta}`
+												: `↓${Math.abs(leaderboardRankDelta)}`}
+										</span>
+									)}
+								</div>
 							</div>
 						</div>
 					)}

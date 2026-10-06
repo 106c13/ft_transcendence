@@ -4,6 +4,11 @@
 	user-select: none;
 }
 
+.selectOpen {
+	position: relative;
+	z-index: 100;
+}
+
 .triggerButton {
 	display: inline-flex;
 	align-items: center;

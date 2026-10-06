@@ -5,6 +5,7 @@ import { User } from '../users/user.entity';
 import { Match } from './match.entity';
 import { Chess } from 'chess.js';
 import { RatingService, getRatingCategory } from './rating.service';
+import { LeaderboardService } from './leaderboard.service';
 
 export type GameModeType = 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2';
 
@@ -83,6 +84,7 @@ export class GameService {
 		private userRepo: Repository<User>,
 
 		private ratingService: RatingService,
+		private leaderboardService: LeaderboardService,
 	) {
 		setInterval(() => this.sweepQueues(), 5000);
 	}
@@ -541,6 +543,12 @@ export class GameService {
 				blackRatingAfter: result?.ratingResult?.blackRating,
 				whiteRatingDelta: result?.ratingResult?.whiteDelta,
 				blackRatingDelta: result?.ratingResult?.blackDelta,
+				whiteLeaderboardRating: result?.leaderboardResult?.white?.leaderboardRating,
+				whiteLeaderboardRank: result?.leaderboardResult?.white?.rank,
+				whiteLeaderboardRankDelta: result?.leaderboardResult?.white?.rankDelta,
+				blackLeaderboardRating: result?.leaderboardResult?.black?.leaderboardRating,
+				blackLeaderboardRank: result?.leaderboardResult?.black?.rank,
+				blackLeaderboardRankDelta: result?.leaderboardResult?.black?.rankDelta,
 			});
 		});
 	}
@@ -596,6 +604,12 @@ export class GameService {
 				blackRatingAfter: result?.ratingResult?.blackRating,
 				whiteRatingDelta: result?.ratingResult?.whiteDelta,
 				blackRatingDelta: result?.ratingResult?.blackDelta,
+				whiteLeaderboardRating: result?.leaderboardResult?.white?.leaderboardRating,
+				whiteLeaderboardRank: result?.leaderboardResult?.white?.rank,
+				whiteLeaderboardRankDelta: result?.leaderboardResult?.white?.rankDelta,
+				blackLeaderboardRating: result?.leaderboardResult?.black?.leaderboardRating,
+				blackLeaderboardRank: result?.leaderboardResult?.black?.rank,
+				blackLeaderboardRankDelta: result?.leaderboardResult?.black?.rankDelta,
 			});
 		});
 
@@ -700,6 +714,12 @@ export class GameService {
 					blackRatingAfter: result?.ratingResult?.blackRating,
 					whiteRatingDelta: result?.ratingResult?.whiteDelta,
 					blackRatingDelta: result?.ratingResult?.blackDelta,
+					whiteLeaderboardRating: result?.leaderboardResult?.white?.leaderboardRating,
+					whiteLeaderboardRank: result?.leaderboardResult?.white?.rank,
+					whiteLeaderboardRankDelta: result?.leaderboardResult?.white?.rankDelta,
+					blackLeaderboardRating: result?.leaderboardResult?.black?.leaderboardRating,
+					blackLeaderboardRank: result?.leaderboardResult?.black?.rank,
+					blackLeaderboardRankDelta: result?.leaderboardResult?.black?.rankDelta,
 				});
 			});
 		}, graceMs);
@@ -829,6 +849,12 @@ export class GameService {
 				blackRatingAfter: result?.ratingResult?.blackRating,
 				whiteRatingDelta: result?.ratingResult?.whiteDelta,
 				blackRatingDelta: result?.ratingResult?.blackDelta,
+				whiteLeaderboardRating: result?.leaderboardResult?.white?.leaderboardRating,
+				whiteLeaderboardRank: result?.leaderboardResult?.white?.rank,
+				whiteLeaderboardRankDelta: result?.leaderboardResult?.white?.rankDelta,
+				blackLeaderboardRating: result?.leaderboardResult?.black?.leaderboardRating,
+				blackLeaderboardRank: result?.leaderboardResult?.black?.rank,
+				blackLeaderboardRankDelta: result?.leaderboardResult?.black?.rankDelta,
 			});
 		});
 	}
@@ -863,6 +889,12 @@ export class GameService {
 				blackRatingAfter: result?.ratingResult?.blackRating,
 				whiteRatingDelta: result?.ratingResult?.whiteDelta,
 				blackRatingDelta: result?.ratingResult?.blackDelta,
+				whiteLeaderboardRating: result?.leaderboardResult?.white?.leaderboardRating,
+				whiteLeaderboardRank: result?.leaderboardResult?.white?.rank,
+				whiteLeaderboardRankDelta: result?.leaderboardResult?.white?.rankDelta,
+				blackLeaderboardRating: result?.leaderboardResult?.black?.leaderboardRating,
+				blackLeaderboardRank: result?.leaderboardResult?.black?.rank,
+				blackLeaderboardRankDelta: result?.leaderboardResult?.black?.rankDelta,
 			});
 		});
 	}
@@ -908,6 +940,9 @@ export class GameService {
 			match.played_at = new Date();
 
 			const category = getRatingCategory(game.mode);
+			const whiteBefore = await this.leaderboardService.getUserLeaderboardInfo(game.white.userId);
+			const blackBefore = await this.leaderboardService.getUserLeaderboardInfo(game.black.userId);
+
 			const ratingResult = await this.ratingService.updateRatings(
 				game.white.userId,
 				game.black.userId,
@@ -915,13 +950,33 @@ export class GameService {
 				category,
 			);
 
+			this.leaderboardService.invalidateCache();
+			const whiteAfter = await this.leaderboardService.getUserLeaderboardInfo(game.white.userId);
+			const blackAfter = await this.leaderboardService.getUserLeaderboardInfo(game.black.userId);
+
+			const whiteRankDelta = (whiteBefore.rank && whiteAfter.rank) ? (whiteBefore.rank - whiteAfter.rank) : 0;
+			const blackRankDelta = (blackBefore.rank && blackAfter.rank) ? (blackBefore.rank - blackAfter.rank) : 0;
+
+			const leaderboardResult = {
+				white: {
+					leaderboardRating: whiteAfter.leaderboardRating,
+					rank: whiteAfter.rank,
+					rankDelta: whiteRankDelta,
+				},
+				black: {
+					leaderboardRating: blackAfter.leaderboardRating,
+					rank: blackAfter.rank,
+					rankDelta: blackRankDelta,
+				},
+			};
+
 			match.white_rating_after = ratingResult.whiteRating;
 			match.black_rating_after = ratingResult.blackRating;
 			match.white_rating_delta = ratingResult.whiteDelta;
 			match.black_rating_delta = ratingResult.blackDelta;
 			const savedMatch = await this.matchRepo.save(match);
 
-			return { savedMatch, ratingResult };
+			return { savedMatch, ratingResult, leaderboardResult };
 		} catch (e) {
 			console.error('Failed to save match:', e);
 			return null;

@@ -40,6 +40,7 @@ function Navbar({ currentUser }: Props) {
 	}
 
 	const isAboutActive = location.pathname === '/about'
+	const isLeaderboardActive = location.pathname === '/leaderboard'
 
 	return (
 		<header className={styles.navbar}>
@@ -57,27 +58,22 @@ function Navbar({ currentUser }: Props) {
 				{/* Notifications */}
 				{currentUser && <NotificationBell userId={currentUser.id} />}
 
+				{/* Leaderboard */}
+				<div
+					className={`${styles.navActionItem} ${isLeaderboardActive ? styles.activeNavAction : ''}`}
+					onClick={() => navigate('/leaderboard')}
+					title={t('leaderboard', 'Leaderboard')}
+				>
+					<span className={styles.navActionIcon}>🏆</span>
+				</div>
+
 				{/* About Info */}
 				<div
 					className={`${styles.navActionItem} ${isAboutActive ? styles.activeNavAction : ''}`}
 					onClick={() => navigate('/about')}
 					title={t('about', 'About')}
 				>
-					<svg
-						className={styles.infoIconSvg}
-						viewBox="0 0 24 24"
-						width="20"
-						height="20"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-					>
-						<circle cx="12" cy="12" r="10" />
-						<line x1="12" y1="16" x2="12" y2="12" />
-						<line x1="12" y1="8" x2="12.01" y2="8" />
-					</svg>
+					<span className={styles.navActionIcon}>ℹ️</span>
 				</div>
 
 				{/* Language Switcher */}

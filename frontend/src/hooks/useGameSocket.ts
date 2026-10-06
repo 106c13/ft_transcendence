@@ -131,6 +131,9 @@ export function useGameSocket() {
     const [blackRatingAfter, setBlackRatingAfter] = useState<number | null>(null)
     const [whiteRatingDelta, setWhiteRatingDelta] = useState<number | null>(null)
     const [blackRatingDelta, setBlackRatingDelta] = useState<number | null>(null)
+    const [playerLeaderboardRating, setPlayerLeaderboardRating] = useState<number | null>(null)
+    const [playerLeaderboardRank, setPlayerLeaderboardRank] = useState<number | null>(null)
+    const [playerLeaderboardRankDelta, setPlayerLeaderboardRankDelta] = useState<number | null>(null)
     const [showConfetti, setShowConfetti] = useState(false)
 
     // Timing States
@@ -243,6 +246,12 @@ export function useGameSocket() {
             blackRatingAfter?: number
             whiteRatingDelta?: number
             blackRatingDelta?: number
+            whiteLeaderboardRating?: number
+            whiteLeaderboardRank?: number
+            whiteLeaderboardRankDelta?: number
+            blackLeaderboardRating?: number
+            blackLeaderboardRank?: number
+            blackLeaderboardRankDelta?: number
         }) => {
             const isViewerMode = data.role === 'viewer'
             setIsViewer(isViewerMode)
@@ -271,6 +280,13 @@ export function useGameSocket() {
             const myAfter = data.playerRating ?? (isWhite ? wRatingAfter : bRatingAfter)
             setPlayerRatingDelta(myDelta ?? null)
             setPlayerRatingAfter(myAfter ?? null)
+
+            const myLbRating = isWhite ? data.whiteLeaderboardRating : data.blackLeaderboardRating
+            const myLbRank = isWhite ? data.whiteLeaderboardRank : data.blackLeaderboardRank
+            const myLbRankDelta = isWhite ? data.whiteLeaderboardRankDelta : data.blackLeaderboardRankDelta
+            if (myLbRating !== undefined) setPlayerLeaderboardRating(myLbRating ?? null)
+            if (myLbRank !== undefined) setPlayerLeaderboardRank(myLbRank ?? null)
+            if (myLbRankDelta !== undefined) setPlayerLeaderboardRankDelta(myLbRankDelta ?? null)
 
             localChess.load(data.fen)
             setBoardFen(data.fen)
@@ -419,6 +435,12 @@ export function useGameSocket() {
             blackRatingAfter?: number
             whiteRatingDelta?: number
             blackRatingDelta?: number
+            whiteLeaderboardRating?: number
+            whiteLeaderboardRank?: number
+            whiteLeaderboardRankDelta?: number
+            blackLeaderboardRating?: number
+            blackLeaderboardRank?: number
+            blackLeaderboardRankDelta?: number
         }) => {
             setIsGameOver(true)
             setHideGameOverModal(false)
@@ -431,16 +453,26 @@ export function useGameSocket() {
             setWhiteRatingDelta(data.whiteRatingDelta ?? null)
             setBlackRatingDelta(data.blackRatingDelta ?? null)
 
-            if (data.reason !== 'ABANDONED') {
-                setShowConfetti(true)
-            }
-
             const isWhite = playerColorRef.current === 'w'
+            const isWinner = data.winner !== null && data.winner === playerColorRef.current
+            if (data.reason !== 'ABANDONED' && isWinner && !isViewer) {
+                setShowConfetti(true)
+            } else {
+                setShowConfetti(false)
+            }
             const ratingAfter = isWhite ? data.whiteRatingAfter : data.blackRatingAfter
             const ratingDelta = isWhite ? data.whiteRatingDelta : data.blackRatingDelta
             const oppRatingAfter = isWhite ? data.blackRatingAfter : data.whiteRatingAfter
             setPlayerRatingAfter(ratingAfter ?? null)
             setPlayerRatingDelta(ratingDelta ?? null)
+
+            const lbRating = isWhite ? data.whiteLeaderboardRating : data.blackLeaderboardRating
+            const lbRank = isWhite ? data.whiteLeaderboardRank : data.blackLeaderboardRank
+            const lbRankDelta = isWhite ? data.whiteLeaderboardRankDelta : data.blackLeaderboardRankDelta
+            setPlayerLeaderboardRating(lbRating ?? null)
+            setPlayerLeaderboardRank(lbRank ?? null)
+            setPlayerLeaderboardRankDelta(lbRankDelta ?? null)
+
             if (ratingAfter !== undefined && ratingAfter !== null) {
                 setPlayerRating(ratingAfter)
             }
@@ -820,6 +852,9 @@ export function useGameSocket() {
         blackRatingAfter,
         whiteRatingDelta,
         blackRatingDelta,
+        playerLeaderboardRating,
+        playerLeaderboardRank,
+        playerLeaderboardRankDelta,
         showConfetti,
         setShowConfetti,
         isLowTime: !isViewer && gameState === 'playing' && !isGameOver && (playerColor === 'w' ? whiteTime : blackTime) <= 10000,

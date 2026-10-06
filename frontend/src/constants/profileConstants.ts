@@ -23,6 +23,8 @@ export type User = {
         blitz: RatingInfo | null
         rapid: RatingInfo | null
     }
+    leaderboardRating?: number
+    leaderboardRank?: number | null
 }
 
 export type FriendStatus =

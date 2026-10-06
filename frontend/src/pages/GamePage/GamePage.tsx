@@ -223,8 +223,12 @@ export default function GamePage() {
                         winnerColor={game.winnerColor}
                         playerColor={game.playerColor}
                         gameOverReason={game.gameOverReason}
+                        mode={game.selectedMode}
                         ratingAfter={game.playerRatingAfter}
                         ratingDelta={game.playerRatingDelta}
+                        leaderboardRating={game.playerLeaderboardRating}
+                        leaderboardRank={game.playerLeaderboardRank}
+                        leaderboardRankDelta={game.playerLeaderboardRankDelta}
                         isViewer={game.isViewer}
                         showConfetti={game.showConfetti}
                         onConfettiComplete={() => game.setShowConfetti(false)}

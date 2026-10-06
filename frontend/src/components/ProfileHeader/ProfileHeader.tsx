@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import type { User, FriendStatus, TabType } from '../../constants/profileConstants'
+import TopRankBadge from '../TopRankBadge/TopRankBadge'
 import styles from './ProfileHeader.module.css'
 
 type Props = {
@@ -85,6 +86,26 @@ function ProfileHeader({
                                     {t('offline', 'Offline')}
                                 </span>
                             )}
+                        </div>
+
+                        <div
+                            className={styles.leaderboardRow}
+                            onClick={() => navigate('/leaderboard')}
+                            title={t('view_leaderboard', 'View Leaderboard')}
+                            role="button"
+                            tabIndex={0}
+                        >
+                            <span className={styles.leaderboardRatingValue}>
+                                {user.leaderboardRating ?? 800}
+                            </span>
+                            {user.leaderboardRank !== undefined && user.leaderboardRank !== null && user.leaderboardRank <= 3 && (
+                                <TopRankBadge rank={user.leaderboardRank} size="sm" />
+                            )}
+                            {user.leaderboardRank ? (
+                                <span className={styles.leaderboardRankPill}>
+                                    #{user.leaderboardRank}
+                                </span>
+                            ) : null}
                         </div>
                     </div>
                 </div>

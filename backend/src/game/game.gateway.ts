@@ -10,6 +10,7 @@ import { Chess } from 'chess.js';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 import { getRatingCategory, RatingService } from './rating.service';
+import { LeaderboardService } from './leaderboard.service';
 import { PresenceService } from '@/presence/presence.service';
 import { ChallengeGateway } from './challenge.gateway';
 
@@ -29,6 +30,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private gameService: GameService,
 		private usersService: UsersService,
 		private ratingService: RatingService,
+		private leaderboardService: LeaderboardService,
 		private presenceService: PresenceService,
 		private challengeGateway: ChallengeGateway,
 	) {
@@ -224,6 +226,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				} catch { }
 			}
 
+			const whiteLb = await this.leaderboardService.getUserLeaderboardInfo(match.white_id);
+			const blackLb = await this.leaderboardService.getUserLeaderboardInfo(match.black_id);
+
 			const payloadData = {
 				gameId: String(match.id),
 				role: session.role,
@@ -253,6 +258,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				blackRatingAfter: match.black_rating_after,
 				whiteRatingDelta: match.white_rating_delta,
 				blackRatingDelta: match.black_rating_delta,
+				whiteLeaderboardRating: whiteLb.leaderboardRating,
+				whiteLeaderboardRank: whiteLb.rank,
+				blackLeaderboardRating: blackLb.leaderboardRating,
+				blackLeaderboardRank: blackLb.rank,
 				whitePlayer: {
 					id: match.white?.id || match.white_id,
 					username: match.white?.username || 'White',

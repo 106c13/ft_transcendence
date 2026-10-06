@@ -14,6 +14,7 @@ import MatchmakingPage from './pages/MatchmakingPage/MatchmakingPage'
 import GameAnalysisPage from './pages/GameAnalysisPage/GameAnalysisPage'
 import RatingHistoryPage from './pages/RatingHistoryPage/RatingHistoryPage'
 import AboutPage from './pages/AboutPage/AboutPage'
+import LeaderboardPage from './pages/LeaderboardPage/LeaderboardPage'
 import { ToastProvider } from './context/ToastProvider'
 import ToastContainer from './components/Toast/ToastContainer'
 
@@ -35,6 +36,7 @@ export default function App() {
         <Route element={<MainLayout />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/rating" element={<RatingHistoryPage />} />
           <Route path="/profile/settings" element={<SettingsPage />} />

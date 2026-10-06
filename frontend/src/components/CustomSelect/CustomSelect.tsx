@@ -54,7 +54,7 @@ export default function CustomSelect<T extends string = string>({
 	}, [isOpen])
 
 	return (
-		<div className={`${styles.customSelect} ${className || ''}`} ref={containerRef} id={id}>
+		<div className={`${styles.customSelect} ${isOpen ? styles.selectOpen : ''} ${className || ''}`} ref={containerRef} id={id}>
 			<button
 				type="button"
 				className={`${styles.triggerButton} ${isOpen ? styles.triggerOpen : ''}`}

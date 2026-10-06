@@ -19,6 +19,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { JwtService } from '@nestjs/jwt'
 import { UsersService } from './users.service'
 import { RatingService } from '@/game/rating.service';
+import { LeaderboardService } from '@/game/leaderboard.service';
 import { PresenceService } from '@/presence/presence.service';
 
 function isValidEmail(email: string) {
@@ -31,6 +32,7 @@ export class UsersController {
 		private readonly usersService: UsersService,
 		private readonly jwtService: JwtService,
 		private readonly ratingService: RatingService,
+		private readonly leaderboardService: LeaderboardService,
 		private readonly presenceService: PresenceService,
 	) {}
 
@@ -46,6 +48,7 @@ export class UsersController {
 		const ratings = await this.ratingService.getAllRatings(user.id);
 		const userStatus = this.presenceService.getUserStatus(user.id);
 		const status = userStatus === 'OFFLINE' ? 'ONLINE' : userStatus;
+		const lbInfo = await this.leaderboardService.getUserLeaderboardInfo(user.id);
 
 		return {
 			id: user.id,
@@ -59,6 +62,8 @@ export class UsersController {
 			created_at: user.created_at,
 			isOwnProfile: true,
 			ratings,
+			leaderboardRating: lbInfo.leaderboardRating,
+			leaderboardRank: lbInfo.rank,
 		}
 	}
 
@@ -103,6 +108,7 @@ export class UsersController {
 		const ratings = await this.ratingService.getAllRatings(user.id);
 		const userStatus = this.presenceService.getUserStatus(user.id);
 		const status = (isOwnProfile && userStatus === 'OFFLINE') ? 'ONLINE' : userStatus;
+		const lbInfo = await this.leaderboardService.getUserLeaderboardInfo(user.id);
 
 		return {
 			id: user.id,
@@ -116,6 +122,8 @@ export class UsersController {
 			created_at: user.created_at,
 			isOwnProfile,
 			ratings,
+			leaderboardRating: lbInfo.leaderboardRating,
+			leaderboardRank: lbInfo.rank,
 		}
 	}
 
