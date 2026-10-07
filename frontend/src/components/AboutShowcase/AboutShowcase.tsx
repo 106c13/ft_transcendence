@@ -1,15 +1,14 @@
-import { DEVS } from '../../utils/aboutUtils'
-import type { DevKey } from '../../utils/aboutUtils'
-import styles from './AboutShowcase.module.css'
+import { DEVS } from '../../utils/aboutUtils';
+import type { DevKey } from '../../utils/aboutUtils';
+import styles from './AboutShowcase.module.css';
 
 interface Props {
-	selectedDev: DevKey | null
-	currentSquare?: string
+	selectedDev: DevKey;
+	currentSquare?: string;
 }
 
-export default function AboutShowcase({ selectedDev, currentSquare }: Props) {
-	// Fallback to arman when closed or unselected to avoid null errors during transitions
-	const dev = selectedDev ? DEVS[selectedDev] : DEVS.arman
+const AboutShowcase = ({ selectedDev, currentSquare }: Props) => {
+	const dev = DEVS[selectedDev];
 
 	return (
 		<div className={styles.showcaseCard} data-about-showcase>
@@ -41,5 +40,7 @@ export default function AboutShowcase({ selectedDev, currentSquare }: Props) {
 
 			<p className={styles.showcaseQuote}>"{dev.tacticalMotto}"</p>
 		</div>
-	)
-}
+	);
+};
+
+export default AboutShowcase;
