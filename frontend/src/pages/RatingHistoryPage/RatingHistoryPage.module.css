@@ -127,6 +127,7 @@
 .spinnerIcon {
 	font-size: 36px;
 	animation: bounce 1.4s infinite ease-in-out;
+	color: var(--color-blue-400);
 }
 
 @keyframes bounce {

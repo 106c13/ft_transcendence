@@ -1,54 +1,54 @@
-import { useState, useRef, useEffect } from 'react'
-import styles from './CustomSelect.module.css'
+import { useState, useRef, useEffect } from 'react';
+import styles from './CustomSelect.module.css';
 
 import type { SelectOption } from '../../utils/selectUtils';
 export type { SelectOption };
 
 type Props<T extends string = string> = {
-	id?: string
-	value: T
-	options: SelectOption<T>[]
-	onChange: (value: T) => void
-	minWidth?: string | number
-	className?: string
-}
+	id?: string;
+	value: T;
+	options: SelectOption<T>[];
+	onChange: (value: T) => void;
+	minWidth?: string | number;
+	className?: string;
+};
 
-export default function CustomSelect<T extends string = string>({
+const CustomSelect = <T extends string = string>({
 	id,
 	value,
 	options,
 	onChange,
 	minWidth,
 	className,
-}: Props<T>) {
-	const [isOpen, setIsOpen] = useState(false)
-	const containerRef = useRef<HTMLDivElement>(null)
+}: Props<T>) => {
+	const [isOpen, setIsOpen] = useState(false);
+	const containerRef = useRef<HTMLDivElement>(null);
 
-	const selected = options.find((opt) => opt.value === value) || options[0]
+	const selected = options.find((opt) => opt.value === value) || options[0];
 
 	useEffect(() => {
 		const handleClickOutside = (e: MouseEvent) => {
 			if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-				setIsOpen(false)
+				setIsOpen(false);
 			}
-		}
+		};
 
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.key === 'Escape') {
-				setIsOpen(false)
+				setIsOpen(false);
 			}
-		}
+		};
 
 		if (isOpen) {
-			document.addEventListener('mousedown', handleClickOutside)
-			document.addEventListener('keydown', handleKeyDown)
+			document.addEventListener('mousedown', handleClickOutside);
+			document.addEventListener('keydown', handleKeyDown);
 		}
 
 		return () => {
-			document.removeEventListener('mousedown', handleClickOutside)
-			document.removeEventListener('keydown', handleKeyDown)
-		}
-	}, [isOpen])
+			document.removeEventListener('mousedown', handleClickOutside);
+			document.removeEventListener('keydown', handleKeyDown);
+		};
+	}, [isOpen]);
 
 	return (
 		<div className={`${styles.customSelect} ${isOpen ? styles.selectOpen : ''} ${className || ''}`} ref={containerRef} id={id}>
@@ -74,8 +74,8 @@ export default function CustomSelect<T extends string = string>({
 							key={opt.value}
 							className={`${styles.menuItem} ${opt.value === value ? styles.menuItemActive : ''}`}
 							onClick={() => {
-								onChange(opt.value)
-								setIsOpen(false)
+								onChange(opt.value);
+								setIsOpen(false);
 							}}
 							role="option"
 							aria-selected={opt.value === value}
@@ -87,6 +87,8 @@ export default function CustomSelect<T extends string = string>({
 				</div>
 			)}
 		</div>
-	)
-}
+	);
+};
+
+export default CustomSelect;
 

@@ -22,9 +22,15 @@
 }
 
 .messagesIcon {
-	font-size: 20px;
-	line-height: 1;
-	display: block;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--color-slate-400);
+	transition: color var(--transition-normal);
+}
+
+.messagesActionItem:hover .messagesIcon {
+	color: var(--color-slate-100);
 }
 
 .notificationBadge {

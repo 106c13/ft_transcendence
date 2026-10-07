@@ -1,32 +1,34 @@
-import { useState, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { RotateCw, Swords, X, Search } from 'lucide-react';
 import type { MatchRecord } from '../../utils/gameUtils';
 import GameRow from '../GameRow/GameRow';
 import CustomSelect from '../CustomSelect/CustomSelect';
+import GameModeIcon from '../GameModeIcon/GameModeIcon';
 import type { SelectOption } from '../../utils/selectUtils';
-import styles from './GamesList.module.css'
+import styles from './GamesList.module.css';
 
 type Props = {
-	matches: MatchRecord[]
-	username: string
-	isOwnProfile: boolean
-	loading: boolean
-	onSelectGame: (match: MatchRecord) => void
-	getOutcome?: (match: MatchRecord) => { label: string; className: string }
-	formatDate?: (dateStr: string) => string
-	formatReason?: (reason: string) => string
-}
+	matches: MatchRecord[];
+	username: string;
+	isOwnProfile: boolean;
+	loading: boolean;
+	onSelectGame: (match: MatchRecord) => void;
+	getOutcome?: (match: MatchRecord) => { label: string; className: string };
+	formatDate?: (dateStr: string) => string;
+	formatReason?: (reason: string) => string;
+};
 
-const GAMES_PER_PAGE = 20
+const GAMES_PER_PAGE = 20;
 
-export default function GamesList({
+const GamesList = ({
 	matches,
 	username,
 	isOwnProfile,
 	loading,
 	onSelectGame,
-}: Props) {
+}: Props) => {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
 
@@ -110,18 +112,18 @@ export default function GamesList({
 		return (
 			<div className={styles.container}>
 				<div className={styles.loadingSpinner}>
-					<span className={styles.spinnerIcon}>♟</span>
+					<RotateCw size={26} className={styles.spinnerIcon} aria-hidden="true" />
 					<p>{t('loading')}</p>
 				</div>
 			</div>
-		)
+		);
 	}
 
 	if (matches.length === 0) {
 		return (
 			<div className={styles.container}>
 				<div className={styles.emptyCard}>
-					<div className={styles.emptyIcon}>♟️</div>
+					<Swords size={36} className={styles.emptyIcon} aria-hidden="true" />
 					<h4 className={styles.emptyTitle}>{t('no_games_yet')}</h4>
 					<p className={styles.emptySubtitle}>
 						{isOwnProfile
@@ -130,33 +132,33 @@ export default function GamesList({
 					</p>
 					{isOwnProfile && (
 						<button className={styles.playNowBtn} onClick={() => navigate('/home')} type="button">
-							⚔️ {t('play_now')}
+							<Swords size={15} aria-hidden="true" /> {t('play_now')}
 						</button>
 					)}
 				</div>
 			</div>
-		)
+		);
 	}
 
 	const colorOptions: SelectOption<'all' | 'white' | 'black'>[] = [
 		{ value: 'all', label: t('all_colors') },
 		{ value: 'white', label: t('white') },
 		{ value: 'black', label: t('black') },
-	]
+	];
 
 	const resultOptions: SelectOption<'all' | 'win' | 'loss' | 'draw'>[] = [
 		{ value: 'all', label: t('all_results') },
 		{ value: 'win', label: t('wins') },
 		{ value: 'loss', label: t('losses') },
 		{ value: 'draw', label: t('draws') },
-	]
+	];
 
 	const modeOptions: SelectOption<'all' | 'bullet' | 'blitz' | 'rapid'>[] = [
 		{ value: 'all', label: t('all_modes') },
-		{ value: 'bullet', icon: '🔥', label: t('bullet_rating') },
-		{ value: 'blitz', icon: '⚡', label: t('blitz_rating') },
-		{ value: 'rapid', icon: '⏳', label: t('rapid_rating') },
-	]
+		{ value: 'bullet', icon: <GameModeIcon mode="bullet" size={14} />, label: t('bullet_rating') },
+		{ value: 'blitz', icon: <GameModeIcon mode="blitz" size={14} />, label: t('blitz_rating') },
+		{ value: 'rapid', icon: <GameModeIcon mode="rapid" size={14} />, label: t('rapid_rating') },
+	];
 
 	return (
 		<div className={styles.container}>
@@ -206,7 +208,7 @@ export default function GamesList({
 				{/* Reset Button */}
 				{hasActiveFilters && (
 					<button className={styles.resetBtn} onClick={handleResetFilters}>
-						✕ {t('clear')}
+						<X size={14} aria-hidden="true" /> {t('clear')}
 					</button>
 				)}
 			</div>
@@ -214,13 +216,13 @@ export default function GamesList({
 			{/* Games List Content */}
 			{totalGames === 0 ? (
 				<div className={styles.emptyCard}>
-					<div className={styles.emptyIcon}>🔍</div>
+					<Search size={36} className={styles.emptyIcon} aria-hidden="true" />
 					<h4 className={styles.emptyTitle}>{t('no_games_matching_filter')}</h4>
 					<p className={styles.emptySubtitle}>
 						{t('try_adjusting_filters')}
 					</p>
 					<button className={styles.resetBtn} onClick={handleResetFilters} type="button">
-						✕ {t('clear')}
+						<X size={14} aria-hidden="true" /> {t('clear')}
 					</button>
 				</div>
 			) : (
@@ -310,5 +312,7 @@ export default function GamesList({
 				</div>
 			)}
 		</div>
-	)
-}
+	);
+};
+
+export default GamesList;

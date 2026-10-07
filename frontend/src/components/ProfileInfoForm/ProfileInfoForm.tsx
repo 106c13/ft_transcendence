@@ -1,15 +1,16 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-import type { User } from '../../utils/profileUtils'
-import { useToast } from '../../context/ToastContext'
-import styles from './ProfileInfoForm.module.css'
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { User as UserIcon, Camera, X } from 'lucide-react';
+import type { User } from '../../utils/profileUtils';
+import { useToast } from '../../context/ToastContext';
+import styles from './ProfileInfoForm.module.css';
 
 type Props = {
-	initialUser?: User | null
-	onUserUpdated?: (user: User) => void
-}
+	initialUser?: User | null;
+	onUserUpdated?: (user: User) => void;
+};
 
-function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
+const ProfileInfoForm = ({ initialUser, onUserUpdated }: Props) => {
 	const { t } = useTranslation()
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -141,8 +142,8 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 		<div className={styles.card}>
 			<div className={styles.cardHeader}>
 				<h2 className={styles.cardTitle}>
-					<span>👤</span>
-					{t('profile_info_title')}
+					<UserIcon size={18} aria-hidden="true" />
+					<span>{t('profile_info_title')}</span>
 				</h2>
 				<p className={styles.cardDesc}>
 					{t('profile_info_desc')}
@@ -166,7 +167,8 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 							className={styles.uploadBtn}
 							onClick={() => fileInputRef.current?.click()}
 						>
-							📷 {t('change_avatar')}
+							<Camera size={15} aria-hidden="true" />
+							<span>{t('change_avatar')}</span>
 						</button>
 
 						{avatarFile && (
@@ -175,7 +177,8 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 								className={styles.cancelBtn}
 								onClick={handleCancelAvatar}
 							>
-								✕ {t('cancel_photo')}
+								<X size={15} aria-hidden="true" />
+								<span>{t('cancel_photo')}</span>
 							</button>
 						)}
 					</div>
@@ -263,7 +266,7 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 				</div>
 			</form>
 		</div>
-	)
-}
+	);
+};
 
-export default ProfileInfoForm
+export default ProfileInfoForm;

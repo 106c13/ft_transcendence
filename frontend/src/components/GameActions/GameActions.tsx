@@ -1,22 +1,23 @@
-import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import type { DrawOfferState } from '../../hooks/useGameSocket'
-import styles from './GameActions.module.css'
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Eye, Search, Home, Check, X, Clock, Ban, Flag } from 'lucide-react';
+import type { DrawOfferState } from '../../hooks/useGameSocket';
+import styles from './GameActions.module.css';
 
 type Props = {
-	isGameOver: boolean
-	isViewer?: boolean
-	onResign: () => void
-	drawOfferState: DrawOfferState
-	onOfferDraw: () => void
-	onAcceptDraw?: () => void
-	onDeclineDraw?: () => void
-	onAnalyze?: () => void
-	movesCount?: number
-}
+	isGameOver: boolean;
+	isViewer?: boolean;
+	onResign: () => void;
+	drawOfferState: DrawOfferState;
+	onOfferDraw: () => void;
+	onAcceptDraw?: () => void;
+	onDeclineDraw?: () => void;
+	onAnalyze?: () => void;
+	movesCount?: number;
+};
 
-function GameActions({
+const GameActions = ({
 	isGameOver,
 	isViewer,
 	onResign,
@@ -26,9 +27,9 @@ function GameActions({
 	onDeclineDraw,
 	onAnalyze,
 	movesCount,
-}: Props) {
-	const { t } = useTranslation()
-	const navigate = useNavigate()
+}: Props) => {
+	const { t } = useTranslation();
+	const navigate = useNavigate();
 	const [showResignModal, setShowResignModal] = useState(false)
 	const resignContainerRef = useRef<HTMLDivElement>(null)
 	const isAbandon = (movesCount ?? 0) < 2
@@ -67,7 +68,8 @@ function GameActions({
 			<div className={styles.gameActions}>
 				{!isGameOver && (
 					<div className={styles.viewerBadge}>
-						👁️ {t('viewer_mode_desc')}
+						<Eye size={16} aria-hidden="true" />
+						<span>{t('viewer_mode_desc')}</span>
 					</div>
 				)}
 				{isGameOver && (
@@ -78,7 +80,8 @@ function GameActions({
 								className={styles.analyzeBtn}
 								onClick={onAnalyze}
 							>
-								🔍 {t('analyze_game')}
+								<Search size={15} aria-hidden="true" />
+								<span>{t('analyze_game')}</span>
 							</button>
 						)}
 						<button
@@ -86,12 +89,13 @@ function GameActions({
 							className={styles.lobbyBtn}
 							onClick={() => navigate('/home')}
 						>
-							🏠 {t('back_to_lobby')}
+							<Home size={15} aria-hidden="true" />
+							<span>{t('back_to_lobby')}</span>
 						</button>
 					</>
 				)}
 			</div>
-		)
+		);
 	}
 
 	if (isGameOver) {
@@ -102,17 +106,19 @@ function GameActions({
 					className={styles.analyzeBtn}
 					onClick={onAnalyze}
 				>
-					🔍 {t('analyze_game')}
+					<Search size={15} aria-hidden="true" />
+					<span>{t('analyze_game')}</span>
 				</button>
 				<button
 					type="button"
 					className={styles.lobbyBtn}
 					onClick={() => navigate('/home')}
 				>
-					🏠 {t('back_to_lobby')}
+					<Home size={15} aria-hidden="true" />
+					<span>{t('back_to_lobby')}</span>
 				</button>
 			</div>
-		)
+		);
 	}
 
 	return (
@@ -121,19 +127,23 @@ function GameActions({
 				{drawOfferState === 'received' ? (
 					<>
 						<button type="button" className={styles.acceptBtn} onClick={onAcceptDraw}>
-							✓ {t('accept_draw')}
+							<Check size={14} aria-hidden="true" />
+							<span>{t('accept_draw')}</span>
 						</button>
 						<button type="button" className={styles.declineBtn} onClick={onDeclineDraw}>
-							✕ {t('decline_draw')}
+							<X size={14} aria-hidden="true" />
+							<span>{t('decline_draw')}</span>
 						</button>
 					</>
 				) : drawOfferState === 'sent' ? (
 					<button type="button" className={`${styles.drawBtn} ${styles.drawBtnDisabled}`} disabled>
-						⏳ {t('draw_offered')}
+						<Clock size={14} aria-hidden="true" />
+						<span>{t('draw_offered')}</span>
 					</button>
 				) : (
 					<button type="button" className={styles.drawBtn} onClick={onOfferDraw}>
-						½ {t('offer_draw')}
+						<span>½</span>
+						<span>{t('offer_draw')}</span>
 					</button>
 				)}
 				<div className={styles.resignContainer} ref={resignContainerRef}>
@@ -143,7 +153,17 @@ function GameActions({
 						onClick={() => setShowResignModal((prev) => !prev)}
 						aria-expanded={showResignModal}
 					>
-						{isAbandon ? `🚫 ${t('abandon')}` : `🏳️ ${t('resign')}`}
+						{isAbandon ? (
+							<>
+								<Ban size={14} aria-hidden="true" />
+								<span>{t('abandon')}</span>
+							</>
+						) : (
+							<>
+								<Flag size={14} aria-hidden="true" />
+								<span>{t('resign')}</span>
+							</>
+						)}
 					</button>
 
 					{showResignModal && (
@@ -167,11 +187,21 @@ function GameActions({
 									type="button"
 									className={`${styles.modalResignBtn} ${isAbandon ? styles.modalAbandonBtn : ''}`}
 									onClick={() => {
-										setShowResignModal(false)
-										onResign()
+										setShowResignModal(false);
+										onResign();
 									}}
 								>
-									{isAbandon ? `🚫 ${t('abandon')}` : `🏳️ ${t('resign')}`}
+									{isAbandon ? (
+										<>
+											<Ban size={14} aria-hidden="true" />
+											<span>{t('abandon')}</span>
+										</>
+									) : (
+										<>
+											<Flag size={14} aria-hidden="true" />
+											<span>{t('resign')}</span>
+										</>
+									)}
 								</button>
 							</div>
 							{/* Pointer pointing right at the center of the original button */}
@@ -181,7 +211,7 @@ function GameActions({
 				</div>
 			</div>
 		</div>
-	)
-}
+	);
+};
 
-export default GameActions
+export default GameActions;

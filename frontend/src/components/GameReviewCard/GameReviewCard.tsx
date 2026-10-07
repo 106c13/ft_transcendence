@@ -1,20 +1,21 @@
-import { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { Chess, type Square } from 'chess.js'
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { RotateCw, Swords, Search } from 'lucide-react';
+import { Chess, type Square } from 'chess.js';
 import type { MatchRecord } from '../../utils/gameUtils';
-import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils'
-import styles from './GameReviewCard.module.css'
+import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils';
+import styles from './GameReviewCard.module.css';
 
 type Props = {
-	games: MatchRecord[]
-	currentUsername?: string
-	loading?: boolean
-}
+	games: MatchRecord[];
+	currentUsername?: string;
+	loading?: boolean;
+};
 
-export default function GameReviewCard({ games, currentUsername, loading }: Props) {
-	const { t } = useTranslation()
-	const navigate = useNavigate()
+const GameReviewCard = ({ games, currentUsername, loading }: Props) => {
+	const { t } = useTranslation();
+	const navigate = useNavigate();
 
 	// Initial random seed generated on mount
 	const [randomSeed] = useState(() => Math.random())
@@ -76,25 +77,25 @@ export default function GameReviewCard({ games, currentUsername, loading }: Prop
 		return (
 			<div className={styles.reviewContainer}>
 				<div className={styles.loadingCard}>
-					<span className={styles.spinnerIcon}>♟</span>
+					<RotateCw size={26} className={styles.spinnerIcon} aria-hidden="true" />
 					<p>{t('loading')}</p>
 				</div>
 			</div>
-		)
+		);
 	}
 
 	if (!selectedGame || !boardData) {
 		return (
 			<div className={styles.reviewContainer}>
 				<div className={styles.emptyCard}>
-					<div className={styles.emptyIcon}>♟️</div>
+					<Swords size={36} className={styles.emptyIcon} aria-hidden="true" />
 					<h4 className={styles.emptyTitle}>{t('no_games_to_review')}</h4>
 					<p className={styles.emptySubtitle}>
 						{t('play_to_unlock_review')}
 					</p>
 				</div>
 			</div>
-		)
+		);
 	}
 
 	const isWhite = selectedGame.white?.username === currentUsername
@@ -246,7 +247,9 @@ export default function GameReviewCard({ games, currentUsername, loading }: Prop
 					opponent: opponentName,
 				})}
 			>
-				<span className={styles.reviewBtnIcon}>🔍</span>
+				<span className={styles.reviewBtnIcon}>
+					<Search size={15} aria-hidden="true" />
+				</span>
 				<span className={styles.reviewBtnText}>
 					{t('review_against_opponent', {
 						opponent: opponentName,
@@ -254,5 +257,7 @@ export default function GameReviewCard({ games, currentUsername, loading }: Prop
 				</span>
 			</button>
 		</div>
-	)
-}
+	);
+};
+
+export default GameReviewCard;

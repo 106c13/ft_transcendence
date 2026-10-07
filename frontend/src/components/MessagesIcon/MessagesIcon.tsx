@@ -1,13 +1,14 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import styles from './MessagesIcon.module.css'
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { MessageSquare } from 'lucide-react';
+import styles from './MessagesIcon.module.css';
 
 type Props = {
-	userId?: number
-}
+	userId?: number;
+};
 
-function MessagesIcon({ userId }: Props) {
+const MessagesIcon = ({ userId }: Props) => {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
 	const [unreadCount, setUnreadCount] = useState(0)
@@ -67,14 +68,16 @@ function MessagesIcon({ userId }: Props) {
 				}
 			}}
 		>
-			<span className={styles.messagesIcon}>✉️</span>
+			<span className={styles.messagesIcon}>
+				<MessageSquare size={18} aria-hidden="true" />
+			</span>
 			{unreadCount > 0 && (
 				<span className={styles.notificationBadge}>
 					{unreadCount > 99 ? '99+' : unreadCount}
 				</span>
 			)}
 		</div>
-	)
-}
+	);
+};
 
-export default MessagesIcon
+export default MessagesIcon;

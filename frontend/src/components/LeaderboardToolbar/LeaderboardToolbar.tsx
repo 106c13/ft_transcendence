@@ -1,8 +1,11 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Search, X, SlidersHorizontal, ArrowDown, ArrowUp, Circle } from 'lucide-react';
 import CustomSelect from '../CustomSelect/CustomSelect';
+import GameModeIcon from '../GameModeIcon/GameModeIcon';
 import type { SelectOption } from '../../utils/selectUtils';
 import styles from '../../pages/LeaderboardPage/LeaderboardPage.module.css';
+
 
 interface LeaderboardToolbarProps {
 	search: string;
@@ -59,8 +62,16 @@ const LeaderboardToolbar = ({
 	const statusOptions: SelectOption<'all' | 'online' | 'ingame'>[] = useMemo(
 		() => [
 			{ value: 'all', label: t('all_players') },
-			{ value: 'online', label: `🟢 ${t('online_only')}` },
-			{ value: 'ingame', label: `🟣 ${t('in_game_only')}` },
+			{
+				value: 'online',
+				label: t('online_only'),
+				icon: <Circle size={8} fill="#22c55e" stroke="none" aria-hidden="true" />,
+			},
+			{
+				value: 'ingame',
+				label: t('in_game_only'),
+				icon: <Circle size={8} fill="#a855f7" stroke="none" aria-hidden="true" />,
+			},
 		],
 		[t]
 	);
@@ -81,8 +92,16 @@ const LeaderboardToolbar = ({
 
 	const orderOptions: SelectOption<'asc' | 'desc'>[] = useMemo(
 		() => [
-			{ value: 'desc', label: `⬇️ ${t('highest_first')}` },
-			{ value: 'asc', label: `⬆️ ${t('lowest_first')}` },
+			{
+				value: 'desc',
+				label: t('highest_first'),
+				icon: <ArrowDown size={14} aria-hidden="true" />,
+			},
+			{
+				value: 'asc',
+				label: t('lowest_first'),
+				icon: <ArrowUp size={14} aria-hidden="true" />,
+			},
 		],
 		[t]
 	);
@@ -92,7 +111,7 @@ const LeaderboardToolbar = ({
 			<div className={styles.primaryControlsRow}>
 				{/* Search Bar */}
 				<div className={styles.searchBox}>
-					<span className={styles.searchIcon}>🔍</span>
+					<Search size={16} className={styles.searchIcon} aria-hidden="true" />
 					<input
 						type="text"
 						placeholder={t('search_player_placeholder')}
@@ -107,7 +126,7 @@ const LeaderboardToolbar = ({
 							type="button"
 							aria-label="Clear search"
 						>
-							✕
+							<X size={14} aria-hidden="true" />
 						</button>
 					)}
 				</div>
@@ -132,7 +151,8 @@ const LeaderboardToolbar = ({
 						}}
 						type="button"
 					>
-						⚡ {t('bullet')}
+						<GameModeIcon mode="bullet" size={14} />
+						<span>{t('bullet')}</span>
 					</button>
 					<button
 						className={`${styles.modeBtn} ${mode === 'blitz' ? styles.modeBtnActive : ''}`}
@@ -142,7 +162,8 @@ const LeaderboardToolbar = ({
 						}}
 						type="button"
 					>
-						🔥 {t('blitz')}
+						<GameModeIcon mode="blitz" size={14} />
+						<span>{t('blitz')}</span>
 					</button>
 					<button
 						className={`${styles.modeBtn} ${mode === 'rapid' ? styles.modeBtnActive : ''}`}
@@ -152,7 +173,8 @@ const LeaderboardToolbar = ({
 						}}
 						type="button"
 					>
-						⏳ {t('rapid')}
+						<GameModeIcon mode="rapid" size={14} />
+						<span>{t('rapid')}</span>
 					</button>
 				</div>
 
@@ -165,7 +187,8 @@ const LeaderboardToolbar = ({
 					}}
 					type="button"
 				>
-					<span>⚙️ {t('filters')}</span>
+					<SlidersHorizontal size={14} aria-hidden="true" />
+					<span>{t('filters')}</span>
 					{activeFilterCount > 0 && (
 						<span className={styles.filterBadgeCount}>{activeFilterCount}</span>
 					)}
@@ -249,8 +272,9 @@ const LeaderboardToolbar = ({
 										onSearchChange('');
 									}}
 									type="button"
+									aria-label="Remove search filter"
 								>
-									✕
+									<X size={12} aria-hidden="true" />
 								</button>
 							</span>
 						)}
@@ -264,8 +288,9 @@ const LeaderboardToolbar = ({
 										onModeChange('all');
 									}}
 									type="button"
+									aria-label="Remove mode filter"
 								>
-									✕
+									<X size={12} aria-hidden="true" />
 								</button>
 							</span>
 						)}
@@ -279,8 +304,9 @@ const LeaderboardToolbar = ({
 										onMinWinRateChange(0);
 									}}
 									type="button"
+									aria-label="Remove win rate filter"
 								>
-									✕
+									<X size={12} aria-hidden="true" />
 								</button>
 							</span>
 						)}
@@ -294,8 +320,9 @@ const LeaderboardToolbar = ({
 										onStatusChange('all');
 									}}
 									type="button"
+									aria-label="Remove status filter"
 								>
-									✕
+									<X size={12} aria-hidden="true" />
 								</button>
 							</span>
 						)}
@@ -310,8 +337,9 @@ const LeaderboardToolbar = ({
 										onOrderChange('desc');
 									}}
 									type="button"
+									aria-label="Remove sort filter"
 								>
-									✕
+									<X size={12} aria-hidden="true" />
 								</button>
 							</span>
 						)}

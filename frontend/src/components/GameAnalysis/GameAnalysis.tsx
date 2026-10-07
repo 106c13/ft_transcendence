@@ -1,11 +1,33 @@
-import type { ReactNode } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import type { Square } from 'chess.js'
-import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils'
-import type { useGameAnalysis } from '../../hooks/useGameAnalysis'
-import type { useGameHistory } from '../../hooks/useGameHistory'
-import styles from './GameAnalysis.module.css'
+import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import {
+	RotateCw,
+	RotateCcw,
+	Download,
+	Gem,
+	Star,
+	Sparkles,
+	CheckCheck,
+	Check,
+	AlertCircle,
+	AlertTriangle,
+	XCircle,
+	Circle,
+	Lightbulb,
+	SkipBack,
+	ChevronLeft,
+	ChevronRight,
+	SkipForward,
+	ArrowLeft,
+	Eye,
+	EyeOff,
+} from 'lucide-react';
+import type { Square } from 'chess.js';
+import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils';
+import type { useGameAnalysis } from '../../hooks/useGameAnalysis';
+import type { useGameHistory } from '../../hooks/useGameHistory';
+import styles from './GameAnalysis.module.css';
 
 // ── Shared types from utils ──
 import type { MatchRecord, MoveAnalysis, GameAnalysisResult } from '../../utils/gameUtils';
@@ -22,18 +44,41 @@ const BADGE_STYLES: Record<string, string> = {
 	mistake: styles.badgeMistake,
 	blunder: styles.badgeBlunder,
 	default: styles.badgeDefault,
-}
+};
+
+const renderClassificationIcon = (classification: string, size = 12) => {
+	switch (classification) {
+		case 'brilliant':
+			return <Gem size={size} aria-hidden="true" />;
+		case 'great':
+			return <Sparkles size={size} aria-hidden="true" />;
+		case 'best':
+			return <Star size={size} aria-hidden="true" />;
+		case 'excellent':
+			return <CheckCheck size={size} aria-hidden="true" />;
+		case 'good':
+			return <Check size={size} aria-hidden="true" />;
+		case 'inaccuracy':
+			return <AlertCircle size={size} aria-hidden="true" />;
+		case 'mistake':
+			return <AlertTriangle size={size} aria-hidden="true" />;
+		case 'blunder':
+			return <XCircle size={size} aria-hidden="true" />;
+		default:
+			return <Circle size={Math.max(6, size - 2)} aria-hidden="true" />;
+	}
+};
 
 type Props = {
-	username: string
-	analysis: ReturnType<typeof useGameAnalysis>
-	history: ReturnType<typeof useGameHistory>
-	onBack?: () => void
-}
+	username: string;
+	analysis: ReturnType<typeof useGameAnalysis>;
+	history: ReturnType<typeof useGameHistory>;
+	onBack?: () => void;
+};
 
-function GameAnalysis({ username, analysis, history, onBack }: Props) {
-	const { t } = useTranslation()
-	const navigate = useNavigate()
+const GameAnalysis = ({ username, analysis, history, onBack }: Props) => {
+	const { t } = useTranslation();
+	const navigate = useNavigate();
 
 	const {
 		selectedGame,
@@ -49,8 +94,7 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 		closeAnalysis,
 		goToPly,
 		toggleBestMove,
-		getClassificationBadge,
-	} = analysis
+	} = analysis;
 
 	const { formatDate, formatReason, handleDownloadPgn } = history
 
@@ -233,10 +277,11 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 			<div className={styles.headerCard}>
 				<div className={styles.headerTop}>
 					<button className={styles.backBtn} onClick={onBack || closeAnalysis}>
-						← {t('back_to_games')}
+						<ArrowLeft size={14} aria-hidden="true" />
+						<span>{t('back_to_games')}</span>
 					</button>
 					<span className={`${styles.modeBadge} ${styles[`mode${selectedGame.mode.replace('+', 'Plus')}`] || ''}`}>
-						{t(selectedGame.mode.toLowerCase(), selectedGame.mode)}
+						{t(selectedGame.mode.toLowerCase())}
 					</span>
 				</div>
 
@@ -276,7 +321,7 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 					<div className={styles.animContainer}>
 						<div className={styles.pulseRingOuter}></div>
 						<div className={styles.pulseRing}></div>
-						<div className={styles.animIcon}>♟️</div>
+						<RotateCw size={36} className={styles.animIcon} aria-hidden="true" />
 					</div>
 
 					<h3 className={styles.analysisTitle}>{t('analyzing_game')}</h3>
@@ -295,7 +340,8 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 								className={styles.downloadPgnBtn}
 								onClick={() => handleDownloadPgn(selectedGame)}
 							>
-								📥 {t('download_pgn')}
+								<Download size={14} aria-hidden="true" />
+								<span>{t('download_pgn')}</span>
 							</button>
 						</div>
 					)}
@@ -317,10 +363,24 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 								<div className={`${styles.accuracyBarFill} ${styles.white}`} style={{ width: `${analysisData.accuracy.white}%` }}></div>
 							</div>
 							<div className={styles.accuracyChips}>
-								{analysisData.summary.white.brilliant > 0 && <span className={`${styles.chip} ${styles.chipBrilliant}`}>💎 {analysisData.summary.white.brilliant}</span>}
-								<span className={`${styles.chip} ${styles.chipBest}`}>⭐ {analysisData.summary.white.best}</span>
-								<span className={`${styles.chip} ${styles.chipMistake}`}>🟠 {analysisData.summary.white.mistake}</span>
-								<span className={`${styles.chip} ${styles.chipBlunder}`}>🔴 {analysisData.summary.white.blunder}</span>
+								{analysisData.summary.white.brilliant > 0 && (
+									<span className={`${styles.chip} ${styles.chipBrilliant}`}>
+										<Gem size={12} aria-hidden="true" />
+										<span>{analysisData.summary.white.brilliant}</span>
+									</span>
+								)}
+								<span className={`${styles.chip} ${styles.chipBest}`}>
+									<Star size={12} aria-hidden="true" />
+									<span>{analysisData.summary.white.best}</span>
+								</span>
+								<span className={`${styles.chip} ${styles.chipMistake}`}>
+									<AlertTriangle size={12} aria-hidden="true" />
+									<span>{analysisData.summary.white.mistake}</span>
+								</span>
+								<span className={`${styles.chip} ${styles.chipBlunder}`}>
+									<XCircle size={12} aria-hidden="true" />
+									<span>{analysisData.summary.white.blunder}</span>
+								</span>
 							</div>
 						</div>
 
@@ -334,10 +394,24 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 								<div className={`${styles.accuracyBarFill} ${styles.black}`} style={{ width: `${analysisData.accuracy.black}%` }}></div>
 							</div>
 							<div className={styles.accuracyChips}>
-								{analysisData.summary.black.brilliant > 0 && <span className={`${styles.chip} ${styles.chipBrilliant}`}>💎 {analysisData.summary.black.brilliant}</span>}
-								<span className={`${styles.chip} ${styles.chipBest}`}>⭐ {analysisData.summary.black.best}</span>
-								<span className={`${styles.chip} ${styles.chipMistake}`}>🟠 {analysisData.summary.black.mistake}</span>
-								<span className={`${styles.chip} ${styles.chipBlunder}`}>🔴 {analysisData.summary.black.blunder}</span>
+								{analysisData.summary.black.brilliant > 0 && (
+									<span className={`${styles.chip} ${styles.chipBrilliant}`}>
+										<Gem size={12} aria-hidden="true" />
+										<span>{analysisData.summary.black.brilliant}</span>
+									</span>
+								)}
+								<span className={`${styles.chip} ${styles.chipBest}`}>
+									<Star size={12} aria-hidden="true" />
+									<span>{analysisData.summary.black.best}</span>
+								</span>
+								<span className={`${styles.chip} ${styles.chipMistake}`}>
+									<AlertTriangle size={12} aria-hidden="true" />
+									<span>{analysisData.summary.black.mistake}</span>
+								</span>
+								<span className={`${styles.chip} ${styles.chipBlunder}`}>
+									<XCircle size={12} aria-hidden="true" />
+									<span>{analysisData.summary.black.blunder}</span>
+								</span>
 							</div>
 						</div>
 					</div>
@@ -432,7 +506,7 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 												{/* Classification marker on played move destination */}
 												{isPlayedDst && currentPosition && (
 													<div className={`${styles.evalMarker} ${BADGE_STYLES[currentPosition.classification] || BADGE_STYLES.default}`}>
-														{getClassificationBadge(currentPosition.classification).icon}
+														{renderClassificationIcon(currentPosition.classification, 11)}
 													</div>
 												)}
 											</div>
@@ -469,7 +543,8 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 												{currentPosition.moveNumber}. {currentPosition.color === 'w' ? '' : '... '}{currentPosition.san}
 											</span>
 											<span className={`${styles.classificationBadge} ${BADGE_STYLES[currentPosition.classification] || BADGE_STYLES.default}`}>
-												{getClassificationBadge(currentPosition.classification).icon} {t(currentPosition.classification, getClassificationBadge(currentPosition.classification).label)}
+												{renderClassificationIcon(currentPosition.classification, 13)}
+												<span>{t(currentPosition.classification)}</span>
 											</span>
 										</div>
 
@@ -483,7 +558,10 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 										{isSuboptimalMove && currentPosition.bestMove && (
 											<div className={styles.bestMoveBox}>
 												<div className={styles.recHeader}>
-													<span className={styles.recLabel}>💡 {t('best_move')}:</span>
+													<span className={styles.recLabel}>
+														<Lightbulb size={14} aria-hidden="true" />
+														<span>{t('best_move')}:</span>
+													</span>
 													<strong className={styles.recMoveSan}>{currentPosition.bestMove.san}</strong>
 												</div>
 												{currentPosition.continuation.length > 0 && (
@@ -495,10 +573,21 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 													</div>
 												)}
 												<button
+													type="button"
 													className={styles.toggleBestHintBtn}
 													onClick={toggleBestMove}
 												>
-													{showBestMoveHint ? t('hide_best_move') : t('show_best_move')}
+													{showBestMoveHint ? (
+														<>
+															<EyeOff size={13} aria-hidden="true" />
+															<span>{t('hide_best_move')}</span>
+														</>
+													) : (
+														<>
+															<Eye size={13} aria-hidden="true" />
+															<span>{t('show_best_move')}</span>
+														</>
+													)}
 												</button>
 											</div>
 										)}
@@ -525,7 +614,10 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 									</>
 								) : (
 									<div className={styles.startPlaceholder}>
-										<span>♟️ {t('starting_position')}</span>
+										<span>
+											<RotateCcw size={15} aria-hidden="true" />
+											<span>{t('starting_position')}</span>
+										</span>
 										<p>{t('nav_moves_instruction')}</p>
 									</div>
 								)}
@@ -533,20 +625,28 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 
 							{/* Move Navigation Buttons */}
 							<div className={styles.navBar}>
-								<button title={t('start_nav')} onClick={() => goToPly(-1)}>⇤</button>
-								<button title={t('prev_nav')} onClick={() => goToPly(Math.max(-1, currentPly - 1))}>◀</button>
-								<button title={t('next_nav')} onClick={() => goToPly(Math.min(analysisData.positions.length - 1, currentPly + 1))}>▶</button>
-								<button title={t('end_nav')} onClick={() => goToPly(analysisData.positions.length - 1)}>⇥</button>
+								<button title={t('start_nav')} onClick={() => goToPly(-1)}>
+									<SkipBack size={15} aria-hidden="true" />
+								</button>
+								<button title={t('prev_nav')} onClick={() => goToPly(Math.max(-1, currentPly - 1))}>
+									<ChevronLeft size={15} aria-hidden="true" />
+								</button>
+								<button title={t('next_nav')} onClick={() => goToPly(Math.min(analysisData.positions.length - 1, currentPly + 1))}>
+									<ChevronRight size={15} aria-hidden="true" />
+								</button>
+								<button title={t('end_nav')} onClick={() => goToPly(analysisData.positions.length - 1)}>
+									<SkipForward size={15} aria-hidden="true" />
+								</button>
 							</div>
 
 							{/* Move History Table */}
 							<div className={styles.movesTable} ref={moveListRef}>
 								{Array.from({ length: Math.ceil(analysisData.positions.length / 2) }).map((_, moveRowIdx) => {
-									const whitePly = moveRowIdx * 2
-									const blackPly = moveRowIdx * 2 + 1
-									const whitePos = analysisData.positions[whitePly]
-									const blackPos = analysisData.positions[blackPly]
-									const moveNumber = moveRowIdx + 1
+									const whitePly = moveRowIdx * 2;
+									const blackPly = moveRowIdx * 2 + 1;
+									const whitePos = analysisData.positions[whitePly];
+									const blackPos = analysisData.positions[blackPly];
+									const moveNumber = moveRowIdx + 1;
 
 									return (
 										<div key={moveNumber} className={styles.moveRow}>
@@ -560,7 +660,7 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 												>
 													<span className={styles.moveSan}>{whitePos.san}</span>
 													<span className={`${styles.cellBadge} ${BADGE_STYLES[whitePos.classification] || BADGE_STYLES.default}`}>
-														{getClassificationBadge(whitePos.classification).icon}
+														{renderClassificationIcon(whitePos.classification, 10)}
 													</span>
 												</div>
 											)}
@@ -573,14 +673,14 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 												>
 													<span className={styles.moveSan}>{blackPos.san}</span>
 													<span className={`${styles.cellBadge} ${BADGE_STYLES[blackPos.classification] || BADGE_STYLES.default}`}>
-														{getClassificationBadge(blackPos.classification).icon}
+														{renderClassificationIcon(blackPos.classification, 10)}
 													</span>
 												</div>
 											) : (
 												<div className={`${styles.moveCell} ${styles.empty}`}></div>
 											)}
 										</div>
-									)
+									);
 								})}
 							</div>
 
@@ -589,14 +689,15 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 								className={styles.downloadPgnSmall}
 								onClick={() => handleDownloadPgn(selectedGame)}
 							>
-								📥 {t('download_pgn')}
+								<Download size={14} aria-hidden="true" />
+								<span>{t('download_pgn')}</span>
 							</button>
 						</div>
 					</div>
 				</div>
 			)}
 		</div>
-	)
-}
+	);
+};
 
-export default GameAnalysis
+export default GameAnalysis;

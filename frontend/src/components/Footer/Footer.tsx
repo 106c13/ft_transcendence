@@ -1,22 +1,37 @@
-import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { DEVS } from '../../utils/aboutUtils'
-import type { User } from '../../utils/profileUtils'
-import styles from './Footer.module.css'
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import {
+	Swords,
+	Trophy,
+	MessageSquare,
+	User,
+	TrendingUp,
+	Settings,
+	LogIn,
+	Sparkles,
+	GraduationCap,
+	ExternalLink,
+	ArrowUp,
+	Info,
+} from 'lucide-react';
+import GameModeIcon from '../GameModeIcon/GameModeIcon';
+import { DEVS } from '../../utils/aboutUtils';
+import type { User as UserType } from '../../utils/profileUtils';
+import styles from './Footer.module.css';
 
 interface FooterProps {
-	currentUser?: User | null
+	currentUser?: UserType | null;
 }
 
-export default function Footer({ currentUser }: FooterProps) {
-	const { t, i18n } = useTranslation()
+const Footer = ({ currentUser }: FooterProps) => {
+	const { t, i18n } = useTranslation();
 
 	const scrollToTop = () => {
-		const startPosition = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0
-		if (startPosition <= 0) return
+		const startPosition = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+		if (startPosition <= 0) return;
 
-		const duration = 500
-		let startTime: number | null = null
+		const duration = 500;
+		let startTime: number | null = null;
 
 		const easeInOutCubic = (t: number) =>
 			t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
@@ -35,14 +50,14 @@ export default function Footer({ currentUser }: FooterProps) {
 			}
 		}
 
-		requestAnimationFrame(step)
-	}
+		requestAnimationFrame(step);
+	};
 
 	const changeLanguage = (lng: string) => {
-		i18n.changeLanguage(lng)
-	}
+		i18n.changeLanguage(lng);
+	};
 
-	const currentLang = i18n.language ? i18n.language.slice(0, 2) : 'en'
+	const currentLang = i18n.language ? i18n.language.slice(0, 2) : 'en';
 
 	return (
 		<footer className={styles.footer} role="contentinfo">
@@ -63,7 +78,7 @@ export default function Footer({ currentUser }: FooterProps) {
 								{t('footer_status_operational')}
 							</span>
 							<span className={styles.capstoneBadge}>
-								<span className={styles.badgeIcon} aria-hidden="true">♟️</span>
+								<GraduationCap size={14} className={styles.badgeIcon} aria-hidden="true" />
 								{t('footer_capstone_badge')}
 							</span>
 						</div>
@@ -78,31 +93,41 @@ export default function Footer({ currentUser }: FooterProps) {
 							<ul className={styles.linkList}>
 								<li>
 									<Link to="/home" className={styles.footerLink}>
-										<span className={styles.linkIcon}>⚔️</span>
+										<span className={styles.linkIcon}>
+											<Swords size={16} aria-hidden="true" />
+										</span>
 										{t('play_online')}
 									</Link>
 								</li>
 								<li>
 									<Link to="/game?mode=bullet" className={styles.footerLink}>
-										<span className={styles.linkIcon}>🔥</span>
+										<span className={styles.linkIcon}>
+											<GameModeIcon mode="bullet" size={16} />
+										</span>
 										{t('footer_bullet_1m')}
 									</Link>
 								</li>
 								<li>
 									<Link to="/game?mode=blitz" className={styles.footerLink}>
-										<span className={styles.linkIcon}>⚡</span>
+										<span className={styles.linkIcon}>
+											<GameModeIcon mode="blitz" size={16} />
+										</span>
 										{t('footer_blitz_3m')}
 									</Link>
 								</li>
 								<li>
 									<Link to="/game?mode=rapid" className={styles.footerLink}>
-										<span className={styles.linkIcon}>⏳</span>
+										<span className={styles.linkIcon}>
+											<GameModeIcon mode="rapid" size={16} />
+										</span>
 										{t('footer_rapid_10m')}
 									</Link>
 								</li>
 								<li>
 									<Link to="/leaderboard" className={styles.footerLink}>
-										<span className={styles.linkIcon}>🏆</span>
+										<span className={styles.linkIcon}>
+											<Trophy size={16} color="#eab308" aria-hidden="true" />
+										</span>
 										{t('leaderboard')}
 									</Link>
 								</li>
@@ -119,25 +144,33 @@ export default function Footer({ currentUser }: FooterProps) {
 							<ul className={styles.linkList}>
 								<li>
 									<Link to="/chat" className={styles.footerLink}>
-										<span className={styles.linkIcon}>💬</span>
+										<span className={styles.linkIcon}>
+											<MessageSquare size={16} aria-hidden="true" />
+										</span>
 										{t('chats')}
 									</Link>
 								</li>
 								<li>
 									<Link to={`/profile/${currentUser.username}`} className={styles.footerLink}>
-										<span className={styles.linkIcon}>👤</span>
+										<span className={styles.linkIcon}>
+											<User size={16} aria-hidden="true" />
+										</span>
 										{t('my_profile')}
 									</Link>
 								</li>
 								<li>
 									<Link to={`/profile/${currentUser.username}/rating`} className={styles.footerLink}>
-										<span className={styles.linkIcon}>📈</span>
+										<span className={styles.linkIcon}>
+											<TrendingUp size={16} aria-hidden="true" />
+										</span>
 										{t('trend_7d')}
 									</Link>
 								</li>
 								<li>
 									<Link to="/profile/settings" className={styles.footerLink}>
-										<span className={styles.linkIcon}>⚙️</span>
+										<span className={styles.linkIcon}>
+											<Settings size={16} aria-hidden="true" />
+										</span>
 										{t('settings')}
 									</Link>
 								</li>
@@ -154,13 +187,17 @@ export default function Footer({ currentUser }: FooterProps) {
 							<ul className={styles.linkList}>
 								<li>
 									<Link to="/login" className={styles.footerLink}>
-										<span className={styles.linkIcon}>🔑</span>
+										<span className={styles.linkIcon}>
+											<LogIn size={16} aria-hidden="true" />
+										</span>
 										{t('sign_in')}
 									</Link>
 								</li>
 								<li>
 									<Link to="/register" className={styles.footerLink}>
-										<span className={styles.linkIcon}>✨</span>
+										<span className={styles.linkIcon}>
+											<Sparkles size={16} aria-hidden="true" />
+										</span>
 										{t('create_account')}
 									</Link>
 								</li>
@@ -176,7 +213,7 @@ export default function Footer({ currentUser }: FooterProps) {
 						<ul className={styles.linkList}>
 							<li>
 								<Link to="/about" className={styles.footerLink}>
-									<span className={styles.linkIcon}>ℹ️</span>
+									<Info size={14} className={styles.linkIcon} aria-hidden="true" />
 									{t('about_project_title')}
 								</Link>
 							</li>
@@ -190,7 +227,7 @@ export default function Footer({ currentUser }: FooterProps) {
 								>
 									<span className={styles.pieceCode}>{DEVS.arman.pieceSymbol}</span>
 									<span className={styles.devName}>{DEVS.arman.name}</span>
-									<span className={styles.externalMark}>↗</span>
+									<ExternalLink size={12} className={styles.externalMark} aria-hidden="true" />
 								</a>
 							</li>
 							<li>
@@ -203,7 +240,7 @@ export default function Footer({ currentUser }: FooterProps) {
 								>
 									<span className={styles.pieceCode}>{DEVS.narek.pieceSymbol}</span>
 									<span className={styles.devName}>{DEVS.narek.name}</span>
-									<span className={styles.externalMark}>↗</span>
+									<ExternalLink size={12} className={styles.externalMark} aria-hidden="true" />
 								</a>
 							</li>
 							<li>
@@ -216,7 +253,7 @@ export default function Footer({ currentUser }: FooterProps) {
 								>
 									<span className={styles.pieceCode}>{DEVS.hakob.pieceSymbol}</span>
 									<span className={styles.devName}>{DEVS.hakob.name}</span>
-									<span className={styles.externalMark}>↗</span>
+									<ExternalLink size={12} className={styles.externalMark} aria-hidden="true" />
 								</a>
 							</li>
 							<li>
@@ -226,9 +263,11 @@ export default function Footer({ currentUser }: FooterProps) {
 									rel="noopener noreferrer"
 									className={styles.footerLink}
 								>
-									<span className={styles.linkIcon}>🎓</span>
+									<span className={styles.linkIcon}>
+										<GraduationCap size={16} aria-hidden="true" />
+									</span>
 									{t('footer_school_network')}
-									<span className={styles.externalMark}>↗</span>
+									<ExternalLink size={12} className={styles.externalMark} aria-hidden="true" />
 								</a>
 							</li>
 						</ul>
@@ -282,12 +321,15 @@ export default function Footer({ currentUser }: FooterProps) {
 							onClick={scrollToTop}
 							title={t('footer_back_to_top')}
 						>
-							<span aria-hidden="true">↑</span>
+							<ArrowUp size={14} aria-hidden="true" />
 							<span>{t('footer_back_to_top')}</span>
 						</button>
 					</div>
 				</div>
 			</div>
 		</footer>
-	)
-}
+	);
+};
+
+export default Footer;
+

@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import MessagesIcon from '../MessagesIcon/MessagesIcon'
-import NotificationBell from '../NotificationBell/NotificationBell'
-import PlayerSearch from '../PlayerSearch/PlayerSearch'
-import styles from './Navbar.module.css'
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Trophy, Info, Globe, User, Settings, LogOut } from 'lucide-react';
+import MessagesIcon from '../MessagesIcon/MessagesIcon';
+import NotificationBell from '../NotificationBell/NotificationBell';
+import PlayerSearch from '../PlayerSearch/PlayerSearch';
+import styles from './Navbar.module.css';
+
 
 type Props = {
 	currentUser?: { id: number; username: string; avatar?: string } | null
@@ -65,7 +67,9 @@ function Navbar({ currentUser }: Props) {
 						onClick={() => navigate('/leaderboard')}
 						title={t('leaderboard')}
 					>
-						<span className={styles.navActionIcon}>🏆</span>
+						<span className={styles.navActionIcon}>
+							<Trophy size={18} aria-hidden="true" />
+						</span>
 					</div>
 				)}
 
@@ -75,7 +79,9 @@ function Navbar({ currentUser }: Props) {
 					onClick={() => navigate('/about')}
 					title={t('about')}
 				>
-					<span className={styles.navActionIcon}>ℹ️</span>
+					<span className={styles.navActionIcon}>
+						<Info size={18} aria-hidden="true" />
+					</span>
 				</div>
 
 				{/* Language Switcher */}
@@ -83,18 +89,26 @@ function Navbar({ currentUser }: Props) {
 					ref={languageMenuRef}
 					className={styles.navActionItem}
 					onClick={() => {
-						setShowLanguageMenu(!showLanguageMenu)
-						setShowProfileMenu(false)
+						setShowLanguageMenu(!showLanguageMenu);
+						setShowProfileMenu(false);
 					}}
 					title={t('language')}
 				>
-					<span className={styles.navActionIcon}>🌐</span>
+					<span className={styles.navActionIcon}>
+						<Globe size={18} aria-hidden="true" />
+					</span>
 
 					{showLanguageMenu && (
 						<div className={styles.languageDropdown}>
-							<div onClick={() => changeLanguage('en')}>🇬🇧 English</div>
-							<div onClick={() => changeLanguage('ru')}>🇷🇺 Русский</div>
-							<div onClick={() => changeLanguage('hy')}>🇦🇲 Հայերեն</div>
+							<div onClick={() => changeLanguage('en')}>
+								<span className={styles.langCode}>EN</span> English
+							</div>
+							<div onClick={() => changeLanguage('ru')}>
+								<span className={styles.langCode}>RU</span> Русский
+							</div>
+							<div onClick={() => changeLanguage('hy')}>
+								<span className={styles.langCode}>HY</span> Հայերեն
+							</div>
 						</div>
 					)}
 				</div>
@@ -105,8 +119,8 @@ function Navbar({ currentUser }: Props) {
 						ref={profileMenuRef}
 						className={`${styles.navActionItem} ${styles.profileMenu}`}
 						onClick={() => {
-							setShowProfileMenu(!showProfileMenu)
-							setShowLanguageMenu(false)
+							setShowProfileMenu(!showProfileMenu);
+							setShowLanguageMenu(false);
 						}}
 					>
 						<img
@@ -114,9 +128,9 @@ function Navbar({ currentUser }: Props) {
 							alt={currentUser?.username || t('profile_tab')}
 							className={styles.navProfileAvatar}
 							onError={(e) => {
-								const target = e.currentTarget
+								const target = e.currentTarget;
 								if (!target.src.endsWith('/assets/default.jpg')) {
-									target.src = '/assets/default.jpg'
+									target.src = '/assets/default.jpg';
 								}
 							}}
 						/>
@@ -124,19 +138,22 @@ function Navbar({ currentUser }: Props) {
 						{showProfileMenu && (
 							<div className={styles.profileDropdown}>
 								<div onClick={() => navigate(`/profile/${currentUser?.username || ''}`)}>
-									👤 {t('my_profile')}
+									<User size={16} aria-hidden="true" />
+									<span>{t('my_profile')}</span>
 								</div>
 								<div onClick={() => navigate('/profile/settings')}>
-									⚙️ {t('settings')}
+									<Settings size={16} aria-hidden="true" />
+									<span>{t('settings')}</span>
 								</div>
 								<div
 									className={styles.danger}
 									onClick={() => {
-										localStorage.removeItem('token')
-										navigate('/login')
+										localStorage.removeItem('token');
+										navigate('/login');
 									}}
 								>
-									🚪 {t('logout')}
+									<LogOut size={16} aria-hidden="true" />
+									<span>{t('logout')}</span>
 								</div>
 							</div>
 						)}

@@ -1,19 +1,23 @@
-import { useTranslation } from 'react-i18next'
-import styles from './DisconnectWarning.module.css'
+import { useTranslation } from 'react-i18next';
+import { AlertTriangle } from 'lucide-react';
+import styles from './DisconnectWarning.module.css';
 
 type Props = {
-	pauseCountdown: number | null
-}
+	pauseCountdown: number | null;
+};
 
-function DisconnectWarning({ pauseCountdown }: Props) {
-	const { t } = useTranslation()
+const DisconnectWarning = ({ pauseCountdown }: Props) => {
+	const { t } = useTranslation();
 
 	return (
 		<div className={styles.gamePauseWarning}>
-			<h4>⚠️ {t('opponent_disconnected_title')}</h4>
+			<h4>
+				<AlertTriangle size={18} aria-hidden="true" />
+				<span>{t('opponent_disconnected_title')}</span>
+			</h4>
 			<p>{t('opponent_reconnect_wait')} {pauseCountdown}s</p>
 		</div>
-	)
-}
+	);
+};
 
-export default DisconnectWarning
+export default DisconnectWarning;

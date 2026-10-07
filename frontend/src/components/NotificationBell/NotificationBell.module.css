@@ -33,9 +33,17 @@
 }
 
 .bellSymbol {
-    font-size: 20px;
     display: block;
-    line-height: 1;
+    color: var(--color-slate-400);
+    transition: color var(--transition-normal);
+}
+
+.bellIcon:hover .bellSymbol {
+    color: var(--color-slate-100);
+}
+
+.bellIcon.active .bellSymbol {
+    color: var(--color-blue-400);
 }
 
 /* Badge */
@@ -259,7 +267,29 @@
 }
 
 .categoryIcon {
-    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.iconFriend {
+    color: var(--color-blue-400);
+}
+
+.iconAccepted {
+    color: var(--color-emerald-400);
+}
+
+.iconMessage {
+    color: var(--color-sky-400);
+}
+
+.iconChallenge {
+    color: var(--color-amber-400);
+}
+
+.iconDefault {
+    color: var(--color-slate-400);
 }
 
 .unreadDot {
@@ -401,6 +431,7 @@
 }
 
 .emptyIcon {
+    color: var(--color-slate-400);
     font-size: 32px;
     opacity: 0.5;
 }

@@ -1,9 +1,12 @@
 import type { MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Search } from 'lucide-react';
 import TopRankBadge from '../TopRankBadge/TopRankBadge';
+import GameModeIcon from '../GameModeIcon/GameModeIcon';
 import { getModeColor } from '../../utils/gameUtils';
 import type { LeaderboardPlayer } from '../../utils/leaderboardUtils';
 import styles from '../../pages/LeaderboardPage/LeaderboardPage.module.css';
+
 
 interface LeaderboardTableProps {
 	players: LeaderboardPlayer[];
@@ -44,7 +47,7 @@ const LeaderboardTable = ({
 				</div>
 			) : players.length === 0 ? (
 				<div className={styles.emptyState}>
-					<div className={styles.emptyIcon}>🔍</div>
+					<Search size={36} className={styles.emptyIcon} aria-hidden="true" />
 					<h3 className={styles.emptyTitle}>{t('no_players_found')}</h3>
 					<p className={styles.emptyText}>
 						{t('no_players_filter_desc')}
@@ -210,7 +213,8 @@ const LeaderboardTable = ({
 												}`}
 												title={`Bullet: ${player.ratings.bullet ? player.ratings.bullet.rating : 'Unrated'}`}
 											>
-												⚡ {player.ratings.bullet ? player.ratings.bullet.rating : '—'}
+												<GameModeIcon mode="bullet" size={12} />
+												<span>{player.ratings.bullet ? player.ratings.bullet.rating : '—'}</span>
 											</span>
 											<span
 												className={`${styles.formatMiniPill} ${
@@ -218,7 +222,8 @@ const LeaderboardTable = ({
 												}`}
 												title={`Blitz: ${player.ratings.blitz ? player.ratings.blitz.rating : 'Unrated'}`}
 											>
-												🔥 {player.ratings.blitz ? player.ratings.blitz.rating : '—'}
+												<GameModeIcon mode="blitz" size={12} />
+												<span>{player.ratings.blitz ? player.ratings.blitz.rating : '—'}</span>
 											</span>
 											<span
 												className={`${styles.formatMiniPill} ${
@@ -226,7 +231,8 @@ const LeaderboardTable = ({
 												}`}
 												title={`Rapid: ${player.ratings.rapid ? player.ratings.rapid.rating : 'Unrated'}`}
 											>
-												⏳ {player.ratings.rapid ? player.ratings.rapid.rating : '—'}
+												<GameModeIcon mode="rapid" size={12} />
+												<span>{player.ratings.rapid ? player.ratings.rapid.rating : '—'}</span>
 											</span>
 										</div>
 									</td>

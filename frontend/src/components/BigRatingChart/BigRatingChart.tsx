@@ -1,23 +1,25 @@
-import { useState, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
-import type { ModeRatingHistory, RatingCategory, AllTimeRatingPoint } from '../../hooks/useRatingHistory'
-import styles from './BigRatingChart.module.css'
+import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Trophy, TrendingDown, TrendingUp, Swords, Target } from 'lucide-react';
+import GameModeIcon from '../GameModeIcon/GameModeIcon';
+import type { ModeRatingHistory, RatingCategory, AllTimeRatingPoint } from '../../hooks/useRatingHistory';
+import styles from './BigRatingChart.module.css';
 
 type Props = {
-	mode: RatingCategory
-	history?: ModeRatingHistory
-}
+	mode: RatingCategory;
+	history?: ModeRatingHistory;
+};
 
-const MODE_META: Record<RatingCategory, { nameKey: string; defaultName: string; icon: string; color: string }> = {
-	bullet: { nameKey: 'bullet_rating', defaultName: 'Bullet', icon: '🔥', color: '#F59E0B' },
-	blitz: { nameKey: 'blitz_rating', defaultName: 'Blitz', icon: '⚡', color: '#38BDF8' },
-	rapid: { nameKey: 'rapid_rating', defaultName: 'Rapid', icon: '⏳', color: '#818CF8' },
-}
+const MODE_META: Record<RatingCategory, { nameKey: string; color: string }> = {
+	bullet: { nameKey: 'bullet_rating', color: '#F59E0B' },
+	blitz: { nameKey: 'blitz_rating', color: '#38BDF8' },
+	rapid: { nameKey: 'rapid_rating', color: '#818CF8' },
+};
 
-export default function BigRatingChart({ mode, history }: Props) {
-	const { t } = useTranslation()
-	const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
-	const meta = MODE_META[mode]
+const BigRatingChart = ({ mode, history }: Props) => {
+	const { t } = useTranslation();
+	const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+	const meta = MODE_META[mode];
 
 	const points: AllTimeRatingPoint[] = useMemo(() => history?.allTime ?? [], [history])
 
@@ -130,7 +132,10 @@ export default function BigRatingChart({ mode, history }: Props) {
 			{/* Top stats summary */}
 			<div className={styles.statsGrid}>
 				<div className={styles.statCard}>
-					<span className={styles.statLabel}>{t('current_rating')}</span>
+					<span className={styles.statLabel}>
+						<TrendingUp size={14} aria-hidden="true" />
+						{t('current_rating')}
+					</span>
 					<span className={styles.statValue}>{history?.current ?? '—'}</span>
 					<span className={styles.statSub}>
 						{history?.isProvisional ? t('provisional') : t('calibrated')}
@@ -138,19 +143,28 @@ export default function BigRatingChart({ mode, history }: Props) {
 				</div>
 
 				<div className={styles.statCard}>
-					<span className={styles.statLabel}>🏆 {t('peak_rating')}</span>
+					<span className={styles.statLabel}>
+						<Trophy size={14} aria-hidden="true" />
+						{t('peak_rating')}
+					</span>
 					<span className={styles.statValue}>{history?.peak ?? '—'}</span>
 					<span className={styles.statSub}>{t('all_time_high')}</span>
 				</div>
 
 				<div className={styles.statCard}>
-					<span className={styles.statLabel}>📉 {t('lowest_rating')}</span>
+					<span className={styles.statLabel}>
+						<TrendingDown size={14} aria-hidden="true" />
+						{t('lowest_rating')}
+					</span>
 					<span className={styles.statValue}>{history?.lowest ?? '—'}</span>
 					<span className={styles.statSub}>{t('all_time_low')}</span>
 				</div>
 
 				<div className={styles.statCard}>
-					<span className={styles.statLabel}>⚔️ {t('total_games')}</span>
+					<span className={styles.statLabel}>
+						<Swords size={14} aria-hidden="true" />
+						{t('total_games')}
+					</span>
 					<span className={styles.statValue}>{history?.gamesPlayed ?? 0}</span>
 					<span className={styles.statSub}>
 						{history?.wins ?? 0}W / {history?.draws ?? 0}D / {history?.losses ?? 0}L
@@ -158,7 +172,10 @@ export default function BigRatingChart({ mode, history }: Props) {
 				</div>
 
 				<div className={styles.statCard}>
-					<span className={styles.statLabel}>🎯 {t('win_rate')}</span>
+					<span className={styles.statLabel}>
+						<Target size={14} aria-hidden="true" />
+						{t('win_rate')}
+					</span>
 					<span className={styles.statValue}>{history?.winRate ?? 0}%</span>
 					<span className={styles.statSub}>{t('overall_success')}</span>
 				</div>
@@ -168,8 +185,10 @@ export default function BigRatingChart({ mode, history }: Props) {
 			<div className={styles.chartCard}>
 				<div className={styles.chartHeader}>
 					<div className={styles.chartTitle}>
-						<span className={styles.chartModeIcon}>{meta.icon}</span>
-						<span className={styles.chartModeTitle}>{t(meta.nameKey, meta.defaultName)} Rating Progression</span>
+						<span className={styles.chartModeIcon}>
+							<GameModeIcon mode={mode} size={22} />
+						</span>
+						<span className={styles.chartModeTitle}>{t(meta.nameKey)}</span>
 					</div>
 					<span className={styles.pointsCount}>
 						{points.length} {t('matches_recorded')}
@@ -178,7 +197,7 @@ export default function BigRatingChart({ mode, history }: Props) {
 
 				{points.length === 0 ? (
 					<div className={styles.emptyState}>
-						<span className={styles.emptyIcon}>📈</span>
+						<TrendingUp size={36} className={styles.emptyIcon} aria-hidden="true" />
 						<h4>{t('no_rating_history')}</h4>
 					</div>
 				) : (
@@ -328,6 +347,8 @@ export default function BigRatingChart({ mode, history }: Props) {
 				)}
 			</div>
 		</div>
-	)
-}
+	);
+};
+
+export default BigRatingChart;
 

@@ -1,24 +1,25 @@
-import { useTranslation } from 'react-i18next'
-import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils'
-import styles from './PromotionOverlay.module.css'
+import { useTranslation } from 'react-i18next';
+import { X } from 'lucide-react';
+import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils';
+import styles from './PromotionOverlay.module.css';
 
 type Props = {
-	playerColor: 'w' | 'b'
-	square?: string | null
-	ranks?: string[]
-	files?: string[]
-	onSelect: (pieceCode: string) => void
-	onCancel: () => void
-}
+	playerColor: 'w' | 'b';
+	square?: string | null;
+	ranks?: string[] ;
+	files?: string[];
+	onSelect: (pieceCode: string) => void;
+	onCancel: () => void;
+};
 
-function PromotionOverlay({
+const PromotionOverlay = ({
 	playerColor,
 	square,
 	ranks,
 	files,
 	onSelect,
 	onCancel,
-}: Props) {
+}: Props) => {
 	const { t } = useTranslation()
 
 	// Calculate anchored positioning based on the promotion square
@@ -66,13 +67,13 @@ function PromotionOverlay({
 					type="button"
 					className={styles.closeBtn}
 					onClick={e => {
-						e.stopPropagation()
-						onCancel()
+						e.stopPropagation();
+						onCancel();
 					}}
 					aria-label={t('cancel')}
 					title={t('cancel')}
 				>
-					✕
+					<X size={12} aria-hidden="true" />
 				</button>
 
 				<div className={styles.pieceOptionsColumn}>
@@ -97,7 +98,7 @@ function PromotionOverlay({
 				</div>
 			</div>
 		</>
-	)
-}
+	);
+};
 
-export default PromotionOverlay
+export default PromotionOverlay;

@@ -1,17 +1,18 @@
-import { useState, useEffect, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-import type { ChallengeReceived } from '../../hooks/useChallengeSocket'
-import styles from './ChallengeNotification.module.css'
+import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { RotateCcw, Swords, Check, X } from 'lucide-react';
+import type { ChallengeReceived } from '../../hooks/useChallengeSocket';
+import styles from './ChallengeNotification.module.css';
 
 type Props = {
-	challenge: ChallengeReceived
-	countdown?: number
-	onAccept: (challengeId: string) => void
-	onDecline: (challengeId: string) => void
-}
+	challenge: ChallengeReceived;
+	countdown?: number;
+	onAccept: (challengeId: string) => void;
+	onDecline: (challengeId: string) => void;
+};
 
-function ChallengeNotification({ challenge, countdown = 30, onAccept, onDecline }: Props) {
-	const { t } = useTranslation()
+const ChallengeNotification = ({ challenge, countdown = 30, onAccept, onDecline }: Props) => {
+	const { t } = useTranslation();
 	const totalMs = (countdown || 30) * 1000
 	const [remainingMs, setRemainingMs] = useState(totalMs)
 	const lastTickRef = useRef<number | null>(null)
@@ -55,7 +56,13 @@ function ChallengeNotification({ challenge, countdown = 30, onAccept, onDecline 
 			<div className={styles.challengeCard}>
 				<div className={styles.challengeHeader}>
 					<div className={styles.headerLeft}>
-						<span className={styles.swordIcon}>{challenge.isRematch ? '🔄' : '⚔️'}</span>
+						<span className={styles.swordIcon}>
+							{challenge.isRematch ? (
+								<RotateCcw size={16} aria-hidden="true" />
+							) : (
+								<Swords size={16} aria-hidden="true" />
+							)}
+						</span>
 						<span className={styles.headerText}>
 							{challenge.isRematch ? t('rematch_incoming') : t('challenge_incoming')}
 						</span>
@@ -89,18 +96,20 @@ function ChallengeNotification({ challenge, countdown = 30, onAccept, onDecline 
 						className={styles.acceptBtn}
 						onClick={() => onAccept(challenge.challengeId)}
 					>
-						✓ {t('accept')}
+						<Check size={14} aria-hidden="true" />
+						<span>{t('accept')}</span>
 					</button>
 					<button
 						className={styles.declineBtn}
 						onClick={() => onDecline(challenge.challengeId)}
 					>
-						✗ {t('decline')}
+						<X size={14} aria-hidden="true" />
+						<span>{t('decline')}</span>
 					</button>
 				</div>
 			</div>
 		</div>
-	)
-}
+	);
+};
 
-export default ChallengeNotification
+export default ChallengeNotification;

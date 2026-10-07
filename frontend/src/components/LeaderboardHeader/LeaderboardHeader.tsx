@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Trophy, Info, Calculator, Scale, Star, Medal } from 'lucide-react';
 import styles from '../../pages/LeaderboardPage/LeaderboardPage.module.css';
 
 interface LeaderboardHeaderProps {
@@ -18,7 +19,8 @@ const LeaderboardHeader = ({
 		<header className={styles.headerSection}>
 			<div className={styles.titleRow}>
 				<h1 className={styles.pageTitle}>
-					<span>🏆</span> {t('global_leaderboard')}
+					<Trophy size={26} color="#eab308" aria-hidden="true" />
+					<span>{t('global_leaderboard')}</span>
 				</h1>
 				<span className={styles.totalBadge}>
 					{total} {t('players')}
@@ -36,7 +38,8 @@ const LeaderboardHeader = ({
 				}}
 				type="button"
 			>
-				ℹ️ {showFormulaInfo ? t('hide_formula') : t('how_it_works')}
+				<Info size={14} aria-hidden="true" />
+				<span>{showFormulaInfo ? t('hide_formula') : t('how_it_works')}</span>
 			</button>
 
 			{/* Rating Formula Explainer Modal/Card with smooth accordion */}
@@ -44,12 +47,14 @@ const LeaderboardHeader = ({
 				<div className={styles.explainerInner}>
 					<div className={styles.explainerCard}>
 						<h3 className={styles.explainerTitle}>
-							<span>📐</span> {t('leaderboard_system_title')}
+							<Calculator size={18} aria-hidden="true" />
+							<span>{t('leaderboard_system_title')}</span>
 						</h3>
 						<div className={styles.explainerGrid}>
 							<div className={styles.explainerItem}>
 								<div className={styles.explainerItemHeader}>
-									⚖️ {t('confidence_weighting')}
+									<Scale size={16} aria-hidden="true" />
+									<span>{t('confidence_weighting')}</span>
 								</div>
 								<p className={styles.explainerItemText}>
 									{t('confidence_desc')}
@@ -57,7 +62,8 @@ const LeaderboardHeader = ({
 							</div>
 							<div className={styles.explainerItem}>
 								<div className={styles.explainerItemHeader}>
-									⭐ {t('versatility_bonus')}
+									<Star size={16} color="#eab308" aria-hidden="true" />
+									<span>{t('versatility_bonus')}</span>
 								</div>
 								<p className={styles.explainerItemText}>
 									{t('versatility_desc')}
@@ -65,7 +71,8 @@ const LeaderboardHeader = ({
 							</div>
 							<div className={styles.explainerItem}>
 								<div className={styles.explainerItemHeader}>
-									🥇 {t('elite_podium')}
+									<Medal size={16} color="#eab308" aria-hidden="true" />
+									<span>{t('elite_podium')}</span>
 								</div>
 								<p className={styles.explainerItemText}>
 									{t('podium_desc')}

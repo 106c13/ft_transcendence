@@ -1,28 +1,29 @@
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import GameModeIcon from '../GameModeIcon/GameModeIcon';
 import type { MatchRecord } from '../../utils/gameUtils';
-import styles from './GameRow.module.css'
+import styles from './GameRow.module.css';
 
 type Props = {
-	match: MatchRecord
-	username: string
-	onSelect: (match: MatchRecord) => void
-	onRowClick?: (match: MatchRecord) => void
-}
+	match: MatchRecord;
+	username: string;
+	onSelect: (match: MatchRecord) => void;
+	onRowClick?: (match: MatchRecord) => void;
+};
 
 function getAvatarUrl(avatar?: string | null) {
 	if (!avatar || avatar === 'default.jpg') {
-		return '/assets/default.jpg'
+		return '/assets/default.jpg';
 	}
 	if (avatar.startsWith('http://') || avatar.startsWith('https://') || avatar.startsWith('/')) {
-		return avatar
+		return avatar;
 	}
-	return `/uploads/${avatar}`
+	return `/uploads/${avatar}`;
 }
 
-export default function GameRow({ match, username, onSelect, onRowClick }: Props) {
-	const { t } = useTranslation()
-	const navigate = useNavigate()
+const GameRow = ({ match, username, onSelect, onRowClick }: Props) => {
+	const { t } = useTranslation();
+	const navigate = useNavigate();
 
 	const handleRowClick = () => {
 		if (onRowClick) {
@@ -85,9 +86,7 @@ export default function GameRow({ match, username, onSelect, onRowClick }: Props
 		? styles.modeBlitz
 		: isRapid
 		? styles.modeRapid
-		: styles.modeDefault
-
-	const modeIcon = isBullet ? '🔥' : isBlitz ? '⚡' : isRapid ? '⏳' : '♟'
+		: styles.modeDefault;
 
 	return (
 		<div
@@ -104,8 +103,10 @@ export default function GameRow({ match, username, onSelect, onRowClick }: Props
 		>
 			{/* 1. Game Mode (First) - Icon on top, mode name under icon */}
 			<div className={styles.modeCol}>
-				<span className={styles.modeIcon}>{modeIcon}</span>
-				<span className={`${styles.modeName} ${modeClass}`}>{t(match.mode.toLowerCase(), match.mode)}</span>
+				<span className={styles.modeIcon}>
+					<GameModeIcon mode={match.mode} size={18} />
+				</span>
+				<span className={`${styles.modeName} ${modeClass}`}>{t(match.mode.toLowerCase())}</span>
 			</div>
 
 			{/* 2. Players Column (White on top, Black on bottom) */}
@@ -214,5 +215,7 @@ export default function GameRow({ match, username, onSelect, onRowClick }: Props
 				{timeStr && <span className={styles.dateSub}>{timeStr}</span>}
 			</div>
 		</div>
-	)
-}
+	);
+};
+
+export default GameRow;

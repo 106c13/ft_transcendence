@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Swords, RotateCw, ArrowRight } from 'lucide-react';
 import profileStyles from './ProfileTabs.module.css';
+
 import type { TabType, User } from '../../utils/profileUtils';
 import { useGameHistory } from '../../hooks/useGameHistory';
 import { useRatingHistory } from '../../hooks/useRatingHistory';
@@ -109,21 +111,24 @@ const ProfileTabs = ({
 									onClick={() => onSelectTab('games')}
 									type="button"
 								>
-									{t('see_all')} →
+									<span>{t('see_all')}</span>
+									<ArrowRight size={14} aria-hidden="true" />
 								</button>
 							)}
 						</div>
 
 						{history.loading ? (
 							<div className={profileStyles.emptyCard}>
-								<span className={profileStyles.spinnerIcon}>♟</span>
+								<RotateCw size={24} className={profileStyles.spinnerIcon} aria-hidden="true" />
 								<p className={profileStyles.emptySubtitle}>
 									{t('loading')}
 								</p>
 							</div>
 						) : recentMatches.length === 0 ? (
 							<div className={profileStyles.emptyCard}>
-								<div className={profileStyles.emptyIcon}>♟️</div>
+								<div className={profileStyles.emptyIcon}>
+									<Swords size={36} aria-hidden="true" />
+								</div>
 								<h4 className={profileStyles.emptyTitle}>
 									{t('no_games_yet')}
 								</h4>
@@ -138,7 +143,8 @@ const ProfileTabs = ({
 										onClick={() => navigate('/home')}
 										type="button"
 									>
-										⚔️ {t('play_now')}
+										<Swords size={16} aria-hidden="true" />
+										<span>{t('play_now')}</span>
 									</button>
 								)}
 							</div>

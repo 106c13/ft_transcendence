@@ -30,8 +30,9 @@
 }
 
 .swordIcon {
-	font-size: 18px;
-	line-height: 1;
+	display: flex;
+	align-items: center;
+	color: var(--color-amber-500);
 }
 
 .headerText {
@@ -99,6 +100,10 @@
 	font-size: 13px;
 	cursor: pointer;
 	transition: all 0.2s;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
 }
 
 .acceptBtn:hover {
@@ -118,6 +123,10 @@
 	font-size: 13px;
 	cursor: pointer;
 	transition: all 0.2s;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
 }
 
 .declineBtn:hover {

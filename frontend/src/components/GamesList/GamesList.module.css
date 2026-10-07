@@ -229,9 +229,9 @@
 }
 
 .spinnerIcon {
-	font-size: 32px;
 	font-size: 28px;
 	animation: bounce 1.5s infinite ease-in-out;
+	color: var(--color-blue-400);
 }
 
 @keyframes bounce {
@@ -253,6 +253,7 @@
 }
 
 .emptyIcon {
+	color: var(--color-slate-400);
 	font-size: 38px;
 	opacity: 0.75;
 	margin-bottom: 2px;

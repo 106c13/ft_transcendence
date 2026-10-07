@@ -55,6 +55,12 @@
 	justify-content: center;
 	font-size: 13px;
 	line-height: 1;
+	color: var(--color-slate-400);
+	transition: color var(--transition-fast);
+}
+
+.triggerButton:hover .optionIcon {
+	color: var(--color-slate-100);
 }
 
 .optionLabel {
@@ -131,9 +137,17 @@
 	color: #F8FAFC;
 }
 
+.menuItem:hover .optionIcon {
+	color: var(--color-slate-100);
+}
+
 .menuItemActive {
 	background: rgba(59, 130, 246, 0.15);
 	color: #60A5FA;
 	font-weight: 700;
+}
+
+.menuItemActive .optionIcon {
+	color: var(--color-blue-400);
 }
 

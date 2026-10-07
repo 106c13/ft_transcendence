@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Settings, User, Lock } from 'lucide-react';
 import type { SettingsTab } from '../../utils/settingsUtils';
 import styles from './SettingsHeader.module.css';
 
@@ -19,7 +20,9 @@ const SettingsHeader = ({
 		<div className={styles.settingsHeader}>
 			<div className={styles.topSection}>
 				<div className={styles.titleGroup}>
-					<div className={styles.iconBadge} aria-hidden="true">⚙️</div>
+					<div className={styles.iconBadge} aria-hidden="true">
+						<Settings size={24} />
+					</div>
 					<div className={styles.textGroup}>
 						<h1 className={styles.pageTitle}>{t('settings')}</h1>
 						<p className={styles.pageSubtitle}>
@@ -38,7 +41,9 @@ const SettingsHeader = ({
 					aria-selected={activeTab === 'profile'}
 					type="button"
 				>
-					<span className={styles.tabIcon}>👤</span>
+					<span className={styles.tabIcon}>
+						<User size={16} aria-hidden="true" />
+					</span>
 					<span>{t('profile_tab')}</span>
 				</button>
 
@@ -49,7 +54,9 @@ const SettingsHeader = ({
 					aria-selected={activeTab === 'security'}
 					type="button"
 				>
-					<span className={styles.tabIcon}>🔒</span>
+					<span className={styles.tabIcon}>
+						<Lock size={16} aria-hidden="true" />
+					</span>
 					<span>{t('security_tab')}</span>
 				</button>
 			</div>

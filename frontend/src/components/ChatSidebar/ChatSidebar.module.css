@@ -83,8 +83,15 @@
 	left: 12px;
 	top: 50%;
 	transform: translateY(-50%);
-	color: #64748B;
+	color: var(--color-slate-400);
 	pointer-events: none;
+	display: flex;
+	align-items: center;
+	transition: color var(--transition-normal);
+}
+
+.searchContainer:focus-within .searchIcon {
+	color: var(--color-blue-400);
 }
 
 .searchInput {

@@ -1,24 +1,25 @@
-import { DEVS } from '../../utils/aboutUtils'
-import type { DevKey } from '../../utils/aboutUtils'
-import styles from './AboutContributors.module.css'
+import { Users, ExternalLink } from 'lucide-react';
+import { DEVS } from '../../utils/aboutUtils';
+import type { DevKey } from '../../utils/aboutUtils';
+import styles from './AboutContributors.module.css';
 
 interface Props {
-	selectedDev: DevKey | null
-	onSelectDev: (dev: DevKey) => void
+	selectedDev: DevKey | null;
+	onSelectDev: (dev: DevKey) => void;
 }
 
-export default function AboutContributors({ selectedDev, onSelectDev }: Props) {
+const AboutContributors = ({ selectedDev, onSelectDev }: Props) => {
 	return (
 		<section>
 			<h2 className={styles.sectionTitle}>
-				<span>♚</span>
+				<Users size={20} className={styles.sectionTitleIcon} aria-hidden="true" />
 				<span>Contributors & Responsibilities</span>
 			</h2>
 
 			<div className={styles.contributorsGrid}>
 				{(Object.keys(DEVS) as DevKey[]).map((key) => {
-					const dev = DEVS[key]
-					const isSelected = selectedDev === key
+					const dev = DEVS[key];
+					const isSelected = selectedDev === key;
 
 					return (
 						<div
@@ -42,7 +43,7 @@ export default function AboutContributors({ selectedDev, onSelectDev }: Props) {
 									onClick={(e) => e.stopPropagation()}
 								>
 									<span>{dev.handle}</span>
-									<span className={styles.externalIcon}>↗</span>
+									<ExternalLink size={12} className={styles.externalIcon} aria-hidden="true" />
 								</a>
 							</div>
 
@@ -64,9 +65,12 @@ export default function AboutContributors({ selectedDev, onSelectDev }: Props) {
 								))}
 							</ul>
 						</div>
-					)
+					);
 				})}
 			</div>
 		</section>
-	)
-}
+	);
+};
+
+export default AboutContributors;
+

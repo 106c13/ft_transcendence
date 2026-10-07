@@ -118,6 +118,7 @@
 }
 
 .emptyIcon {
+	color: var(--color-slate-400);
 	font-size: 36px;
 	margin-bottom: 8px;
 	opacity: 0.75;
@@ -142,6 +143,7 @@
 	font-size: 28px;
 	animation: spin 1.8s infinite linear;
 	margin-bottom: 8px;
+	color: var(--color-blue-400);
 }
 
 @keyframes spin {

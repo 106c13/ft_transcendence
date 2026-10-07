@@ -144,6 +144,9 @@
 	font-size: 11.5px;
 	color: #94A3B8;
 	font-family: var(--mono, monospace);
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
 }
 
 .arrowIndicator {
@@ -175,6 +178,7 @@
 }
 
 .emptyIcon {
+	color: var(--color-slate-400);
 	font-size: 38px;
 	opacity: 0.75;
 	margin-bottom: 2px;

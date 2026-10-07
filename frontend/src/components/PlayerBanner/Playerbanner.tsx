@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import type { RatingInfo } from '../../utils/profileUtils'
-import { getAvatarUrl, getModeColor, getPieceImageSrc } from '../../utils/gameUtils'
-import styles from './PlayerBanner.module.css'
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import type { RatingInfo } from '../../utils/profileUtils';
+import { getAvatarUrl, getModeColor, getPieceImageSrc } from '../../utils/gameUtils';
+import GameModeIcon from '../GameModeIcon/GameModeIcon';
+import styles from './PlayerBanner.module.css';
+
 
 type PieceCapture = { type: string; color: 'w' | 'b' }
 
@@ -40,7 +42,7 @@ export function formatTime(timeMs: number) {
 	return `${minStr}:${secStr}`
 }
 
-function PlayerBanner({
+const PlayerBanner = ({
 	name,
 	username,
 	avatar,
@@ -56,9 +58,9 @@ function PlayerBanner({
 	selectedMode = 'blitz',
 	capturedPieces,
 	materialDiff,
-}: Props) {
-	const { t } = useTranslation()
-	const navigate = useNavigate()
+}: Props) => {
+	const { t } = useTranslation();
+	const navigate = useNavigate();
 	const [isOpen, setIsOpen] = useState(false)
 	const [ratings, setRatings] = useState<Record<string, RatingInfo | null> | null>(initialRatings || null)
 	const [userAvatar, setUserAvatar] = useState<string | null>(avatar || null)
@@ -232,7 +234,9 @@ function PlayerBanner({
 									<div className={styles.ratingPopupGrid}>
 										<div className={`${styles.ratingPopupItem} ${selectedMode === 'bullet' ? styles.ratingItemActive : ''}`}>
 											<div className={styles.ratingPopupHeader}>
-												<span className={styles.ratingPopupIcon}>🔥</span>
+												<span className={styles.ratingPopupIcon}>
+													<GameModeIcon mode="bullet" size={16} />
+												</span>
 												<span className={styles.ratingPopupMode}>{t('bullet_rating')}</span>
 											</div>
 											<span className={styles.ratingPopupValue} style={{ color: getModeColor('bullet') }}>
@@ -242,7 +246,9 @@ function PlayerBanner({
 
 										<div className={`${styles.ratingPopupItem} ${selectedMode === 'blitz' ? styles.ratingItemActive : ''}`}>
 											<div className={styles.ratingPopupHeader}>
-												<span className={styles.ratingPopupIcon}>⚡</span>
+												<span className={styles.ratingPopupIcon}>
+													<GameModeIcon mode="blitz" size={16} />
+												</span>
 												<span className={styles.ratingPopupMode}>{t('blitz_rating')}</span>
 											</div>
 											<span className={styles.ratingPopupValue} style={{ color: getModeColor('blitz') }}>
@@ -252,7 +258,9 @@ function PlayerBanner({
 
 										<div className={`${styles.ratingPopupItem} ${selectedMode === 'rapid' ? styles.ratingItemActive : ''}`}>
 											<div className={styles.ratingPopupHeader}>
-												<span className={styles.ratingPopupIcon}>⏳</span>
+												<span className={styles.ratingPopupIcon}>
+													<GameModeIcon mode="rapid" size={16} />
+												</span>
 												<span className={styles.ratingPopupMode}>{t('rapid_rating')}</span>
 											</div>
 											<span className={styles.ratingPopupValue} style={{ color: getModeColor('rapid') }}>
@@ -304,7 +312,7 @@ function PlayerBanner({
 				<div className={styles.gameClock}>{formatTime(time)}</div>
 			</div>
 		</div>
-	)
-}
+	);
+};
 
-export default PlayerBanner
+export default PlayerBanner;

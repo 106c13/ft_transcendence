@@ -1,7 +1,9 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import styles from './NotificationBell.module.css'
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Bell, BellOff, Users, UserCheck, MessageSquare, Swords, Check, X } from 'lucide-react';
+import styles from './NotificationBell.module.css';
+
 
 export type Notification = {
     id: number
@@ -405,15 +407,15 @@ function NotificationBell({ userId }: { userId: number }) {
 
     // Category icon
     const getNotificationIcon = (notif: Notification) => {
-        if (isFriendRequest(notif)) return '👥'
-        if (notif.message.includes('accepted your friend request')) return '🤝'
-        if (notif.message.includes('message') || notif.link?.startsWith('/chat/')) return '💬'
-        if (notif.message.includes('challenge') || notif.message.includes('game')) return '🏓'
-        return '🔔'
-    }
+        if (isFriendRequest(notif)) return <Users size={16} className={styles.iconFriend} aria-hidden="true" />;
+        if (notif.message.includes('accepted your friend request')) return <UserCheck size={16} className={styles.iconAccepted} aria-hidden="true" />;
+        if (notif.message.includes('message') || notif.link?.startsWith('/chat/')) return <MessageSquare size={16} className={styles.iconMessage} aria-hidden="true" />;
+        if (notif.message.includes('challenge') || notif.message.includes('game')) return <Swords size={16} className={styles.iconChallenge} aria-hidden="true" />;
+        return <Bell size={16} className={styles.iconDefault} aria-hidden="true" />;
+    };
 
     const displayedNotifications =
-        filter === 'unread' ? notifications.filter((n) => !n.is_read) : notifications
+        filter === 'unread' ? notifications.filter((n) => !n.is_read) : notifications;
 
     return (
         <div className={styles.notificationBellContainer} ref={containerRef}>
@@ -426,12 +428,12 @@ function NotificationBell({ userId }: { userId: number }) {
                 aria-expanded={isOpen}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        toggleDropdown()
+                        e.preventDefault();
+                        toggleDropdown();
                     }
                 }}
             >
-                <span className={styles.bellSymbol}>🔔</span>
+                <Bell size={20} className={styles.bellSymbol} aria-hidden="true" />
                 {unreadCount > 0 && (
                     <span className={styles.notificationBadge}>
                         {unreadCount > 99 ? '99+' : unreadCount}
@@ -500,14 +502,14 @@ function NotificationBell({ userId }: { userId: number }) {
                             </div>
                         ) : displayedNotifications.length === 0 ? (
                             <div className={styles.noNotifications}>
-                                <span className={styles.emptyIcon}>🔕</span>
+                                <BellOff size={32} className={styles.emptyIcon} aria-hidden="true" />
                                 <p>{t('no_notifications')}</p>
                             </div>
                         ) : (
                             displayedNotifications.map((notif) => {
-                                const isFriendReq = isFriendRequest(notif)
-                                const feedback = actionFeedback[notif.id]
-                                const isActionBusy = actionLoading[notif.id]
+                                const isFriendReq = isFriendRequest(notif);
+                                const feedback = actionFeedback[notif.id];
+                                const isActionBusy = actionLoading[notif.id];
 
                                 return (
                                     <div
@@ -537,11 +539,11 @@ function NotificationBell({ userId }: { userId: number }) {
                                                 >
                                                     {feedback === 'accepted' ? (
                                                         <span className={styles.actionFeedbackAccepted}>
-                                                            ✓ {t('accepted')}
+                                                            <Check size={14} aria-hidden="true" /> {t('accepted')}
                                                         </span>
                                                     ) : feedback === 'declined' ? (
                                                         <span className={styles.actionFeedbackDeclined}>
-                                                            ✕ {t('declined')}
+                                                            <X size={14} aria-hidden="true" /> {t('declined')}
                                                         </span>
                                                     ) : (
                                                         <>
@@ -579,10 +581,10 @@ function NotificationBell({ userId }: { userId: number }) {
                                             title={t('delete')}
                                             aria-label={t('delete_notification')}
                                         >
-                                            ✕
+                                            <X size={14} aria-hidden="true" />
                                         </button>
                                     </div>
-                                )
+                                );
                             })
                         )}
                     </div>

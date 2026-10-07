@@ -36,6 +36,7 @@
 }
 
 .activeNavAction .navActionIcon {
+	color: var(--color-blue-400);
 	transform: scale(1.1);
 	filter: drop-shadow(0 2px 8px rgba(96, 165, 250, 0.4));
 }
@@ -64,7 +65,19 @@
 }
 
 .navActionIcon {
-	font-size: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--color-slate-400);
+	transition: color var(--transition-normal);
+}
+
+.navActionItem:hover .navActionIcon {
+	color: var(--color-slate-100);
+}
+
+.activeNavAction:hover .navActionIcon {
+	color: var(--color-blue-400);
 }
 
 .notificationBadge {
@@ -145,6 +158,21 @@
 	background: rgba(96, 165, 250, 0.12);
 }
 
+.profileDropdown div svg {
+	color: var(--color-slate-400);
+	flex-shrink: 0;
+	transition: color var(--transition-fast);
+}
+
+.profileDropdown div:hover svg {
+	color: var(--color-blue-400);
+}
+
+.profileDropdown .danger svg,
+.profileDropdown .danger:hover svg {
+	color: currentColor;
+}
+
 .profileDropdown .danger {
 	color: #F87171;
 	border-top: 1px solid rgba(148, 163, 184, 0.12);
@@ -152,4 +180,14 @@
 
 .profileDropdown .danger:hover {
 	background: rgba(248, 113, 113, 0.12);
+}
+
+.langCode {
+	font-size: 11px;
+	font-weight: 700;
+	padding: 2px 5px;
+	border-radius: 4px;
+	background: rgba(148, 163, 184, 0.2);
+	color: #94A3B8;
+	letter-spacing: 0.5px;
 }

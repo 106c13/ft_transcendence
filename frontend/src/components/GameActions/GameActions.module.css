@@ -357,5 +357,9 @@
 	font-weight: 600;
 	text-align: center;
 	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
 }
 

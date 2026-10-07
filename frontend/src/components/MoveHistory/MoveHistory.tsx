@@ -1,6 +1,8 @@
-import { useEffect, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-import styles from './MoveHistory.module.css'
+import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ScrollText, Eye, SkipBack, ChevronLeft, ChevronRight, SkipForward } from 'lucide-react';
+import styles from './MoveHistory.module.css';
+
 
 type Props = {
 	moveHistory: string[]
@@ -80,7 +82,9 @@ function MoveHistory({
 			<div className={styles.moveHistoryList} ref={moveListRef}>
 				{rows.length === 0 ? (
 					<div className={styles.emptyHistory}>
-						<div className={styles.emptyHistoryIcon}>♟️</div>
+						<div className={styles.emptyHistoryIcon}>
+							<ScrollText size={36} aria-hidden="true" />
+						</div>
 						<span className={styles.emptyHistoryTitle}>
 							{t('no_moves_yet')}
 						</span>
@@ -138,7 +142,10 @@ function MoveHistory({
 			</div>
 
 			{isReviewing && (
-				<div className={styles.reviewingBanner}>{t('reviewing_banner')}</div>
+				<div className={styles.reviewingBanner}>
+					<Eye size={14} aria-hidden="true" />
+					<span>{t('reviewing_banner')}</span>
+				</div>
 			)}
 
 			<div className={styles.moveNavRow}>
@@ -149,7 +156,7 @@ function MoveHistory({
 					disabled={halfMoves <= 0}
 					onClick={() => onSelectIndex(0)}
 				>
-					⇤
+					<SkipBack size={14} aria-hidden="true" />
 				</button>
 				<button
 					type="button"
@@ -158,7 +165,7 @@ function MoveHistory({
 					disabled={halfMoves <= 0}
 					onClick={() => onSelectIndex(Math.max(0, viewIndex - 1))}
 				>
-					◀
+					<ChevronLeft size={14} aria-hidden="true" />
 				</button>
 				<button
 					type="button"
@@ -167,7 +174,7 @@ function MoveHistory({
 					disabled={halfMoves <= 0}
 					onClick={() => onSelectIndex(Math.min(moveHistory.length - 1, viewIndex + 1))}
 				>
-					▶
+					<ChevronRight size={14} aria-hidden="true" />
 				</button>
 				<button
 					type="button"
@@ -176,11 +183,12 @@ function MoveHistory({
 					disabled={halfMoves <= 0}
 					onClick={() => onSelectIndex(moveHistory.length - 1)}
 				>
-					⇥
+					<SkipForward size={14} aria-hidden="true" />
 				</button>
 			</div>
 		</div>
-	)
-}
+	);
+};
 
-export default MoveHistory
+export default MoveHistory;
+

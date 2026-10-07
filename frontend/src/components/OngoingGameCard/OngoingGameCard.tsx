@@ -1,33 +1,34 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { Chess } from 'chess.js'
-import io from 'socket.io-client'
-import ChessBoard from '../ChessBoard/ChessBoard'
-import { playSound } from '../../utils/sound'
-import styles from './OngoingGameCard.module.css'
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Trophy, Clock, Swords, ArrowRight } from 'lucide-react';
+import { Chess } from 'chess.js';
+import io from 'socket.io-client';
+import ChessBoard from '../ChessBoard/ChessBoard';
+import { playSound } from '../../utils/sound';
+import styles from './OngoingGameCard.module.css';
 
 import type { LiveGamePlayer, LiveGameData } from '../../utils/gameUtils';
 export type { LiveGamePlayer, LiveGameData };
 
 type Props = {
-	gameData: LiveGameData
-	profileUsername: string
-	currentUserId?: number | null
-	size?: number | null
-	onGameOverStartExit?: () => void
-	onGameOverDone: () => void
-}
+	gameData: LiveGameData;
+	profileUsername: string;
+	currentUserId?: number | null;
+	size?: number | null;
+	onGameOverStartExit?: () => void;
+	onGameOverDone: () => void;
+};
 
-export default function OngoingGameCard({
+const OngoingGameCard = ({
 	gameData,
 	profileUsername,
 	currentUserId,
 	size,
 	onGameOverStartExit,
 	onGameOverDone,
-}: Props) {
-	const { t } = useTranslation()
+}: Props) => {
+	const { t } = useTranslation();
 	const navigate = useNavigate()
 
 	const [fen, setFen] = useState(gameData.fen)
@@ -250,16 +251,22 @@ export default function OngoingGameCard({
 							: styles.defeatBadge
 					} ${isResultExiting ? styles.resultBadgeExit : ''}`}
 				>
-					<span>
-						{isDraw
-							? `½ - ½ ${t('draw')}`
-							: isProfileWinner
-							? `🏆 ${t('victory')}`
-							: t('defeat')}
+					<span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+						{isDraw ? (
+							`½ - ½ ${t('draw')}`
+						) : isProfileWinner ? (
+							<>
+								<Trophy size={14} aria-hidden="true" />
+								<span>{t('victory')}</span>
+							</>
+						) : (
+							t('defeat')
+						)}
 					</span>
 					{countdown !== null && (
-						<span className={styles.countdownPill}>
-							⏱️ {countdown}s
+						<span className={styles.countdownPill} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+							<Clock size={12} aria-hidden="true" />
+							<span>{countdown}s</span>
 						</span>
 					)}
 				</div>
@@ -272,7 +279,7 @@ export default function OngoingGameCard({
 						newMatchPhase === 'exit' ? styles.newMatchBannerExit : ''
 					}`}
 				>
-					<span>⚔️</span>
+					<Swords size={15} aria-hidden="true" />
 					<span>{t('new_match_started')}</span>
 				</div>
 			)}
@@ -281,7 +288,7 @@ export default function OngoingGameCard({
 			<div className={styles.hoverOverlay}>
 				<div className={styles.spectateButton}>
 					<span>{t('click_to_spectate')}</span>
-					<span className={styles.spectateArrow}>→</span>
+					<ArrowRight size={14} className={styles.spectateArrow} aria-hidden="true" />
 				</div>
 			</div>
 
@@ -314,5 +321,7 @@ export default function OngoingGameCard({
 				/>
 			</div>
 		</div>
-	)
-}
+	);
+};
+
+export default OngoingGameCard;

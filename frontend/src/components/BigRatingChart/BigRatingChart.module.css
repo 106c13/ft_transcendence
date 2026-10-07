@@ -29,12 +29,14 @@
 }
 
 .statLabel {
-	font-size: 11.5px;
 	font-size: 11px;
 	font-weight: 600;
 	color: #94A3B8;
 	text-transform: uppercase;
 	letter-spacing: 0.4px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
 }
 
 .statValue {
@@ -264,6 +266,7 @@
 }
 
 .emptyIcon {
+	color: var(--color-slate-400);
 	font-size: 40px;
 	font-size: 36px;
 	opacity: 0.6;

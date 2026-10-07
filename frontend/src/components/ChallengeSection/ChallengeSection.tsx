@@ -1,24 +1,25 @@
-import { useState, useRef, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import styles from './ChallengeSection.module.css'
+import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Swords, User, X, Check } from 'lucide-react';
+import styles from './ChallengeSection.module.css';
 
 type Friend = {
-	username: string
-	avatar: string | null
-}
+	username: string;
+	avatar: string | null;
+};
 
 type Props = {
-	active: boolean
-	onToggle: () => void
-	selectedFriend: string
-	onSelectFriend: (username: string) => void
-	friends: Friend[]
-}
+	active: boolean;
+	onToggle: () => void;
+	selectedFriend: string;
+	onSelectFriend: (username: string) => void;
+	friends: Friend[];
+};
 
-function ChallengeSection({
+const ChallengeSection = ({
 	active, onToggle, selectedFriend, onSelectFriend,
 	friends
-}: Props) {
+}: Props) => {
 	const { t } = useTranslation();
 	const [isOpen, setIsOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
@@ -89,7 +90,9 @@ function ChallengeSection({
 					className={`${styles.challengeToggle} ${active ? styles.challengeToggleActive : ''}`}
 					onClick={handleToggle}
 				>
-					<span className={styles.challengeIcon}>⚔️</span>
+					<span className={styles.challengeIcon}>
+						<Swords size={18} aria-hidden="true" />
+					</span>
 					{t('challenge_friend')}
 				</button>
 
@@ -112,9 +115,9 @@ function ChallengeSection({
 										alt={selectedFriendObj.username}
 										className={styles.triggerAvatar}
 										onError={(e) => {
-											const target = e.currentTarget
+											const target = e.currentTarget;
 											if (!target.src.endsWith('/assets/default.jpg')) {
-												target.src = '/assets/default.jpg'
+												target.src = '/assets/default.jpg';
 											}
 										}}
 									/>
@@ -122,7 +125,9 @@ function ChallengeSection({
 								</>
 							) : (
 								<>
-									<span className={styles.triggerPlaceholderIcon}>👤</span>
+									<span className={styles.triggerPlaceholderIcon}>
+										<User size={16} aria-hidden="true" />
+									</span>
 									<span className={styles.triggerPlaceholderText}>
 										{t('select_friend')}
 									</span>
@@ -177,11 +182,11 @@ function ChallengeSection({
 											type="button"
 											className={styles.searchClearBtn}
 											onClick={() => {
-												setSearchQuery('')
-												searchInputRef.current?.focus()
+												setSearchQuery('');
+												searchInputRef.current?.focus();
 											}}
 										>
-											✕
+											<X size={13} aria-hidden="true" />
 										</button>
 									)}
 								</div>
@@ -192,7 +197,9 @@ function ChallengeSection({
 									className={styles.dropdownClearOption}
 									onClick={() => handleSelect('')}
 								>
-									<span className={styles.clearIcon}>✕</span>
+									<span className={styles.clearIcon}>
+										<X size={14} aria-hidden="true" />
+									</span>
 									<span>{t('deselect_friend')}</span>
 								</div>
 							)}
@@ -208,7 +215,7 @@ function ChallengeSection({
 									</div>
 								) : (
 									filteredFriends.map(friend => {
-										const isSelected = friend.username === selectedFriend
+										const isSelected = friend.username === selectedFriend;
 										return (
 											<div
 												key={friend.username}
@@ -220,16 +227,20 @@ function ChallengeSection({
 													alt={friend.username}
 													className={styles.optionAvatar}
 													onError={(e) => {
-														const target = e.currentTarget
+														const target = e.currentTarget;
 														if (!target.src.endsWith('/assets/default.jpg')) {
-															target.src = '/assets/default.jpg'
+															target.src = '/assets/default.jpg';
 														}
 													}}
 												/>
 												<span className={styles.optionUsername}>{friend.username}</span>
-												{isSelected && <span className={styles.optionCheck}>✓</span>}
+												{isSelected && (
+													<span className={styles.optionCheck}>
+														<Check size={14} aria-hidden="true" />
+													</span>
+												)}
 											</div>
-										)
+										);
 									})
 								)}
 							</div>
@@ -250,7 +261,7 @@ function ChallengeSection({
 				</div>
 			)}
 		</div>
-	)
-}
+	);
+};
 
-export default ChallengeSection
+export default ChallengeSection;

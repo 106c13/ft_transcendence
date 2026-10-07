@@ -115,8 +115,15 @@
 	left: 12px;
 	top: 50%;
 	transform: translateY(-50%);
-	color: #94A3B8;
+	color: var(--color-slate-400);
 	pointer-events: none;
+	display: flex;
+	align-items: center;
+	transition: color var(--transition-normal);
+}
+
+.searchWrapper:focus-within .searchIcon {
+	color: var(--color-blue-400);
 }
 
 .searchInput {
@@ -278,6 +285,7 @@
 }
 
 .emptyIcon {
+	color: var(--color-slate-400);
 	font-size: 32px;
 	margin-bottom: 4px;
 	opacity: 0.8;

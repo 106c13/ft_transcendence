@@ -1,44 +1,39 @@
-import { useTranslation } from 'react-i18next'
-import type { ModeRatingHistory, RatingCategory } from '../../hooks/useRatingHistory'
-import styles from './MiniRatingChart.module.css'
+import { useTranslation } from 'react-i18next';
+import GameModeIcon from '../GameModeIcon/GameModeIcon';
+import type { ModeRatingHistory, RatingCategory } from '../../hooks/useRatingHistory';
+import styles from './MiniRatingChart.module.css';
 
 type Props = {
-	mode: RatingCategory
-	history?: ModeRatingHistory
-	onClick: () => void
-	compact?: boolean
-}
+	mode: RatingCategory;
+	history?: ModeRatingHistory;
+	onClick: () => void;
+	compact?: boolean;
+};
 
 const MODE_CONFIG: Record<
 	RatingCategory,
-	{ nameKey: string; defaultName: string; icon: string; time: string; color: string }
+	{ nameKey: string; time: string; color: string }
 > = {
 	bullet: {
 		nameKey: 'bullet_rating',
-		defaultName: 'Bullet',
-		icon: '🔥',
 		time: '1 min',
 		color: '#F59E0B',
 	},
 	blitz: {
 		nameKey: 'blitz_rating',
-		defaultName: 'Blitz',
-		icon: '⚡',
 		time: '3 min',
 		color: '#38BDF8',
 	},
 	rapid: {
 		nameKey: 'rapid_rating',
-		defaultName: 'Rapid',
-		icon: '⏳',
 		time: '10 min',
 		color: '#818CF8',
 	},
-}
+};
 
-export default function MiniRatingChart({ mode, history, onClick, compact = false }: Props) {
-	const { t } = useTranslation()
-	const config = MODE_CONFIG[mode]
+const MiniRatingChart = ({ mode, history, onClick, compact = false }: Props) => {
+	const { t } = useTranslation();
+	const config = MODE_CONFIG[mode];
 
 	const isNotPlayed = !history || history.gamesPlayed === 0
 	const isProvisional = history?.isProvisional ?? true
@@ -93,11 +88,13 @@ export default function MiniRatingChart({ mode, history, onClick, compact = fals
 			>
 				<div className={styles.compactRow}>
 					<div className={styles.modeInfo}>
-						<span className={styles.modeIcon}>{config.icon}</span>
+						<span className={styles.modeIcon}>
+							<GameModeIcon mode={mode} size={16} />
+						</span>
 						<div className={styles.modeText}>
-							<span className={styles.modeTitle}>{t(config.nameKey, config.defaultName)}</span>
+							<span className={styles.modeTitle}>{t(config.nameKey)}</span>
 							<span className={styles.modeTime}>
-								{t(mode === 'bullet' ? 'time_1_min' : mode === 'blitz' ? 'time_3_min' : 'time_10_min', config.time)}
+								{t(mode === 'bullet' ? 'time_1_min' : mode === 'blitz' ? 'time_3_min' : 'time_10_min')}
 							</span>
 						</div>
 					</div>
@@ -181,11 +178,13 @@ export default function MiniRatingChart({ mode, history, onClick, compact = fals
 		<div className={styles.miniChartCard} onClick={onClick} role="button" tabIndex={0}>
 			<div className={styles.header}>
 				<div className={styles.modeInfo}>
-					<span className={styles.modeIcon}>{config.icon}</span>
+					<span className={styles.modeIcon}>
+						<GameModeIcon mode={mode} size={20} />
+					</span>
 					<div className={styles.modeText}>
-						<span className={styles.modeTitle}>{t(config.nameKey, config.defaultName)}</span>
+						<span className={styles.modeTitle}>{t(config.nameKey)}</span>
 						<span className={styles.modeTime}>
-							{t(mode === 'bullet' ? 'time_1_min' : mode === 'blitz' ? 'time_3_min' : 'time_10_min', config.time)}
+							{t(mode === 'bullet' ? 'time_1_min' : mode === 'blitz' ? 'time_3_min' : 'time_10_min')}
 						</span>
 					</div>
 				</div>
@@ -302,6 +301,8 @@ export default function MiniRatingChart({ mode, history, onClick, compact = fals
 				)}
 			</div>
 		</div>
-	)
-}
+	);
+};
+
+export default MiniRatingChart;
 

@@ -50,6 +50,7 @@
 .spinnerIcon {
 	font-size: 48px;
 	animation: pulse 1.5s ease-in-out infinite alternate;
+	color: var(--color-blue-400);
 }
 
 @keyframes pulse {

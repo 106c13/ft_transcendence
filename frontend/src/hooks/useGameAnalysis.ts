@@ -195,25 +195,25 @@ export function useGameAnalysis() {
 	const getClassificationBadge = (classification: string) => {
 		switch (classification) {
 			case 'brilliant':
-				return { label: 'Brilliant', icon: '💎', colorClass: 'brilliant' }
+				return { label: 'Brilliant', colorClass: 'brilliant' };
 			case 'great':
-				return { label: 'Great Move', icon: '!', colorClass: 'great' }
+				return { label: 'Great Move', colorClass: 'great' };
 			case 'best':
-				return { label: 'Best', icon: '⭐', colorClass: 'best' }
+				return { label: 'Best', colorClass: 'best' };
 			case 'excellent':
-				return { label: 'Excellent', icon: '🟢', colorClass: 'excellent' }
+				return { label: 'Excellent', colorClass: 'excellent' };
 			case 'good':
-				return { label: 'Good', icon: '🔵', colorClass: 'good' }
+				return { label: 'Good', colorClass: 'good' };
 			case 'inaccuracy':
-				return { label: 'Inaccuracy', icon: '🟡', colorClass: 'inaccuracy' }
+				return { label: 'Inaccuracy', colorClass: 'inaccuracy' };
 			case 'mistake':
-				return { label: 'Mistake', icon: '🟠', colorClass: 'mistake' }
+				return { label: 'Mistake', colorClass: 'mistake' };
 			case 'blunder':
-				return { label: 'Blunder', icon: '🔴', colorClass: 'blunder' }
+				return { label: 'Blunder', colorClass: 'blunder' };
 			default:
-				return { label: classification, icon: '♟', colorClass: 'default' }
+				return { label: classification, colorClass: 'default' };
 		}
-	}
+	};
 
 	return {
 		selectedGame,

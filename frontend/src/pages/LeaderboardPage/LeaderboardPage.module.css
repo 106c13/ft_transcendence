@@ -139,6 +139,10 @@
 	gap: 8px;
 }
 
+.explainerTitle svg {
+	color: var(--color-blue-400);
+}
+
 .explainerGrid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -157,6 +161,9 @@
 }
 
 .explainerItemHeader {
+	display: flex;
+	align-items: center;
+	gap: 6px;
 	font-size: 13.5px;
 	font-weight: 700;
 	color: #60A5FA;
@@ -371,9 +378,16 @@
 	left: 14px;
 	top: 50%;
 	transform: translateY(-50%);
-	color: #94A3B8;
+	color: var(--color-slate-400);
 	font-size: 14px;
 	pointer-events: none;
+	display: flex;
+	align-items: center;
+	transition: color var(--transition-normal);
+}
+
+.searchBox:focus-within .searchIcon {
+	color: var(--color-blue-400);
 }
 
 .searchInput {
@@ -402,14 +416,19 @@
 	transform: translateY(-50%);
 	background: transparent;
 	border: none;
-	color: #94A3B8;
+	color: var(--color-slate-400);
 	font-size: 14px;
 	cursor: pointer;
 	padding: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--radius-sm);
+	transition: color var(--transition-fast);
 }
 
 .clearSearchBtn:hover {
-	color: #F8FAFC;
+	color: var(--color-slate-100);
 }
 
 .modeButtonGroup {
@@ -464,10 +483,23 @@
 	color: #F8FAFC;
 }
 
+.filterToggleBtn svg {
+	color: var(--color-slate-400);
+	transition: color var(--transition-fast);
+}
+
+.filterToggleBtn:hover svg {
+	color: var(--color-slate-100);
+}
+
 .filterToggleBtnActive {
 	background: rgba(99, 102, 241, 0.15);
 	border-color: #6366F1;
 	color: #818CF8;
+}
+
+.filterToggleBtnActive svg {
+	color: var(--color-indigo-400);
 }
 
 .filterBadgeCount {
@@ -636,6 +668,10 @@
 	padding: 0;
 	font-size: 11px;
 	line-height: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: color var(--transition-fast);
 }
 
 .chipCloseBtn:hover {
@@ -1036,6 +1072,7 @@
 }
 
 .emptyIcon {
+	color: var(--color-slate-400);
 	font-size: 42px;
 	margin-bottom: 4px;
 }

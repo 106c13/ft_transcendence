@@ -1,19 +1,21 @@
-import { useEffect, useState } from 'react'
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { useGameHistory } from '../../hooks/useGameHistory'
-import { useRatingHistory, type RatingCategory } from '../../hooks/useRatingHistory'
-import { usePageTitle } from '../../hooks/usePageTitle'
-import type { User } from '../../utils/profileUtils'
-import BigRatingChart from '../../components/BigRatingChart/BigRatingChart'
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { TrendingUp, ArrowLeft } from 'lucide-react';
+import { useGameHistory } from '../../hooks/useGameHistory';
+import { useRatingHistory, type RatingCategory } from '../../hooks/useRatingHistory';
+import { usePageTitle } from '../../hooks/usePageTitle';
+import type { User } from '../../utils/profileUtils';
+import BigRatingChart from '../../components/BigRatingChart/BigRatingChart';
 import CustomSelect from '../../components/CustomSelect/CustomSelect';
+import GameModeIcon from '../../components/GameModeIcon/GameModeIcon';
 import type { SelectOption } from '../../utils/selectUtils';
-import styles from './RatingHistoryPage.module.css'
+import styles from './RatingHistoryPage.module.css';
 
-const VALID_MODES: RatingCategory[] = ['bullet', 'blitz', 'rapid']
+const VALID_MODES: RatingCategory[] = ['bullet', 'blitz', 'rapid'];
 
-export default function RatingHistoryPage() {
-	const { t } = useTranslation()
+const RatingHistoryPage = () => {
+	const { t } = useTranslation();
 	usePageTitle('page_title_rating_history')
 	const { username: paramUsername } = useParams()
 	const navigate = useNavigate()
@@ -70,20 +72,20 @@ export default function RatingHistoryPage() {
 		return (
 			<div className={styles.ratingHistoryPage}>
 				<div className={styles.loadingSpinner}>
-					<span className={styles.spinnerIcon}>📈</span>
+					<TrendingUp size={32} className={styles.spinnerIcon} aria-hidden="true" />
 					<p>{t('loading')}</p>
 				</div>
 			</div>
-		)
+		);
 	}
 
-	const currentModeHistory = ratingData[selectedMode]
+	const currentModeHistory = ratingData[selectedMode];
 
 	const modeOptions: SelectOption<RatingCategory>[] = [
-		{ value: 'bullet', icon: '🔥', label: `${t('bullet_rating')} (${t('time_1_min')})` },
-		{ value: 'blitz', icon: '⚡', label: `${t('blitz_rating')} (${t('time_3_min')})` },
-		{ value: 'rapid', icon: '⏳', label: `${t('rapid_rating')} (${t('time_10_min')})` },
-	]
+		{ value: 'bullet', icon: <GameModeIcon mode="bullet" size={14} />, label: `${t('bullet_rating')} (${t('time_1_min')})` },
+		{ value: 'blitz', icon: <GameModeIcon mode="blitz" size={14} />, label: `${t('blitz_rating')} (${t('time_3_min')})` },
+		{ value: 'rapid', icon: <GameModeIcon mode="rapid" size={14} />, label: `${t('rapid_rating')} (${t('time_10_min')})` },
+	];
 
 	return (
 		<div className={styles.ratingHistoryPage}>
@@ -91,7 +93,8 @@ export default function RatingHistoryPage() {
 				{/* Top bar with back button & game mode dropdown */}
 				<div className={styles.topBar}>
 					<button className={styles.backBtn} onClick={handleBack}>
-						← {t('back_to_profile')}
+						<ArrowLeft size={14} aria-hidden="true" />
+						<span>{t('back_to_profile')}</span>
 					</button>
 
 					<div className={styles.modeSelectorGroup}>
@@ -134,6 +137,8 @@ export default function RatingHistoryPage() {
 				<BigRatingChart mode={selectedMode} history={currentModeHistory} />
 			</div>
 		</div>
-	)
-}
+	);
+};
+
+export default RatingHistoryPage;
 

@@ -170,6 +170,7 @@
 }
 
 .emptyIcon {
+	color: var(--color-slate-400);
 	font-size: var(--font-size-xl);
 	opacity: 0.7;
 	flex-shrink: 0;

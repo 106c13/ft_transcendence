@@ -1,42 +1,43 @@
-import { useState, useMemo, useCallback } from 'react'
-import { useTranslation } from 'react-i18next'
-import styles from './ChatSidebar.module.css'
+import { useState, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MessageSquare, Search, Plus } from 'lucide-react';
+import styles from './ChatSidebar.module.css';
 
 import type { ChatObject } from '../../utils/chatUtils';
 export type { ChatObject };
 
 type Props = {
-	chats: ChatObject[]
-	selectedChat: ChatObject | null
-	currentUserId: number | null
-	onSelectChat: (chat: ChatObject) => void
-	activeUserId?: number | null
-	onOpenNewChat: () => void
-	friendStatusMap?: Map<number, string>
-	isMobileHidden?: boolean
-}
+	chats: ChatObject[];
+	selectedChat: ChatObject | null;
+	currentUserId: number | null;
+	onSelectChat: (chat: ChatObject) => void;
+	activeUserId?: number | null;
+	onOpenNewChat: () => void;
+	friendStatusMap?: Map<number, string>;
+	isMobileHidden?: boolean;
+};
 
 function formatChatTime(dateStr?: string): string {
-	if (!dateStr) return ''
+	if (!dateStr) return '';
 	try {
-		const date = new Date(dateStr)
-		if (isNaN(date.getTime())) return ''
-		const now = new Date()
+		const date = new Date(dateStr);
+		if (isNaN(date.getTime())) return '';
+		const now = new Date();
 		const isToday =
 			date.getDate() === now.getDate() &&
 			date.getMonth() === now.getMonth() &&
-			date.getFullYear() === now.getFullYear()
+			date.getFullYear() === now.getFullYear();
 
 		if (isToday) {
-			return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+			return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 		}
-		return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
+		return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 	} catch {
-		return ''
+		return '';
 	}
 }
 
-function ChatSidebar({
+const ChatSidebar = ({
 	chats,
 	selectedChat,
 	currentUserId,
@@ -45,7 +46,7 @@ function ChatSidebar({
 	onOpenNewChat,
 	friendStatusMap,
 	isMobileHidden = false,
-}: Props) {
+}: Props) => {
 	const { t } = useTranslation()
 	const [searchQuery, setSearchQuery] = useState('')
 
@@ -84,38 +85,13 @@ function ChatSidebar({
 						onClick={onOpenNewChat}
 						title={t('new_chat')}
 					>
-						<svg
-							width="15"
-							height="15"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2.5"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						>
-							<line x1="12" y1="5" x2="12" y2="19" />
-							<line x1="5" y1="12" x2="19" y2="12" />
-						</svg>
+						<Plus size={15} strokeWidth={2.5} aria-hidden="true" />
 						<span>{t('new_chat')}</span>
 					</button>
 				</div>
 
 				<div className={styles.searchContainer}>
-					<svg
-						className={styles.searchIcon}
-						width="14"
-						height="14"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-					>
-						<circle cx="11" cy="11" r="8" />
-						<line x1="21" y1="21" x2="16.65" y2="16.65" />
-					</svg>
+					<Search size={14} className={styles.searchIcon} aria-hidden="true" />
 					<input
 						type="text"
 						className={styles.searchInput}
@@ -220,7 +196,7 @@ function ChatSidebar({
 
 				{chats.length === 0 ? (
 					<div className={styles.noChats}>
-						<span className={styles.noChatsIcon}>💬</span>
+						<MessageSquare size={32} className={styles.noChatsIcon} aria-hidden="true" />
 						<span className={styles.noChatsText}>
 							{t('no_chats_yet')}
 						</span>
@@ -234,7 +210,7 @@ function ChatSidebar({
 					</div>
 				) : filteredChats.length === 0 ? (
 					<div className={styles.noChats}>
-						<span className={styles.noChatsIcon}>🔍</span>
+						<Search size={32} className={styles.noChatsIcon} aria-hidden="true" />
 						<span className={styles.noChatsText}>
 							{t('no_chats_found')}
 						</span>
@@ -242,7 +218,7 @@ function ChatSidebar({
 				) : null}
 			</div>
 		</aside>
-	)
-}
+	);
+};
 
-export default ChatSidebar
+export default ChatSidebar;

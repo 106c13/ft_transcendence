@@ -193,7 +193,7 @@
 }
 
 .animIcon {
-	font-size: 38px;
+	color: var(--color-blue-400);
 	z-index: 2;
 	animation: enginePulse 2s infinite ease-in-out;
 }
@@ -403,6 +403,9 @@
 	font-weight: 700;
 	padding: 2px 7px;
 	border-radius: 6px;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
 }
 
 .chipBrilliant { background: rgba(56, 189, 248, 0.15); color: #38BDF8; }
@@ -662,7 +665,10 @@
 .startPlaceholder span {
 	font-weight: 700;
 	color: #E2E8F0;
-	display: block;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
 	margin-bottom: 4px;
 }
 
@@ -687,6 +693,9 @@
 .recLabel {
 	color: #4ADE80;
 	font-weight: 600;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
 }
 
 .recMoveSan {
@@ -711,17 +720,19 @@
 }
 
 .toggleBestHintBtn {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--gap-xs);
 	background: rgba(34, 197, 94, 0.15);
 	color: #4ADE80;
 	border: 1px solid rgba(34, 197, 94, 0.3);
 	padding: 4px 10px;
-	border-radius: 6px;
-	font-size: 11px;
+	border-radius: var(--radius-md);
+	font-size: var(--font-size-xs);
 	font-weight: 600;
 	cursor: pointer;
-	margin-top: 4px;
 	align-self: flex-start;
-	transition: 0.2s;
+	transition: var(--transition-normal);
 }
 
 .toggleBestHintBtn:hover {
@@ -750,6 +761,9 @@
 	font-size: 14px;
 	cursor: pointer;
 	transition: 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .navBar button:hover {
@@ -824,6 +838,9 @@
 	font-weight: 800;
 	padding: 1px 5px;
 	border-radius: 4px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .downloadPgnSmall {

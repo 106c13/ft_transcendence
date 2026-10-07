@@ -1,3 +1,4 @@
+import { ExternalLink } from 'lucide-react';
 import { DEVS } from '../../utils/aboutUtils';
 import type { DevKey } from '../../utils/aboutUtils';
 import styles from './AboutShowcase.module.css';
@@ -25,7 +26,7 @@ const AboutShowcase = ({ selectedDev, currentSquare }: Props) => {
 						className={styles.intraButton}
 					>
 						<span>42 Intra</span>
-						<span className={styles.externalIcon}>↗</span>
+						<ExternalLink size={12} className={styles.externalIcon} aria-hidden="true" />
 					</a>
 				</div>
 

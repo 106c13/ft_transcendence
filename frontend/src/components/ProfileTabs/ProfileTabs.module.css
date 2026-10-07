@@ -164,6 +164,7 @@
 }
 
 .emptyIcon {
+	color: var(--color-slate-400);
 	font-size: 38px;
 	opacity: 0.75;
 	margin-bottom: var(--margin-xs);
@@ -185,6 +186,10 @@
 }
 
 .playNowBtn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--gap-sm);
 	background: linear-gradient(135deg, var(--color-blue-500) 0%, var(--color-blue-600) 100%);
 	color: #ffffff;
 	border: none;
@@ -206,7 +211,7 @@
 	font-size: 28px;
 	animation: spin 1.8s infinite linear;
 	margin-bottom: var(--margin-xs);
-	color: var(--color-slate-400);
+	color: var(--color-blue-400);
 }
 
 @keyframes spin {

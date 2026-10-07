@@ -1,15 +1,16 @@
-import { useEffect, useRef } from 'react'
-import { useNavigate, useSearchParams, useOutletContext } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { Socket } from 'socket.io-client'
-import { useGameSocketContext } from '../../context/GameSocketContext'
-import { usePageTitle } from '../../hooks/usePageTitle'
-import { getPieceImageSrc } from '../../utils/gameUtils'
-import type { GameModeType } from '../../utils/gameModeUtils'
-import type { LayoutContextType } from '../../layouts/MainLayout'
-import styles from './MatchmakingPage.module.css'
+import { useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams, useOutletContext } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { X } from 'lucide-react';
+import { Socket } from 'socket.io-client';
+import { useGameSocketContext } from '../../context/GameSocketContext';
+import { usePageTitle } from '../../hooks/usePageTitle';
+import { getPieceImageSrc } from '../../utils/gameUtils';
+import type { GameModeType } from '../../utils/gameModeUtils';
+import type { LayoutContextType } from '../../layouts/MainLayout';
+import styles from './MatchmakingPage.module.css';
 
-export default function MatchmakingPage() {
+const MatchmakingPage = () => {
     const { t } = useTranslation()
     usePageTitle('page_title_searching')
     const navigate = useNavigate()
@@ -96,10 +97,13 @@ export default function MatchmakingPage() {
                         className={styles.cancelMatchBtn}
                         onClick={handleCancel}
                     >
-                        ✕ {t('cancel')}
+                        <X size={15} aria-hidden="true" />
+                        <span>{t('cancel')}</span>
                     </button>
                 </div>
             </main>
         </div>
-    )
-}
+    );
+};
+
+export default MatchmakingPage;

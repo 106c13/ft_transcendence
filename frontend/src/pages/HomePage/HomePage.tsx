@@ -1,21 +1,22 @@
-import { useState, useEffect, useMemo } from 'react'
-import { useNavigate, useOutletContext } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import type { LayoutContextType } from '../../layouts/MainLayout'
-import { useToast } from '../../context/ToastContext'
-import { useGameHistory } from '../../hooks/useGameHistory'
-import { usePageTitle } from '../../hooks/usePageTitle'
-import GameModesGrid from '../../components/GameModesGrid/GameModesGrid'
-import ChallengeSection from '../../components/ChallengeSection/ChallengeSection'
-import GameReviewCard from '../../components/GameReviewCard/GameReviewCard'
-import HomeRecentGames from '../../components/HomeRecentGames/HomeRecentGames'
-import PlayerRatingsCard from '../../components/PlayerRatingsCard/PlayerRatingsCard'
-import FriendsPreview from '../../components/FriendsPreview/FriendsPreview'
-import type { GameModeType, ModeItem } from '../../utils/gameModeUtils'
-import type { User } from '../../utils/profileUtils'
-import styles from './HomePage.module.css'
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Swords, BarChart3 } from 'lucide-react';
+import type { LayoutContextType } from '../../layouts/MainLayout';
+import { useToast } from '../../context/ToastContext';
+import { useGameHistory } from '../../hooks/useGameHistory';
+import { usePageTitle } from '../../hooks/usePageTitle';
+import GameModesGrid from '../../components/GameModesGrid/GameModesGrid';
+import ChallengeSection from '../../components/ChallengeSection/ChallengeSection';
+import GameReviewCard from '../../components/GameReviewCard/GameReviewCard';
+import HomeRecentGames from '../../components/HomeRecentGames/HomeRecentGames';
+import PlayerRatingsCard from '../../components/PlayerRatingsCard/PlayerRatingsCard';
+import FriendsPreview from '../../components/FriendsPreview/FriendsPreview';
+import type { GameModeType, ModeItem } from '../../utils/gameModeUtils';
+import type { User } from '../../utils/profileUtils';
+import styles from './HomePage.module.css';
 
-function HomePage() {
+const HomePage = () => {
 	const { t } = useTranslation()
 	usePageTitle('page_title_home')
 	const { toast } = useToast()
@@ -105,13 +106,13 @@ function HomePage() {
 	const effectiveRatings = ratings || currentUser?.ratings || null
 
 	const modes: ModeItem[] = [
-		{ id: 'bullet', emoji: '🔥', label: t('bullet'), time: t('time_1_min'), desc: t('bullet_desc') },
-		{ id: 'blitz', emoji: '⚡', label: t('blitz'), time: t('time_3_min'), desc: t('blitz_desc') },
-		{ id: 'rapid', emoji: '⏳', label: t('rapid'), time: t('time_10_min'), desc: t('strategic_classical') },
-		{ id: 'bullet+2', emoji: '🔥', label: t('bullet'), time: t('time_1_inc'), desc: t('bullet_inc_desc'), increment: '+2' },
-		{ id: 'blitz+2', emoji: '⚡', label: t('blitz'), time: t('time_3_inc'), desc: t('blitz_inc_desc'), increment: '+2' },
-		{ id: 'rapid+2', emoji: '⏳', label: t('rapid'), time: t('time_10_inc'), desc: t('rapid_inc_desc'), increment: '+2' },
-	]
+		{ id: 'bullet', emoji: '', label: t('bullet'), time: t('time_1_min'), desc: t('bullet_desc') },
+		{ id: 'blitz', emoji: '', label: t('blitz'), time: t('time_3_min'), desc: t('blitz_desc') },
+		{ id: 'rapid', emoji: '', label: t('rapid'), time: t('time_10_min'), desc: t('strategic_classical') },
+		{ id: 'bullet+2', emoji: '', label: t('bullet'), time: t('time_1_inc'), desc: t('bullet_inc_desc'), increment: '+2' },
+		{ id: 'blitz+2', emoji: '', label: t('blitz'), time: t('time_3_inc'), desc: t('blitz_inc_desc'), increment: '+2' },
+		{ id: 'rapid+2', emoji: '', label: t('rapid'), time: t('time_10_inc'), desc: t('rapid_inc_desc'), increment: '+2' },
+	];
 
 	return (
 		<div className={styles.homeContainer}>
@@ -124,7 +125,7 @@ function HomePage() {
 				<section className={styles.section}>
 					<div className={styles.sectionHeader}>
 						<h2 className={styles.sectionTitle}>
-							<span>⚔️</span> {t('play_online')}
+							<Swords size={20} aria-hidden="true" /> {t('play_online')}
 						</h2>
 					</div>
 
@@ -156,7 +157,7 @@ function HomePage() {
 				<section className={styles.section}>
 					<div className={styles.sectionHeader}>
 						<h2 className={styles.sectionTitle}>
-							<span>📊</span> {t('stats_and_more')}
+							<BarChart3 size={20} aria-hidden="true" /> {t('stats_and_more')}
 						</h2>
 					</div>
 
@@ -186,7 +187,7 @@ function HomePage() {
 				</section>
 			</main>
 		</div>
-	)
-}
+	);
+};
 
-export default HomePage
+export default HomePage;

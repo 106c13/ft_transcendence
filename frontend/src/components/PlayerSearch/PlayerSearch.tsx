@@ -1,18 +1,19 @@
-import { useEffect, useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import styles from './PlayerSearch.module.css'
+import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Search, X } from 'lucide-react';
+import styles from './PlayerSearch.module.css';
 
 export type SearchUser = {
-	id: number
-	username: string
-	email: string
-	avatar?: string
-	bio?: string
-	status?: 'ONLINE' | 'OFFLINE' | 'INGAME'
-}
+	id: number;
+	username: string;
+	email: string;
+	avatar?: string;
+	bio?: string;
+	status?: 'ONLINE' | 'OFFLINE' | 'INGAME';
+};
 
-function PlayerSearch() {
+const PlayerSearch = () => {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
 	const [isExpanded, setIsExpanded] = useState(false)
@@ -151,7 +152,9 @@ function PlayerSearch() {
 				}}
 				title={!isExpanded ? t('search_players') : undefined}
 			>
-				<span className={styles.searchIcon}>🔍</span>
+				<span className={styles.searchIcon}>
+					<Search size={18} aria-hidden="true" />
+				</span>
 				<input
 					ref={inputRef}
 					type="text"
@@ -169,7 +172,7 @@ function PlayerSearch() {
 					title={t('close')}
 					tabIndex={isExpanded ? 0 : -1}
 				>
-					✕
+					<X size={14} aria-hidden="true" />
 				</button>
 			</div>
 
@@ -202,7 +205,8 @@ function PlayerSearch() {
 				</div>
 			)}
 		</div>
-	)
-}
+	);
+};
 
-export default PlayerSearch
+export default PlayerSearch;
+

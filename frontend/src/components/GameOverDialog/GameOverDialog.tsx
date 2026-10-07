@@ -1,7 +1,9 @@
-import { useTranslation } from 'react-i18next'
-import ModalConfetti from '../ModalConfetti/ModalConfetti'
-import TopRankBadge from '../TopRankBadge/TopRankBadge'
-import styles from './GameOverDialog.module.css'
+import { useTranslation } from 'react-i18next';
+import { X, Search } from 'lucide-react';
+import ModalConfetti from '../ModalConfetti/ModalConfetti';
+import TopRankBadge from '../TopRankBadge/TopRankBadge';
+import styles from './GameOverDialog.module.css';
+
 
 type Props = {
 	winnerColor: 'w' | 'b' | null
@@ -88,7 +90,9 @@ function GameOverDialog({
 			{showConfetti && isWinner && <ModalConfetti onComplete={onConfettiComplete} />}
 
 			<div className={`${styles.gameOverBox} ${isAbandoned ? styles.gameOverBoxAbandoned : ''}`}>
-				<button className={styles.closeModalX} onClick={onClose} aria-label={t('close')}>✕</button>
+				<button className={styles.closeModalX} onClick={onClose} aria-label={t('close')}>
+					<X size={16} aria-hidden="true" />
+				</button>
 
 				<div className={`${styles.modalBody} ${isViewer ? styles.modalBodyViewer : ''}`}>
 					<div className={styles.resultHeader}>
@@ -179,7 +183,8 @@ function GameOverDialog({
 
 							{gameOverReason !== 'ABANDONED' && onAnalyze && (
 								<button className={styles.analyzeBtn} onClick={onAnalyze}>
-									🔍 {t('analyze_game')}
+									<Search size={16} aria-hidden="true" />
+									<span>{t('analyze_game')}</span>
 								</button>
 							)}
 						</>

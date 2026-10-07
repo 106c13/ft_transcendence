@@ -65,6 +65,10 @@
 	letter-spacing: 0.2px;
 }
 
+.sectionTitle svg {
+	color: var(--color-blue-400);
+}
+
 /* ── Section 1: Play Online Layout ── */
 .playOnlineLayout {
 	display: grid;

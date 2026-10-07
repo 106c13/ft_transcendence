@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { useGameHistory } from '../../hooks/useGameHistory'
-import { useGameAnalysis } from '../../hooks/useGameAnalysis'
-import { usePageTitle } from '../../hooks/usePageTitle'
-import GameAnalysis from '../../components/GameAnalysis/GameAnalysis'
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { RotateCw } from 'lucide-react';
+import { useGameHistory } from '../../hooks/useGameHistory';
+import { useGameAnalysis } from '../../hooks/useGameAnalysis';
+import { usePageTitle } from '../../hooks/usePageTitle';
+import GameAnalysis from '../../components/GameAnalysis/GameAnalysis';
 import type { MatchRecord } from '../../utils/gameUtils';
-import styles from './GameAnalysisPage.module.css'
+import styles from './GameAnalysisPage.module.css';
 
-export default function GameAnalysisPage() {
+const GameAnalysisPage = () => {
 	const { t } = useTranslation()
 	usePageTitle('page_title_game_analysis')
 	const { id, username: routeUsername } = useParams<{ id: string; username?: string }>()
@@ -132,11 +133,11 @@ export default function GameAnalysisPage() {
 		return (
 			<div className={styles.page}>
 				<div className={styles.loadingSpinner}>
-					<span className={styles.spinnerIcon}>♟</span>
+					<RotateCw size={26} className={styles.spinnerIcon} aria-hidden="true" />
 					<p>{t('loading')}</p>
 				</div>
 			</div>
-		)
+		);
 	}
 
 	return (
@@ -149,5 +150,7 @@ export default function GameAnalysisPage() {
 				onBack={handleBack}
 			/>
 		</div>
-	)
-}
+	);
+};
+
+export default GameAnalysisPage;

@@ -1,8 +1,10 @@
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import type { User, FriendStatus, TabType } from '../../utils/profileUtils'
-import TopRankBadge from '../TopRankBadge/TopRankBadge'
-import styles from './ProfileHeader.module.css'
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { Settings, LogOut, UserPlus, Clock, Check, X, UserCheck, MessageSquare } from 'lucide-react';
+import type { User, FriendStatus, TabType } from '../../utils/profileUtils';
+import TopRankBadge from '../TopRankBadge/TopRankBadge';
+import styles from './ProfileHeader.module.css';
+
 
 type Props = {
     user: User
@@ -118,13 +120,15 @@ const ProfileHeader = ({
                             className={`${styles.headerBtn} ${styles.secondaryBtn}`}
                             onClick={onSettings}
                         >
-                            ⚙️ {t('settings')}
+                            <Settings size={15} aria-hidden="true" />
+                            <span>{t('settings')}</span>
                         </button>
                         <button
                             className={`${styles.headerBtn} ${styles.dangerBtn}`}
                             onClick={onLogout}
                         >
-                            🚪 {t('logout')}
+                            <LogOut size={15} aria-hidden="true" />
+                            <span>{t('logout')}</span>
                         </button>
                     </>
                 ) : isLoggedIn ? (
@@ -134,7 +138,8 @@ const ProfileHeader = ({
                                 className={`${styles.headerBtn} ${styles.primaryBtn}`}
                                 onClick={onSend}
                             >
-                                + {t('send_friend_request')}
+                                <UserPlus size={15} aria-hidden="true" />
+                                <span>{t('send_friend_request')}</span>
                             </button>
                         )}
 
@@ -144,7 +149,8 @@ const ProfileHeader = ({
                                 onClick={onCancel}
                                 title={t('cancel_request')}
                             >
-                                ⏳ {t('request_sent')}
+                                <Clock size={15} aria-hidden="true" />
+                                <span>{t('request_sent')}</span>
                             </button>
                         )}
 
@@ -154,13 +160,15 @@ const ProfileHeader = ({
                                     className={`${styles.headerBtn} ${styles.successBtn}`}
                                     onClick={onAccept}
                                 >
-                                    ✓ {t('accept')}
+                                    <Check size={15} aria-hidden="true" />
+                                    <span>{t('accept')}</span>
                                 </button>
                                 <button
                                     className={`${styles.headerBtn} ${styles.dangerBtn}`}
                                     onClick={onReject}
                                 >
-                                    ✕ {t('reject')}
+                                    <X size={15} aria-hidden="true" />
+                                    <span>{t('reject')}</span>
                                 </button>
                             </>
                         )}
@@ -172,13 +180,15 @@ const ProfileHeader = ({
                                     onClick={onUnfriend}
                                     title={t('unfriend')}
                                 >
-                                    ✓ {t('friends')}
+                                    <UserCheck size={15} aria-hidden="true" />
+                                    <span>{t('friends')}</span>
                                 </button>
                                 <button
                                     className={`${styles.headerBtn} ${styles.secondaryBtn}`}
                                     onClick={handleMessageClick}
                                 >
-                                    💬 {t('message')}
+                                    <MessageSquare size={15} aria-hidden="true" />
+                                    <span>{t('message')}</span>
                                 </button>
                             </>
                         )}

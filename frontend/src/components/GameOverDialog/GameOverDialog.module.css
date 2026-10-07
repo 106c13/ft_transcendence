@@ -47,17 +47,22 @@
 	right: 14px;
 	background: transparent;
 	border: none;
-	color: #94A3B8;
+	color: var(--color-slate-400);
 	font-size: 20px;
 	cursor: pointer;
-	transition: color 0.2s;
+	transition: all 0.2s ease;
 	padding: 4px;
 	line-height: 1;
 	z-index: 5;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--radius-sm);
 }
 
 .closeModalX:hover {
-	color: #F8FAFC;
+	color: var(--color-slate-100);
+	background: rgba(148, 163, 184, 0.15);
 }
 
 @keyframes scaleUp {

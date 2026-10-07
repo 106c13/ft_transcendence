@@ -1,13 +1,13 @@
-import type { GameModeType, ModeItem } from '../../utils/gameModeUtils'
-import styles from './GameModesGrid.module.css'
-import GameMode from '../GameMode/GameMode'
+import type { GameModeType, ModeItem } from '../../utils/gameModeUtils';
+import styles from './GameModesGrid.module.css';
+import GameMode from '../GameMode/GameMode';
 
 type Props = {
-	modes: ModeItem[]
-	onSelectMode: (mode: GameModeType) => void
-}
+	modes: ModeItem[];
+	onSelectMode: (mode: GameModeType) => void;
+};
 
-function GameModesGrid({ modes, onSelectMode }: Props) {
+const GameModesGrid = ({ modes, onSelectMode }: Props) => {
 	return (
 		<div className={styles.homeModesGrid}>
 			{modes.map((mode) => (
@@ -23,7 +23,7 @@ function GameModesGrid({ modes, onSelectMode }: Props) {
 				/>
 			))}
 		</div>
-	)
-}
+	);
+};
 
-export default GameModesGrid
+export default GameModesGrid;

@@ -1,27 +1,28 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { X, Users, Search, MessageSquare } from 'lucide-react';
 import type { ChatObject, Friend } from '../../utils/chatUtils';
 import styles from './NewChatModal.module.css';
 
 export type { Friend };
 
 type Props = {
-	isOpen: boolean
-	onClose: () => void
-	friends: Friend[]
-	chats: ChatObject[]
-	onSelectFriend: (friend: Friend) => void
-	loading?: boolean
-}
+	isOpen: boolean;
+	onClose: () => void;
+	friends: Friend[];
+	chats: ChatObject[];
+	onSelectFriend: (friend: Friend) => void;
+	loading?: boolean;
+};
 
-export default function NewChatModal({
+const NewChatModal = ({
 	isOpen,
 	onClose,
 	friends,
 	chats,
 	onSelectFriend,
 	loading = false,
-}: Props) {
+}: Props) => {
 	const { t } = useTranslation()
 	const [searchQuery, setSearchQuery] = useState('')
 	const inputRef = useRef<HTMLInputElement>(null)
@@ -72,7 +73,7 @@ export default function NewChatModal({
 						onClick={onClose}
 						aria-label={t('close')}
 					>
-						✕
+						<X size={16} aria-hidden="true" />
 					</button>
 				</div>
 
@@ -110,7 +111,7 @@ export default function NewChatModal({
 						</div>
 					) : friends.length === 0 ? (
 						<div className={styles.emptyState}>
-							<span className={styles.emptyIcon}>👥</span>
+							<Users size={32} className={styles.emptyIcon} aria-hidden="true" />
 							<div>{t('no_friends_to_chat')}</div>
 							<div className={styles.emptySubtext}>
 								{t('add_friends_tip')}
@@ -118,7 +119,7 @@ export default function NewChatModal({
 						</div>
 					) : filteredFriends.length === 0 ? (
 						<div className={styles.emptyState}>
-							<span className={styles.emptyIcon}>🔍</span>
+							<Search size={32} className={styles.emptyIcon} aria-hidden="true" />
 							<div>{t('no_friends_found')}</div>
 							<div className={styles.emptySubtext}>
 								{t('try_different_search')}
@@ -190,31 +191,22 @@ export default function NewChatModal({
 											type="button"
 											className={styles.startChatBtn}
 											onClick={(e) => {
-												e.stopPropagation()
-												onSelectFriend(friend)
+												e.stopPropagation();
+												onSelectFriend(friend);
 											}}
 										>
-											<svg
-												width="14"
-												height="14"
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2.2"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-											>
-												<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-											</svg>
+											<MessageSquare size={14} aria-hidden="true" />
 											<span>{t('start_chat')}</span>
 										</button>
 									</div>
 								</div>
-							)
+							);
 						})
 					)}
 				</div>
 			</div>
 		</div>
-	)
-}
+	);
+};
+
+export default NewChatModal;

@@ -1,18 +1,19 @@
-import styles from './GameMode.module.css'
-import type { GameModeType } from '../../utils/gameModeUtils'
-import { modeClassMap } from '../../utils/gameModeUtils'
+import styles from './GameMode.module.css';
+import type { GameModeType } from '../../utils/gameModeUtils';
+import { modeClassMap } from '../../utils/gameModeUtils';
+import GameModeIcon from '../GameModeIcon/GameModeIcon';
 
 type Props = {
-	id: GameModeType
-	emoji: string
-	label: string
-	time: string
-	desc?: string
-	increment?: string
-	onSelect: (mode: GameModeType) => void
-}
+	id: GameModeType;
+	emoji?: string;
+	label: string;
+	time: string;
+	desc?: string;
+	increment?: string;
+	onSelect: (mode: GameModeType) => void;
+};
 
-function GameMode({ id, emoji, label, time, desc, increment, onSelect }: Props) {
+const GameMode = ({ id, label, time, desc, increment, onSelect }: Props) => {
 	return (
 		<button
 			className={`${styles.homeModeCard} ${styles[modeClassMap[id]]}`}
@@ -20,7 +21,9 @@ function GameMode({ id, emoji, label, time, desc, increment, onSelect }: Props) 
 			type="button"
 		>
 			<div className={styles.homeModeTop}>
-				<span className={styles.homeModeEmoji}>{emoji}</span>
+				<span className={styles.homeModeEmoji}>
+					<GameModeIcon mode={id} size={26} />
+				</span>
 				{increment && (
 					<span className={styles.homeModeIncBadge}>{increment}s</span>
 				)}
@@ -31,7 +34,7 @@ function GameMode({ id, emoji, label, time, desc, increment, onSelect }: Props) 
 				{desc && <div className={styles.homeModeDesc}>{desc}</div>}
 			</div>
 		</button>
-	)
-}
+	);
+};
 
-export default GameMode
+export default GameMode;

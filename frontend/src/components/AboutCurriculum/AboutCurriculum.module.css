@@ -19,6 +19,10 @@
 	gap: 8px;
 }
 
+.sectionTitle svg {
+	color: var(--color-blue-400);
+}
+
 .curriculumText {
 	font-size: 14.5px;
 	line-height: 1.65;
@@ -49,6 +53,10 @@
 	display: flex;
 	align-items: center;
 	gap: 6px;
+}
+
+.techItemTitle svg {
+	color: var(--color-blue-400);
 }
 
 .techItemDesc {

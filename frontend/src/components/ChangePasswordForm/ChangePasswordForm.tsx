@@ -1,11 +1,12 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useToast } from '../../context/ToastContext'
-import styles from './ChangePasswordForm.module.css'
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Lock, Eye, EyeOff } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
+import styles from './ChangePasswordForm.module.css';
 
-function ChangePasswordForm() {
-	const { t } = useTranslation()
-	const { toast } = useToast()
+const ChangePasswordForm = () => {
+	const { t } = useTranslation();
+	const { toast } = useToast();
 
 	const [oldPassword, setOldPassword] = useState('')
 	const [newPassword, setNewPassword] = useState('')
@@ -74,8 +75,8 @@ function ChangePasswordForm() {
 		<div className={styles.card}>
 			<div className={styles.cardHeader}>
 				<h2 className={styles.cardTitle}>
-					<span>🔒</span>
-					{t('security_title')}
+					<Lock size={20} aria-hidden="true" />
+					<span>{t('security_title')}</span>
 				</h2>
 				<p className={styles.cardDesc}>
 					{t('security_desc')}
@@ -103,12 +104,7 @@ function ChangePasswordForm() {
 							onClick={() => setShowOld(!showOld)}
 							aria-label={showOld ? t('hide_password') : t('show_password')}
 						>
-							<img
-								src={showOld ? '/assets/eye-off.svg' : '/assets/eye.svg'}
-								alt=""
-								width={18}
-								height={18}
-							/>
+							{showOld ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
 						</button>
 					</div>
 				</div>
@@ -133,12 +129,7 @@ function ChangePasswordForm() {
 							onClick={() => setShowNew(!showNew)}
 							aria-label={showNew ? t('hide_password') : t('show_password')}
 						>
-							<img
-								src={showNew ? '/assets/eye-off.svg' : '/assets/eye.svg'}
-								alt=""
-								width={18}
-								height={18}
-							/>
+							{showNew ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
 						</button>
 					</div>
 					<p className={styles.fieldHint}>
@@ -166,12 +157,7 @@ function ChangePasswordForm() {
 							onClick={() => setShowConfirm(!showConfirm)}
 							aria-label={showConfirm ? t('hide_password') : t('show_password')}
 						>
-							<img
-								src={showConfirm ? '/assets/eye-off.svg' : '/assets/eye.svg'}
-								alt=""
-								width={18}
-								height={18}
-							/>
+							{showConfirm ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
 						</button>
 					</div>
 				</div>
@@ -187,7 +173,7 @@ function ChangePasswordForm() {
 				</div>
 			</form>
 		</div>
-	)
-}
+	);
+};
 
-export default ChangePasswordForm
+export default ChangePasswordForm;

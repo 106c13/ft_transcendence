@@ -1,16 +1,18 @@
-import { useState, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
-import type { User } from '../../utils/profileUtils'
-import styles from './FriendsList.module.css'
+import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Users, Search, X, ArrowRight } from 'lucide-react';
+import GameModeIcon from '../GameModeIcon/GameModeIcon';
+import type { User } from '../../utils/profileUtils';
+import styles from './FriendsList.module.css';
 
 type Props = {
-	friends: User[]
-	onOpenProfile: (username: string) => void
-}
+	friends: User[];
+	onOpenProfile: (username: string) => void;
+};
 
-export default function FriendsList({ friends, onOpenProfile }: Props) {
-	const { t } = useTranslation()
-	const [searchQuery, setSearchQuery] = useState('')
+const FriendsList = ({ friends, onOpenProfile }: Props) => {
+	const { t } = useTranslation();
+	const [searchQuery, setSearchQuery] = useState('');
 
 	const filteredFriends = useMemo(() => {
 		if (!searchQuery.trim()) return friends
@@ -39,7 +41,7 @@ export default function FriendsList({ friends, onOpenProfile }: Props) {
 
 			{friends.length === 0 ? (
 				<div className={styles.emptyCard}>
-					<div className={styles.emptyIcon}>👥</div>
+					<Users size={36} className={styles.emptyIcon} aria-hidden="true" />
 					<h4 className={styles.emptyTitle}>{t('no_friends_yet')}</h4>
 					<p className={styles.emptySubtitle}>
 						{t('add_friends_tip')}
@@ -47,7 +49,7 @@ export default function FriendsList({ friends, onOpenProfile }: Props) {
 				</div>
 			) : filteredFriends.length === 0 ? (
 				<div className={styles.emptyCard}>
-					<div className={styles.emptyIcon}>🔍</div>
+					<Search size={36} className={styles.emptyIcon} aria-hidden="true" />
 					<h4 className={styles.emptyTitle}>{t('no_friends_matching_query')}</h4>
 					<p className={styles.emptySubtitle}>
 						{t('try_different_search')}
@@ -57,7 +59,8 @@ export default function FriendsList({ friends, onOpenProfile }: Props) {
 						onClick={() => setSearchQuery('')}
 						type="button"
 					>
-						✕ {t('clear')}
+						<X size={14} aria-hidden="true" />
+						<span>{t('clear')}</span>
 					</button>
 				</div>
 			) : (
@@ -102,17 +105,20 @@ export default function FriendsList({ friends, onOpenProfile }: Props) {
 									<span className={styles.friendName}>{friend.username}</span>
 									{friend.ratings?.blitz?.rating && (
 										<span className={styles.friendRating}>
-											⚡ {friend.ratings.blitz.rating}
+											<GameModeIcon mode="blitz" size={13} />
+											<span>{friend.ratings.blitz.rating}</span>
 										</span>
 									)}
 								</div>
 							</div>
 
-							<span className={styles.arrowIndicator}>→</span>
+							<ArrowRight size={16} className={styles.arrowIndicator} aria-hidden="true" />
 						</div>
 					))}
 				</div>
 			)}
 		</div>
-	)
-}
+	);
+};
+
+export default FriendsList;

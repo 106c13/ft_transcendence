@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Users, ArrowRight } from 'lucide-react';
 import type { User } from '../../utils/profileUtils';
 import styles from './FriendsPreview.module.css';
 
@@ -20,13 +21,14 @@ const FriendsPreview = ({ friends, onFriendClick, onSeeAll }: Props) => {
 					<span className={styles.countBadge}>{friends.length}</span>
 				</div>
 				<button className={styles.seeAllBtn} onClick={onSeeAll} type="button">
-					{t('see_all')} →
+					<span>{t('see_all')}</span>
+					<ArrowRight size={14} aria-hidden="true" />
 				</button>
 			</div>
 
 			{displayedFriends.length === 0 ? (
 				<div className={styles.emptyState}>
-					<span className={styles.emptyIcon}>👥</span>
+					<Users size={32} className={styles.emptyIcon} aria-hidden="true" />
 					<div className={styles.emptyTextGroup}>
 						<span className={styles.emptyTitle}>{t('no_friends_yet')}</span>
 						<span className={styles.emptySubtitle}>

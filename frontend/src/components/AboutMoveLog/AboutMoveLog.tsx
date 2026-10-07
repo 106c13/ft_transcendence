@@ -1,20 +1,21 @@
-import { useEffect, useRef } from 'react'
-import { MOVE_STEPS } from '../../utils/aboutUtils'
-import styles from './AboutMoveLog.module.css'
+import { useEffect, useRef } from 'react';
+import { ScrollText, Play, Pause, SkipBack, ChevronLeft, ChevronRight, SkipForward } from 'lucide-react';
+import { MOVE_STEPS } from '../../utils/aboutUtils';
+import styles from './AboutMoveLog.module.css';
 
 interface Props {
-	currentPly: number
-	onSelectPly: (ply: number) => void
-	isPlaying: boolean
-	onTogglePlay: () => void
+	currentPly: number;
+	onSelectPly: (ply: number) => void;
+	isPlaying: boolean;
+	onTogglePlay: () => void;
 }
 
-export default function AboutMoveLog({
+const AboutMoveLog = ({
 	currentPly,
 	onSelectPly,
 	isPlaying,
 	onTogglePlay,
-}: Props) {
+}: Props) => {
 	const listRef = useRef<HTMLDivElement>(null)
 
 	// Keep active move visible in vertical list
@@ -48,11 +49,21 @@ export default function AboutMoveLog({
 			{/* Header */}
 			<div className={styles.header}>
 				<h4 className={styles.title}>
-					<span>♟</span>
+					<ScrollText size={16} aria-hidden="true" />
 					<span>Move History</span>
 				</h4>
 				<span className={`${styles.statusBadge} ${isPlaying ? styles.playing : ''}`}>
-					{isPlaying ? '▶ Auto' : '⏸ Paused'}
+					{isPlaying ? (
+						<>
+							<Play size={11} fill="currentColor" aria-hidden="true" />
+							<span>Auto</span>
+						</>
+					) : (
+						<>
+							<Pause size={11} aria-hidden="true" />
+							<span>Paused</span>
+						</>
+					)}
 				</span>
 			</div>
 
@@ -128,7 +139,7 @@ export default function AboutMoveLog({
 					disabled={currentPly === 0}
 					title="Start Position (Down Arrow)"
 				>
-					⇤
+					<SkipBack size={14} aria-hidden="true" />
 				</button>
 				<button
 					type="button"
@@ -137,7 +148,7 @@ export default function AboutMoveLog({
 					disabled={currentPly === 0}
 					title="Previous Move (Left Arrow)"
 				>
-					◀
+					<ChevronLeft size={14} aria-hidden="true" />
 				</button>
 				<button
 					type="button"
@@ -145,7 +156,17 @@ export default function AboutMoveLog({
 					onClick={onTogglePlay}
 					title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
 				>
-					{isPlaying ? '⏸ Pause' : '▶ Play'}
+					{isPlaying ? (
+						<>
+							<Pause size={13} aria-hidden="true" />
+							<span>Pause</span>
+						</>
+					) : (
+						<>
+							<Play size={13} fill="currentColor" aria-hidden="true" />
+							<span>Play</span>
+						</>
+					)}
 				</button>
 				<button
 					type="button"
@@ -154,7 +175,7 @@ export default function AboutMoveLog({
 					disabled={currentPly === maxPly}
 					title="Next Move (Right Arrow)"
 				>
-					▶
+					<ChevronRight size={14} aria-hidden="true" />
 				</button>
 				<button
 					type="button"
@@ -163,9 +184,11 @@ export default function AboutMoveLog({
 					disabled={currentPly === maxPly}
 					title="Checkmate (Up Arrow)"
 				>
-					⇥
+					<SkipForward size={14} aria-hidden="true" />
 				</button>
 			</div>
 		</div>
-	)
-}
+	);
+};
+
+export default AboutMoveLog;

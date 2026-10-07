@@ -1,10 +1,11 @@
-import styles from './AboutCurriculum.module.css'
+import { GraduationCap, Zap, Brain, ShieldCheck, Server } from 'lucide-react';
+import styles from './AboutCurriculum.module.css';
 
-export default function AboutCurriculum() {
+const AboutCurriculum = () => {
 	return (
 		<section className={styles.curriculumCard}>
 			<h2 className={styles.sectionTitle}>
-				<span>♟</span>
+				<GraduationCap size={22} aria-hidden="true" />
 				<span>About the 42 Curriculum & ft_transcendence</span>
 			</h2>
 
@@ -18,7 +19,8 @@ export default function AboutCurriculum() {
 			<div className={styles.techStackGrid}>
 				<div className={styles.techItem}>
 					<div className={styles.techItemTitle}>
-						<span>⚡</span> Core Gameplay
+						<Zap size={16} aria-hidden="true" />
+						<span>Core Gameplay</span>
 					</div>
 					<p className={styles.techItemDesc}>
 						Full chess rule-set, move validation, clock management, premoves, and live WebSocket matchmaking.
@@ -27,7 +29,8 @@ export default function AboutCurriculum() {
 
 				<div className={styles.techItem}>
 					<div className={styles.techItemTitle}>
-						<span>🧠</span> Game Analysis & ELO
+						<Brain size={16} aria-hidden="true" />
+						<span>Game Analysis & ELO</span>
 					</div>
 					<p className={styles.techItemDesc}>
 						Integrated Stockfish engine, centipawn evaluations, brilliant move detection, and dynamic leaderboards.
@@ -36,7 +39,8 @@ export default function AboutCurriculum() {
 
 				<div className={styles.techItem}>
 					<div className={styles.techItemTitle}>
-						<span>🛡️</span> Auth, Chat & i18n
+						<ShieldCheck size={16} aria-hidden="true" />
+						<span>Auth, Chat & i18n</span>
 					</div>
 					<p className={styles.techItemDesc}>
 						JWT authentication, 2FA, instant messaging rooms, real-time notifications, and trilingual support.
@@ -45,7 +49,8 @@ export default function AboutCurriculum() {
 
 				<div className={styles.techItem}>
 					<div className={styles.techItemTitle}>
-						<span>🐳</span> Infrastructure
+						<Server size={16} aria-hidden="true" />
+						<span>Infrastructure</span>
 					</div>
 					<p className={styles.techItemDesc}>
 						Fully dockerized microservices with NestJS, PostgreSQL, Nginx, and React 19 single-page architecture.
@@ -53,5 +58,7 @@ export default function AboutCurriculum() {
 				</div>
 			</div>
 		</section>
-	)
-}
+	);
+};
+
+export default AboutCurriculum;
