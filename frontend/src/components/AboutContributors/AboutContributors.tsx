@@ -1,5 +1,5 @@
-import { DEVS } from '../../constants/aboutConstants'
-import type { DevKey } from '../../constants/aboutConstants'
+import { DEVS } from '../../utils/aboutUtils'
+import type { DevKey } from '../../utils/aboutUtils'
 import styles from './AboutContributors.module.css'
 
 interface Props {

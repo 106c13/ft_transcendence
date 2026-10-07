@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import type { MatchRecord } from '../GameAnalysis/GameAnalysis'
+import type { MatchRecord } from '../../utils/gameUtils';
 import styles from './GameRow.module.css'
 
 type Props = {
@@ -115,7 +115,7 @@ export default function GameRow({ match, username, onSelect, onRowClick }: Props
 					<div className={styles.playerRow}>
 						<img
 							src={getAvatarUrl(whitePlayer?.avatar)}
-							alt={whitePlayer?.username || t('white', 'White')}
+							alt={whitePlayer?.username || t('white')}
 							className={styles.playerAvatar}
 							onError={(e) => {
 								const target = e.currentTarget
@@ -126,11 +126,11 @@ export default function GameRow({ match, username, onSelect, onRowClick }: Props
 						/>
 						<span
 							className={`${styles.colorSquare} ${styles.squareWhite}`}
-							title={t('white', 'White')}
-							aria-label={t('white', 'White')}
+							title={t('white')}
+							aria-label={t('white')}
 						/>
 						<span className={`${styles.playerName} ${isUserWhite ? styles.currentUser : ''}`}>
-							{whitePlayer?.username || t('unknown', 'Unknown')}
+							{whitePlayer?.username || t('unknown')}
 						</span>
 						{whiteRating !== null && whiteRating !== undefined && (
 							<span className={styles.playerRating}>({whiteRating})</span>
@@ -141,7 +141,7 @@ export default function GameRow({ match, username, onSelect, onRowClick }: Props
 					<div className={styles.playerRow}>
 						<img
 							src={getAvatarUrl(blackPlayer?.avatar)}
-							alt={blackPlayer?.username || t('black', 'Black')}
+							alt={blackPlayer?.username || t('black')}
 							className={styles.playerAvatar}
 							onError={(e) => {
 								const target = e.currentTarget
@@ -152,11 +152,11 @@ export default function GameRow({ match, username, onSelect, onRowClick }: Props
 						/>
 						<span
 							className={`${styles.colorSquare} ${styles.squareBlack}`}
-							title={t('black', 'Black')}
-							aria-label={t('black', 'Black')}
+							title={t('black')}
+							aria-label={t('black')}
 						/>
 						<span className={`${styles.playerName} ${isUserBlack ? styles.currentUser : ''}`}>
-							{blackPlayer?.username || t('unknown', 'Unknown')}
+							{blackPlayer?.username || t('unknown')}
 						</span>
 						{blackRating !== null && blackRating !== undefined && (
 							<span className={styles.playerRating}>({blackRating})</span>
@@ -169,7 +169,7 @@ export default function GameRow({ match, username, onSelect, onRowClick }: Props
 			<div className={styles.movesCol}>
 				<span
 					className={styles.movesCount}
-					title={moveCount ? `${moveCount} ${moveCount === 1 ? t('move', 'move') : t('moves', 'moves')}` : undefined}
+					title={moveCount ? `${moveCount} ${moveCount === 1 ? t('move') : t('moves')}` : undefined}
 				>
 					{moveCount ?? '-'}
 				</span>
@@ -187,10 +187,10 @@ export default function GameRow({ match, username, onSelect, onRowClick }: Props
 					}`}
 				>
 					{outcome === 'win'
-						? t('win', 'WIN')
+						? t('win')
 						: outcome === 'loss'
-						? t('loss', 'LOSS')
-						: t('draw', 'DRAW')}
+						? t('loss')
+						: t('draw')}
 				</span>
 			</div>
 
@@ -204,7 +204,7 @@ export default function GameRow({ match, username, onSelect, onRowClick }: Props
 						onSelect(match)
 					}}
 				>
-					{t('review', 'Review')}
+					{t('review')}
 				</button>
 			</div>
 

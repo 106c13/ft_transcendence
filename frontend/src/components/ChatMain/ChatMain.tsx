@@ -1,18 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import type { ChatObject } from '../ChatSidebar/ChatSidebar'
-import type { Friend } from '../NewChatModal/NewChatModal'
-import styles from './ChatMain.module.css'
+import type { ChatObject, Friend, Message } from '../../utils/chatUtils';
+import styles from './ChatMain.module.css';
 
-export type Message = {
-	id: number
-	chat_id: string
-	sender_id: number
-	content: string
-	created_at: string
-	sender?: { id: number; username: string; avatar?: string }
-}
+export type { Message };
 
 type Props = {
 	selectedChat: ChatObject | null
@@ -81,10 +73,10 @@ function ChatMain({
 
 	const statusLabel =
 		otherUserStatus === 'ONLINE'
-			? t('online', 'Online')
+			? t('online')
 			: otherUserStatus === 'INGAME'
-			? t('in_game', 'In Game')
-			: t('offline', 'Offline')
+			? t('in_game')
+			: t('offline')
 
 	// Always scroll down when messages change or chat changes
 	useEffect(() => {
@@ -122,7 +114,7 @@ function ChatMain({
 									type="button"
 									className={styles.backButton}
 									onClick={onBackToChats}
-									aria-label={t('back_to_chats', 'Back to chats')}
+									aria-label={t('back_to_chats')}
 								>
 									<svg
 										width="14"
@@ -136,7 +128,7 @@ function ChatMain({
 									>
 										<polyline points="15 18 9 12 15 6" />
 									</svg>
-									<span>{t('chats', 'Chats')}</span>
+									<span>{t('chats')}</span>
 								</button>
 							)}
 
@@ -185,7 +177,7 @@ function ChatMain({
 										navigate(`/profile/${otherUser.username}`)
 									}
 								}}
-								title={t('view_profile', 'View Profile')}
+								title={t('view_profile')}
 							>
 								<svg
 									width="15"
@@ -200,7 +192,7 @@ function ChatMain({
 									<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
 									<circle cx="12" cy="7" r="4" />
 								</svg>
-								<span>{t('view_profile', 'View Profile')}</span>
+								<span>{t('view_profile')}</span>
 							</button>
 						</div>
 					</div>
@@ -233,7 +225,7 @@ function ChatMain({
 									onSendMessage()
 								}
 							}}
-							placeholder={t('type_message', 'Type a message...')}
+							placeholder={t('type_message')}
 						/>
 						<button
 							type="button"
@@ -254,7 +246,7 @@ function ChatMain({
 								<line x1="22" y1="2" x2="11" y2="13" />
 								<polygon points="22 2 15 22 11 13 2 9 22 2" />
 							</svg>
-							<span>{t('send', 'Send')}</span>
+							<span>{t('send')}</span>
 						</button>
 					</div>
 				</>
@@ -276,13 +268,10 @@ function ChatMain({
 							</svg>
 						</div>
 						<h2 className={styles.emptyChatTitle}>
-							{t('your_messages', 'Your Messages')}
+							{t('your_messages')}
 						</h2>
 						<p className={styles.emptyChatSubtitle}>
-							{t(
-								'select_chat_desc',
-								'Select a conversation from the sidebar or start a new chat with a friend.'
-							)}
+							{t('select_chat_desc')}
 						</p>
 
 						{onOpenNewChat && (
@@ -304,14 +293,14 @@ function ChatMain({
 									<line x1="12" y1="5" x2="12" y2="19" />
 									<line x1="5" y1="12" x2="19" y2="12" />
 								</svg>
-								<span>{t('start_conversation', 'Start a Conversation')}</span>
+								<span>{t('start_conversation')}</span>
 							</button>
 						)}
 
 						{friends.length > 0 && onSelectFriend && (
 							<div className={styles.quickFriendsSection}>
 								<span className={styles.quickFriendsLabel}>
-									{t('friends_title', 'Friends')}
+									{t('friends_title')}
 								</span>
 								<div className={styles.quickFriendsGrid}>
 									{friends.slice(0, 6).map((friend) => (

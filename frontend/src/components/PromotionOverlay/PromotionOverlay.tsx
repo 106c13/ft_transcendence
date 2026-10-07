@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { getPieceImageSrc, PIECE_NAME } from '../../constants/gameConstants'
+import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils'
 import styles from './PromotionOverlay.module.css'
 
 type Props = {
@@ -69,8 +69,8 @@ function PromotionOverlay({
 						e.stopPropagation()
 						onCancel()
 					}}
-					aria-label={t('cancel', 'Cancel')}
-					title={t('cancel', 'Cancel')}
+					aria-label={t('cancel')}
+					title={t('cancel')}
 				>
 					✕
 				</button>

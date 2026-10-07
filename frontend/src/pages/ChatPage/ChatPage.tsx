@@ -6,12 +6,13 @@ import { useChat } from '../../hooks/useChat'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import ChatSidebar from '../../components/ChatSidebar/ChatSidebar'
 import ChatMain from '../../components/ChatMain/ChatMain'
-import NewChatModal, { type Friend } from '../../components/NewChatModal/NewChatModal'
+import NewChatModal from '../../components/NewChatModal/NewChatModal';
+import type { Friend } from '../../utils/chatUtils';
 import styles from './ChatPage.module.css'
 
 function ChatPage() {
 	const { t } = useTranslation()
-	usePageTitle('page_title_chat', 'Chat')
+	usePageTitle('page_title_chat')
 	const navigate = useNavigate()
 	const { currentUser } = useOutletContext<LayoutContextType>()
 	const currentUserId = currentUser?.id ?? null

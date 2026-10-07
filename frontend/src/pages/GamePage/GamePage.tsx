@@ -13,7 +13,7 @@ import styles from './GamePage.module.css'
 
 export default function GamePage() {
     const { t } = useTranslation()
-    usePageTitle('page_title_game', 'Chess Arena')
+    usePageTitle('page_title_game')
 
     const layoutContext = useOutletContext<LayoutContextType | undefined>()
     const challengeSocket = layoutContext?.challengeSocket
@@ -113,7 +113,7 @@ export default function GamePage() {
                             />
                         ) : (
                             <PlayerBanner
-                                name={game.opponentName || t('opponent', 'Opponent')}
+                                name={game.opponentName || t('opponent')}
                                 username={game.opponentName}
                                 avatar={game.opponentAvatar}
                                 color={opponentColor}

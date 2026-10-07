@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import type { RatingInfo } from '../../constants/profileConstants'
-import { getAvatarUrl, getModeColor, getPieceImageSrc } from '../../constants/gameConstants'
+import type { RatingInfo } from '../../utils/profileUtils'
+import { getAvatarUrl, getModeColor, getPieceImageSrc } from '../../utils/gameUtils'
 import styles from './PlayerBanner.module.css'
 
 type PieceCapture = { type: string; color: 'w' | 'b' }
@@ -71,7 +71,7 @@ function PlayerBanner({
 	const canViewProfile = Boolean(
 		actualUsername &&
 		actualUsername !== 'Opponent' &&
-		actualUsername !== t('opponent', 'Opponent') &&
+		actualUsername !== t('opponent') &&
 		actualUsername !== 'AI'
 	)
 
@@ -181,7 +181,7 @@ function PlayerBanner({
 									setIsOpen(prev => !prev)
 								}
 							}}
-							title={isOpen ? t('click_to_collapse', 'Click to collapse') : t('click_to_view_ratings', 'Click to view player ratings')}
+							title={isOpen ? t('click_to_collapse') : t('click_to_view_ratings')}
 						>
 							<img
 								src={getAvatarUrl(userAvatar)}
@@ -227,13 +227,13 @@ function PlayerBanner({
 									className={`${styles.ratingPopup} ${isBottom ? styles.popupAbove : styles.popupBelow}`}
 									onClick={e => e.stopPropagation()}
 									role="dialog"
-									aria-label={t('player_ratings', 'Player Ratings')}
+									aria-label={t('player_ratings')}
 								>
 									<div className={styles.ratingPopupGrid}>
 										<div className={`${styles.ratingPopupItem} ${selectedMode === 'bullet' ? styles.ratingItemActive : ''}`}>
 											<div className={styles.ratingPopupHeader}>
 												<span className={styles.ratingPopupIcon}>🔥</span>
-												<span className={styles.ratingPopupMode}>{t('bullet_rating', 'Bullet')}</span>
+												<span className={styles.ratingPopupMode}>{t('bullet_rating')}</span>
 											</div>
 											<span className={styles.ratingPopupValue} style={{ color: getModeColor('bullet') }}>
 												{getDisplayRating('bullet')}
@@ -243,7 +243,7 @@ function PlayerBanner({
 										<div className={`${styles.ratingPopupItem} ${selectedMode === 'blitz' ? styles.ratingItemActive : ''}`}>
 											<div className={styles.ratingPopupHeader}>
 												<span className={styles.ratingPopupIcon}>⚡</span>
-												<span className={styles.ratingPopupMode}>{t('blitz_rating', 'Blitz')}</span>
+												<span className={styles.ratingPopupMode}>{t('blitz_rating')}</span>
 											</div>
 											<span className={styles.ratingPopupValue} style={{ color: getModeColor('blitz') }}>
 												{getDisplayRating('blitz')}
@@ -253,7 +253,7 @@ function PlayerBanner({
 										<div className={`${styles.ratingPopupItem} ${selectedMode === 'rapid' ? styles.ratingItemActive : ''}`}>
 											<div className={styles.ratingPopupHeader}>
 												<span className={styles.ratingPopupIcon}>⏳</span>
-												<span className={styles.ratingPopupMode}>{t('rapid_rating', 'Rapid')}</span>
+												<span className={styles.ratingPopupMode}>{t('rapid_rating')}</span>
 											</div>
 											<span className={styles.ratingPopupValue} style={{ color: getModeColor('rapid') }}>
 												{getDisplayRating('rapid')}
@@ -268,7 +268,7 @@ function PlayerBanner({
 												className={styles.seeProfileBtn}
 												onClick={handleSeeProfile}
 											>
-												{t('see_profile', 'See profile')} →
+												{t('see_profile')} →
 											</button>
 										</div>
 									)}

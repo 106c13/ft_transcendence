@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import CustomSelect, { type SelectOption } from '../CustomSelect/CustomSelect';
+import CustomSelect from '../CustomSelect/CustomSelect';
+import type { SelectOption } from '../../utils/selectUtils';
 import styles from '../../pages/LeaderboardPage/LeaderboardPage.module.css';
 
 interface LeaderboardToolbarProps {
@@ -23,7 +24,7 @@ interface LeaderboardToolbarProps {
 	onResetFilters: () => void;
 }
 
-export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
+const LeaderboardToolbar = ({
 	search,
 	onSearchChange,
 	debouncedSearch,
@@ -41,12 +42,12 @@ export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
 	order,
 	onOrderChange,
 	onResetFilters,
-}) => {
+}: LeaderboardToolbarProps) => {
 	const { t } = useTranslation();
 
 	const winRateOptions: SelectOption<string>[] = useMemo(
 		() => [
-			{ value: '0', label: t('any_win_rate', 'Any Win Rate') },
+			{ value: '0', label: t('any_win_rate') },
 			{ value: '40', label: '40%+' },
 			{ value: '50', label: '50%+' },
 			{ value: '60', label: '60%+' },
@@ -57,31 +58,31 @@ export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
 
 	const statusOptions: SelectOption<'all' | 'online' | 'ingame'>[] = useMemo(
 		() => [
-			{ value: 'all', label: t('all_players', 'All Players') },
-			{ value: 'online', label: `🟢 ${t('online_only', 'Online Only')}` },
-			{ value: 'ingame', label: `🟣 ${t('in_game_only', 'In Game Only')}` },
+			{ value: 'all', label: t('all_players') },
+			{ value: 'online', label: `🟢 ${t('online_only')}` },
+			{ value: 'ingame', label: `🟣 ${t('in_game_only')}` },
 		],
 		[t]
 	);
 
 	const sortOptions: SelectOption<string>[] = useMemo(
 		() => [
-			{ value: 'leaderboardRating', label: t('leaderboard_rating', 'Leaderboard Rating') },
-			{ value: 'highestRating', label: t('peak_elo', 'Peak Elo') },
-			{ value: 'winRate', label: t('winrate', 'Win Rate') },
-			{ value: 'wins', label: t('total_wins', 'Total Wins') },
-			{ value: 'bullet', label: t('bullet_rating', 'Bullet Rating') },
-			{ value: 'blitz', label: t('blitz_rating', 'Blitz Rating') },
-			{ value: 'rapid', label: t('rapid_rating', 'Rapid Rating') },
-			{ value: 'username', label: t('username', 'Username') },
+			{ value: 'leaderboardRating', label: t('leaderboard_rating') },
+			{ value: 'highestRating', label: t('peak_elo') },
+			{ value: 'winRate', label: t('winrate') },
+			{ value: 'wins', label: t('total_wins') },
+			{ value: 'bullet', label: t('bullet_rating') },
+			{ value: 'blitz', label: t('blitz_rating') },
+			{ value: 'rapid', label: t('rapid_rating') },
+			{ value: 'username', label: t('username') },
 		],
 		[t]
 	);
 
 	const orderOptions: SelectOption<'asc' | 'desc'>[] = useMemo(
 		() => [
-			{ value: 'desc', label: `⬇️ ${t('highest_first', 'Highest First')}` },
-			{ value: 'asc', label: `⬆️ ${t('lowest_first', 'Lowest First')}` },
+			{ value: 'desc', label: `⬇️ ${t('highest_first')}` },
+			{ value: 'asc', label: `⬆️ ${t('lowest_first')}` },
 		],
 		[t]
 	);
@@ -94,7 +95,7 @@ export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
 					<span className={styles.searchIcon}>🔍</span>
 					<input
 						type="text"
-						placeholder={t('search_player_placeholder', 'Search player by username...')}
+						placeholder={t('search_player_placeholder')}
 						value={search}
 						onChange={(e) => onSearchChange(e.target.value)}
 						className={styles.searchInput}
@@ -121,7 +122,7 @@ export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
 						}}
 						type="button"
 					>
-						{t('all_formats', 'All Formats')}
+						{t('all_formats')}
 					</button>
 					<button
 						className={`${styles.modeBtn} ${mode === 'bullet' ? styles.modeBtnActive : ''}`}
@@ -131,7 +132,7 @@ export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
 						}}
 						type="button"
 					>
-						⚡ {t('bullet', 'Bullet')}
+						⚡ {t('bullet')}
 					</button>
 					<button
 						className={`${styles.modeBtn} ${mode === 'blitz' ? styles.modeBtnActive : ''}`}
@@ -141,7 +142,7 @@ export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
 						}}
 						type="button"
 					>
-						🔥 {t('blitz', 'Blitz')}
+						🔥 {t('blitz')}
 					</button>
 					<button
 						className={`${styles.modeBtn} ${mode === 'rapid' ? styles.modeBtnActive : ''}`}
@@ -151,7 +152,7 @@ export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
 						}}
 						type="button"
 					>
-						⏳ {t('rapid', 'Rapid')}
+						⏳ {t('rapid')}
 					</button>
 				</div>
 
@@ -164,7 +165,7 @@ export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
 					}}
 					type="button"
 				>
-					<span>⚙️ {t('filters', 'Filters')}</span>
+					<span>⚙️ {t('filters')}</span>
 					{activeFilterCount > 0 && (
 						<span className={styles.filterBadgeCount}>{activeFilterCount}</span>
 					)}
@@ -179,7 +180,7 @@ export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
 							<div className={styles.drawerFiltersGroup}>
 								{/* Min Win Rate */}
 								<div className={styles.filterField}>
-									<label className={styles.filterLabel}>{t('min_win_rate', 'Min Win Rate')}</label>
+									<label className={styles.filterLabel}>{t('min_win_rate')}</label>
 									<CustomSelect<string>
 										value={String(minWinRate)}
 										options={winRateOptions}
@@ -189,7 +190,7 @@ export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
 
 								{/* Activity / Online Status */}
 								<div className={styles.filterField}>
-									<label className={styles.filterLabel}>{t('status', 'Status')}</label>
+									<label className={styles.filterLabel}>{t('status')}</label>
 									<CustomSelect<'all' | 'online' | 'ingame'>
 										value={status}
 										options={statusOptions}
@@ -199,7 +200,7 @@ export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
 
 								{/* Sort Field */}
 								<div className={styles.filterField}>
-									<label className={styles.filterLabel}>{t('sort_by', 'Sort By')}</label>
+									<label className={styles.filterLabel}>{t('sort_by')}</label>
 									<CustomSelect<string>
 										value={sortBy}
 										options={sortOptions}
@@ -209,7 +210,7 @@ export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
 
 								{/* Order */}
 								<div className={styles.filterField}>
-									<label className={styles.filterLabel}>{t('sort_direction', 'Order')}</label>
+									<label className={styles.filterLabel}>{t('sort_direction')}</label>
 									<CustomSelect<'asc' | 'desc'>
 										value={order}
 										options={orderOptions}
@@ -227,7 +228,7 @@ export const LeaderboardToolbar: React.FC<LeaderboardToolbarProps> = ({
 								}}
 								type="button"
 							>
-								↺ {t('reset_all_filters', 'Reset All Filters')}
+								↺ {t('reset_all_filters')}
 							</button>
 						</div>
 					</div>

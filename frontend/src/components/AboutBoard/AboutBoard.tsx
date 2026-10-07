@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { DEVS } from '../../constants/aboutConstants'
-import type { DevKey } from '../../constants/aboutConstants'
+import { DEVS } from '../../utils/aboutUtils'
+import type { DevKey } from '../../utils/aboutUtils'
 import styles from './AboutBoard.module.css'
 
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']

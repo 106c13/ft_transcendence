@@ -2,16 +2,8 @@ import { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import styles from './ChatSidebar.module.css'
 
-export type ChatObject = {
-	id: number
-	chat_id: string
-	user1_id: number
-	user2_id: number
-	user1: { id: number; username: string; avatar?: string; status?: string }
-	user2: { id: number; username: string; avatar?: string; status?: string }
-	unreadCount?: number
-	lastMessage?: { id?: number; content?: string; created_at?: string; sender_id?: number } | string | null
-}
+import type { ChatObject } from '../../utils/chatUtils';
+export type { ChatObject };
 
 type Props = {
 	chats: ChatObject[]
@@ -83,14 +75,14 @@ function ChatSidebar({
 			<div className={styles.chatSidebarHeader}>
 				<div className={styles.headerTop}>
 					<div className={styles.titleGroup}>
-						<h2>{t('chats', 'Chats')}</h2>
+						<h2>{t('chats')}</h2>
 						<span className={styles.chatCountBadge}>{chats.length}</span>
 					</div>
 					<button
 						type="button"
 						className={styles.newChatButton}
 						onClick={onOpenNewChat}
-						title={t('new_chat', 'New Chat')}
+						title={t('new_chat')}
 					>
 						<svg
 							width="15"
@@ -105,7 +97,7 @@ function ChatSidebar({
 							<line x1="12" y1="5" x2="12" y2="19" />
 							<line x1="5" y1="12" x2="19" y2="12" />
 						</svg>
-						<span>{t('new_chat', 'New Chat')}</span>
+						<span>{t('new_chat')}</span>
 					</button>
 				</div>
 
@@ -127,7 +119,7 @@ function ChatSidebar({
 					<input
 						type="text"
 						className={styles.searchInput}
-						placeholder={t('search_chats', 'Search chats...')}
+						placeholder={t('search_chats')}
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 					/>
@@ -193,10 +185,10 @@ function ChatSidebar({
 										className={`${styles.statusDot} ${statusClass}`}
 										title={
 											userStatus === 'ONLINE'
-												? t('online', 'Online')
+												? t('online')
 												: userStatus === 'INGAME'
-												? t('in_game', 'In Game')
-												: t('offline', 'Offline')
+												? t('in_game')
+												: t('offline')
 										}
 									/>
 								)}
@@ -230,21 +222,21 @@ function ChatSidebar({
 					<div className={styles.noChats}>
 						<span className={styles.noChatsIcon}>💬</span>
 						<span className={styles.noChatsText}>
-							{t('no_chats_yet', 'No chats yet')}
+							{t('no_chats_yet')}
 						</span>
 						<button
 							type="button"
 							className={styles.startChatAction}
 							onClick={onOpenNewChat}
 						>
-							{t('start_chat', 'Start Chat')}
+							{t('start_chat')}
 						</button>
 					</div>
 				) : filteredChats.length === 0 ? (
 					<div className={styles.noChats}>
 						<span className={styles.noChatsIcon}>🔍</span>
 						<span className={styles.noChatsText}>
-							{t('no_chats_found', 'No chats found matching search')}
+							{t('no_chats_found')}
 						</span>
 					</div>
 				) : null}

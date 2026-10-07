@@ -4,7 +4,7 @@ import styles from './NotFoundPage.module.css'
 
 function NotFoundPage() {
 	const { t } = useTranslation()
-	usePageTitle('page_title_not_found', 'Page Not Found')
+	usePageTitle('page_title_not_found')
 
 	return (
 		<div className={styles.notFoundContainer}>

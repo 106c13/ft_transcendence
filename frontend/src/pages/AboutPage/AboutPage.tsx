@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { usePageTitle } from '../../hooks/usePageTitle'
-import { MOVE_STEPS } from '../../constants/aboutConstants'
-import type { DevKey } from '../../constants/aboutConstants'
+import { MOVE_STEPS } from '../../utils/aboutUtils'
+import type { DevKey } from '../../utils/aboutUtils'
 import AboutHero from '../../components/AboutHero/AboutHero'
 import AboutShowcase from '../../components/AboutShowcase/AboutShowcase'
 import AboutMoveLog from '../../components/AboutMoveLog/AboutMoveLog'
@@ -11,7 +11,7 @@ import AboutCurriculum from '../../components/AboutCurriculum/AboutCurriculum'
 import styles from './AboutPage.module.css'
 
 export default function AboutPage() {
-	usePageTitle('page_title_about', 'About')
+	usePageTitle('page_title_about')
 
 	const [currentPly, setCurrentPly] = useState(0)
 	const [isPlaying, setIsPlaying] = useState(false)

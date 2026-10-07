@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import type { User, FriendStatus, TabType } from '../../constants/profileConstants'
+import type { User, FriendStatus, TabType } from '../../utils/profileUtils'
 import TopRankBadge from '../TopRankBadge/TopRankBadge'
 import styles from './ProfileHeader.module.css'
 
@@ -23,7 +23,7 @@ type Props = {
     onSettings: () => void
 }
 
-function ProfileHeader({
+const ProfileHeader = ({
     user,
     isOwnProfile,
     isLoggedIn,
@@ -38,9 +38,9 @@ function ProfileHeader({
     onUnfriend,
     onLogout,
     onSettings,
-}: Props) {
-    const { t } = useTranslation()
-    const navigate = useNavigate()
+}: Props) => {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
 
     const handleMessageClick = () => {
         navigate(`/chat/${user.id}`)
@@ -58,7 +58,7 @@ function ProfileHeader({
                                 ? `/uploads/${user.avatar}`
                                 : `/assets/default.jpg`
                         }
-                        alt={user.username || t('avatar', 'Avatar')}
+                        alt={user.username || t('avatar')}
                         onError={(e) => {
                             const target = e.currentTarget
                             if (!target.src.endsWith('/assets/default.jpg')) {
@@ -73,17 +73,17 @@ function ProfileHeader({
                             {isLiveGame || user.status === 'INGAME' ? (
                                 <span className={styles.ingameIndicator}>
                                     <span className={styles.ingameDot}></span>
-                                    {t('in_game', 'In Game')}
+                                    {t('in_game')}
                                 </span>
                             ) : isOwnProfile || user.status === 'ONLINE' ? (
                                 <span className={styles.onlineIndicator}>
                                     <span className={styles.onlineDot}></span>
-                                    {t('online', 'Online')}
+                                    {t('online')}
                                 </span>
                             ) : (
                                 <span className={styles.offlineIndicator}>
                                     <span className={styles.offlineDot}></span>
-                                    {t('offline', 'Offline')}
+                                    {t('offline')}
                                 </span>
                             )}
                         </div>
@@ -91,7 +91,7 @@ function ProfileHeader({
                         <div
                             className={styles.leaderboardRow}
                             onClick={() => navigate('/leaderboard')}
-                            title={t('view_leaderboard', 'View Leaderboard')}
+                            title={t('view_leaderboard')}
                             role="button"
                             tabIndex={0}
                         >
@@ -118,13 +118,13 @@ function ProfileHeader({
                             className={`${styles.headerBtn} ${styles.secondaryBtn}`}
                             onClick={onSettings}
                         >
-                            ⚙️ {t('settings', 'Settings')}
+                            ⚙️ {t('settings')}
                         </button>
                         <button
                             className={`${styles.headerBtn} ${styles.dangerBtn}`}
                             onClick={onLogout}
                         >
-                            🚪 {t('logout', 'Logout')}
+                            🚪 {t('logout')}
                         </button>
                     </>
                 ) : isLoggedIn ? (
@@ -134,7 +134,7 @@ function ProfileHeader({
                                 className={`${styles.headerBtn} ${styles.primaryBtn}`}
                                 onClick={onSend}
                             >
-                                + {t('send_friend_request', 'Add Friend')}
+                                + {t('send_friend_request')}
                             </button>
                         )}
 
@@ -142,9 +142,9 @@ function ProfileHeader({
                             <button
                                 className={`${styles.headerBtn} ${styles.pendingBtn}`}
                                 onClick={onCancel}
-                                title={t('cancel_request', 'Cancel Request')}
+                                title={t('cancel_request')}
                             >
-                                ⏳ {t('request_sent', 'Request Sent')}
+                                ⏳ {t('request_sent')}
                             </button>
                         )}
 
@@ -154,13 +154,13 @@ function ProfileHeader({
                                     className={`${styles.headerBtn} ${styles.successBtn}`}
                                     onClick={onAccept}
                                 >
-                                    ✓ {t('accept', 'Accept')}
+                                    ✓ {t('accept')}
                                 </button>
                                 <button
                                     className={`${styles.headerBtn} ${styles.dangerBtn}`}
                                     onClick={onReject}
                                 >
-                                    ✕ {t('reject', 'Reject')}
+                                    ✕ {t('reject')}
                                 </button>
                             </>
                         )}
@@ -170,15 +170,15 @@ function ProfileHeader({
                                 <button
                                     className={`${styles.headerBtn} ${styles.friendsBtn}`}
                                     onClick={onUnfriend}
-                                    title={t('unfriend', 'Unfriend')}
+                                    title={t('unfriend')}
                                 >
-                                    ✓ {t('friends', 'Friends')}
+                                    ✓ {t('friends')}
                                 </button>
                                 <button
                                     className={`${styles.headerBtn} ${styles.secondaryBtn}`}
                                     onClick={handleMessageClick}
                                 >
-                                    💬 {t('message', 'Message')}
+                                    💬 {t('message')}
                                 </button>
                             </>
                         )}
@@ -189,17 +189,17 @@ function ProfileHeader({
 
             {/* Bio Section */}
             <div className={styles.bioSection}>
-                <p className={styles.bio}>{user.bio || t('no_bio_yet', 'No bio yet')}</p>
+                <p className={styles.bio}>{user.bio || t('no_bio_yet')}</p>
             </div>
 
             {/* Meta Row: Joined Date */}
             <div className={styles.metaRow}>
                 <div className={styles.joinedAt}>
-                    <span>{t('joined', 'Joined')}: </span>
+                    <span>{t('joined')}: </span>
                     <span className={styles.joinedDate}>
                         {user.created_at
                             ? new Date(user.created_at).toLocaleDateString()
-                            : t('unknown', 'Unknown')}
+                            : t('unknown')}
                     </span>
                 </div>
             </div>
@@ -213,7 +213,7 @@ function ProfileHeader({
                     aria-selected={activeTab === 'overview'}
                     type="button"
                 >
-                    {t('overview', 'Overview')}
+                    {t('overview')}
                 </button>
 
                 <button
@@ -223,7 +223,7 @@ function ProfileHeader({
                     aria-selected={activeTab === 'games'}
                     type="button"
                 >
-                    {t('games', 'Games')}
+                    {t('games')}
                 </button>
 
                 <button
@@ -233,11 +233,11 @@ function ProfileHeader({
                     aria-selected={activeTab === 'friends'}
                     type="button"
                 >
-                    {t('friends', 'Friends')}
+                    {t('friends')}
                 </button>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default ProfileHeader
+export default ProfileHeader;

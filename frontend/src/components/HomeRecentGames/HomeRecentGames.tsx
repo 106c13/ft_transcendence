@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import type { MatchRecord } from '../GameAnalysis/GameAnalysis'
+import type { MatchRecord } from '../../utils/gameUtils';
 import GameRow from '../GameRow/GameRow'
 import styles from './HomeRecentGames.module.css'
 
@@ -30,13 +30,13 @@ export default function HomeRecentGames({ matches, username, loading }: Props) {
 		<div className={styles.recentGamesCard}>
 			<div className={styles.header}>
 				<div className={styles.titleGroup}>
-					<h3 className={styles.cardTitle}>{t('recent_games', 'Recent Matches')}</h3>
+					<h3 className={styles.cardTitle}>{t('recent_games')}</h3>
 					<span className={styles.countBadge}>{matches.length}</span>
 				</div>
 
 				{matches.length > 0 && (
 					<button className={styles.seeAllBtn} onClick={handleSeeAll} type="button">
-						{t('see_all', 'See all')} →
+						{t('see_all')} →
 					</button>
 				)}
 			</div>
@@ -44,23 +44,23 @@ export default function HomeRecentGames({ matches, username, loading }: Props) {
 			{loading ? (
 				<div className={styles.emptyState}>
 					<span className={styles.spinnerIcon}>♟</span>
-					<p>{t('loading', 'Loading recent games...')}</p>
+					<p>{t('loading')}</p>
 				</div>
 			) : recentMatches.length === 0 ? (
 				<div className={styles.emptyState}>
 					<div className={styles.emptyIcon}>♟️</div>
-					<p className={styles.emptyText}>{t('no_games_yet', 'No games played yet')}</p>
-					<p className={styles.emptySub}>{t('play_a_game_hint', 'Play online above to start building your match history.')}</p>
+					<p className={styles.emptyText}>{t('no_games_yet')}</p>
+					<p className={styles.emptySub}>{t('play_a_game_hint')}</p>
 				</div>
 			) : (
 				<div className={styles.gamesListRows}>
 					<div className={styles.listHeader}>
-						<span>{t('mode', 'Mode')}</span>
-						<span>{t('players', 'Players')}</span>
-						<span>{t('moves', 'Moves')}</span>
-						<span>{t('result', 'Result')}</span>
-						<span>{t('review', 'Review')}</span>
-						<span>{t('date', 'Date')}</span>
+						<span>{t('mode')}</span>
+						<span>{t('players')}</span>
+						<span>{t('moves')}</span>
+						<span>{t('result')}</span>
+						<span>{t('review')}</span>
+						<span>{t('date')}</span>
 					</div>
 
 					<div className={styles.rowsContainer}>

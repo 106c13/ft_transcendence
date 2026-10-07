@@ -1,6 +1,6 @@
 import styles from './GameMode.module.css'
-import type { GameModeType } from '../../constants/gameModeConstats'
-import { modeClassMap } from '../../constants/gameModeConstats'
+import type { GameModeType } from '../../utils/gameModeUtils'
+import { modeClassMap } from '../../utils/gameModeUtils'
 
 type Props = {
 	id: GameModeType

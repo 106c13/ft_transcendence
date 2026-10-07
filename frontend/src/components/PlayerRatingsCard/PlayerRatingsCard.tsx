@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import type { RatingInfo } from '../../constants/profileConstants'
+import type { RatingInfo } from '../../utils/profileUtils'
 import styles from './PlayerRatingsCard.module.css'
 
 type Props = {
@@ -22,9 +22,9 @@ export default function PlayerRatingsCard({
 	const navigate = useNavigate()
 
 	const modes = [
-		{ key: 'bullet', nameKey: 'bullet_rating', defaultName: 'Bullet', icon: '🔥', time: t('time_1_min', '1 min') },
-		{ key: 'blitz', nameKey: 'blitz_rating', defaultName: 'Blitz', icon: '⚡', time: t('time_3_min', '3 min') },
-		{ key: 'rapid', nameKey: 'rapid_rating', defaultName: 'Rapid', icon: '⏳', time: t('time_10_min', '10 min') },
+		{ key: 'bullet', nameKey: 'bullet_rating', defaultName: 'Bullet', icon: '🔥', time: t('time_1_min') },
+		{ key: 'blitz', nameKey: 'blitz_rating', defaultName: 'Blitz', icon: '⚡', time: t('time_3_min') },
+		{ key: 'rapid', nameKey: 'rapid_rating', defaultName: 'Rapid', icon: '⏳', time: t('time_10_min') },
 	] as const
 
 	const handleClickMode = (modeKey: string) => {
@@ -40,7 +40,7 @@ export default function PlayerRatingsCard({
 			{showHeader && (
 				<div className={styles.cardHeader}>
 					<div className={styles.titleGroup}>
-						<h3 className={styles.cardTitle}>{t('ratings_title', 'Ratings')}</h3>
+						<h3 className={styles.cardTitle}>{t('ratings_title')}</h3>
 					</div>
 					{!hideSeeAll && (
 						<button
@@ -48,7 +48,7 @@ export default function PlayerRatingsCard({
 							onClick={() => username ? navigate(`/profile/${username}`) : navigate('/profile')}
 							type="button"
 						>
-							{t('see_all', 'See all')} →
+							{t('see_all')} →
 						</button>
 					)}
 				</div>
@@ -57,9 +57,9 @@ export default function PlayerRatingsCard({
 			<div className={styles.ratingsListSection}>
 				{!hideListHeader && (
 					<div className={styles.listHeader}>
-						<span>{t('mode', 'Mode')}</span>
-						<span>{t('rating', 'Rating')}</span>
-						<span>{t('win_rate', 'Win Rate')}</span>
+						<span>{t('mode')}</span>
+						<span>{t('rating')}</span>
+						<span>{t('win_rate')}</span>
 					</div>
 				)}
 
@@ -108,15 +108,15 @@ export default function PlayerRatingsCard({
 									</span>
 									{!isNotPlayed && (
 										<div className={styles.recordSub}>
-											<span className={styles.wins}>{wins}{t('wins_short', 'W')}</span>
+											<span className={styles.wins}>{wins}{t('wins_short')}</span>
 											<span>/</span>
 											{(info?.draws ?? 0) > 0 && (
 												<>
-													<span className={styles.draws}>{info?.draws}{t('draws_short', 'D')}</span>
+													<span className={styles.draws}>{info?.draws}{t('draws_short')}</span>
 													<span>/</span>
 												</>
 											)}
-											<span className={styles.losses}>{info?.losses ?? 0}{t('losses_short', 'L')}</span>
+											<span className={styles.losses}>{info?.losses ?? 0}{t('losses_short')}</span>
 										</div>
 									)}
 								</div>

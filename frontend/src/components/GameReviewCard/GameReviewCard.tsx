@@ -2,8 +2,8 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Chess, type Square } from 'chess.js'
-import type { MatchRecord } from '../GameAnalysis/GameAnalysis'
-import { getPieceImageSrc, PIECE_NAME } from '../../constants/gameConstants'
+import type { MatchRecord } from '../../utils/gameUtils';
+import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils'
 import styles from './GameReviewCard.module.css'
 
 type Props = {
@@ -77,7 +77,7 @@ export default function GameReviewCard({ games, currentUsername, loading }: Prop
 			<div className={styles.reviewContainer}>
 				<div className={styles.loadingCard}>
 					<span className={styles.spinnerIcon}>♟</span>
-					<p>{t('loading', 'Loading games...')}</p>
+					<p>{t('loading')}</p>
 				</div>
 			</div>
 		)
@@ -88,9 +88,9 @@ export default function GameReviewCard({ games, currentUsername, loading }: Prop
 			<div className={styles.reviewContainer}>
 				<div className={styles.emptyCard}>
 					<div className={styles.emptyIcon}>♟️</div>
-					<h4 className={styles.emptyTitle}>{t('no_games_to_review', 'Review Past Games')}</h4>
+					<h4 className={styles.emptyTitle}>{t('no_games_to_review')}</h4>
 					<p className={styles.emptySubtitle}>
-						{t('play_to_unlock_review', 'Play a game to see your moves and analyze key moments here.')}
+						{t('play_to_unlock_review')}
 					</p>
 				</div>
 			</div>
@@ -244,14 +244,12 @@ export default function GameReviewCard({ games, currentUsername, loading }: Prop
 				type="button"
 				title={t('review_against_opponent', {
 					opponent: opponentName,
-					defaultValue: `Review against ${opponentName}`,
 				})}
 			>
 				<span className={styles.reviewBtnIcon}>🔍</span>
 				<span className={styles.reviewBtnText}>
 					{t('review_against_opponent', {
 						opponent: opponentName,
-						defaultValue: `Review against ${opponentName}`,
 					})}
 				</span>
 			</button>

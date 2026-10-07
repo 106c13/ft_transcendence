@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import type { LayoutContextType } from '../../layouts/MainLayout'
 import { usePageTitle } from '../../hooks/usePageTitle'
-import SettingsHeader, { type SettingsTab } from '../../components/SettingsHeader/SettingsHeader'
+import SettingsHeader from '../../components/SettingsHeader/SettingsHeader';
+import type { SettingsTab } from '../../utils/settingsUtils';
 import ProfileInfoForm from '../../components/ProfileInfoForm/ProfileInfoForm'
 import ChangePasswordForm from '../../components/ChangePasswordForm/ChangePasswordForm'
 import styles from './SettingsPage.module.css'
 
 function SettingsPage() {
-	usePageTitle('page_title_settings', 'Settings')
+	usePageTitle('page_title_settings')
 	const { currentUser, setCurrentUser } = useOutletContext<LayoutContextType>()
 	const [activeTab, setActiveTab] = useState<SettingsTab>('profile')
 

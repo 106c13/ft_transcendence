@@ -5,12 +5,12 @@ import { useGameHistory } from '../../hooks/useGameHistory'
 import { useGameAnalysis } from '../../hooks/useGameAnalysis'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import GameAnalysis from '../../components/GameAnalysis/GameAnalysis'
-import type { MatchRecord } from '../../components/GameAnalysis/GameAnalysis'
+import type { MatchRecord } from '../../utils/gameUtils';
 import styles from './GameAnalysisPage.module.css'
 
 export default function GameAnalysisPage() {
 	const { t } = useTranslation()
-	usePageTitle('page_title_game_analysis', 'Game Analysis')
+	usePageTitle('page_title_game_analysis')
 	const { id, username: routeUsername } = useParams<{ id: string; username?: string }>()
 	const navigate = useNavigate()
 	const location = useLocation()
@@ -35,7 +35,7 @@ export default function GameAnalysisPage() {
 		}
 
 		if (!id) {
-			setError(t('game_not_found', 'Game not found'))
+			setError(t('game_not_found'))
 			setLoadingMatch(false)
 			return
 		}
@@ -52,11 +52,11 @@ export default function GameAnalysisPage() {
 					const data: MatchRecord = await res.json()
 					setMatch(data)
 				} else {
-					setError(t('game_not_found', 'Game not found'))
+					setError(t('game_not_found'))
 				}
 			} catch (err) {
 				console.error('Failed to load match:', err)
-				setError(t('game_not_found', 'Game not found'))
+				setError(t('game_not_found'))
 			} finally {
 				setLoadingMatch(false)
 			}
@@ -118,7 +118,7 @@ export default function GameAnalysisPage() {
 			<div className={styles.page}>
 				<div className={styles.breadcrumb}>
 					<button className={styles.backBtn} onClick={() => navigate(-1)}>
-						← {t('back', 'Back')}
+						← {t('back')}
 					</button>
 				</div>
 				<div className={styles.errorCard}>
@@ -133,7 +133,7 @@ export default function GameAnalysisPage() {
 			<div className={styles.page}>
 				<div className={styles.loadingSpinner}>
 					<span className={styles.spinnerIcon}>♟</span>
-					<p>{t('loading', 'Loading game analysis...')}</p>
+					<p>{t('loading')}</p>
 				</div>
 			</div>
 		)

@@ -8,7 +8,7 @@ import { useChallengeSocket } from '../hooks/useChallengeSocket'
 import type { ChallengeStatus, ChallengeReceived, ChallengeSent } from '../hooks/useChallengeSocket'
 import { useToast } from '../context/ToastContext'
 
-import type { User } from '../constants/profileConstants'
+import type { User } from '../utils/profileUtils'
 export type { User }
 
 export type LayoutContextType = {

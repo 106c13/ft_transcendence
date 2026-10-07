@@ -122,9 +122,7 @@ export function useChallengeSocket(userId: number | undefined) {
         })
         socketRef.current = socket
 
-        socket.on('connect', () => {
-            console.log('Challenge Socket connected:', socket.id)
-        })
+        socket.on('connect', () => {})
 
         socket.on('challenge_sent', (data: ChallengeSent) => {
             setChallengeStatus('sent')

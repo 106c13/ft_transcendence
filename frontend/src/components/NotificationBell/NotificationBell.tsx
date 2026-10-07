@@ -391,14 +391,14 @@ function NotificationBell({ userId }: { userId: number }) {
         const now = new Date()
         const diffSecs = Math.floor((now.getTime() - date.getTime()) / 1000)
 
-        if (diffSecs < 60) return t('just_now', 'Just now')
+        if (diffSecs < 60) return t('just_now')
         const diffMins = Math.floor(diffSecs / 60)
-        if (diffMins < 60) return t('minutes_ago', { count: diffMins, defaultValue: `${diffMins}m ago` })
+        if (diffMins < 60) return t('minutes_ago', { count: diffMins})
         const diffHours = Math.floor(diffMins / 60)
-        if (diffHours < 24) return t('hours_ago', { count: diffHours, defaultValue: `${diffHours}h ago` })
+        if (diffHours < 24) return t('hours_ago', { count: diffHours})
         const diffDays = Math.floor(diffHours / 24)
-        if (diffDays === 1) return t('yesterday', 'Yesterday')
-        if (diffDays < 7) return t('days_ago', { count: diffDays, defaultValue: `${diffDays}d ago` })
+        if (diffDays === 1) return t('yesterday')
+        if (diffDays < 7) return t('days_ago', { count: diffDays})
 
         return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
     }
@@ -422,7 +422,7 @@ function NotificationBell({ userId }: { userId: number }) {
                 onClick={toggleDropdown}
                 role="button"
                 tabIndex={0}
-                aria-label={t('notifications', 'Notifications')}
+                aria-label={t('notifications')}
                 aria-expanded={isOpen}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -444,10 +444,10 @@ function NotificationBell({ userId }: { userId: number }) {
                     {/* Header */}
                     <div className={styles.notificationHeader}>
                         <div className={styles.headerTitleGroup}>
-                            <h3>{t('notifications', 'Notifications')}</h3>
+                            <h3>{t('notifications')}</h3>
                             {unreadCount > 0 && (
                                 <span className={styles.headerUnreadBadge}>
-                                    {unreadCount} {t('unread', 'Unread')}
+                                    {unreadCount} {t('unread')}
                                 </span>
                             )}
                         </div>
@@ -457,18 +457,18 @@ function NotificationBell({ userId }: { userId: number }) {
                                 <button
                                     className={styles.actionTextBtn}
                                     onClick={markAllRead}
-                                    title={t('mark_all_read', 'Mark all read')}
+                                    title={t('mark_all_read')}
                                 >
-                                    {t('mark_all_read', 'Mark all read')}
+                                    {t('mark_all_read')}
                                 </button>
                             )}
                             {notifications.length > 0 && (
                                 <button
                                     className={`${styles.actionTextBtn} ${styles.clearBtn}`}
                                     onClick={clearAll}
-                                    title={t('clear_all', 'Clear all')}
+                                    title={t('clear_all')}
                                 >
-                                    {t('clear_all', 'Clear all')}
+                                    {t('clear_all')}
                                 </button>
                             )}
                         </div>
@@ -481,13 +481,13 @@ function NotificationBell({ userId }: { userId: number }) {
                                 className={`${styles.filterTab} ${filter === 'all' ? styles.activeTab : ''}`}
                                 onClick={() => setFilter('all')}
                             >
-                                {t('all', 'All')} ({notifications.length})
+                                {t('all')} ({notifications.length})
                             </button>
                             <button
                                 className={`${styles.filterTab} ${filter === 'unread' ? styles.activeTab : ''}`}
                                 onClick={() => setFilter('unread')}
                             >
-                                {t('unread', 'Unread')} ({unreadCount})
+                                {t('unread')} ({unreadCount})
                             </button>
                         </div>
                     )}
@@ -501,7 +501,7 @@ function NotificationBell({ userId }: { userId: number }) {
                         ) : displayedNotifications.length === 0 ? (
                             <div className={styles.noNotifications}>
                                 <span className={styles.emptyIcon}>🔕</span>
-                                <p>{t('no_notifications', 'No notifications')}</p>
+                                <p>{t('no_notifications')}</p>
                             </div>
                         ) : (
                             displayedNotifications.map((notif) => {
@@ -537,11 +537,11 @@ function NotificationBell({ userId }: { userId: number }) {
                                                 >
                                                     {feedback === 'accepted' ? (
                                                         <span className={styles.actionFeedbackAccepted}>
-                                                            ✓ {t('accepted', 'Accepted')}
+                                                            ✓ {t('accepted')}
                                                         </span>
                                                     ) : feedback === 'declined' ? (
                                                         <span className={styles.actionFeedbackDeclined}>
-                                                            ✕ {t('declined', 'Declined')}
+                                                            ✕ {t('declined')}
                                                         </span>
                                                     ) : (
                                                         <>
@@ -552,7 +552,7 @@ function NotificationBell({ userId }: { userId: number }) {
                                                                 }
                                                                 disabled={isActionBusy}
                                                             >
-                                                                {t('accept', 'Accept')}
+                                                                {t('accept')}
                                                             </button>
                                                             <button
                                                                 className={styles.declineBtn}
@@ -561,7 +561,7 @@ function NotificationBell({ userId }: { userId: number }) {
                                                                 }
                                                                 disabled={isActionBusy}
                                                             >
-                                                                {t('reject', 'Reject')}
+                                                                {t('reject')}
                                                             </button>
                                                         </>
                                                     )}
@@ -576,8 +576,8 @@ function NotificationBell({ userId }: { userId: number }) {
                                         <button
                                             className={styles.deleteNotification}
                                             onClick={(e) => deleteNotification(notif.id, e)}
-                                            title={t('delete', 'Delete')}
-                                            aria-label={t('delete_notification', 'Delete notification')}
+                                            title={t('delete')}
+                                            aria-label={t('delete_notification')}
                                         >
                                             ✕
                                         </button>

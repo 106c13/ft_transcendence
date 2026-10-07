@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { User } from '../../constants/profileConstants'
+import type { User } from '../../utils/profileUtils'
 import { useToast } from '../../context/ToastContext'
 import styles from './ProfileInfoForm.module.css'
 
@@ -142,10 +142,10 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 			<div className={styles.cardHeader}>
 				<h2 className={styles.cardTitle}>
 					<span>👤</span>
-					{t('profile_info_title', 'Profile Information')}
+					{t('profile_info_title')}
 				</h2>
 				<p className={styles.cardDesc}>
-					{t('profile_info_desc', 'Update your avatar, username, and bio details')}
+					{t('profile_info_desc')}
 				</p>
 			</div>
 
@@ -154,7 +154,7 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 				<div className={styles.avatarWrapper}>
 					<img
 						src={displayAvatar}
-						alt={t('avatar_preview', 'Avatar preview')}
+						alt={t('avatar_preview')}
 						className={styles.avatarImage}
 					/>
 				</div>
@@ -166,7 +166,7 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 							className={styles.uploadBtn}
 							onClick={() => fileInputRef.current?.click()}
 						>
-							📷 {t('change_avatar', 'Change Avatar')}
+							📷 {t('change_avatar')}
 						</button>
 
 						{avatarFile && (
@@ -175,13 +175,13 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 								className={styles.cancelBtn}
 								onClick={handleCancelAvatar}
 							>
-								✕ {t('cancel_photo', 'Cancel')}
+								✕ {t('cancel_photo')}
 							</button>
 						)}
 					</div>
 
 					<p className={styles.avatarHint}>
-						{t('avatar_hint', 'Supports JPG, PNG or WebP. Max 5MB.')}
+						{t('avatar_hint')}
 					</p>
 
 					<input
@@ -197,25 +197,25 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 			<form className={styles.form} onSubmit={handleSave}>
 				<div className={styles.formGroup}>
 					<label className={styles.label} htmlFor="settings-username">
-						{t('username', 'Username')}
+						{t('username')}
 					</label>
 					<input
 						id="settings-username"
 						className={styles.input}
 						value={username}
 						onChange={e => setUsername(e.target.value)}
-						placeholder={t('username', 'Username')}
+						placeholder={t('username')}
 						maxLength={15}
 						required
 					/>
 					<p className={styles.fieldHint}>
-						{t('username_hint', 'Letters and numbers only, max 15 characters')}
+						{t('username_hint')}
 					</p>
 				</div>
 
 				<div className={styles.formGroup}>
 					<label className={styles.label} htmlFor="settings-email">
-						{t('email', 'Email')}
+						{t('email')}
 					</label>
 					<input
 						id="settings-email"
@@ -223,7 +223,7 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 						className={styles.input}
 						value={email}
 						onChange={e => setEmail(e.target.value)}
-						placeholder={t('email', 'Email')}
+						placeholder={t('email')}
 						required
 					/>
 				</div>
@@ -231,7 +231,7 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 				<div className={styles.formGroup}>
 					<div className={styles.labelRow}>
 						<label className={styles.label} htmlFor="settings-bio">
-							{t('bio', 'Bio')}
+							{t('bio')}
 						</label>
 						<span
 							className={`${styles.charCount} ${
@@ -246,7 +246,7 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 						className={styles.textarea}
 						value={bio}
 						onChange={e => setBio(e.target.value)}
-						placeholder={t('bio', 'Bio')}
+						placeholder={t('bio')}
 						maxLength={100}
 						rows={3}
 					/>
@@ -258,7 +258,7 @@ function ProfileInfoForm({ initialUser, onUserUpdated }: Props) {
 						type="submit"
 						disabled={loading}
 					>
-						{loading ? t('saving', 'Saving...') : t('save', 'Save')}
+						{loading ? t('saving') : t('save')}
 					</button>
 				</div>
 			</form>

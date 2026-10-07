@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { DEVS } from '../../constants/aboutConstants'
+import { DEVS } from '../../utils/aboutUtils'
 import styles from './AboutHero.module.css'
 
 export default function AboutHero() {
@@ -50,7 +50,7 @@ export default function AboutHero() {
 			</p>
 
 			<div className={styles.curriculumSubtitle}>
-				{t('about_curriculum_badge', '42 Curriculum Capstone Project')}
+				{t('about_curriculum_badge')}
 			</div>
 		</section>
 	)

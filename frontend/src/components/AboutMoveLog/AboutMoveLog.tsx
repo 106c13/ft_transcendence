@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { MOVE_STEPS } from '../../constants/aboutConstants'
+import { MOVE_STEPS } from '../../utils/aboutUtils'
 import styles from './AboutMoveLog.module.css'
 
 interface Props {

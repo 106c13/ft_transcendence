@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { MatchRecord } from '../components/GameAnalysis/GameAnalysis'
+import { downloadPgn, type MatchRecord } from '../utils/gameUtils';
 
 export function useGameHistory(username: string) {
 	const { t } = useTranslation()
@@ -41,7 +41,7 @@ export function useGameHistory(username: string) {
 		const isUserBlack = match.black?.username === username
 
 		if (!match.winner_id) {
-			return { label: t('draw', 'Draw'), className: 'draw' }
+			return { label: t('draw'), className: 'draw' }
 		}
 
 		const userWon =
@@ -49,9 +49,9 @@ export function useGameHistory(username: string) {
 			(isUserBlack && match.winner_id === match.black_id)
 
 		if (userWon) {
-			return { label: t('victory', 'Victory'), className: 'win' }
+			return { label: t('victory'), className: 'win' }
 		} else {
-			return { label: t('defeat', 'Defeat'), className: 'loss' }
+			return { label: t('defeat'), className: 'loss' }
 		}
 	}
 
@@ -72,41 +72,27 @@ export function useGameHistory(username: string) {
 	const formatReason = (reason: string) => {
 		switch (reason) {
 			case 'CHECKMATE':
-				return t('reason_checkmate', 'Checkmate')
+				return t('reason_checkmate')
 			case 'STALEMATE':
-				return t('reason_stalemate', 'Stalemate')
+				return t('reason_stalemate')
 			case 'TIMEOUT':
-				return t('reason_timeout', 'Time Out')
+				return t('reason_timeout')
 			case 'RESIGNATION':
-				return t('reason_resignation', 'Resignation')
+				return t('reason_resignation')
 			case 'DISCONNECTION':
-				return t('reason_disconnection', 'Disconnection')
+				return t('reason_disconnection')
 			case 'DRAW':
 			case 'INSUFFICIENT_MATERIAL':
 			case 'THREEFOLD_REPETITION':
-				return t('reason_draw', 'Draw')
+				return t('reason_draw')
 			default:
 				return reason
 		}
 	}
 
 	const handleDownloadPgn = (match: MatchRecord) => {
-		if (!match.pgn) return
-		const whiteName = match.white?.username || 'White'
-		const blackName = match.black?.username || 'Black'
-		const dateStr = match.played_at ? new Date(match.played_at).toISOString().split('T')[0] : 'match'
-		const filename = `${whiteName}_vs_${blackName}_${dateStr}.pgn`
-
-		const blob = new Blob([match.pgn], { type: 'application/x-chess-pgn;charset=utf-8' })
-		const url = URL.createObjectURL(blob)
-		const link = document.createElement('a')
-		link.href = url
-		link.download = filename
-		document.body.appendChild(link)
-		link.click()
-		document.body.removeChild(link)
-		URL.revokeObjectURL(url)
-	}
+		downloadPgn(match);
+	};
 
 	return {
 		matches,

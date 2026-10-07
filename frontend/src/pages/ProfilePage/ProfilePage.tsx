@@ -1,25 +1,26 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { useParams, useOutletContext } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { useProfile } from '../../hooks/useProfile'
-import { usePageTitle } from '../../hooks/usePageTitle'
-import { useGameHistory } from '../../hooks/useGameHistory'
-import type { TabType } from '../../constants/profileConstants'
-import type { LayoutContextType } from '../../layouts/MainLayout'
-import ProfileHeader from '../../components/ProfileHeader/ProfileHeader'
-import ProfileTabs from '../../components/ProfileTabs/ProfileTabs'
-import OngoingGameCard, { type LiveGameData } from '../../components/OngoingGameCard/OngoingGameCard'
-import pageStyles from './ProfilePage.module.css'
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams, useOutletContext } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useProfile } from '../../hooks/useProfile';
+import { usePageTitle } from '../../hooks/usePageTitle';
+import { useGameHistory } from '../../hooks/useGameHistory';
+import type { TabType } from '../../utils/profileUtils';
+import type { LayoutContextType } from '../../layouts/MainLayout';
+import ProfileHeader from '../../components/ProfileHeader/ProfileHeader';
+import ProfileTabs from '../../components/ProfileTabs/ProfileTabs';
+import OngoingGameCard from '../../components/OngoingGameCard/OngoingGameCard';
+import type { LiveGameData } from '../../utils/gameUtils';
+import pageStyles from './ProfilePage.module.css';
 
 type Props = {
-    defaultTab?: TabType
-}
+    defaultTab?: TabType;
+};
 
-function ProfilePage({ defaultTab = 'overview' }: Props) {
-    const { t } = useTranslation()
-    const { username } = useParams()
-    const layoutContext = useOutletContext<LayoutContextType | undefined>()
-    const currentUserId = layoutContext?.currentUser?.id ?? null
+const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
+    const { t } = useTranslation();
+    const { username } = useParams();
+    const layoutContext = useOutletContext<LayoutContextType | undefined>();
+    const currentUserId = layoutContext?.currentUser?.id ?? null;
 
     const {
         user,
@@ -39,33 +40,33 @@ function ProfilePage({ defaultTab = 'overview' }: Props) {
         logout,
         goToSettings,
         goToUserProfile,
-    } = useProfile(username, defaultTab)
+    } = useProfile(username, defaultTab);
 
     // Load game history to know total games count and pass down to tabs
-    const history = useGameHistory(user?.username || '')
+    const history = useGameHistory(user?.username || '');
 
     // Live Ongoing Game beside header
-    const [activeGame, setActiveGame] = useState<LiveGameData | null>(null)
-    const [isLiveActive, setIsLiveActive] = useState(false)
-    const [headerHeight, setHeaderHeight] = useState<number | null>(null)
-    const headerRef = useRef<HTMLDivElement>(null)
+    const [activeGame, setActiveGame] = useState<LiveGameData | null>(null);
+    const [isLiveActive, setIsLiveActive] = useState(false);
+    const [headerHeight, setHeaderHeight] = useState<number | null>(null);
+    const headerRef = useRef<HTMLDivElement>(null);
 
     const fetchLiveGame = useCallback(async () => {
-        if (!user?.username) return
+        if (!user?.username) return;
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('token');
             const res = await fetch(`/api/game/live/${user.username}`, {
                 headers: token ? { Authorization: `Bearer ${token}` } : {},
-            })
+            });
             if (res.ok) {
-                const data = await res.json()
+                const data = await res.json();
                 if (data?.gameId) {
-                    setActiveGame(data)
+                    setActiveGame(data);
                     // rAF ensures the element is mounted in DOM before triggering active class for smooth expansion
                     requestAnimationFrame(() => {
-                        setIsLiveActive(true)
-                    })
-                    return
+                        setIsLiveActive(true);
+                    });
+                    return;
                 }
             }
             // If response is not ok (no active game on server):
@@ -73,101 +74,97 @@ function ProfilePage({ defaultTab = 'overview' }: Props) {
             // If activeGame is already mounted, OngoingGameCard handles the 5-second countdown on game over.
             setActiveGame((prev) => {
                 if (!prev) {
-                    setIsLiveActive(false)
-                    return null
+                    setIsLiveActive(false);
+                    return null;
                 }
-                return prev
-            })
+                return prev;
+            });
         } catch {
             setActiveGame((prev) => {
                 if (!prev) {
-                    setIsLiveActive(false)
-                    return null
+                    setIsLiveActive(false);
+                    return null;
                 }
-                return prev
-            })
+                return prev;
+            });
         }
-    }, [user?.username])
+    }, [user?.username]);
 
     useEffect(() => {
-        setActiveGame(null)
-        setIsLiveActive(false)
-        fetchLiveGame()
-    }, [user?.username, fetchLiveGame])
+        setActiveGame(null);
+        setIsLiveActive(false);
+        fetchLiveGame();
+    }, [user?.username, fetchLiveGame]);
 
     // Listen for live presence changes to automatically detect game start
     useEffect(() => {
         const handleStatusChange = (e: Event) => {
             const customEvent = e as CustomEvent<{
-                userId: number
-                username: string
-                status: string
-                gameId?: string
-            }>
-            const data = customEvent.detail
-            if (!data || !user?.username) return
+                userId: number;
+                username: string;
+                status: string;
+                gameId?: string;
+            }>;
+            const data = customEvent.detail;
+            if (!data || !user?.username) return;
 
             if (data.username?.toLowerCase() === user.username.toLowerCase()) {
                 if (data.status === 'INGAME') {
-                    fetchLiveGame()
+                    fetchLiveGame();
                 }
             }
-        }
+        };
 
-        window.addEventListener('user_status_changed', handleStatusChange)
+        window.addEventListener('user_status_changed', handleStatusChange);
         return () => {
-            window.removeEventListener('user_status_changed', handleStatusChange)
-        }
-    }, [user?.username, fetchLiveGame])
+            window.removeEventListener('user_status_changed', handleStatusChange);
+        };
+    }, [user?.username, fetchLiveGame]);
 
     // Measure header height to keep board 1:1 matching
     useEffect(() => {
-        if (!headerRef.current) return
+        if (!headerRef.current) return;
 
         const updateHeight = () => {
             if (headerRef.current) {
-                const h = headerRef.current.offsetHeight
+                const h = headerRef.current.offsetHeight;
                 if (h > 0) {
                     setHeaderHeight((prev) => {
                         if (prev !== null && Math.abs(prev - h) <= 2) {
-                            return prev
+                            return prev;
                         }
-                        return h
-                    })
+                        return h;
+                    });
                 }
             }
-        }
+        };
 
-        updateHeight()
+        updateHeight();
 
         const ro = new ResizeObserver(() => {
-            updateHeight()
-        })
-        ro.observe(headerRef.current)
+            updateHeight();
+        });
+        ro.observe(headerRef.current);
 
-        return () => ro.disconnect()
-    }, [user, friends])
+        return () => ro.disconnect();
+    }, [user, friends]);
 
     const handleStartExit = useCallback(() => {
-        setIsLiveActive(false)
-    }, [])
+        setIsLiveActive(false);
+    }, []);
 
     const handleDoneExit = useCallback(() => {
-        setActiveGame(null)
-    }, [])
+        setActiveGame(null);
+    }, []);
 
-    usePageTitle(
-        user?.isOwnProfile ? 'page_title_profile' : 'page_title_user_profile',
-        user?.isOwnProfile ? 'Profile' : `${user?.username || ''}'s Profile`,
-        { username: user?.username || '' }
-    )
+    usePageTitle(user?.isOwnProfile ? 'page_title_profile' : 'page_title_user_profile', { username: user?.username || '' });
 
     if (error) {
         return (
             <div className={pageStyles.authPage}>
                 <p className={`${pageStyles.msg} ${pageStyles.error}`}>{error}</p>
             </div>
-        )
+        );
     }
 
     if (!user) {
@@ -175,7 +172,7 @@ function ProfilePage({ defaultTab = 'overview' }: Props) {
             <div className={pageStyles.authPage}>
                 <p className={pageStyles.msg}>{t('user_not_found')}</p>
             </div>
-        )
+        );
     }
 
     return (
@@ -239,7 +236,7 @@ function ProfilePage({ defaultTab = 'overview' }: Props) {
                 onFriendClick={goToUserProfile}
             />
         </div>
-    )
-}
+    );
+};
 
-export default ProfilePage
+export default ProfilePage;

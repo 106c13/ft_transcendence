@@ -130,27 +130,27 @@ export default function BigRatingChart({ mode, history }: Props) {
 			{/* Top stats summary */}
 			<div className={styles.statsGrid}>
 				<div className={styles.statCard}>
-					<span className={styles.statLabel}>{t('current_rating', 'Current Rating')}</span>
+					<span className={styles.statLabel}>{t('current_rating')}</span>
 					<span className={styles.statValue}>{history?.current ?? '—'}</span>
 					<span className={styles.statSub}>
-						{history?.isProvisional ? t('provisional', 'Provisional') : t('calibrated', 'Calibrated')}
+						{history?.isProvisional ? t('provisional') : t('calibrated')}
 					</span>
 				</div>
 
 				<div className={styles.statCard}>
-					<span className={styles.statLabel}>🏆 {t('peak_rating', 'Peak Rating')}</span>
+					<span className={styles.statLabel}>🏆 {t('peak_rating')}</span>
 					<span className={styles.statValue}>{history?.peak ?? '—'}</span>
-					<span className={styles.statSub}>{t('all_time_high', 'All-time high')}</span>
+					<span className={styles.statSub}>{t('all_time_high')}</span>
 				</div>
 
 				<div className={styles.statCard}>
-					<span className={styles.statLabel}>📉 {t('lowest_rating', 'Lowest Rating')}</span>
+					<span className={styles.statLabel}>📉 {t('lowest_rating')}</span>
 					<span className={styles.statValue}>{history?.lowest ?? '—'}</span>
-					<span className={styles.statSub}>{t('all_time_low', 'All-time low')}</span>
+					<span className={styles.statSub}>{t('all_time_low')}</span>
 				</div>
 
 				<div className={styles.statCard}>
-					<span className={styles.statLabel}>⚔️ {t('total_games', 'Total Games')}</span>
+					<span className={styles.statLabel}>⚔️ {t('total_games')}</span>
 					<span className={styles.statValue}>{history?.gamesPlayed ?? 0}</span>
 					<span className={styles.statSub}>
 						{history?.wins ?? 0}W / {history?.draws ?? 0}D / {history?.losses ?? 0}L
@@ -158,9 +158,9 @@ export default function BigRatingChart({ mode, history }: Props) {
 				</div>
 
 				<div className={styles.statCard}>
-					<span className={styles.statLabel}>🎯 {t('win_rate', 'Win Rate')}</span>
+					<span className={styles.statLabel}>🎯 {t('win_rate')}</span>
 					<span className={styles.statValue}>{history?.winRate ?? 0}%</span>
-					<span className={styles.statSub}>{t('overall_success', 'Overall success')}</span>
+					<span className={styles.statSub}>{t('overall_success')}</span>
 				</div>
 			</div>
 
@@ -172,14 +172,14 @@ export default function BigRatingChart({ mode, history }: Props) {
 						<span className={styles.chartModeTitle}>{t(meta.nameKey, meta.defaultName)} Rating Progression</span>
 					</div>
 					<span className={styles.pointsCount}>
-						{points.length} {t('matches_recorded', 'matches recorded')}
+						{points.length} {t('matches_recorded')}
 					</span>
 				</div>
 
 				{points.length === 0 ? (
 					<div className={styles.emptyState}>
 						<span className={styles.emptyIcon}>📈</span>
-						<h4>{t('no_rating_history', 'No rating history recorded yet for this mode')}</h4>
+						<h4>{t('no_rating_history')}</h4>
 					</div>
 				) : (
 					<div className={styles.svgContainer}>
@@ -206,13 +206,13 @@ export default function BigRatingChart({ mode, history }: Props) {
 									<div className={styles.tooltipMatch}>
 										<span className={styles.tooltipOpponent}>vs {activePoint.opponent}</span>
 										{activePoint.result === 'win' && (
-											<span className={styles.tooltipResultWin}>{t('win', 'WIN')}</span>
+											<span className={styles.tooltipResultWin}>{t('win')}</span>
 										)}
 										{activePoint.result === 'loss' && (
-											<span className={styles.tooltipResultLoss}>{t('loss', 'LOSS')}</span>
+											<span className={styles.tooltipResultLoss}>{t('loss')}</span>
 										)}
 										{activePoint.result === 'draw' && (
-											<span className={styles.tooltipResultDraw}>{t('draw', 'DRAW')}</span>
+											<span className={styles.tooltipResultDraw}>{t('draw')}</span>
 										)}
 									</div>
 								)}

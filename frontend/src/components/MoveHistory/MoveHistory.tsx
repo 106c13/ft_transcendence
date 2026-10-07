@@ -74,7 +74,7 @@ function MoveHistory({
 	return (
 		<div className={styles.moveHistoryRoot}>
 			<div className={styles.moveHistoryHeader}>
-				<span className={styles.moveHistoryTitle}>{t('move_history', 'Move Log')}</span>
+				<span className={styles.moveHistoryTitle}>{t('move_history')}</span>
 			</div>
 
 			<div className={styles.moveHistoryList} ref={moveListRef}>
@@ -82,10 +82,10 @@ function MoveHistory({
 					<div className={styles.emptyHistory}>
 						<div className={styles.emptyHistoryIcon}>♟️</div>
 						<span className={styles.emptyHistoryTitle}>
-							{t('no_moves_yet', 'No moves played yet')}
+							{t('no_moves_yet')}
 						</span>
 						<span className={styles.emptyHistorySubtitle}>
-							{t('moves_appear_here', 'Moves will appear here as the game progresses')}
+							{t('moves_appear_here')}
 						</span>
 					</div>
 				) : (
@@ -118,12 +118,12 @@ function MoveHistory({
 								)}
 
 								<div className={styles.moveTimesGroup}>
-									<div className={styles.timeItem} title={t('white_time_spent', "White's time spent")}>
+									<div className={styles.timeItem} title={t('white_time_spent')}>
 										<span className={styles.timeDotWhite} />
 										<span className={styles.timeText}>{formatMoveTime(row.whiteTime)}</span>
 									</div>
 									{row.blackSan ? (
-										<div className={styles.timeItem} title={t('black_time_spent', "Black's time spent")}>
+										<div className={styles.timeItem} title={t('black_time_spent')}>
 											<span className={styles.timeDotBlack} />
 											<span className={styles.timeText}>{formatMoveTime(row.blackTime)}</span>
 										</div>
@@ -138,14 +138,14 @@ function MoveHistory({
 			</div>
 
 			{isReviewing && (
-				<div className={styles.reviewingBanner}>{t('reviewing_banner', '👁 Reviewing — not live')}</div>
+				<div className={styles.reviewingBanner}>{t('reviewing_banner')}</div>
 			)}
 
 			<div className={styles.moveNavRow}>
 				<button
 					type="button"
 					className={styles.navBtn}
-					title={t('start', 'Start')}
+					title={t('start')}
 					disabled={halfMoves <= 0}
 					onClick={() => onSelectIndex(0)}
 				>
@@ -154,7 +154,7 @@ function MoveHistory({
 				<button
 					type="button"
 					className={styles.navBtn}
-					title={t('previous', 'Previous')}
+					title={t('previous')}
 					disabled={halfMoves <= 0}
 					onClick={() => onSelectIndex(Math.max(0, viewIndex - 1))}
 				>
@@ -163,7 +163,7 @@ function MoveHistory({
 				<button
 					type="button"
 					className={styles.navBtn}
-					title={t('next', 'Next')}
+					title={t('next')}
 					disabled={halfMoves <= 0}
 					onClick={() => onSelectIndex(Math.min(moveHistory.length - 1, viewIndex + 1))}
 				>
@@ -172,7 +172,7 @@ function MoveHistory({
 				<button
 					type="button"
 					className={styles.navBtn}
-					title={t('latest', 'Latest')}
+					title={t('latest')}
 					disabled={halfMoves <= 0}
 					onClick={() => onSelectIndex(moveHistory.length - 1)}
 				>

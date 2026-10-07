@@ -1,14 +1,14 @@
 .friendsPreviewCard {
-	background: #1E293B;
-	border: 1px solid rgba(148, 163, 184, 0.12);
-	border-radius: 12px;
-	padding: 13px 16px;
+	background: var(--color-bg-card);
+	border: 1px solid var(--color-border-subtle);
+	border-radius: var(--radius-2xl);
+	padding: var(--padding-md) var(--padding-lg);
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
+	gap: var(--gap-md);
 	width: 100%;
 	box-sizing: border-box;
-	transition: all 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+	transition: all var(--transition-smooth);
 }
 
 .header {
@@ -20,52 +20,56 @@
 .titleGroup {
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: var(--gap-sm);
 }
 
 .title {
-	font-size: 14.5px;
+	font-size: var(--font-size-base);
 	font-weight: 700;
-	color: #F8FAFC;
+	color: var(--color-slate-50);
 	margin: 0;
 }
 
 .countBadge {
-	font-size: 11px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: var(--font-size-xs);
 	font-weight: 700;
-	background: rgba(148, 163, 184, 0.12);
-	color: #94A3B8;
-	padding: 2px 7px;
-	border-radius: 10px;
+	background: var(--color-border-subtle);
+	color: var(--color-slate-400);
+	padding: 2px var(--padding-sm);
+	border-radius: var(--radius-xl);
+	line-height: 1.2;
 }
 
 .seeAllBtn {
 	background: none;
 	border: none;
-	color: #60A5FA;
-	font-size: 12px;
+	color: var(--color-blue-400);
+	font-size: var(--font-size-sm);
 	font-weight: 600;
 	cursor: pointer;
-	padding: 3px 6px;
-	border-radius: 6px;
-	transition: all 0.2s ease;
+	padding: var(--padding-xs) var(--padding-sm);
+	border-radius: var(--radius-md);
+	transition: all var(--transition-normal);
 	display: inline-flex;
 	align-items: center;
-	gap: 4px;
+	gap: var(--gap-xs);
 }
 
 .seeAllBtn:hover {
 	background: rgba(96, 165, 250, 0.1);
-	color: #93C5FD;
+	color: var(--color-slate-100);
 }
 
 .avatarsList {
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: var(--gap-md);
 	flex-wrap: wrap;
 	padding: 2px 0;
-	transition: all 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+	transition: all var(--transition-smooth);
 }
 
 .avatarItem {
@@ -74,8 +78,8 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-	            opacity 0.25s ease;
+	transition: transform var(--transition-smooth),
+	            opacity var(--transition-normal);
 }
 
 .avatarImg {
@@ -86,19 +90,18 @@
 	max-width: 38px;
 	max-height: 38px;
 	aspect-ratio: 1 / 1;
-	border-radius: 50%;
+	border-radius: var(--radius-full);
 	object-fit: cover;
 	display: block;
 	border: 2px solid rgba(148, 163, 184, 0.2);
-	transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-	background: #334155;
+	transition: all var(--transition-normal);
+	background: var(--color-slate-700);
 }
 
 .avatarItem:hover .avatarImg {
 	transform: scale(1.12);
-	border-color: #3B82F6;
-	box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
-	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+	border-color: var(--color-blue-500);
+	box-shadow: var(--shadow-glow-blue);
 }
 
 .statusDot {
@@ -107,49 +110,45 @@
 	right: -1px;
 	width: 10px;
 	height: 10px;
-	border-radius: 50%;
-	border: 1.5px solid #1E293B;
+	border-radius: var(--radius-full);
+	border: 1.5px solid var(--color-bg-card);
 	z-index: 2;
 }
 
 .statusDot.online {
-	background: #4ADE80;
+	background: var(--color-emerald-400);
 	box-shadow: 0 0 4px rgba(74, 222, 128, 0.6);
 }
 
 .statusDot.ingame {
-	background: #A855F7;
+	background: var(--color-purple-500);
 	box-shadow: 0 0 4px rgba(168, 85, 247, 0.6);
 }
 
 .statusDot.offline {
-	background: #64748B;
+	background: var(--color-slate-500);
 }
 
 .tooltip {
 	position: absolute;
 	bottom: -28px;
-	bottom: -26px;
 	left: 50%;
 	transform: translateX(-50%) translateY(4px);
 	background: rgba(15, 23, 42, 0.95);
 	backdrop-filter: blur(6px);
-	border: 1px solid rgba(148, 163, 184, 0.2);
-	color: #F8FAFC;
-	font-size: 11px;
-	font-size: 10.5px;
+	border: 1px solid var(--color-border-subtle);
+	color: var(--color-slate-50);
+	font-size: var(--font-size-xs);
 	font-weight: 600;
-	padding: 3px 8px;
-	border-radius: 6px;
-	padding: 2px 7px;
-	border-radius: 5px;
+	padding: 2px var(--padding-sm);
+	border-radius: var(--radius-md);
 	white-space: nowrap;
 	pointer-events: none;
 	opacity: 0;
 	visibility: hidden;
-	transition: all 0.15s ease;
-	z-index: 20;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+	transition: all var(--transition-fast);
+	z-index: var(--z-dropdown);
+	box-shadow: var(--shadow-lg);
 }
 
 .avatarItem:hover .tooltip {
@@ -161,17 +160,17 @@
 .emptyState {
 	display: flex;
 	align-items: center;
-	gap: 10px;
-	padding: 10px 12px;
+	gap: var(--gap-md);
+	padding: var(--padding-sm) var(--padding-md);
 	background: rgba(15, 23, 42, 0.4);
 	border: 1px dashed rgba(148, 163, 184, 0.15);
-	border-radius: 8px;
-	margin: 2px 0;
+	border-radius: var(--radius-lg);
+	margin-bottom: var(--margin-xs);
 	box-sizing: border-box;
 }
 
 .emptyIcon {
-	font-size: 20px;
+	font-size: var(--font-size-xl);
 	opacity: 0.7;
 	flex-shrink: 0;
 }
@@ -179,19 +178,19 @@
 .emptyTextGroup {
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
+	gap: var(--gap-xs);
 	min-width: 0;
 }
 
 .emptyTitle {
-	font-size: 12.5px;
+	font-size: var(--font-size-sm);
 	font-weight: 600;
-	color: #CBD5E1;
+	color: var(--color-slate-300);
 }
 
 .emptySubtitle {
-	font-size: 11px;
-	color: #64748B;
+	font-size: var(--font-size-xs);
+	color: var(--color-slate-500);
 	line-height: 1.3;
 }
 

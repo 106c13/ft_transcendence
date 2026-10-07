@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './TopRankBadge.module.css';
 
 interface TopRankBadgeProps {
@@ -8,12 +7,12 @@ interface TopRankBadgeProps {
 	showTooltip?: boolean;
 }
 
-export const TopRankBadge: React.FC<TopRankBadgeProps> = ({
+const TopRankBadge = ({
 	rank,
 	size = 'md',
 	className = '',
 	showTooltip = true,
-}) => {
+}: TopRankBadgeProps) => {
 	if (rank < 1 || rank > 3) return null;
 
 	const sizeClass =

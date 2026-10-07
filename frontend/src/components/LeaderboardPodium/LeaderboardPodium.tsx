@@ -1,7 +1,6 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import TopRankBadge from '../TopRankBadge/TopRankBadge';
-import type { LeaderboardPlayer } from '../../pages/LeaderboardPage/types';
+import type { LeaderboardPlayer } from '../../utils/leaderboardUtils';
 import styles from '../../pages/LeaderboardPage/LeaderboardPage.module.css';
 
 interface LeaderboardPodiumProps {
@@ -13,10 +12,10 @@ interface LeaderboardPodiumProps {
 	onPlayerClick: (username: string) => void;
 }
 
-export const LeaderboardPodium: React.FC<LeaderboardPodiumProps> = ({
+const LeaderboardPodium = ({
 	podiumPlayers,
 	onPlayerClick,
-}) => {
+}: LeaderboardPodiumProps) => {
 	const { t } = useTranslation();
 
 	if (!podiumPlayers) return null;
@@ -57,9 +56,9 @@ export const LeaderboardPodium: React.FC<LeaderboardPodiumProps> = ({
 					<TopRankBadge rank={2} size="md" />
 				</div>
 				<div className={styles.podiumStatsRow}>
-					<span>{podiumPlayers.second.stats.totalGames} {t('matches', 'Games')}</span>
+					<span>{podiumPlayers.second.stats.totalGames} {t('matches')}</span>
 					<span className={styles.podiumStatHighlight}>
-						{podiumPlayers.second.stats.winRate}% {t('winrate', 'WR')}
+						{podiumPlayers.second.stats.winRate}% {t('winrate')}
 					</span>
 				</div>
 			</div>
@@ -101,9 +100,9 @@ export const LeaderboardPodium: React.FC<LeaderboardPodiumProps> = ({
 					<TopRankBadge rank={1} size="md" />
 				</div>
 				<div className={styles.podiumStatsRow}>
-					<span>{podiumPlayers.first.stats.totalGames} {t('matches', 'Games')}</span>
+					<span>{podiumPlayers.first.stats.totalGames} {t('matches')}</span>
 					<span className={styles.podiumStatHighlight}>
-						{podiumPlayers.first.stats.winRate}% {t('winrate', 'WR')}
+						{podiumPlayers.first.stats.winRate}% {t('winrate')}
 					</span>
 				</div>
 			</div>
@@ -142,9 +141,9 @@ export const LeaderboardPodium: React.FC<LeaderboardPodiumProps> = ({
 					<TopRankBadge rank={3} size="md" />
 				</div>
 				<div className={styles.podiumStatsRow}>
-					<span>{podiumPlayers.third.stats.totalGames} {t('matches', 'Games')}</span>
+					<span>{podiumPlayers.third.stats.totalGames} {t('matches')}</span>
 					<span className={styles.podiumStatHighlight}>
-						{podiumPlayers.third.stats.winRate}% {t('winrate', 'WR')}
+						{podiumPlayers.third.stats.winRate}% {t('winrate')}
 					</span>
 				</div>
 			</div>

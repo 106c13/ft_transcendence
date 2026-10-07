@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import type { MatchRecord } from '../GameAnalysis/GameAnalysis'
-import GameRow from '../GameRow/GameRow'
-import CustomSelect, { type SelectOption } from '../CustomSelect/CustomSelect'
+import type { MatchRecord } from '../../utils/gameUtils';
+import GameRow from '../GameRow/GameRow';
+import CustomSelect from '../CustomSelect/CustomSelect';
+import type { SelectOption } from '../../utils/selectUtils';
 import styles from './GamesList.module.css'
 
 type Props = {
@@ -110,7 +111,7 @@ export default function GamesList({
 			<div className={styles.container}>
 				<div className={styles.loadingSpinner}>
 					<span className={styles.spinnerIcon}>♟</span>
-					<p>{t('loading', 'Loading games...')}</p>
+					<p>{t('loading')}</p>
 				</div>
 			</div>
 		)
@@ -121,15 +122,15 @@ export default function GamesList({
 			<div className={styles.container}>
 				<div className={styles.emptyCard}>
 					<div className={styles.emptyIcon}>♟️</div>
-					<h4 className={styles.emptyTitle}>{t('no_games_yet', 'No games played yet')}</h4>
+					<h4 className={styles.emptyTitle}>{t('no_games_yet')}</h4>
 					<p className={styles.emptySubtitle}>
 						{isOwnProfile
-							? t('play_first_game_prompt', 'Play matches to build your game history and analysis log.')
-							: t('user_no_games', 'This user has not played any games yet.')}
+							? t('play_first_game_prompt')
+							: t('user_no_games')}
 					</p>
 					{isOwnProfile && (
 						<button className={styles.playNowBtn} onClick={() => navigate('/home')} type="button">
-							⚔️ {t('play_now', 'Play Now')}
+							⚔️ {t('play_now')}
 						</button>
 					)}
 				</div>
@@ -138,23 +139,23 @@ export default function GamesList({
 	}
 
 	const colorOptions: SelectOption<'all' | 'white' | 'black'>[] = [
-		{ value: 'all', label: t('all_colors', 'All Colors') },
-		{ value: 'white', label: t('white', 'White') },
-		{ value: 'black', label: t('black', 'Black') },
+		{ value: 'all', label: t('all_colors') },
+		{ value: 'white', label: t('white') },
+		{ value: 'black', label: t('black') },
 	]
 
 	const resultOptions: SelectOption<'all' | 'win' | 'loss' | 'draw'>[] = [
-		{ value: 'all', label: t('all_results', 'All Results') },
-		{ value: 'win', label: t('wins', 'Wins') },
-		{ value: 'loss', label: t('losses', 'Losses') },
-		{ value: 'draw', label: t('draws', 'Draws') },
+		{ value: 'all', label: t('all_results') },
+		{ value: 'win', label: t('wins') },
+		{ value: 'loss', label: t('losses') },
+		{ value: 'draw', label: t('draws') },
 	]
 
 	const modeOptions: SelectOption<'all' | 'bullet' | 'blitz' | 'rapid'>[] = [
-		{ value: 'all', label: t('all_modes', 'All Modes') },
-		{ value: 'bullet', icon: '🔥', label: t('bullet_rating', 'Bullet') },
-		{ value: 'blitz', icon: '⚡', label: t('blitz_rating', 'Blitz') },
-		{ value: 'rapid', icon: '⏳', label: t('rapid_rating', 'Rapid') },
+		{ value: 'all', label: t('all_modes') },
+		{ value: 'bullet', icon: '🔥', label: t('bullet_rating') },
+		{ value: 'blitz', icon: '⚡', label: t('blitz_rating') },
+		{ value: 'rapid', icon: '⏳', label: t('rapid_rating') },
 	]
 
 	return (
@@ -162,7 +163,7 @@ export default function GamesList({
 			{/* Top header */}
 			<div className={styles.header}>
 				<div className={styles.titleGroup}>
-					<h3 className={styles.title}>{t('games', 'Games')}</h3>
+					<h3 className={styles.title}>{t('games')}</h3>
 					<span className={styles.countBadge}>{matches.length}</span>
 				</div>
 			</div>
@@ -171,7 +172,7 @@ export default function GamesList({
 			<div className={styles.filterBar}>
 				{/* Color Filter */}
 				<div className={styles.filterGroup}>
-					<label className={styles.filterLabel}>{t('filter_color', 'Color')}:</label>
+					<label className={styles.filterLabel}>{t('filter_color')}:</label>
 					<CustomSelect<'all' | 'white' | 'black'>
 						value={colorFilter}
 						options={colorOptions}
@@ -182,7 +183,7 @@ export default function GamesList({
 
 				{/* Result Filter */}
 				<div className={styles.filterGroup}>
-					<label className={styles.filterLabel}>{t('filter_result', 'Result')}:</label>
+					<label className={styles.filterLabel}>{t('filter_result')}:</label>
 					<CustomSelect<'all' | 'win' | 'loss' | 'draw'>
 						value={resultFilter}
 						options={resultOptions}
@@ -193,7 +194,7 @@ export default function GamesList({
 
 				{/* Game Mode Filter */}
 				<div className={styles.filterGroup}>
-					<label className={styles.filterLabel}>{t('filter_mode', 'Game Mode')}:</label>
+					<label className={styles.filterLabel}>{t('filter_mode')}:</label>
 					<CustomSelect<'all' | 'bullet' | 'blitz' | 'rapid'>
 						value={modeFilter}
 						options={modeOptions}
@@ -205,7 +206,7 @@ export default function GamesList({
 				{/* Reset Button */}
 				{hasActiveFilters && (
 					<button className={styles.resetBtn} onClick={handleResetFilters}>
-						✕ {t('clear', 'Clear Filters')}
+						✕ {t('clear')}
 					</button>
 				)}
 			</div>
@@ -214,24 +215,24 @@ export default function GamesList({
 			{totalGames === 0 ? (
 				<div className={styles.emptyCard}>
 					<div className={styles.emptyIcon}>🔍</div>
-					<h4 className={styles.emptyTitle}>{t('no_games_matching_filter', 'No games match the selected filters')}</h4>
+					<h4 className={styles.emptyTitle}>{t('no_games_matching_filter')}</h4>
 					<p className={styles.emptySubtitle}>
-						{t('try_adjusting_filters', 'Try adjusting your color, result, or mode filters.')}
+						{t('try_adjusting_filters')}
 					</p>
 					<button className={styles.resetBtn} onClick={handleResetFilters} type="button">
-						✕ {t('clear', 'Clear Filters')}
+						✕ {t('clear')}
 					</button>
 				</div>
 			) : (
 				<div className={styles.listContainer}>
 					{/* Table Column Labels */}
 					<div className={styles.listHeader}>
-						<span>{t('mode', 'Mode')}</span>
-						<span>{t('players', 'Players')}</span>
-						<span>{t('moves', 'Moves')}</span>
-						<span>{t('result', 'Result')}</span>
-						<span>{t('review', 'Review')}</span>
-						<span>{t('date', 'Date')}</span>
+						<span>{t('mode')}</span>
+						<span>{t('players')}</span>
+						<span>{t('moves')}</span>
+						<span>{t('result')}</span>
+						<span>{t('review')}</span>
+						<span>{t('date')}</span>
 					</div>
 
 					<div className={styles.rowsContainer}>
@@ -256,7 +257,6 @@ export default function GamesList({
 							from: fromIndex,
 							to: toIndex,
 							total: totalGames,
-							defaultValue: `Showing ${fromIndex}–${toIndex} of ${totalGames} games`,
 						})}
 					</div>
 
@@ -267,7 +267,7 @@ export default function GamesList({
 								disabled={safePage <= 1}
 								onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
 							>
-								{t('previous', 'Previous')}
+								{t('previous')}
 							</button>
 
 							{Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -303,7 +303,7 @@ export default function GamesList({
 								disabled={safePage >= totalPages}
 								onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
 							>
-								{t('next', 'Next')}
+								{t('next')}
 							</button>
 						</div>
 					)}

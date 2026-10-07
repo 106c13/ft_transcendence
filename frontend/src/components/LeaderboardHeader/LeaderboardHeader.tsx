@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from '../../pages/LeaderboardPage/LeaderboardPage.module.css';
 
@@ -8,28 +7,25 @@ interface LeaderboardHeaderProps {
 	onToggleFormulaInfo: () => void;
 }
 
-export const LeaderboardHeader: React.FC<LeaderboardHeaderProps> = ({
+const LeaderboardHeader = ({
 	total,
 	showFormulaInfo,
 	onToggleFormulaInfo,
-}) => {
+}: LeaderboardHeaderProps) => {
 	const { t } = useTranslation();
 
 	return (
 		<header className={styles.headerSection}>
 			<div className={styles.titleRow}>
 				<h1 className={styles.pageTitle}>
-					<span>🏆</span> {t('global_leaderboard', 'Global Leaderboard')}
+					<span>🏆</span> {t('global_leaderboard')}
 				</h1>
 				<span className={styles.totalBadge}>
-					{total} {t('players', 'Players')}
+					{total} {t('players')}
 				</span>
 			</div>
 			<p className={styles.subtitle}>
-				{t(
-					'leaderboard_subtitle',
-					'Rankings calculated from cross-format performance across Bullet, Blitz, and Rapid chess.'
-				)}
+				{t('leaderboard_subtitle')}
 			</p>
 
 			<button
@@ -40,7 +36,7 @@ export const LeaderboardHeader: React.FC<LeaderboardHeaderProps> = ({
 				}}
 				type="button"
 			>
-				ℹ️ {showFormulaInfo ? t('hide_formula', 'Hide Rating Formula') : t('how_it_works', 'How Rating Works')}
+				ℹ️ {showFormulaInfo ? t('hide_formula') : t('how_it_works')}
 			</button>
 
 			{/* Rating Formula Explainer Modal/Card with smooth accordion */}
@@ -48,40 +44,31 @@ export const LeaderboardHeader: React.FC<LeaderboardHeaderProps> = ({
 				<div className={styles.explainerInner}>
 					<div className={styles.explainerCard}>
 						<h3 className={styles.explainerTitle}>
-							<span>📐</span> {t('leaderboard_system_title', 'Leaderboard Rating Formula')}
+							<span>📐</span> {t('leaderboard_system_title')}
 						</h3>
 						<div className={styles.explainerGrid}>
 							<div className={styles.explainerItem}>
 								<div className={styles.explainerItemHeader}>
-									⚖️ {t('confidence_weighting', 'Confidence Weighting')}
+									⚖️ {t('confidence_weighting')}
 								</div>
 								<p className={styles.explainerItemText}>
-									{t(
-										'confidence_desc',
-										'Formats with 5+ games receive full 100% confidence weight. Provisional formats (1–4 games) scale dynamically, preventing single lucky wins from skewing ratings.'
-									)}
+									{t('confidence_desc')}
 								</p>
 							</div>
 							<div className={styles.explainerItem}>
 								<div className={styles.explainerItemHeader}>
-									⭐ {t('versatility_bonus', 'Versatility Mastery')}
+									⭐ {t('versatility_bonus')}
 								</div>
 								<p className={styles.explainerItemText}>
-									{t(
-										'versatility_desc',
-										'Players competing across multiple calibrated formats earn a versatility bonus (+15 for 2 formats, +30 for all 3 formats), rewarding well-rounded grandmasters.'
-									)}
+									{t('versatility_desc')}
 								</p>
 							</div>
 							<div className={styles.explainerItem}>
 								<div className={styles.explainerItemHeader}>
-									🥇 {t('elite_podium', 'Top 3 Honors')}
+									🥇 {t('elite_podium')}
 								</div>
 								<p className={styles.explainerItemText}>
-									{t(
-										'podium_desc',
-										'The top 3 global positions earn distinct Gold, Silver, and Bronze trophy badges displayed across leaderboards, profiles, and post-game screens.'
-									)}
+									{t('podium_desc')}
 								</p>
 							</div>
 						</div>

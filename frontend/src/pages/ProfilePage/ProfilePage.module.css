@@ -3,7 +3,7 @@
 	flex-direction: column;
 	align-items: center;
 	padding: 84px 40px 40px;
-	color: #E2E8F0;
+	color: var(--color-slate-200);
 	min-height: 100vh;
 	width: 100%;
 	box-sizing: border-box;
@@ -14,19 +14,19 @@
 	justify-content: center;
 	align-items: center;
 	min-height: 100vh;
-	padding-top: 64px;
+	padding-bottom: 64px;
 	box-sizing: border-box;
-	background: radial-gradient(circle at top, #0F172A, #101A30);
-	color: #E2E8F0;
+	background: radial-gradient(circle at top, var(--color-slate-900), var(--color-bg-deep));
+	color: var(--color-slate-200);
 }
 
 .msg {
-	font-size: 16px;
-	color: #94A3B8;
+	font-size: var(--font-size-md);
+	color: var(--color-slate-400);
 }
 
 .error {
-	color: #F87171;
+	color: var(--color-red-400);
 }
 
 /* Header & Live Game Side-by-Side Wrapper using CSS Grid for 100% fluid track interpolation */
@@ -36,7 +36,7 @@
 	column-gap: 0px;
 	width: 100%;
 	max-width: 860px;
-	margin: 0 auto 20px;
+	margin: 0 auto var(--margin-2xl);
 	position: relative;
 	transition: grid-template-columns 0.45s cubic-bezier(0.16, 1, 0.3, 1),
 	            column-gap 0.45s cubic-bezier(0.16, 1, 0.3, 1);
@@ -44,7 +44,7 @@
 
 .headerWrapper.hasLiveGame {
 	grid-template-columns: 1fr var(--header-height, 220px);
-	column-gap: 16px;
+	column-gap: var(--gap-lg);
 }
 
 .headerContainer {
@@ -58,7 +58,7 @@
 	width: var(--header-height, 220px);
 	height: var(--header-height, 220px);
 	overflow: hidden;
-	border-radius: 14px;
+	border-radius: var(--radius-2xl);
 	box-sizing: border-box;
 	min-width: 0;
 	opacity: 0;
@@ -76,13 +76,14 @@
 
 @media (max-width: 768px) {
 	.profilePage {
-		padding: 72px 16px 30px;
+		padding: 72px var(--padding-lg) var(--padding-3xl);
 	}
 
 	.headerWrapper {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		margin-bottom: var(--margin-xl);
 	}
 
 	.liveGameContainer {
@@ -90,6 +91,6 @@
 		max-width: 280px;
 		height: auto;
 		aspect-ratio: 1 / 1;
-		margin-top: 14px;
+		margin-bottom: var(--margin-md);
 	}
 }

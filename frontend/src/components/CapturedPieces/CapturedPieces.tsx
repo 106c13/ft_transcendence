@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { getPieceImageSrc, PIECE_NAME } from '../../constants/gameConstants'
+import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils'
 import styles from './CapturedPieces.module.css'
 
 type PieceCapture = { type: string; color: 'w' | 'b' }
@@ -16,7 +16,7 @@ function CapturedPieces({ captured, whiteScore, blackScore, playerColor }: Props
 
 	return (
 		<div className={styles.capturedContainer}>
-			<span className={styles.capturedLabel}>{t('captured_by_you', 'Captured by You')}</span>
+			<span className={styles.capturedLabel}>{t('captured_by_you')}</span>
 			<div className={styles.capturedList}>
 				{(playerColor === 'w' ? captured.b : captured.w).length === 0 ? (
 					<span className={styles.emptyCaptured}>—</span>
@@ -39,7 +39,7 @@ function CapturedPieces({ captured, whiteScore, blackScore, playerColor }: Props
 			</div>
 
 			<span className={styles.capturedLabel} style={{ marginTop: '10px' }}>
-				{t('captured_by_opponent', 'Captured by Opponent')}
+				{t('captured_by_opponent')}
 			</span>
 			<div className={styles.capturedList}>
 				{(playerColor === 'w' ? captured.w : captured.b).length === 0 ? (

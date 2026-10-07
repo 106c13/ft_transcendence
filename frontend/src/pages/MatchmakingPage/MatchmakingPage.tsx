@@ -4,14 +4,14 @@ import { useTranslation } from 'react-i18next'
 import { Socket } from 'socket.io-client'
 import { useGameSocketContext } from '../../context/GameSocketContext'
 import { usePageTitle } from '../../hooks/usePageTitle'
-import { getPieceImageSrc } from '../../constants/gameConstants'
-import type { GameModeType } from '../../constants/gameModeConstats'
+import { getPieceImageSrc } from '../../utils/gameUtils'
+import type { GameModeType } from '../../utils/gameModeUtils'
 import type { LayoutContextType } from '../../layouts/MainLayout'
 import styles from './MatchmakingPage.module.css'
 
 export default function MatchmakingPage() {
     const { t } = useTranslation()
-    usePageTitle('page_title_searching', 'Finding Match...')
+    usePageTitle('page_title_searching')
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
 
@@ -29,12 +29,10 @@ export default function MatchmakingPage() {
         socketRef.current = socket
 
         const onConnect = () => {
-            console.log('Matchmaking Socket connected:', socket.id)
             socket.emit('find_match', { mode: modeParam })
         }
 
         const onMatchFound = (data: { gameId: string }) => {
-            console.log('Match found! Navigating to /game/' + data.gameId)
             matchFoundRef.current = true
             navigate(`/game/${data.gameId}`)
         }
@@ -71,8 +69,8 @@ export default function MatchmakingPage() {
     const category = (modeParam.replace('+2', '') as 'bullet' | 'blitz' | 'rapid') || 'blitz'
     const userRatingInfo = currentUser?.ratings?.[category]
     const searchingRatingText = userRatingInfo
-        ? (userRatingInfo.isProvisional ? `~${userRatingInfo.rating} (${t('provisional', 'provisional')})` : `${userRatingInfo.rating}`)
-        : `~800 (${t('provisional', 'provisional')})`
+        ? (userRatingInfo.isProvisional ? `~${userRatingInfo.rating} (${t('provisional')})` : `${userRatingInfo.rating}`)
+        : `~800 (${t('provisional')})`
 
     return (
         <div className={styles.pageContainer}>
@@ -85,20 +83,20 @@ export default function MatchmakingPage() {
                             className={styles.searchingPulseIcon}
                         />
                     </div>
-                    <h3>{t('searching_match', 'Searching for opponent...')}</h3>
+                    <h3>{t('searching_match')}</h3>
                     <p>
-                        {t('searching_desc', 'Filtering by match speed: ')}{' '}
+                        {t('searching_desc')}{' '}
                         <span className={styles.modeBadge}>{modeParam}</span>
                     </p>
                     <p className={styles.searchingRating}>
-                        {t('your_rating', 'Your rating')}: <strong>{searchingRatingText}</strong>
+                        {t('your_rating')}: <strong>{searchingRatingText}</strong>
                     </p>
                     <button
                         type="button"
                         className={styles.cancelMatchBtn}
                         onClick={handleCancel}
                     >
-                        ✕ {t('cancel', 'Cancel')}
+                        ✕ {t('cancel')}
                     </button>
                 </div>
             </main>

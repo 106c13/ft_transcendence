@@ -1,18 +1,19 @@
-import { useTranslation } from 'react-i18next'
-import styles from './SettingsHeader.module.css'
+import { useTranslation } from 'react-i18next';
+import type { SettingsTab } from '../../utils/settingsUtils';
+import styles from './SettingsHeader.module.css';
 
-export type SettingsTab = 'profile' | 'security'
+export type { SettingsTab };
 
 interface SettingsHeaderProps {
-	activeTab: SettingsTab
-	onSelectTab: (tab: SettingsTab) => void
+	activeTab: SettingsTab;
+	onSelectTab: (tab: SettingsTab) => void;
 }
 
-export default function SettingsHeader({
+const SettingsHeader = ({
 	activeTab,
 	onSelectTab,
-}: SettingsHeaderProps) {
-	const { t } = useTranslation()
+}: SettingsHeaderProps) => {
+	const { t } = useTranslation();
 
 	return (
 		<div className={styles.settingsHeader}>
@@ -20,9 +21,9 @@ export default function SettingsHeader({
 				<div className={styles.titleGroup}>
 					<div className={styles.iconBadge} aria-hidden="true">⚙️</div>
 					<div className={styles.textGroup}>
-						<h1 className={styles.pageTitle}>{t('settings', 'Settings')}</h1>
+						<h1 className={styles.pageTitle}>{t('settings')}</h1>
 						<p className={styles.pageSubtitle}>
-							{t('settings_subtitle', 'Manage your profile details and account security')}
+							{t('settings_subtitle')}
 						</p>
 					</div>
 				</div>
@@ -38,7 +39,7 @@ export default function SettingsHeader({
 					type="button"
 				>
 					<span className={styles.tabIcon}>👤</span>
-					<span>{t('profile_tab', 'Profile')}</span>
+					<span>{t('profile_tab')}</span>
 				</button>
 
 				<button
@@ -49,9 +50,11 @@ export default function SettingsHeader({
 					type="button"
 				>
 					<span className={styles.tabIcon}>🔒</span>
-					<span>{t('security_tab', 'Security')}</span>
+					<span>{t('security_tab')}</span>
 				</button>
 			</div>
 		</div>
-	)
-}
+	);
+};
+
+export default SettingsHeader;

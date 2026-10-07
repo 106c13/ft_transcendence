@@ -4,21 +4,20 @@
 	margin: 0 auto;
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
+	gap: var(--gap-2xl);
 }
 
 .overviewSection {
-	margin-top: 0;
 	display: flex;
 	flex-direction: column;
-	gap: 14px;
+	gap: var(--gap-2xl);
 	width: 100%;
 }
 
 .ratingsSection {
 	display: flex;
 	flex-direction: column;
-	gap: 8px;
+	gap: var(--gap-sm);
 	width: 100%;
 }
 
@@ -29,19 +28,19 @@
 }
 
 .sectionTitle {
-	font-size: 14.5px;
+	font-size: var(--font-size-base);
 	font-weight: 700;
-	color: #F8FAFC;
+	color: var(--color-slate-50);
 	margin: 0;
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: var(--gap-sm);
 }
 
 .ratingsGrid {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	gap: 12px;
+	gap: var(--gap-md);
 	width: 100%;
 }
 
@@ -60,7 +59,7 @@
 	padding: 0;
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: var(--gap-md);
 	width: 100%;
 }
 
@@ -68,31 +67,33 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 0 2px;
+	padding: 0 var(--padding-xs);
 }
 
 .titleGroup {
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: var(--gap-sm);
 }
 
 .countBadge {
-	font-size: 12px;
-	font-size: 11.5px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: var(--font-size-xs);
 	font-weight: 700;
-	background: rgba(148, 163, 184, 0.12);
-	color: #94A3B8;
-	padding: 2px 8px;
-	border-radius: 12px;
-	padding: 2px 7px;
-	border-radius: 10px;
+	background: var(--color-slate-800);
+	border: 1px solid var(--color-border-subtle);
+	color: var(--color-slate-400);
+	padding: 2px var(--padding-sm);
+	border-radius: var(--radius-xl);
+	line-height: 1.2;
 }
 
 .gamesListRows {
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: var(--gap-xs);
 	width: 100%;
 }
 
@@ -107,12 +108,12 @@
 	display: grid;
 	grid-template-columns: 80px minmax(180px, 1fr) 70px 85px 95px 120px;
 	gap: 10px;
-	padding: 2px 14px;
-	font-size: 10.5px;
+	padding: 2px var(--padding-md);
+	font-size: var(--font-size-xs);
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
-	color: #64748B;
+	color: var(--color-slate-500);
 	text-align: center;
 }
 
@@ -132,69 +133,68 @@
 .seeAllBtn {
 	background: none;
 	border: none;
-	color: #60A5FA;
-	font-size: 12px;
+	color: var(--color-blue-400);
+	font-size: var(--font-size-sm);
 	font-weight: 600;
 	cursor: pointer;
-	padding: 3px 6px;
-	border-radius: 6px;
-	transition: all 0.2s ease;
+	padding: var(--padding-xs) var(--padding-sm);
+	border-radius: var(--radius-md);
+	transition: all var(--transition-normal);
 	display: inline-flex;
 	align-items: center;
-	gap: 4px;
+	gap: var(--gap-xs);
 }
 
 .seeAllBtn:hover {
 	background: rgba(96, 165, 250, 0.1);
-	color: #93C5FD;
+	color: var(--color-slate-100);
 }
 
 .emptyCard {
-	background: #1E293B;
-	border: 1px solid rgba(148, 163, 184, 0.12);
-	border-radius: 12px;
-	padding: 36px 20px;
+	background: var(--color-bg-card);
+	border: 1px solid var(--color-border-subtle);
+	border-radius: var(--radius-2xl);
+	padding: var(--padding-4xl) var(--padding-xl);
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	text-align: center;
-	gap: 8px;
+	gap: var(--gap-sm);
 	box-sizing: border-box;
 }
 
 .emptyIcon {
 	font-size: 38px;
 	opacity: 0.75;
-	margin-bottom: 2px;
+	margin-bottom: var(--margin-xs);
 }
 
 .emptyTitle {
-	font-size: 16px;
+	font-size: var(--font-size-md);
 	font-weight: 700;
-	color: #E2E8F0;
+	color: var(--color-slate-200);
 	margin: 0;
 }
 
 .emptySubtitle {
-	font-size: 13px;
-	color: #94A3B8;
+	font-size: var(--font-size-base);
+	color: var(--color-slate-400);
 	max-width: 380px;
 	margin: 0;
 	line-height: 1.45;
 }
 
 .playNowBtn {
-	margin-top: 6px;
-	background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
-	color: white;
+	background: linear-gradient(135deg, var(--color-blue-500) 0%, var(--color-blue-600) 100%);
+	color: #ffffff;
 	border: none;
-	padding: 8px 18px;
-	border-radius: 8px;
+	padding: var(--padding-sm) var(--padding-lg);
+	border-radius: var(--radius-lg);
 	font-weight: 600;
-	font-size: 13px;
+	font-size: var(--font-size-base);
 	cursor: pointer;
-	transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+	transition: all var(--transition-smooth);
+	box-shadow: var(--shadow-glow-blue);
 }
 
 .playNowBtn:hover {
@@ -205,8 +205,8 @@
 .spinnerIcon {
 	font-size: 28px;
 	animation: spin 1.8s infinite linear;
-	margin-bottom: 4px;
-	color: #94A3B8;
+	margin-bottom: var(--margin-xs);
+	color: var(--color-slate-400);
 }
 
 @keyframes spin {

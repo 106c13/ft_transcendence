@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '../../hooks/usePageTitle';
-import type { LeaderboardPlayer } from './types';
+import type { LeaderboardPlayer } from '../../utils/leaderboardUtils';
 import LeaderboardHeader from '../../components/LeaderboardHeader/LeaderboardHeader';
 import LeaderboardPodium from '../../components/LeaderboardPodium/LeaderboardPodium';
 import LeaderboardToolbar from '../../components/LeaderboardToolbar/LeaderboardToolbar';
@@ -12,9 +12,9 @@ import styles from './LeaderboardPage.module.css';
 
 export type { LeaderboardPlayer };
 
-export const LeaderboardPage: React.FC = () => {
+const LeaderboardPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t('leaderboard', 'Leaderboard'));
+	usePageTitle(t('leaderboard'));
 	const navigate = useNavigate();
 
 	// Server-driven state
@@ -23,6 +23,11 @@ export const LeaderboardPage: React.FC = () => {
 	const [totalPages, setTotalPages] = useState(1);
 	const [page, setPage] = useState(1);
 	const [loading, setLoading] = useState(true);
+	const [topThree, setTopThree] = useState<{
+		first: LeaderboardPlayer;
+		second: LeaderboardPlayer;
+		third: LeaderboardPlayer;
+	} | null>(null);
 
 	// Filter and Sort states
 	const [search, setSearch] = useState('');
@@ -158,11 +163,6 @@ export const LeaderboardPage: React.FC = () => {
 	}, [debouncedSearch, mode, minWinRate, status, sortBy, order]);
 
 	// Permanent top 3 global champions for podium view (always present)
-	const [topThree, setTopThree] = useState<{
-		first: LeaderboardPlayer;
-		second: LeaderboardPlayer;
-		third: LeaderboardPlayer;
-	} | null>(null);
 
 	// Fetch top 3 global champions once on mount
 	useEffect(() => {

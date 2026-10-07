@@ -7,7 +7,7 @@ import styles from '../Common.module.css'
 
 function LoginPage() {
 	const { t } = useTranslation()
-	usePageTitle('page_title_login', 'Sign In')
+	usePageTitle('page_title_login')
 	const {
 		email,
 		password,

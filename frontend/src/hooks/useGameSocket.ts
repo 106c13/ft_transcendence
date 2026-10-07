@@ -7,8 +7,8 @@ import { Chess } from 'chess.js'
 import type { Square } from 'chess.js'
 import { useToast } from '../context/ToastContext'
 
-import { getPieceImageSrc } from '../constants/gameConstants'
-import type { GameModeType } from '../constants/gameModeConstats'
+import { getPieceImageSrc } from '../utils/gameUtils'
+import type { GameModeType } from '../utils/gameModeUtils'
 import { playSound, type SoundType } from '../utils/sound'
 
 function getSoundForSan(san?: string, isSelf = false): SoundType {
@@ -192,7 +192,7 @@ export function useGameSocket() {
 
     useEffect(() => {
         if (!activeGameId) {
-            toast.error(t('game_not_found', 'Game not found'))
+            toast.error(t('game_not_found'))
             navigate('/home', { replace: true })
         }
     }, [activeGameId, navigate, t, toast])
@@ -206,7 +206,6 @@ export function useGameSocket() {
         socketRef.current = socket
 
         const onConnect = () => {
-            console.log('Game Arena Socket connected:', socket.id)
             socket.emit('join_game', { gameId: activeGameId })
         }
         socket.on('connect', onConnect)
@@ -515,7 +514,7 @@ export function useGameSocket() {
             if (err.message === 'invalid_move') {
                 handleIllegalMove()
             } else if (err.message === 'game_not_found' || err.message === 'missing_game_id') {
-                toast.error(t('game_not_found', 'Game not found'))
+                toast.error(t('game_not_found'))
                 navigate('/home', { replace: true })
                 return
             } else {

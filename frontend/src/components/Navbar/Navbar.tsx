@@ -63,7 +63,7 @@ function Navbar({ currentUser }: Props) {
 					<div
 						className={`${styles.navActionItem} ${isLeaderboardActive ? styles.activeNavAction : ''}`}
 						onClick={() => navigate('/leaderboard')}
-						title={t('leaderboard', 'Leaderboard')}
+						title={t('leaderboard')}
 					>
 						<span className={styles.navActionIcon}>🏆</span>
 					</div>
@@ -73,7 +73,7 @@ function Navbar({ currentUser }: Props) {
 				<div
 					className={`${styles.navActionItem} ${isAboutActive ? styles.activeNavAction : ''}`}
 					onClick={() => navigate('/about')}
-					title={t('about', 'About')}
+					title={t('about')}
 				>
 					<span className={styles.navActionIcon}>ℹ️</span>
 				</div>
@@ -86,7 +86,7 @@ function Navbar({ currentUser }: Props) {
 						setShowLanguageMenu(!showLanguageMenu)
 						setShowProfileMenu(false)
 					}}
-					title={t('language', 'Language')}
+					title={t('language')}
 				>
 					<span className={styles.navActionIcon}>🌐</span>
 
@@ -111,7 +111,7 @@ function Navbar({ currentUser }: Props) {
 					>
 						<img
 							src={currentUser?.avatar && currentUser.avatar !== 'default.jpg' ? `/uploads/${currentUser.avatar}` : '/assets/default.jpg'}
-							alt={currentUser?.username || t('profile_tab', 'Profile')}
+							alt={currentUser?.username || t('profile_tab')}
 							className={styles.navProfileAvatar}
 							onError={(e) => {
 								const target = e.currentTarget
@@ -124,10 +124,10 @@ function Navbar({ currentUser }: Props) {
 						{showProfileMenu && (
 							<div className={styles.profileDropdown}>
 								<div onClick={() => navigate(`/profile/${currentUser?.username || ''}`)}>
-									👤 {t('my_profile', 'My Profile')}
+									👤 {t('my_profile')}
 								</div>
 								<div onClick={() => navigate('/profile/settings')}>
-									⚙️ {t('settings', 'Settings')}
+									⚙️ {t('settings')}
 								</div>
 								<div
 									className={styles.danger}
@@ -136,7 +136,7 @@ function Navbar({ currentUser }: Props) {
 										navigate('/login')
 									}}
 								>
-									🚪 {t('logout', 'Logout')}
+									🚪 {t('logout')}
 								</div>
 							</div>
 						)}

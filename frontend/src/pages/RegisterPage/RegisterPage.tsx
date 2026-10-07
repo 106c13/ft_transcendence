@@ -7,7 +7,7 @@ import styles from '../Common.module.css'
 
 function RegisterPage() {
 	const { t } = useTranslation()
-	usePageTitle('page_title_register', 'Create Account')
+	usePageTitle('page_title_register')
 	const {
 		email,
 		username,

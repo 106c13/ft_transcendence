@@ -46,39 +46,39 @@ function GameOverDialog({
 	const isWaiting = rematchState === 'sent'
 
 	const getResultText = () => {
-		if (gameOverReason === 'ABANDONED') return t('reason_abandoned', 'Game Abandoned')
+		if (gameOverReason === 'ABANDONED') return t('reason_abandoned')
 		if (isViewer) {
-			if (winnerColor === 'w') return t('white_won', 'White won')
-			if (winnerColor === 'b') return t('black_won', 'Black won')
-			return t('draw', 'Draw')
+			if (winnerColor === 'w') return t('white_won')
+			if (winnerColor === 'b') return t('black_won')
+			return t('draw')
 		}
-		if (winnerColor === playerColor) return t('victory', 'Victory!')
-		if (winnerColor === null) return t('draw', 'Draw')
-		return t('defeat', 'Defeat')
+		if (winnerColor === playerColor) return t('victory')
+		if (winnerColor === null) return t('draw')
+		return t('defeat')
 	}
 
 	const getReasonText = () => {
 		switch (gameOverReason) {
 			case 'ABANDONED':
-				return t('reason_abandoned_desc', 'Game was abandoned before both players made a move')
+				return t('reason_abandoned_desc')
 			case 'CHECKMATE':
-				return isViewer ? t('by_checkmate', 'By checkmate') : t('reason_checkmate', 'Checkmate')
+				return isViewer ? t('by_checkmate') : t('reason_checkmate')
 			case 'STALEMATE':
-				return isViewer ? t('by_stalemate', 'By stalemate') : t('reason_stalemate', 'Stalemate')
+				return isViewer ? t('by_stalemate') : t('reason_stalemate')
 			case 'TIMEOUT':
-				return isViewer ? t('by_timeout', 'By timeout') : t('reason_timeout', 'Time Out')
+				return isViewer ? t('by_timeout') : t('reason_timeout')
 			case 'RESIGNATION':
-				return isViewer ? t('by_resignation', 'By resignation') : t('reason_resignation', 'Resigned')
+				return isViewer ? t('by_resignation') : t('reason_resignation')
 			case 'DISCONNECTION':
-				return isViewer ? t('by_disconnection', 'By disconnection') : t('reason_disconnection', 'Opponent Disconnected')
+				return isViewer ? t('by_disconnection') : t('reason_disconnection')
 			case 'DRAW':
-				return isViewer ? t('by_draw', 'By agreement') : t('reason_draw', 'Draw')
+				return isViewer ? t('by_draw') : t('reason_draw')
 			default:
-				return gameOverReason ? `${t('by', 'By')} ${gameOverReason.toLowerCase()}` : ''
+				return gameOverReason ? `${t('by')} ${gameOverReason.toLowerCase()}` : ''
 		}
 	}
 
-	const modeLabel = mode ? mode.replace('+2', ' +2').toUpperCase() : t('format', 'FORMAT')
+	const modeLabel = mode ? mode.replace('+2', ' +2').toUpperCase() : t('format')
 
 	const isWinner = winnerColor !== null && winnerColor === playerColor && !isViewer
 	const isAbandoned = gameOverReason === 'ABANDONED'
@@ -88,11 +88,11 @@ function GameOverDialog({
 			{showConfetti && isWinner && <ModalConfetti onComplete={onConfettiComplete} />}
 
 			<div className={`${styles.gameOverBox} ${isAbandoned ? styles.gameOverBoxAbandoned : ''}`}>
-				<button className={styles.closeModalX} onClick={onClose} aria-label={t('close', 'Close')}>✕</button>
+				<button className={styles.closeModalX} onClick={onClose} aria-label={t('close')}>✕</button>
 
 				<div className={`${styles.modalBody} ${isViewer ? styles.modalBodyViewer : ''}`}>
 					<div className={styles.resultHeader}>
-						<h2 className={styles.gameOverTitle}>{t('game_over', 'Game Over')}</h2>
+						<h2 className={styles.gameOverTitle}>{t('game_over')}</h2>
 						<div className={styles.gameOverResult}>{getResultText()}</div>
 						{getReasonText() && <div className={styles.gameOverReason}>{getReasonText()}</div>}
 					</div>
@@ -103,7 +103,7 @@ function GameOverDialog({
 							{/* Left: Format Elo */}
 							<div className={styles.ratingCard}>
 								<div className={styles.ratingCategoryTitle}>
-									{modeLabel} {t('rating_label', 'ELO')}
+									{modeLabel} {t('rating_label')}
 								</div>
 								<div className={styles.ratingDisplay}>
 									<span className={styles.bigRatingValue}>{ratingAfter ?? '—'}</span>
@@ -126,7 +126,7 @@ function GameOverDialog({
 							{/* Right: Leaderboard Place & Position Delta */}
 							<div className={styles.ratingCard}>
 								<div className={styles.ratingCategoryTitle}>
-									{t('leaderboard', 'LEADERBOARD')}
+									{t('leaderboard')}
 								</div>
 								<div className={styles.ratingDisplay}>
 									<span className={styles.bigRatingValue}>
@@ -158,13 +158,13 @@ function GameOverDialog({
 				<div className={styles.modalFooter}>
 					{isViewer ? (
 						<button className={styles.reviewBtn} onClick={onClose}>
-							{t('review_game', 'Review Game')}
+							{t('review_game')}
 						</button>
 					) : (
 						<>
 							<div className={styles.buttonRow}>
 								<button className={styles.playAgainBtn} onClick={onPlayAgain}>
-									{t('play_again', 'Play Again')}
+									{t('play_again')}
 								</button>
 								{gameOverReason !== 'ABANDONED' && (
 									<button
@@ -172,14 +172,14 @@ function GameOverDialog({
 										onClick={onRematch}
 										disabled={isWaiting}
 									>
-										{isWaiting ? t('rematch_waiting', 'Waiting...') : t('rematch', 'Rematch')}
+										{isWaiting ? t('rematch_waiting') : t('rematch')}
 									</button>
 								)}
 							</div>
 
 							{gameOverReason !== 'ABANDONED' && onAnalyze && (
 								<button className={styles.analyzeBtn} onClick={onAnalyze}>
-									🔍 {t('analyze_game', 'Analyze Game')}
+									🔍 {t('analyze_game')}
 								</button>
 							)}
 						</>

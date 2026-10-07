@@ -63,7 +63,7 @@ function ChessInfoPanel({
 	return (
 		<div className={styles.gameInfoPanel}>
 			<div className={styles.panelHeader}>
-				<h3>{t('match_panel', 'Match Control')}</h3>
+				<h3>{t('match_panel')}</h3>
 				<span className={`${styles.gameModeTag} ${styles[modeTagClassMap[selectedMode] || 'blitz']}`}>
 					{selectedMode}
 				</span>

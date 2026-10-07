@@ -1,30 +1,30 @@
-export type DevKey = 'arman' | 'narek' | 'hakob'
+export type DevKey = 'arman' | 'narek' | 'hakob';
 
 export interface DevProfile {
-	id: DevKey
-	name: string
-	handle: string
-	intraUrl: string
-	pieceCode: 'K' | 'Q' | 'N'
-	pieceSymbol: string
-	pieceSvg: string
-	pieceRoleName: string
-	shortRole: string
-	statement: string
-	tacticalMotto: string
-	highlights: string[]
+	id: DevKey;
+	name: string;
+	handle: string;
+	intraUrl: string;
+	pieceCode: 'K' | 'Q' | 'N';
+	pieceSymbol: string;
+	pieceSvg: string;
+	pieceRoleName: string;
+	shortRole: string;
+	statement: string;
+	tacticalMotto: string;
+	highlights: string[];
 }
 
 export interface MoveStep {
-	ply: number
-	moveNumber: number
-	color: 'w' | 'b'
-	san: string
-	from: string
-	to: string
-	piece: string
-	fen: string
-	isCheckmate?: boolean
+	ply: number;
+	moveNumber: number;
+	color: 'w' | 'b';
+	san: string;
+	from: string;
+	to: string;
+	piece: string;
+	fen: string;
+	isCheckmate?: boolean;
 }
 
 export const DEVS: Record<DevKey, DevProfile> = {
@@ -91,9 +91,9 @@ export const DEVS: Record<DevKey, DevProfile> = {
 			'Crafted live notification bells, friend requests & user presence status',
 		],
 	},
-}
+};
 
-export const INITIAL_FEN = '8/8/8/3N4/8/8/2Q5/2K2k2 w - - 0 1'
+export const INITIAL_FEN = '8/8/8/3N4/8/8/2Q5/2K2k2 w - - 0 1';
 
 export const MOVE_STEPS: MoveStep[] = [
 	{
@@ -162,4 +162,4 @@ export const MOVE_STEPS: MoveStep[] = [
 		fen: '8/8/8/8/8/4N3/6Q1/3K3k b - - 5 3',
 		isCheckmate: true,
 	},
-]
+];

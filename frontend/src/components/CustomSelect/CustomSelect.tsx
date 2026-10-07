@@ -1,11 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import styles from './CustomSelect.module.css'
 
-export type SelectOption<T extends string = string> = {
-	value: T
-	label: string
-	icon?: string
-}
+import type { SelectOption } from '../../utils/selectUtils';
+export type { SelectOption };
 
 type Props<T extends string = string> = {
 	id?: string

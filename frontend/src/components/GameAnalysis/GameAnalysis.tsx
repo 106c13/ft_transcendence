@@ -2,69 +2,14 @@ import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import type { Square } from 'chess.js'
-import { getPieceImageSrc, PIECE_NAME } from '../../constants/gameConstants'
+import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils'
 import type { useGameAnalysis } from '../../hooks/useGameAnalysis'
 import type { useGameHistory } from '../../hooks/useGameHistory'
 import styles from './GameAnalysis.module.css'
 
-// ── Shared types ──
-export type MatchRecord = {
-	id: number
-	white_id: number
-	black_id: number
-	winner_id: number | null
-	mode: 'bullet' | 'blitz' | 'rapid' | 'bullet+2' | 'blitz+2' | 'rapid+2'
-	result: string
-	pgn: string
-	move_times?: number[] | null
-	played_at: string
-	analysis?: GameAnalysisResult
-	white?: { id: number; username: string; avatar?: string }
-	black?: { id: number; username: string; avatar?: string }
-	winner?: { id: number; username: string; avatar?: string }
-	white_rating_after?: number | null
-	black_rating_after?: number | null
-	white_rating_delta?: number | null
-	black_rating_delta?: number | null
-}
-
-export interface MoveAnalysis {
-	ply: number;
-	moveNumber: number;
-	color: 'w' | 'b';
-	san: string;
-	from: string;
-	to: string;
-	fenBefore: string;
-	fenAfter: string;
-	score: number;
-	mate: number | null;
-	centipawnLoss?: number;
-	winChance: number;
-
-	bestMove: {
-		from: string;
-		to: string;
-		san: string;
-	} | null;
-	continuation: string[];
-	classification: 'brilliant' | 'great' | 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder';
-	explanation: string;
-	explanationKey?: string;
-	explanationParams?: Record<string, any>;
-}
-
-export interface GameAnalysisResult {
-	accuracy: {
-		white: number;
-		black: number;
-	};
-	summary: {
-		white: Record<string, number>;
-		black: Record<string, number>;
-	};
-	positions: MoveAnalysis[];
-}
+// ── Shared types from utils ──
+import type { MatchRecord, MoveAnalysis, GameAnalysisResult } from '../../utils/gameUtils';
+export type { MatchRecord, MoveAnalysis, GameAnalysisResult };
 
 // ── Badge color mapping ──
 const BADGE_STYLES: Record<string, string> = {
@@ -288,7 +233,7 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 			<div className={styles.headerCard}>
 				<div className={styles.headerTop}>
 					<button className={styles.backBtn} onClick={onBack || closeAnalysis}>
-						← {t('back_to_games', 'Back to Games')}
+						← {t('back_to_games')}
 					</button>
 					<span className={`${styles.modeBadge} ${styles[`mode${selectedGame.mode.replace('+', 'Plus')}`] || ''}`}>
 						{t(selectedGame.mode.toLowerCase(), selectedGame.mode)}
@@ -298,16 +243,16 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 				<div className={styles.matchup}>
 					<div className={styles.player}>
 						<span className={`${styles.colorIndicator} ${styles[userColor]}`}></span>
-						<span className={styles.playerName}>{username} ({t('you', 'You')})</span>
+						<span className={styles.playerName}>{username} ({t('you')})</span>
 					</div>
-					<div className={styles.vs}>{t('vs', 'vs')}</div>
+					<div className={styles.vs}>{t('vs')}</div>
 					<div className={styles.player}>
 						<span className={`${styles.colorIndicator} ${styles[opponentColor]}`}></span>
 						<span
 							className={`${styles.playerName} ${styles.opponentLink}`}
 							onClick={() => opponent?.username && navigate(`/profile/${opponent.username}`)}
 						>
-							{opponent?.username || t('opponent', 'Opponent')}
+							{opponent?.username || t('opponent')}
 						</span>
 					</div>
 				</div>
@@ -334,14 +279,14 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 						<div className={styles.animIcon}>♟️</div>
 					</div>
 
-					<h3 className={styles.analysisTitle}>{t('analyzing_game', 'Analyzing game...')}</h3>
+					<h3 className={styles.analysisTitle}>{t('analyzing_game')}</h3>
 
 					<div className={styles.progressbarContainer}>
 						<div className={styles.progressbarFill}></div>
 					</div>
 
 					<p className={styles.statusText}>
-						{t('evaluating_moves', 'Evaluating moves and critical moments with chess engine...')}
+						{t('evaluating_moves')}
 					</p>
 
 					{selectedGame.pgn && (
@@ -350,7 +295,7 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 								className={styles.downloadPgnBtn}
 								onClick={() => handleDownloadPgn(selectedGame)}
 							>
-								📥 {t('download_pgn', 'Download PGN')}
+								📥 {t('download_pgn')}
 							</button>
 						</div>
 					)}
@@ -365,7 +310,7 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 						<div className={`${styles.accuracyCard} ${styles.whiteSide}`}>
 							<div className={styles.accuracyHeader}>
 								<span className={`${styles.sideDot} ${styles.white}`}></span>
-								<span className={styles.playerTitle}>{selectedGame.white?.username || t('white', 'White')}</span>
+								<span className={styles.playerTitle}>{selectedGame.white?.username || t('white')}</span>
 							</div>
 							<div className={styles.accuracyScore}>{analysisData.accuracy.white}%</div>
 							<div className={styles.accuracyBarTrack}>
@@ -382,7 +327,7 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 						<div className={`${styles.accuracyCard} ${styles.blackSide}`}>
 							<div className={styles.accuracyHeader}>
 								<span className={`${styles.sideDot} ${styles.black}`}></span>
-								<span className={styles.playerTitle}>{selectedGame.black?.username || t('black', 'Black')}</span>
+								<span className={styles.playerTitle}>{selectedGame.black?.username || t('black')}</span>
 							</div>
 							<div className={styles.accuracyScore}>{analysisData.accuracy.black}%</div>
 							<div className={styles.accuracyBarTrack}>
@@ -411,7 +356,7 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 									{evalInfo.scoreText}
 								</div>
 							</div>
-							<span className={styles.evalSideHint}>{t('eval', 'Eval')}</span>
+							<span className={styles.evalSideHint}>{t('eval')}</span>
 						</div>
 
 						{/* Chess Board with SVG pieces */}
@@ -452,14 +397,14 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 												{piece && (
 													<img
 														src={getPieceImageSrc(piece.type, piece.color)}
-														alt={`${piece.color === 'w' ? t('white', 'White') : t('black', 'Black')} ${t(PIECE_NAME[piece.type].toLowerCase(), PIECE_NAME[piece.type])}`}
+														alt={`${piece.color === 'w' ? t('white') : t('black')} ${t(PIECE_NAME[piece.type].toLowerCase(), PIECE_NAME[piece.type])}`}
 														className={`${styles.pieceImg} ${piece.color === 'w' ? styles.whitePiece : styles.blackPiece}`}
 													/>
 												)}
 
 												{/* King Win / Loss Indicators */}
 												{isFinalPosition && winnerColor && piece?.type === 'k' && piece.color === winnerColor && (
-													<div className={styles.kingBadgeWinner} title={t('winner', 'Winner')}>
+													<div className={styles.kingBadgeWinner} title={t('winner')}>
 														<svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
 															<path
 																fill="currentColor"
@@ -470,7 +415,7 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 												)}
 
 												{isFinalPosition && winnerColor && piece?.type === 'k' && piece.color !== winnerColor && (
-													<div className={styles.kingBadgeLoser} title={t('loser', 'Defeated')}>
+													<div className={styles.kingBadgeLoser} title={t('loser')}>
 														<svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
 															<path
 																fill="none"
@@ -538,12 +483,12 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 										{isSuboptimalMove && currentPosition.bestMove && (
 											<div className={styles.bestMoveBox}>
 												<div className={styles.recHeader}>
-													<span className={styles.recLabel}>💡 {t('best_move', 'Best Move')}:</span>
+													<span className={styles.recLabel}>💡 {t('best_move')}:</span>
 													<strong className={styles.recMoveSan}>{currentPosition.bestMove.san}</strong>
 												</div>
 												{currentPosition.continuation.length > 0 && (
 													<div className={styles.continuationLine}>
-														<span className={styles.continuationLabel}>{t('engine_line', 'Engine Line')}:</span>
+														<span className={styles.continuationLabel}>{t('engine_line')}:</span>
 														<span className={styles.continuationMoves}>
 															{currentPosition.continuation.join(' ')}
 														</span>
@@ -553,7 +498,7 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 													className={styles.toggleBestHintBtn}
 													onClick={toggleBestMove}
 												>
-													{showBestMoveHint ? t('hide_best_move', '👁️ Hide Best Move') : t('show_best_move', '👁️ Show Best Move on Board')}
+													{showBestMoveHint ? t('hide_best_move') : t('show_best_move')}
 												</button>
 											</div>
 										)}
@@ -561,37 +506,37 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 										{/* Engine Telemetry */}
 										<div className={styles.engineStats}>
 											<div className={styles.engineStatItem}>
-												<span className={styles.statName}>{t('engine', 'Engine')}:</span>
-												<span className={styles.statVal}>Stockfish ({t('depth', 'Depth')} 15)</span>
+												<span className={styles.statName}>{t('engine')}:</span>
+												<span className={styles.statVal}>Stockfish ({t('depth')} 15)</span>
 											</div>
 											<div className={styles.engineStatItem}>
-												<span className={styles.statName}>{t('eval_score', 'Eval Score')}:</span>
+												<span className={styles.statName}>{t('eval_score')}:</span>
 												<span className={styles.statVal}>{evalInfo.scoreText}</span>
 											</div>
 											<div className={styles.engineStatItem}>
-												<span className={styles.statName}>{t('centipawn_loss', 'Centipawn Loss')}:</span>
+												<span className={styles.statName}>{t('centipawn_loss')}:</span>
 												<span className={styles.statVal}>{currentPosition.centipawnLoss !== undefined ? `${currentPosition.centipawnLoss} cp` : '0 cp'}</span>
 											</div>
 											<div className={styles.engineStatItem}>
-												<span className={styles.statName}>{t('win_chance', 'Win Chance')}:</span>
-												<span className={styles.statVal}>{t('white', 'White')} {evalInfo.winChanceWhite}% • {t('black', 'Black')} {evalInfo.winChanceBlack}%</span>
+												<span className={styles.statName}>{t('win_chance')}:</span>
+												<span className={styles.statVal}>{t('white')} {evalInfo.winChanceWhite}% • {t('black')} {evalInfo.winChanceBlack}%</span>
 											</div>
 										</div>
 									</>
 								) : (
 									<div className={styles.startPlaceholder}>
-										<span>♟️ {t('starting_position', 'Starting Position')}</span>
-										<p>{t('nav_moves_instruction', 'Use arrows or click moves below to evaluate the game.')}</p>
+										<span>♟️ {t('starting_position')}</span>
+										<p>{t('nav_moves_instruction')}</p>
 									</div>
 								)}
 							</div>
 
 							{/* Move Navigation Buttons */}
 							<div className={styles.navBar}>
-								<button title={t('start_nav', 'Start (Down Arrow)')} onClick={() => goToPly(-1)}>⇤</button>
-								<button title={t('prev_nav', 'Previous (Left Arrow)')} onClick={() => goToPly(Math.max(-1, currentPly - 1))}>◀</button>
-								<button title={t('next_nav', 'Next (Right Arrow)')} onClick={() => goToPly(Math.min(analysisData.positions.length - 1, currentPly + 1))}>▶</button>
-								<button title={t('end_nav', 'End (Up Arrow)')} onClick={() => goToPly(analysisData.positions.length - 1)}>⇥</button>
+								<button title={t('start_nav')} onClick={() => goToPly(-1)}>⇤</button>
+								<button title={t('prev_nav')} onClick={() => goToPly(Math.max(-1, currentPly - 1))}>◀</button>
+								<button title={t('next_nav')} onClick={() => goToPly(Math.min(analysisData.positions.length - 1, currentPly + 1))}>▶</button>
+								<button title={t('end_nav')} onClick={() => goToPly(analysisData.positions.length - 1)}>⇥</button>
 							</div>
 
 							{/* Move History Table */}
@@ -644,7 +589,7 @@ function GameAnalysis({ username, analysis, history, onBack }: Props) {
 								className={styles.downloadPgnSmall}
 								onClick={() => handleDownloadPgn(selectedGame)}
 							>
-								📥 {t('download_pgn', 'Download PGN')}
+								📥 {t('download_pgn')}
 							</button>
 						</div>
 					</div>

@@ -1,4 +1,4 @@
-import type { GameModeType, ModeItem } from '../../constants/gameModeConstats'
+import type { GameModeType, ModeItem } from '../../utils/gameModeUtils'
 import styles from './GameModesGrid.module.css'
 import GameMode from '../GameMode/GameMode'
 

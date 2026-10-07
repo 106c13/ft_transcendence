@@ -75,24 +75,24 @@ function ChangePasswordForm() {
 			<div className={styles.cardHeader}>
 				<h2 className={styles.cardTitle}>
 					<span>🔒</span>
-					{t('security_title', 'Password & Security')}
+					{t('security_title')}
 				</h2>
 				<p className={styles.cardDesc}>
-					{t('security_desc', 'Ensure your account is protected with a strong password')}
+					{t('security_desc')}
 				</p>
 			</div>
 
 			<form className={styles.form} onSubmit={handlePasswordChange}>
 				<div className={styles.formGroup}>
 					<label className={styles.label} htmlFor="old-password">
-						{t('old_password', 'Current Password')}
+						{t('old_password')}
 					</label>
 					<div className={styles.passwordWrapper}>
 						<input
 							id="old-password"
 							className={styles.input}
 							type={showOld ? 'text' : 'password'}
-							placeholder={t('old_password', 'Current Password')}
+							placeholder={t('old_password')}
 							value={oldPassword}
 							onChange={e => setOldPassword(e.target.value)}
 							required
@@ -101,7 +101,7 @@ function ChangePasswordForm() {
 							type="button"
 							className={styles.eyeBtn}
 							onClick={() => setShowOld(!showOld)}
-							aria-label={showOld ? t('hide_password', 'Hide password') : t('show_password', 'Show password')}
+							aria-label={showOld ? t('hide_password') : t('show_password')}
 						>
 							<img
 								src={showOld ? '/assets/eye-off.svg' : '/assets/eye.svg'}
@@ -115,14 +115,14 @@ function ChangePasswordForm() {
 
 				<div className={styles.formGroup}>
 					<label className={styles.label} htmlFor="new-password">
-						{t('new_password', 'New Password')}
+						{t('new_password')}
 					</label>
 					<div className={styles.passwordWrapper}>
 						<input
 							id="new-password"
 							className={styles.input}
 							type={showNew ? 'text' : 'password'}
-							placeholder={t('new_password', 'New Password')}
+							placeholder={t('new_password')}
 							value={newPassword}
 							onChange={e => setNewPassword(e.target.value)}
 							required
@@ -131,7 +131,7 @@ function ChangePasswordForm() {
 							type="button"
 							className={styles.eyeBtn}
 							onClick={() => setShowNew(!showNew)}
-							aria-label={showNew ? t('hide_password', 'Hide password') : t('show_password', 'Show password')}
+							aria-label={showNew ? t('hide_password') : t('show_password')}
 						>
 							<img
 								src={showNew ? '/assets/eye-off.svg' : '/assets/eye.svg'}
@@ -142,20 +142,20 @@ function ChangePasswordForm() {
 						</button>
 					</div>
 					<p className={styles.fieldHint}>
-						{t('password_req_hint', 'Must be at least 8 characters with letters, numbers, and special symbols')}
+						{t('password_req_hint')}
 					</p>
 				</div>
 
 				<div className={styles.formGroup}>
 					<label className={styles.label} htmlFor="confirm-password">
-						{t('confirm_password', 'Confirm Password')}
+						{t('confirm_password')}
 					</label>
 					<div className={styles.passwordWrapper}>
 						<input
 							id="confirm-password"
 							className={styles.input}
 							type={showConfirm ? 'text' : 'password'}
-							placeholder={t('confirm_password', 'Confirm Password')}
+							placeholder={t('confirm_password')}
 							value={confirmPassword}
 							onChange={e => setConfirmPassword(e.target.value)}
 							required
@@ -164,7 +164,7 @@ function ChangePasswordForm() {
 							type="button"
 							className={styles.eyeBtn}
 							onClick={() => setShowConfirm(!showConfirm)}
-							aria-label={showConfirm ? t('hide_password', 'Hide password') : t('show_password', 'Show password')}
+							aria-label={showConfirm ? t('hide_password') : t('show_password')}
 						>
 							<img
 								src={showConfirm ? '/assets/eye-off.svg' : '/assets/eye.svg'}
@@ -182,7 +182,7 @@ function ChangePasswordForm() {
 						type="submit"
 						disabled={loading}
 					>
-						{loading ? t('updating', 'Updating...') : t('update_password', 'Update password')}
+						{loading ? t('updating') : t('update_password')}
 					</button>
 				</div>
 			</form>

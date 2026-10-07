@@ -56,10 +56,10 @@ function MessagesIcon({ userId }: Props) {
 		<div
 			className={styles.messagesActionItem}
 			onClick={() => navigate('/chat')}
-			title={t('chat', 'Chat')}
+			title={t('chat')}
 			role="button"
 			tabIndex={0}
-			aria-label={t('chat', 'Chat')}
+			aria-label={t('chat')}
 			onKeyDown={(e) => {
 				if (e.key === 'Enter' || e.key === ' ') {
 					e.preventDefault()

@@ -4,16 +4,17 @@ import { useTranslation } from 'react-i18next'
 import { useGameHistory } from '../../hooks/useGameHistory'
 import { useRatingHistory, type RatingCategory } from '../../hooks/useRatingHistory'
 import { usePageTitle } from '../../hooks/usePageTitle'
-import type { User } from '../../constants/profileConstants'
+import type { User } from '../../utils/profileUtils'
 import BigRatingChart from '../../components/BigRatingChart/BigRatingChart'
-import CustomSelect, { type SelectOption } from '../../components/CustomSelect/CustomSelect'
+import CustomSelect from '../../components/CustomSelect/CustomSelect';
+import type { SelectOption } from '../../utils/selectUtils';
 import styles from './RatingHistoryPage.module.css'
 
 const VALID_MODES: RatingCategory[] = ['bullet', 'blitz', 'rapid']
 
 export default function RatingHistoryPage() {
 	const { t } = useTranslation()
-	usePageTitle('page_title_rating_history', 'Rating History')
+	usePageTitle('page_title_rating_history')
 	const { username: paramUsername } = useParams()
 	const navigate = useNavigate()
 	const [searchParams, setSearchParams] = useSearchParams()
@@ -70,7 +71,7 @@ export default function RatingHistoryPage() {
 			<div className={styles.ratingHistoryPage}>
 				<div className={styles.loadingSpinner}>
 					<span className={styles.spinnerIcon}>📈</span>
-					<p>{t('loading', 'Loading rating history...')}</p>
+					<p>{t('loading')}</p>
 				</div>
 			</div>
 		)
@@ -79,9 +80,9 @@ export default function RatingHistoryPage() {
 	const currentModeHistory = ratingData[selectedMode]
 
 	const modeOptions: SelectOption<RatingCategory>[] = [
-		{ value: 'bullet', icon: '🔥', label: `${t('bullet_rating', 'Bullet')} (${t('time_1_min', '1 min')})` },
-		{ value: 'blitz', icon: '⚡', label: `${t('blitz_rating', 'Blitz')} (${t('time_3_min', '3 min')})` },
-		{ value: 'rapid', icon: '⏳', label: `${t('rapid_rating', 'Rapid')} (${t('time_10_min', '10 min')})` },
+		{ value: 'bullet', icon: '🔥', label: `${t('bullet_rating')} (${t('time_1_min')})` },
+		{ value: 'blitz', icon: '⚡', label: `${t('blitz_rating')} (${t('time_3_min')})` },
+		{ value: 'rapid', icon: '⏳', label: `${t('rapid_rating')} (${t('time_10_min')})` },
 	]
 
 	return (
@@ -90,12 +91,12 @@ export default function RatingHistoryPage() {
 				{/* Top bar with back button & game mode dropdown */}
 				<div className={styles.topBar}>
 					<button className={styles.backBtn} onClick={handleBack}>
-						← {t('back_to_profile', 'Back to Profile')}
+						← {t('back_to_profile')}
 					</button>
 
 					<div className={styles.modeSelectorGroup}>
 						<label className={styles.modeLabel}>
-							{t('filter_mode', 'Game Mode')}:
+							{t('filter_mode')}:
 						</label>
 						<CustomSelect<RatingCategory>
 							value={selectedMode}
@@ -123,7 +124,7 @@ export default function RatingHistoryPage() {
 						<div className={styles.userInfo}>
 							<span className={styles.userName}>{user.username}</span>
 							<span className={styles.userSubtitle}>
-								{t('rating_overview', 'Rating Overview & Progression')}
+								{t('rating_overview')}
 							</span>
 						</div>
 					</div>

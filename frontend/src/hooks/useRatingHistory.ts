@@ -1,40 +1,19 @@
-import { useMemo } from 'react'
-import type { MatchRecord } from '../components/GameAnalysis/GameAnalysis'
-import type { User, RatingInfo } from '../constants/profileConstants'
+import { useMemo } from 'react';
+import type { User, RatingInfo } from '../utils/profileUtils';
+import type {
+	MatchRecord,
+	RatingCategory,
+	SparklinePoint,
+	AllTimeRatingPoint,
+	ModeRatingHistory,
+} from '../utils/gameUtils';
 
-export type RatingCategory = 'bullet' | 'blitz' | 'rapid'
-
-export type SparklinePoint = {
-	date: string
-	label: string
-	rating: number
-}
-
-export type AllTimeRatingPoint = {
-	id: string | number
-	date: string
-	displayDate: string
-	rating: number
-	delta: number | null
-	result?: 'win' | 'loss' | 'draw'
-	opponent?: string
-	mode: string
-}
-
-export type ModeRatingHistory = {
-	current: number
-	peak: number
-	lowest: number
-	gamesPlayed: number
-	wins: number
-	losses: number
-	draws: number
-	winRate: number
-	isProvisional: boolean
-	delta7Days: number
-	last7Days: SparklinePoint[]
-	allTime: AllTimeRatingPoint[]
-}
+export type {
+	RatingCategory,
+	SparklinePoint,
+	AllTimeRatingPoint,
+	ModeRatingHistory,
+};
 
 export function useRatingHistory(
 	matches: MatchRecord[],

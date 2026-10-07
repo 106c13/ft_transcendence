@@ -11,13 +11,13 @@ import GameReviewCard from '../../components/GameReviewCard/GameReviewCard'
 import HomeRecentGames from '../../components/HomeRecentGames/HomeRecentGames'
 import PlayerRatingsCard from '../../components/PlayerRatingsCard/PlayerRatingsCard'
 import FriendsPreview from '../../components/FriendsPreview/FriendsPreview'
-import type { GameModeType, ModeItem } from '../../constants/gameModeConstats'
-import type { User } from '../../constants/profileConstants'
+import type { GameModeType, ModeItem } from '../../utils/gameModeUtils'
+import type { User } from '../../utils/profileUtils'
 import styles from './HomePage.module.css'
 
 function HomePage() {
 	const { t } = useTranslation()
-	usePageTitle('page_title_home', 'Home')
+	usePageTitle('page_title_home')
 	const { toast } = useToast()
 	const navigate = useNavigate()
 	const { currentUser, challengeSocket } = useOutletContext<LayoutContextType>()
@@ -124,7 +124,7 @@ function HomePage() {
 				<section className={styles.section}>
 					<div className={styles.sectionHeader}>
 						<h2 className={styles.sectionTitle}>
-							<span>⚔️</span> {t('play_online', 'Play Online')}
+							<span>⚔️</span> {t('play_online')}
 						</h2>
 					</div>
 
@@ -156,7 +156,7 @@ function HomePage() {
 				<section className={styles.section}>
 					<div className={styles.sectionHeader}>
 						<h2 className={styles.sectionTitle}>
-							<span>📊</span> {t('stats_and_more', 'Stats & More')}
+							<span>📊</span> {t('stats_and_more')}
 						</h2>
 					</div>
 

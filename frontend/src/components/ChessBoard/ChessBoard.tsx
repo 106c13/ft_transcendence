@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Chess, Square, PieceSymbol } from 'chess.js'
-import { getPieceImageSrc, PIECE_NAME } from '../../constants/gameConstants'
+import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils'
 import PromotionOverlay from '../PromotionOverlay/PromotionOverlay'
 import DisconnectWarning from '../DisconnectWarning/DisconnectWarning'
 import styles from './ChessBoard.module.css'
@@ -565,7 +565,7 @@ function ChessBoard({
                             {piece && !isPieceDraggedFromHere && (
                                 <img
                                     src={getPieceImageSrc(piece.type, piece.color)}
-                                    alt={`${piece.color === 'w' ? t('white', 'White') : t('black', 'Black')} ${t(PIECE_NAME[piece.type].toLowerCase(), PIECE_NAME[piece.type])}`}
+                                    alt={`${piece.color === 'w' ? t('white') : t('black')} ${t(PIECE_NAME[piece.type].toLowerCase(), PIECE_NAME[piece.type])}`}
                                     className={`${styles.piece} ${
                                         piece.color === 'w' ? styles.white : styles.black
                                     } ${isOwnPiece && canInteract ? styles.draggablePiece : ''} ${
@@ -578,7 +578,7 @@ function ChessBoard({
 
                             {/* King Win / Loss Indicators */}
                             {isWinnerKing && (
-                                <div className={styles.kingBadgeWinner} title={t('winner', 'Winner')}>
+                                <div className={styles.kingBadgeWinner} title={t('winner')}>
                                     <svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
                                         <path
                                             fill="currentColor"
@@ -589,7 +589,7 @@ function ChessBoard({
                             )}
 
                             {isLoserKing && (
-                                <div className={styles.kingBadgeLoser} title={t('loser', 'Defeated')}>
+                                <div className={styles.kingBadgeLoser} title={t('loser')}>
                                     <svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
                                         <path
                                             fill="none"

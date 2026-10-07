@@ -10,8 +10,8 @@ function DisconnectWarning({ pauseCountdown }: Props) {
 
 	return (
 		<div className={styles.gamePauseWarning}>
-			<h4>⚠️ {t('opponent_disconnected_title', 'Opponent Disconnected')}</h4>
-			<p>{t('opponent_reconnect_wait', 'Waiting for reconnection...')} {pauseCountdown}s</p>
+			<h4>⚠️ {t('opponent_disconnected_title')}</h4>
+			<p>{t('opponent_reconnect_wait')} {pauseCountdown}s</p>
 		</div>
 	)
 }

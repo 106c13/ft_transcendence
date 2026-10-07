@@ -57,7 +57,7 @@ function ChallengeNotification({ challenge, countdown = 30, onAccept, onDecline 
 					<div className={styles.headerLeft}>
 						<span className={styles.swordIcon}>{challenge.isRematch ? '🔄' : '⚔️'}</span>
 						<span className={styles.headerText}>
-							{challenge.isRematch ? t('rematch_incoming', 'Rematch!') : t('challenge_incoming', 'Challenge!')}
+							{challenge.isRematch ? t('rematch_incoming') : t('challenge_incoming')}
 						</span>
 					</div>
 					<span className={styles.countdownBadge}>{displaySeconds}s</span>
@@ -69,12 +69,10 @@ function ChallengeNotification({ challenge, countdown = 30, onAccept, onDecline 
 							? t('rematches_you_to_game', {
 									from: challenge.from,
 									mode: modeLabels[challenge.mode] || challenge.mode,
-									defaultValue: `${challenge.from} offers a rematch in ${modeLabels[challenge.mode] || challenge.mode}!`,
 							  })
 							: t('challenges_you_to_game', {
 									from: challenge.from,
 									mode: modeLabels[challenge.mode] || challenge.mode,
-									defaultValue: `${challenge.from} challenges you to a ${modeLabels[challenge.mode] || challenge.mode} game!`,
 							  })}
 					</p>
 				</div>
@@ -91,13 +89,13 @@ function ChallengeNotification({ challenge, countdown = 30, onAccept, onDecline 
 						className={styles.acceptBtn}
 						onClick={() => onAccept(challenge.challengeId)}
 					>
-						✓ {t('accept', 'Accept')}
+						✓ {t('accept')}
 					</button>
 					<button
 						className={styles.declineBtn}
 						onClick={() => onDecline(challenge.challengeId)}
 					>
-						✗ {t('decline', 'Decline')}
+						✗ {t('decline')}
 					</button>
 				</div>
 			</div>

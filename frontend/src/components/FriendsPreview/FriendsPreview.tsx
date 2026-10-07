@@ -1,26 +1,26 @@
-import { useTranslation } from 'react-i18next'
-import type { User } from '../../constants/profileConstants'
-import styles from './FriendsPreview.module.css'
+import { useTranslation } from 'react-i18next';
+import type { User } from '../../utils/profileUtils';
+import styles from './FriendsPreview.module.css';
 
 type Props = {
-	friends: User[]
-	onFriendClick: (username: string) => void
-	onSeeAll: () => void
-}
+	friends: User[];
+	onFriendClick: (username: string) => void;
+	onSeeAll: () => void;
+};
 
-export default function FriendsPreview({ friends, onFriendClick, onSeeAll }: Props) {
-	const { t } = useTranslation()
-	const displayedFriends = friends.slice(0, 7)
+const FriendsPreview = ({ friends, onFriendClick, onSeeAll }: Props) => {
+	const { t } = useTranslation();
+	const displayedFriends = friends.slice(0, 7);
 
 	return (
 		<div className={styles.friendsPreviewCard}>
 			<div className={styles.header}>
 				<div className={styles.titleGroup}>
-					<h3 className={styles.title}>{t('friends_title', 'Friends')}</h3>
+					<h3 className={styles.title}>{t('friends_title')}</h3>
 					<span className={styles.countBadge}>{friends.length}</span>
 				</div>
-				<button className={styles.seeAllBtn} onClick={onSeeAll}>
-					{t('see_all', 'See all')} →
+				<button className={styles.seeAllBtn} onClick={onSeeAll} type="button">
+					{t('see_all')} →
 				</button>
 			</div>
 
@@ -28,9 +28,9 @@ export default function FriendsPreview({ friends, onFriendClick, onSeeAll }: Pro
 				<div className={styles.emptyState}>
 					<span className={styles.emptyIcon}>👥</span>
 					<div className={styles.emptyTextGroup}>
-						<span className={styles.emptyTitle}>{t('no_friends_yet', 'No friends yet')}</span>
+						<span className={styles.emptyTitle}>{t('no_friends_yet')}</span>
 						<span className={styles.emptySubtitle}>
-							{t('add_friends_tip', 'Visit player profiles to send friend requests.')}
+							{t('add_friends_tip')}
 						</span>
 					</div>
 				</div>
@@ -49,9 +49,9 @@ export default function FriendsPreview({ friends, onFriendClick, onSeeAll }: Pro
 								alt={friend.username}
 								className={styles.avatarImg}
 								onError={(e) => {
-									const target = e.currentTarget
+									const target = e.currentTarget;
 									if (!target.src.endsWith('/assets/default.jpg')) {
-										target.src = '/assets/default.jpg'
+										target.src = '/assets/default.jpg';
 									}
 								}}
 							/>
@@ -70,6 +70,8 @@ export default function FriendsPreview({ friends, onFriendClick, onSeeAll }: Pro
 				</div>
 			)}
 		</div>
-	)
-}
+	);
+};
+
+export default FriendsPreview;
 

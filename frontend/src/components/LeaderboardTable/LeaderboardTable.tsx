@@ -1,8 +1,8 @@
-import React from 'react';
+import type { MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import TopRankBadge from '../TopRankBadge/TopRankBadge';
-import { getModeColor } from '../../constants/gameConstants';
-import type { LeaderboardPlayer } from '../../pages/LeaderboardPage/types';
+import { getModeColor } from '../../utils/gameUtils';
+import type { LeaderboardPlayer } from '../../utils/leaderboardUtils';
 import styles from '../../pages/LeaderboardPage/LeaderboardPage.module.css';
 
 interface LeaderboardTableProps {
@@ -15,7 +15,7 @@ interface LeaderboardTableProps {
 	onResetFilters: () => void;
 }
 
-export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
+const LeaderboardTable = ({
 	players,
 	loading,
 	sortBy,
@@ -23,10 +23,10 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 	onSort,
 	onPlayerClick,
 	onResetFilters,
-}) => {
+}: LeaderboardTableProps) => {
 	const { t } = useTranslation();
 
-	const handleHeaderClick = (e: React.MouseEvent, field: string) => {
+	const handleHeaderClick = (e: MouseEvent, field: string) => {
 		e.preventDefault();
 		e.stopPropagation();
 		if (e.currentTarget instanceof HTMLElement) {
@@ -40,21 +40,21 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 			{loading && players.length === 0 ? (
 				<div className={styles.loadingState}>
 					<div className={styles.spinner} />
-					<span>{t('loading_leaderboard', 'Loading leaderboard rankings...')}</span>
+					<span>{t('loading_leaderboard')}</span>
 				</div>
 			) : players.length === 0 ? (
 				<div className={styles.emptyState}>
 					<div className={styles.emptyIcon}>🔍</div>
-					<h3 className={styles.emptyTitle}>{t('no_players_found', 'No players found')}</h3>
+					<h3 className={styles.emptyTitle}>{t('no_players_found')}</h3>
 					<p className={styles.emptyText}>
-						{t('no_players_filter_desc', 'Try clearing or loosening your filters to see more players.')}
+						{t('no_players_filter_desc')}
 					</p>
 					<button
 						className={styles.resetBtn}
 						onClick={onResetFilters}
 						type="button"
 					>
-						{t('reset_filters', 'Reset Filters')}
+						{t('reset_filters')}
 					</button>
 				</div>
 			) : (
@@ -69,13 +69,13 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 									className={`${styles.sortableHeader} ${styles.rankCell}`}
 									onClick={(e) => handleHeaderClick(e, 'leaderboardRating')}
 								>
-									{t('rank', 'Rank')}
+									{t('rank')}
 								</th>
 								<th
 									className={styles.sortableHeader}
 									onClick={(e) => handleHeaderClick(e, 'username')}
 								>
-									{t('player', 'Player')}
+									{t('player')}
 									{sortBy === 'username' && (
 										<span className={styles.sortArrow}>{order === 'asc' ? '▲' : '▼'}</span>
 									)}
@@ -84,7 +84,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 									className={styles.sortableHeader}
 									onClick={(e) => handleHeaderClick(e, 'leaderboardRating')}
 								>
-									{t('leaderboard_rating', 'Leaderboard Rating')}
+									{t('leaderboard_rating')}
 									{sortBy === 'leaderboardRating' && (
 										<span className={styles.sortArrow}>{order === 'asc' ? '▲' : '▼'}</span>
 									)}
@@ -93,19 +93,19 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 									className={`${styles.sortableHeader} ${styles.highestCol}`}
 									onClick={(e) => handleHeaderClick(e, 'highestRating')}
 								>
-									{t('peak_elo', 'Peak Elo')}
+									{t('peak_elo')}
 									{sortBy === 'highestRating' && (
 										<span className={styles.sortArrow}>{order === 'asc' ? '▲' : '▼'}</span>
 									)}
 								</th>
 								<th className={styles.formatsCol}>
-									{t('formats', 'Formats')}
+									{t('formats')}
 								</th>
 								<th
 									className={`${styles.sortableHeader} ${styles.recordCol}`}
 									onClick={(e) => handleHeaderClick(e, 'wins')}
 								>
-									{t('record_wdl', 'W / D / L')}
+									{t('record_wdl')}
 									{sortBy === 'wins' && (
 										<span className={styles.sortArrow}>{order === 'asc' ? '▲' : '▼'}</span>
 									)}
@@ -114,7 +114,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 									className={styles.sortableHeader}
 									onClick={(e) => handleHeaderClick(e, 'winRate')}
 								>
-									{t('winrate', 'Win Rate')}
+									{t('winrate')}
 									{sortBy === 'winRate' && (
 										<span className={styles.sortArrow}>{order === 'asc' ? '▲' : '▼'}</span>
 									)}
@@ -169,10 +169,10 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 												<span className={styles.playerName}>@{player.username}</span>
 												<span className={styles.playerSubtitle}>
 													{player.status === 'INGAME'
-														? t('in_game', 'In Game')
+														? t('in_game')
 														: player.status === 'ONLINE'
-														? t('online', 'Online')
-														: t('offline', 'Offline')}
+														? t('online')
+														: t('offline')}
 												</span>
 											</div>
 										</div>

@@ -90,7 +90,7 @@ function ChallengeSection({
 					onClick={handleToggle}
 				>
 					<span className={styles.challengeIcon}>⚔️</span>
-					{t('challenge_friend', 'Challenge a Friend')}
+					{t('challenge_friend')}
 				</button>
 
 				<div
@@ -124,7 +124,7 @@ function ChallengeSection({
 								<>
 									<span className={styles.triggerPlaceholderIcon}>👤</span>
 									<span className={styles.triggerPlaceholderText}>
-										{t('select_friend', '— Select a friend —')}
+										{t('select_friend')}
 									</span>
 								</>
 							)}
@@ -167,7 +167,7 @@ function ChallengeSection({
 										ref={searchInputRef}
 										type="text"
 										className={styles.searchInput}
-										placeholder={t('search_friends', 'Search friends...')}
+										placeholder={t('search_friends')}
 										value={searchQuery}
 										onChange={(e) => setSearchQuery(e.target.value)}
 										autoFocus
@@ -193,18 +193,18 @@ function ChallengeSection({
 									onClick={() => handleSelect('')}
 								>
 									<span className={styles.clearIcon}>✕</span>
-									<span>{t('deselect_friend', '— Deselect friend —')}</span>
+									<span>{t('deselect_friend')}</span>
 								</div>
 							)}
 							{/* 3. Dedicated Scrollable Friends Container */}
 							<div className={styles.friendsList}>
 								{friends.length === 0 ? (
 									<div className={styles.emptyOptions}>
-										{t('no_friends_available', 'No friends found')}
+										{t('no_friends_available')}
 									</div>
 								) : filteredFriends.length === 0 ? (
 									<div className={styles.emptyOptions}>
-										{t('no_friends_match', 'No friends match "{{query}}"', { query: searchQuery })}
+										{t('no_friends_match', { query: searchQuery })}
 									</div>
 								) : (
 									filteredFriends.map(friend => {
@@ -240,13 +240,13 @@ function ChallengeSection({
 
 			{active && friends.length === 0 && (
 				<div className={styles.noFriendsMsg}>
-					{t('no_friends_to_challenge', 'You don\'t have any friends yet. Add friends to challenge them!')}
+					{t('no_friends_to_challenge')}
 				</div>
 			)}
 
 			{active && !selectedFriend && friends.length > 0 && (
 				<div className={styles.hintMessage}>
-					{t('challenge_hint', 'Select a friend, then click a game mode below to send a challenge')}
+					{t('challenge_hint')}
 				</div>
 			)}
 		</div>

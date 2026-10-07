@@ -1,28 +1,28 @@
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import profileStyles from './ProfileTabs.module.css'
-import type { TabType, User } from '../../constants/profileConstants'
-import { useGameHistory } from '../../hooks/useGameHistory'
-import { useRatingHistory, type RatingCategory } from '../../hooks/useRatingHistory'
-import FriendsList from '../FriendsList/FriendsList'
-import GamesList from '../GamesList/GamesList'
-import MiniRatingChart from '../MiniRatingChart/MiniRatingChart'
-import FriendsPreview from '../FriendsPreview/FriendsPreview'
-import GameRow from '../GameRow/GameRow'
-import type { MatchRecord } from '../GameAnalysis/GameAnalysis'
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import profileStyles from './ProfileTabs.module.css';
+import type { TabType, User } from '../../utils/profileUtils';
+import { useGameHistory } from '../../hooks/useGameHistory';
+import { useRatingHistory } from '../../hooks/useRatingHistory';
+import FriendsList from '../FriendsList/FriendsList';
+import GamesList from '../GamesList/GamesList';
+import MiniRatingChart from '../MiniRatingChart/MiniRatingChart';
+import FriendsPreview from '../FriendsPreview/FriendsPreview';
+import GameRow from '../GameRow/GameRow';
+import type { MatchRecord, RatingCategory } from '../../utils/gameUtils';
 
 type Props = {
-	activeTab: TabType
-	friends: User[]
-	username?: string
-	isOwnProfile: boolean
-	ratings?: User['ratings']
-	historyData?: ReturnType<typeof useGameHistory>
-	onSelectTab: (tab: TabType) => void
-	onFriendClick: (targetUsername: string) => void
-}
+	activeTab: TabType;
+	friends: User[];
+	username?: string;
+	isOwnProfile: boolean;
+	ratings?: User['ratings'];
+	historyData?: ReturnType<typeof useGameHistory>;
+	onSelectTab: (tab: TabType) => void;
+	onFriendClick: (targetUsername: string) => void;
+};
 
-export default function ProfileTabs({
+const ProfileTabs = ({
 	activeTab,
 	username,
 	friends,
@@ -31,28 +31,28 @@ export default function ProfileTabs({
 	historyData,
 	onSelectTab,
 	onFriendClick,
-}: Props) {
-	const { t } = useTranslation()
-	const navigate = useNavigate()
+}: Props) => {
+	const { t } = useTranslation();
+	const navigate = useNavigate();
 
 	// Load match history for games and rating computations
-	const internalHistory = useGameHistory(username || '')
-	const history = historyData || internalHistory
-	const ratingData = useRatingHistory(history.matches, username || '', ratings)
+	const internalHistory = useGameHistory(username || '');
+	const history = historyData || internalHistory;
+	const ratingData = useRatingHistory(history.matches, username || '', ratings);
 
 	const handleSelectGame = (match: MatchRecord) => {
 		navigate(`/game/analysis/${match.id}`, {
 			state: { match, fromUsername: username },
-		})
-	}
+		});
+	};
 
 	const handleChartClick = (mode: RatingCategory) => {
 		if (username) {
-			navigate(`/profile/${username}/rating?mode=${mode}`)
+			navigate(`/profile/${username}/rating?mode=${mode}`);
 		}
-	}
+	};
 
-	const recentMatches = history.matches.slice(0, 6)
+	const recentMatches = history.matches.slice(0, 6);
 
 	return (
 		<div className={profileStyles.tabsWrapper}>
@@ -62,7 +62,7 @@ export default function ProfileTabs({
 					<div className={profileStyles.ratingsSection}>
 						<div className={profileStyles.sectionHeader}>
 							<h3 className={profileStyles.sectionTitle}>
-								{t('rating_overview_header', 'Rating Overview')}
+								{t('rating_overview_header')}
 							</h3>
 						</div>
 
@@ -96,7 +96,7 @@ export default function ProfileTabs({
 						<div className={profileStyles.recentGamesHeader}>
 							<div className={profileStyles.titleGroup}>
 								<h3 className={profileStyles.sectionTitle}>
-									{t('recent_games', 'Recent Matches')}
+									{t('recent_games')}
 								</h3>
 								<span className={profileStyles.countBadge}>
 									{history.matches.length}
@@ -109,7 +109,7 @@ export default function ProfileTabs({
 									onClick={() => onSelectTab('games')}
 									type="button"
 								>
-									{t('see_all', 'See all')} →
+									{t('see_all')} →
 								</button>
 							)}
 						</div>
@@ -118,19 +118,19 @@ export default function ProfileTabs({
 							<div className={profileStyles.emptyCard}>
 								<span className={profileStyles.spinnerIcon}>♟</span>
 								<p className={profileStyles.emptySubtitle}>
-									{t('loading', 'Loading recent games...')}
+									{t('loading')}
 								</p>
 							</div>
 						) : recentMatches.length === 0 ? (
 							<div className={profileStyles.emptyCard}>
 								<div className={profileStyles.emptyIcon}>♟️</div>
 								<h4 className={profileStyles.emptyTitle}>
-									{t('no_games_yet', 'No games played yet')}
+									{t('no_games_yet')}
 								</h4>
 								<p className={profileStyles.emptySubtitle}>
 									{isOwnProfile
-										? t('play_first_game_prompt', 'Play matches to build your game history and analysis log.')
-										: t('user_no_games', 'This user has not played any games yet.')}
+										? t('play_first_game_prompt')
+										: t('user_no_games')}
 								</p>
 								{isOwnProfile && (
 									<button
@@ -138,19 +138,19 @@ export default function ProfileTabs({
 										onClick={() => navigate('/home')}
 										type="button"
 									>
-										⚔️ {t('play_now', 'Play Now')}
+										⚔️ {t('play_now')}
 									</button>
 								)}
 							</div>
 						) : (
 							<div className={profileStyles.gamesListRows}>
 								<div className={profileStyles.listHeader}>
-									<span>{t('mode', 'Mode')}</span>
-									<span>{t('players', 'Players')}</span>
-									<span>{t('moves', 'Moves')}</span>
-									<span>{t('result', 'Result')}</span>
-									<span>{t('review', 'Review')}</span>
-									<span>{t('date', 'Date')}</span>
+									<span>{t('mode')}</span>
+									<span>{t('players')}</span>
+									<span>{t('moves')}</span>
+									<span>{t('result')}</span>
+									<span>{t('review')}</span>
+									<span>{t('date')}</span>
 								</div>
 
 								<div className={profileStyles.rowsContainer}>
@@ -189,5 +189,7 @@ export default function ProfileTabs({
 				/>
 			)}
 		</div>
-	)
-}
+	);
+};
+
+export default ProfileTabs;

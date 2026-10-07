@@ -103,11 +103,11 @@ export default function MiniRatingChart({ mode, history, onClick, compact = fals
 					</div>
 
 					<div className={styles.compactRecord}>
-						<span className={styles.compactWins}>{wins}{t('wins_short', 'W')}</span>
+						<span className={styles.compactWins}>{wins}{t('wins_short')}</span>
 						<span className={styles.compactSep}>/</span>
-						<span className={styles.compactDraws}>{draws}{t('draws_short', 'D')}</span>
+						<span className={styles.compactDraws}>{draws}{t('draws_short')}</span>
 						<span className={styles.compactSep}>/</span>
-						<span className={styles.compactLosses}>{losses}{t('losses_short', 'L')}</span>
+						<span className={styles.compactLosses}>{losses}{t('losses_short')}</span>
 					</div>
 
 					<div className={styles.compactChartContainer}>
@@ -192,15 +192,15 @@ export default function MiniRatingChart({ mode, history, onClick, compact = fals
 
 				{isNotPlayed ? (
 					<span className={`${styles.badge} ${styles.badgeNotPlayed}`}>
-						{t('not_played', 'Not played')}
+						{t('not_played')}
 					</span>
 				) : isProvisional ? (
 					<span className={`${styles.badge} ${styles.badgeCalibrating}`}>
-						{t('calibrating', 'Calibrating')} ({history?.gamesPlayed}/5)
+						{t('calibrating')} ({history?.gamesPlayed}/5)
 					</span>
 				) : (
 					<span className={`${styles.badge} ${styles.badgeActive}`}>
-						{history?.winRate}% {t('win_rate', 'Win rate')}
+						{history?.winRate}% {t('win_rate')}
 					</span>
 				)}
 			</div>
@@ -225,7 +225,7 @@ export default function MiniRatingChart({ mode, history, onClick, compact = fals
 						}`}
 					>
 						<span>{delta > 0 ? `+${delta}` : delta}</span>
-						<span className={styles.deltaLabel}>{t('7d', '7d')}</span>
+						<span className={styles.deltaLabel}>{t('7d')}</span>
 					</div>
 				)}
 			</div>

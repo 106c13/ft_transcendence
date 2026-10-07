@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import io, { Socket } from 'socket.io-client'
-import type { ChatObject } from '../components/ChatSidebar/ChatSidebar'
-import type { Message } from '../components/ChatMain/ChatMain'
+import type { ChatObject, Message } from '../utils/chatUtils';
 
 export function useChat(currentUserId: number | null) {
 	const navigate = useNavigate()
@@ -73,9 +72,7 @@ export function useChat(currentUserId: number | null) {
 		})
 		socketRef.current = socket
 
-		socket.on('connect', () => {
-			console.log('Chat socket connected')
-		})
+		socket.on('connect', () => {})
 
 		socket.on('new_message', (data: { type: string; message: Message }) => {
 			const newMsg = data?.message
@@ -118,9 +115,7 @@ export function useChat(currentUserId: number | null) {
 			}
 		})
 
-		socket.on('disconnect', () => {
-			console.log('Chat socket disconnected')
-		})
+		socket.on('disconnect', () => {})
 
 		return () => {
 			socket.disconnect()

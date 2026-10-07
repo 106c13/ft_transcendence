@@ -24,10 +24,10 @@ export default function ToastItem({ toast, onDismiss }: Props) {
 
   // Default type titles if no custom title is passed
   const defaultTitles = {
-    success: t('toast_success', 'Success'),
-    error: t('toast_error', 'Error'),
-    warning: t('toast_warning', 'Notice'),
-    info: t('toast_info', 'Information'),
+    success: t('toast_success'),
+    error: t('toast_error'),
+    warning: t('toast_warning'),
+    info: t('toast_info'),
   }
 
   // Message localization check
@@ -94,7 +94,7 @@ export default function ToastItem({ toast, onDismiss }: Props) {
           type="button"
           className={styles.closeBtn}
           onClick={() => onDismiss(toast.id)}
-          aria-label={t('dismiss_notification', 'Dismiss notification')}
+          aria-label={t('dismiss_notification')}
         >
           ✕
         </button>

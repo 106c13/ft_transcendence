@@ -29,11 +29,11 @@ function PasswordInput({ value, onChange, placeholder, name = 'password', requir
 				type="button"
 				className={styles.eyeBtn}
 				onClick={() => setShowPassword(prev => !prev)}
-				aria-label={showPassword ? t('hide_password', 'Hide password') : t('show_password', 'Show password')}
+				aria-label={showPassword ? t('hide_password') : t('show_password')}
 			>
 				<img
 					src={showPassword ? '/assets/eye-off.svg' : '/assets/eye.svg'}
-					alt={showPassword ? t('hide_password', 'Hide password') : t('show_password', 'Show password')}
+					alt={showPassword ? t('hide_password') : t('show_password')}
 					width={18}
 					height={18}
 				/>

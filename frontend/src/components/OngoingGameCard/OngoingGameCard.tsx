@@ -7,29 +7,8 @@ import ChessBoard from '../ChessBoard/ChessBoard'
 import { playSound } from '../../utils/sound'
 import styles from './OngoingGameCard.module.css'
 
-export interface LiveGamePlayer {
-	id: number
-	username: string
-	avatar?: string | null
-	rating: number
-	isProvisional: boolean
-}
-
-export interface LiveGameData {
-	gameId: string
-	fen: string
-	turn: 'w' | 'b'
-	mode: string
-	whiteTime: number
-	blackTime: number
-	lastMoveTime: number
-	lastMove?: { from: string; to: string } | null
-	isCheck?: boolean
-	isPaused?: boolean
-	isGameOver?: boolean
-	whitePlayer: LiveGamePlayer
-	blackPlayer: LiveGamePlayer
-}
+import type { LiveGamePlayer, LiveGameData } from '../../utils/gameUtils';
+export type { LiveGamePlayer, LiveGameData };
 
 type Props = {
 	gameData: LiveGameData
@@ -273,10 +252,10 @@ export default function OngoingGameCard({
 				>
 					<span>
 						{isDraw
-							? `½ - ½ ${t('draw', 'Draw')}`
+							? `½ - ½ ${t('draw')}`
 							: isProfileWinner
-							? `🏆 ${t('victory', 'Victory')}`
-							: t('defeat', 'Defeat')}
+							? `🏆 ${t('victory')}`
+							: t('defeat')}
 					</span>
 					{countdown !== null && (
 						<span className={styles.countdownPill}>
@@ -294,14 +273,14 @@ export default function OngoingGameCard({
 					}`}
 				>
 					<span>⚔️</span>
-					<span>{t('new_match_started', 'New Match Started')}</span>
+					<span>{t('new_match_started')}</span>
 				</div>
 			)}
 
 			{/* Hover Overlay: Click to spectate with weaker blur and "see all" button style */}
 			<div className={styles.hoverOverlay}>
 				<div className={styles.spectateButton}>
-					<span>{t('click_to_spectate', 'Click to spectate the game')}</span>
+					<span>{t('click_to_spectate')}</span>
 					<span className={styles.spectateArrow}>→</span>
 				</div>
 			</div>

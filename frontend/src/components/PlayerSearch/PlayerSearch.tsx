@@ -149,13 +149,13 @@ function PlayerSearch() {
 						setIsExpanded(true)
 					}
 				}}
-				title={!isExpanded ? t('search_players', 'Search Players') : undefined}
+				title={!isExpanded ? t('search_players') : undefined}
 			>
 				<span className={styles.searchIcon}>🔍</span>
 				<input
 					ref={inputRef}
 					type="text"
-					placeholder={isExpanded ? t('search_placeholder', 'Search players...') : ''}
+					placeholder={isExpanded ? t('search_placeholder') : ''}
 					value={searchQuery}
 					onChange={(e) => setSearchQuery(e.target.value)}
 					className={styles.navbarSearchInput}
@@ -166,7 +166,7 @@ function PlayerSearch() {
 					type="button"
 					className={`${styles.searchCloseBtn} ${isExpanded ? styles.showClose : ''}`}
 					onClick={handleClose}
-					title={t('close', 'Close')}
+					title={t('close')}
 					tabIndex={isExpanded ? 0 : -1}
 				>
 					✕
@@ -198,7 +198,7 @@ function PlayerSearch() {
 
 			{isExpanded && showResults && searchResults.length === 0 && searchQuery && (
 				<div className={`${styles.navSearchResults} ${styles.empty}`}>
-					{t('no_users_found', 'No users found')}
+					{t('no_users_found')}
 				</div>
 			)}
 		</div>

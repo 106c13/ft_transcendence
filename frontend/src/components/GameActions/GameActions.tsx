@@ -67,7 +67,7 @@ function GameActions({
 			<div className={styles.gameActions}>
 				{!isGameOver && (
 					<div className={styles.viewerBadge}>
-						👁️ {t('viewer_mode_desc', 'You are viewing this match live')}
+						👁️ {t('viewer_mode_desc')}
 					</div>
 				)}
 				{isGameOver && (
@@ -78,7 +78,7 @@ function GameActions({
 								className={styles.analyzeBtn}
 								onClick={onAnalyze}
 							>
-								🔍 {t('analyze_game', 'Analyze Game')}
+								🔍 {t('analyze_game')}
 							</button>
 						)}
 						<button
@@ -86,7 +86,7 @@ function GameActions({
 							className={styles.lobbyBtn}
 							onClick={() => navigate('/home')}
 						>
-							🏠 {t('back_to_lobby', 'Back to Lobby')}
+							🏠 {t('back_to_lobby')}
 						</button>
 					</>
 				)}
@@ -102,14 +102,14 @@ function GameActions({
 					className={styles.analyzeBtn}
 					onClick={onAnalyze}
 				>
-					🔍 {t('analyze_game', 'Analyze Game')}
+					🔍 {t('analyze_game')}
 				</button>
 				<button
 					type="button"
 					className={styles.lobbyBtn}
 					onClick={() => navigate('/home')}
 				>
-					🏠 {t('back_to_lobby', 'Back to Lobby')}
+					🏠 {t('back_to_lobby')}
 				</button>
 			</div>
 		)
@@ -121,19 +121,19 @@ function GameActions({
 				{drawOfferState === 'received' ? (
 					<>
 						<button type="button" className={styles.acceptBtn} onClick={onAcceptDraw}>
-							✓ {t('accept_draw', 'Accept')}
+							✓ {t('accept_draw')}
 						</button>
 						<button type="button" className={styles.declineBtn} onClick={onDeclineDraw}>
-							✕ {t('decline_draw', 'Decline')}
+							✕ {t('decline_draw')}
 						</button>
 					</>
 				) : drawOfferState === 'sent' ? (
 					<button type="button" className={`${styles.drawBtn} ${styles.drawBtnDisabled}`} disabled>
-						⏳ {t('draw_offered', 'Draw Offered...')}
+						⏳ {t('draw_offered')}
 					</button>
 				) : (
 					<button type="button" className={styles.drawBtn} onClick={onOfferDraw}>
-						½ {t('offer_draw', 'Offer Draw')}
+						½ {t('offer_draw')}
 					</button>
 				)}
 				<div className={styles.resignContainer} ref={resignContainerRef}>
@@ -143,17 +143,17 @@ function GameActions({
 						onClick={() => setShowResignModal((prev) => !prev)}
 						aria-expanded={showResignModal}
 					>
-						{isAbandon ? `🚫 ${t('abandon', 'Abandon')}` : `🏳️ ${t('resign', 'Resign')}`}
+						{isAbandon ? `🚫 ${t('abandon')}` : `🏳️ ${t('resign')}`}
 					</button>
 
 					{showResignModal && (
 						<div
 							className={`${styles.resignModal} ${isAbandon ? styles.abandonModal : ''}`}
 							role="dialog"
-							aria-label={isAbandon ? t('confirm_abandon_short', 'Abandon game?') : t('confirm_resign_short', 'Resign game?')}
+							aria-label={isAbandon ? t('confirm_abandon_short') : t('confirm_resign_short')}
 						>
 							<span className={styles.modalPrompt}>
-								{isAbandon ? t('confirm_abandon_short', 'Abandon game?') : t('confirm_resign_short', 'Resign game?')}
+								{isAbandon ? t('confirm_abandon_short') : t('confirm_resign_short')}
 							</span>
 							<div className={styles.modalButtons}>
 								<button
@@ -161,7 +161,7 @@ function GameActions({
 									className={styles.modalCancelBtn}
 									onClick={() => setShowResignModal(false)}
 								>
-									{t('cancel_action', 'Cancel')}
+									{t('cancel_action')}
 								</button>
 								<button
 									type="button"
@@ -171,7 +171,7 @@ function GameActions({
 										onResign()
 									}}
 								>
-									{isAbandon ? `🚫 ${t('abandon', 'Abandon')}` : `🏳️ ${t('resign', 'Resign')}`}
+									{isAbandon ? `🚫 ${t('abandon')}` : `🏳️ ${t('resign')}`}
 								</button>
 							</div>
 							{/* Pointer pointing right at the center of the original button */}

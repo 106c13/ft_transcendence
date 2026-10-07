@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import type { TabType, User, FriendStatus } from '../constants/profileConstants'
+import type { TabType, User, FriendStatus } from '../utils/profileUtils'
 
 export function useProfile(username?: string, defaultTab: TabType = 'overview') {
 	const location = useLocation()

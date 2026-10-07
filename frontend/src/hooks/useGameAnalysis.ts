@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { Chess } from 'chess.js'
-import type { MatchRecord, GameAnalysisResult, MoveAnalysis } from '../components/GameAnalysis/GameAnalysis'
+import type { MatchRecord, GameAnalysisResult, MoveAnalysis } from '../utils/gameUtils';
 import { playSound, type SoundType } from '../utils/sound'
 
 function getSoundForSan(san?: string): SoundType {

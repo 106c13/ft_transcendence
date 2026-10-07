@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { User } from '../../constants/profileConstants'
+import type { User } from '../../utils/profileUtils'
 import styles from './FriendsList.module.css'
 
 type Props = {
@@ -22,7 +22,7 @@ export default function FriendsList({ friends, onOpenProfile }: Props) {
 		<div className={styles.container}>
 			<div className={styles.topBar}>
 				<div className={styles.titleGroup}>
-					<h3 className={styles.title}>{t('friends_title', 'Friends')}</h3>
+					<h3 className={styles.title}>{t('friends_title')}</h3>
 					<span className={styles.countBadge}>{friends.length}</span>
 				</div>
 
@@ -30,7 +30,7 @@ export default function FriendsList({ friends, onOpenProfile }: Props) {
 					<input
 						type="text"
 						className={styles.searchInput}
-						placeholder={t('search_friends', 'Search friends...')}
+						placeholder={t('search_friends')}
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 					/>
@@ -40,24 +40,24 @@ export default function FriendsList({ friends, onOpenProfile }: Props) {
 			{friends.length === 0 ? (
 				<div className={styles.emptyCard}>
 					<div className={styles.emptyIcon}>👥</div>
-					<h4 className={styles.emptyTitle}>{t('no_friends_yet', 'No friends yet')}</h4>
+					<h4 className={styles.emptyTitle}>{t('no_friends_yet')}</h4>
 					<p className={styles.emptySubtitle}>
-						{t('add_friends_tip', 'Visit player profiles to send friend requests.')}
+						{t('add_friends_tip')}
 					</p>
 				</div>
 			) : filteredFriends.length === 0 ? (
 				<div className={styles.emptyCard}>
 					<div className={styles.emptyIcon}>🔍</div>
-					<h4 className={styles.emptyTitle}>{t('no_friends_matching_query', 'No friends match your search')}</h4>
+					<h4 className={styles.emptyTitle}>{t('no_friends_matching_query')}</h4>
 					<p className={styles.emptySubtitle}>
-						{t('try_different_search', 'Try searching for another username.')}
+						{t('try_different_search')}
 					</p>
 					<button
 						className={styles.resetBtn}
 						onClick={() => setSearchQuery('')}
 						type="button"
 					>
-						✕ {t('clear', 'Clear Search')}
+						✕ {t('clear')}
 					</button>
 				</div>
 			) : (
@@ -91,10 +91,10 @@ export default function FriendsList({ friends, onOpenProfile }: Props) {
 										}`}
 										title={
 											friend.status === 'ONLINE'
-												? t('online', 'Online')
+												? t('online')
 												: friend.status === 'INGAME'
-												? t('in_game', 'In Game')
-												: t('offline', 'Offline')
+												? t('in_game')
+												: t('offline')
 										}
 									/>
 								</div>

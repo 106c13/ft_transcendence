@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { DEVS } from '../../constants/aboutConstants'
-import type { User } from '../../constants/profileConstants'
+import { DEVS } from '../../utils/aboutUtils'
+import type { User } from '../../utils/profileUtils'
 import styles from './Footer.module.css'
 
 interface FooterProps {
@@ -54,17 +54,17 @@ export default function Footer({ currentUser }: FooterProps) {
 							<h3 className={styles.brandTitle}>ft_transcendence</h3>
 						</Link>
 						<p className={styles.brandTagline}>
-							{t('footer_tagline', 'A real-time competitive chess platform built for the 42 curriculum. Play live matches, analyze positions with Stockfish, and climb the global ladder.')}
+							{t('footer_tagline')}
 						</p>
 
 						<div className={styles.badgeRow}>
 							<span className={styles.statusBadge}>
 								<span className={styles.statusDot} aria-hidden="true" />
-								{t('footer_status_operational', 'Systems Operational')}
+								{t('footer_status_operational')}
 							</span>
 							<span className={styles.capstoneBadge}>
 								<span className={styles.badgeIcon} aria-hidden="true">♟️</span>
-								{t('footer_capstone_badge', '42 Yerevan Capstone')}
+								{t('footer_capstone_badge')}
 							</span>
 						</div>
 					</div>
@@ -73,37 +73,37 @@ export default function Footer({ currentUser }: FooterProps) {
 					{currentUser && (
 						<div className={styles.navCol}>
 							<h4 className={styles.colTitle}>
-								{t('footer_play_title', 'Play & Compete')}
+								{t('footer_play_title')}
 							</h4>
 							<ul className={styles.linkList}>
 								<li>
 									<Link to="/home" className={styles.footerLink}>
 										<span className={styles.linkIcon}>⚔️</span>
-										{t('play_online', 'Play Online')}
+										{t('play_online')}
 									</Link>
 								</li>
 								<li>
 									<Link to="/game?mode=bullet" className={styles.footerLink}>
 										<span className={styles.linkIcon}>🔥</span>
-										{t('footer_bullet_1m', 'Bullet (1 min)')}
+										{t('footer_bullet_1m')}
 									</Link>
 								</li>
 								<li>
 									<Link to="/game?mode=blitz" className={styles.footerLink}>
 										<span className={styles.linkIcon}>⚡</span>
-										{t('footer_blitz_3m', 'Blitz (3 min)')}
+										{t('footer_blitz_3m')}
 									</Link>
 								</li>
 								<li>
 									<Link to="/game?mode=rapid" className={styles.footerLink}>
 										<span className={styles.linkIcon}>⏳</span>
-										{t('footer_rapid_10m', 'Rapid (10 min)')}
+										{t('footer_rapid_10m')}
 									</Link>
 								</li>
 								<li>
 									<Link to="/leaderboard" className={styles.footerLink}>
 										<span className={styles.linkIcon}>🏆</span>
-										{t('leaderboard', 'Leaderboard')}
+										{t('leaderboard')}
 									</Link>
 								</li>
 							</ul>
@@ -114,31 +114,31 @@ export default function Footer({ currentUser }: FooterProps) {
 					{currentUser && (
 						<div className={styles.navCol}>
 							<h4 className={styles.colTitle}>
-								{t('footer_platform_title', 'Platform')}
+								{t('footer_platform_title')}
 							</h4>
 							<ul className={styles.linkList}>
 								<li>
 									<Link to="/chat" className={styles.footerLink}>
 										<span className={styles.linkIcon}>💬</span>
-										{t('chats', 'Live Chat')}
+										{t('chats')}
 									</Link>
 								</li>
 								<li>
 									<Link to={`/profile/${currentUser.username}`} className={styles.footerLink}>
 										<span className={styles.linkIcon}>👤</span>
-										{t('my_profile', 'Player Profile')}
+										{t('my_profile')}
 									</Link>
 								</li>
 								<li>
 									<Link to={`/profile/${currentUser.username}/rating`} className={styles.footerLink}>
 										<span className={styles.linkIcon}>📈</span>
-										{t('trend_7d', 'Rating History')}
+										{t('trend_7d')}
 									</Link>
 								</li>
 								<li>
 									<Link to="/profile/settings" className={styles.footerLink}>
 										<span className={styles.linkIcon}>⚙️</span>
-										{t('settings', 'Settings')}
+										{t('settings')}
 									</Link>
 								</li>
 							</ul>
@@ -149,19 +149,19 @@ export default function Footer({ currentUser }: FooterProps) {
 					{!currentUser && (
 						<div className={styles.navCol}>
 							<h4 className={styles.colTitle}>
-								{t('footer_access_title', 'Get Started')}
+								{t('footer_access_title')}
 							</h4>
 							<ul className={styles.linkList}>
 								<li>
 									<Link to="/login" className={styles.footerLink}>
 										<span className={styles.linkIcon}>🔑</span>
-										{t('sign_in', 'Sign in')}
+										{t('sign_in')}
 									</Link>
 								</li>
 								<li>
 									<Link to="/register" className={styles.footerLink}>
 										<span className={styles.linkIcon}>✨</span>
-										{t('create_account', 'Create Account')}
+										{t('create_account')}
 									</Link>
 								</li>
 							</ul>
@@ -171,13 +171,13 @@ export default function Footer({ currentUser }: FooterProps) {
 					{/* About & 42 School Column (available to both authenticated & guest) */}
 					<div className={styles.navCol}>
 						<h4 className={styles.colTitle}>
-							{t('footer_about_title', 'About & 42')}
+							{t('footer_about_title')}
 						</h4>
 						<ul className={styles.linkList}>
 							<li>
 								<Link to="/about" className={styles.footerLink}>
 									<span className={styles.linkIcon}>ℹ️</span>
-									{t('about_project_title', 'About Project')}
+									{t('about_project_title')}
 								</Link>
 							</li>
 							<li>
@@ -227,7 +227,7 @@ export default function Footer({ currentUser }: FooterProps) {
 									className={styles.footerLink}
 								>
 									<span className={styles.linkIcon}>🎓</span>
-									{t('footer_school_network', '42 Network Official')}
+									{t('footer_school_network')}
 									<span className={styles.externalMark}>↗</span>
 								</a>
 							</li>
@@ -239,10 +239,10 @@ export default function Footer({ currentUser }: FooterProps) {
 				<div className={styles.footerBottom}>
 					<div className={styles.copyrightGroup}>
 						<span className={styles.copyrightText}>
-							© {new Date().getFullYear()} ft_transcendence. {t('footer_all_rights', 'All rights reserved.')}
+							© {new Date().getFullYear()} ft_transcendence. {t('footer_all_rights')}
 						</span>
 						<span className={styles.madeByText}>
-							{t('footer_made_by', 'Crafted with passion at 42 Yerevan')}
+							{t('footer_made_by')}
 						</span>
 					</div>
 
@@ -280,10 +280,10 @@ export default function Footer({ currentUser }: FooterProps) {
 							type="button"
 							className={styles.backToTopBtn}
 							onClick={scrollToTop}
-							title={t('footer_back_to_top', 'Back to top')}
+							title={t('footer_back_to_top')}
 						>
 							<span aria-hidden="true">↑</span>
-							<span>{t('footer_back_to_top', 'Back to top')}</span>
+							<span>{t('footer_back_to_top')}</span>
 						</button>
 					</div>
 				</div>

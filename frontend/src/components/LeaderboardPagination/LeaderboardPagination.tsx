@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './LeaderboardPagination.module.css';
 
@@ -9,12 +8,12 @@ interface LeaderboardPaginationProps {
 	onPageChange: (page: number) => void;
 }
 
-export const LeaderboardPagination: React.FC<LeaderboardPaginationProps> = ({
+const LeaderboardPagination = ({
 	page,
 	totalPages,
 	total,
 	onPageChange,
-}) => {
+}: LeaderboardPaginationProps) => {
 	const { t } = useTranslation();
 
 	if (total === 0) return null;
@@ -30,7 +29,6 @@ export const LeaderboardPagination: React.FC<LeaderboardPaginationProps> = ({
 					from: fromIndex,
 					to: toIndex,
 					total,
-					defaultValue: `Showing ${fromIndex}–${toIndex} of ${total} players`,
 				})}
 			</div>
 
@@ -45,7 +43,7 @@ export const LeaderboardPagination: React.FC<LeaderboardPaginationProps> = ({
 						}}
 						type="button"
 					>
-						{t('previous', 'Previous')}
+						{t('previous')}
 					</button>
 
 					{Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -88,7 +86,7 @@ export const LeaderboardPagination: React.FC<LeaderboardPaginationProps> = ({
 						}}
 						type="button"
 					>
-						{t('next', 'Next')}
+						{t('next')}
 					</button>
 				</div>
 			)}
