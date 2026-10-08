@@ -15,7 +15,6 @@ const ProfileMenu = ({ currentUser, onOpen }: Props) => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const [isOpen, setIsOpen] = useState(false);
-	const [isFirstItemHovered, setIsFirstItemHovered] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 
 	const [prevPath, setPrevPath] = useState(location.pathname);
@@ -99,14 +98,8 @@ const ProfileMenu = ({ currentUser, onOpen }: Props) => {
 			</Tooltip>
 
 			{isOpen && (
-				<div
-					className={`${styles.profileDropdown} ${
-						isFirstItemHovered ? styles.firstItemHovered : ''
-					}`}
-				>
+				<div className={styles.profileDropdown}>
 					<div
-						onMouseEnter={() => setIsFirstItemHovered(true)}
-						onMouseLeave={() => setIsFirstItemHovered(false)}
 						onClick={(e) => {
 							e.stopPropagation();
 							setIsOpen(false);

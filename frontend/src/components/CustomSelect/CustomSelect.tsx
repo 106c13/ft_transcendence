@@ -25,6 +25,7 @@ const CustomSelect = <T extends string = string>({
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const selected = options.find((opt) => opt.value === value) || options[0];
+	const hasAnyIcon = options.some((opt) => Boolean(opt.icon));
 
 	useEffect(() => {
 		const handleClickOutside = (e: MouseEvent) => {
@@ -54,14 +55,18 @@ const CustomSelect = <T extends string = string>({
 		<div className={`${styles.customSelect} ${isOpen ? styles.selectOpen : ''} ${className || ''}`} ref={containerRef} id={id}>
 			<button
 				type="button"
-				className={`${styles.triggerButton} ${isOpen ? styles.triggerOpen : ''}`}
+				className={`${styles.triggerButton} ${isOpen ? styles.triggerOpen : ''} ${hasAnyIcon ? styles.triggerWithIcon : ''}`}
 				onClick={() => setIsOpen((prev) => !prev)}
 				style={minWidth ? { minWidth } : undefined}
 				aria-haspopup="listbox"
 				aria-expanded={isOpen}
 			>
-				<span className={styles.selectedContent}>
-					{selected?.icon && <span className={styles.optionIcon}>{selected.icon}</span>}
+				<span className={`${styles.selectedContent} ${hasAnyIcon ? styles.selectedContentWithIcon : ''}`}>
+					{hasAnyIcon && (
+						<span className={styles.iconSlot} aria-hidden="true">
+							{selected?.icon || null}
+						</span>
+					)}
 					<span className={styles.optionLabel}>{selected?.label}</span>
 				</span>
 				<span className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`}>▾</span>
@@ -72,7 +77,7 @@ const CustomSelect = <T extends string = string>({
 					{options.map((opt) => (
 						<div
 							key={opt.value}
-							className={`${styles.menuItem} ${opt.value === value ? styles.menuItemActive : ''}`}
+							className={`${styles.menuItem} ${hasAnyIcon ? styles.menuItemWithIcon : ''} ${opt.value === value ? styles.menuItemActive : ''}`}
 							onClick={() => {
 								onChange(opt.value);
 								setIsOpen(false);
@@ -80,7 +85,11 @@ const CustomSelect = <T extends string = string>({
 							role="option"
 							aria-selected={opt.value === value}
 						>
-							{opt.icon && <span className={styles.optionIcon}>{opt.icon}</span>}
+							{hasAnyIcon && (
+								<span className={styles.iconSlot} aria-hidden="true">
+									{opt.icon || null}
+								</span>
+							)}
 							<span className={styles.optionLabel}>{opt.label}</span>
 						</div>
 					))}

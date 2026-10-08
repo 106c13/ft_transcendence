@@ -207,8 +207,9 @@ const GamesList = ({
 
 				{/* Reset Button */}
 				{hasActiveFilters && (
-					<button className={styles.resetBtn} onClick={handleResetFilters}>
-						<X size={14} aria-hidden="true" /> {t('clear')}
+					<button className={styles.resetBtn} onClick={handleResetFilters} type="button">
+						<X size={14} aria-hidden="true" />
+						<span>{t('clear')}</span>
 					</button>
 				)}
 			</div>
@@ -222,7 +223,8 @@ const GamesList = ({
 						{t('try_adjusting_filters')}
 					</p>
 					<button className={styles.resetBtn} onClick={handleResetFilters} type="button">
-						<X size={14} aria-hidden="true" /> {t('clear')}
+						<X size={14} aria-hidden="true" />
+						<span>{t('clear')}</span>
 					</button>
 				</div>
 			) : (

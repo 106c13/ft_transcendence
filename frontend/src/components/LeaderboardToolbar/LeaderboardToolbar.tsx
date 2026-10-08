@@ -141,7 +141,7 @@ const LeaderboardToolbar = ({
 						}}
 						type="button"
 					>
-						{t('all_formats')}
+						<span>{t('all_formats')}</span>
 					</button>
 					<button
 						className={`${styles.modeBtn} ${mode === 'bullet' ? styles.modeBtnActive : ''}`}
@@ -151,7 +151,9 @@ const LeaderboardToolbar = ({
 						}}
 						type="button"
 					>
-						<GameModeIcon mode="bullet" size={14} />
+						<span className={styles.modeBtnIcon}>
+							<GameModeIcon mode="bullet" size={14} />
+						</span>
 						<span>{t('bullet')}</span>
 					</button>
 					<button
@@ -162,7 +164,9 @@ const LeaderboardToolbar = ({
 						}}
 						type="button"
 					>
-						<GameModeIcon mode="blitz" size={14} />
+						<span className={styles.modeBtnIcon}>
+							<GameModeIcon mode="blitz" size={14} />
+						</span>
 						<span>{t('blitz')}</span>
 					</button>
 					<button
@@ -173,7 +177,9 @@ const LeaderboardToolbar = ({
 						}}
 						type="button"
 					>
-						<GameModeIcon mode="rapid" size={14} />
+						<span className={styles.modeBtnIcon}>
+							<GameModeIcon mode="rapid" size={14} />
+						</span>
 						<span>{t('rapid')}</span>
 					</button>
 				</div>

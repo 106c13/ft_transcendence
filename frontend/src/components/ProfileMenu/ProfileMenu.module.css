@@ -62,12 +62,12 @@
 	border-left: 1px solid rgba(148, 163, 184, 0.2);
 	border-top: 1px solid rgba(148, 163, 184, 0.2);
 	z-index: 2;
+	pointer-events: none;
 	transition: background var(--transition-fast);
 }
 
 /* Match arrow color seamlessly when hovering "My Profile" */
-.profileDropdown:has(div:first-child:hover)::after,
-.profileDropdown.firstItemHovered::after {
+.profileDropdown:has(div:first-child:hover)::after {
 	background: color-mix(in srgb, var(--color-blue-400) 12%, var(--color-bg-card));
 }
 

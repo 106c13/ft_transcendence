@@ -78,6 +78,11 @@
 	line-height: 1.15;
 }
 
+.listHeader span:first-child {
+	justify-content: flex-start;
+	text-align: left;
+}
+
 .rowsContainer {
 	display: flex;
 	flex-direction: column;
@@ -133,21 +138,27 @@
 .modeLeft {
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	text-align: center;
+	justify-content: flex-start;
+	gap: var(--gap-sm);
+	text-align: left;
 }
 
 .modeIcon {
-	font-size: 18px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 16px;
+	min-width: 16px;
+	font-size: 16px;
 	line-height: 1;
+	flex-shrink: 0;
 }
 
 .modeMeta {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	text-align: center;
+	align-items: flex-start;
+	text-align: left;
 }
 
 .modeName {

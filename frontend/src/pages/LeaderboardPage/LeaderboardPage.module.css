@@ -441,26 +441,51 @@
 }
 
 .modeBtn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--gap-sm);
 	background: transparent;
 	border: none;
-	color: #94A3B8;
+	color: var(--color-slate-400);
 	font-size: 13px;
 	font-weight: 600;
+	line-height: 1;
 	padding: 7px 14px;
-	border-radius: 8px;
+	border-radius: var(--radius-lg);
 	cursor: pointer;
-	transition: all 0.2s;
+	transition: all var(--transition-normal);
 	white-space: nowrap;
 }
 
 .modeBtn:hover {
-	color: #F8FAFC;
+	color: var(--color-slate-50);
 }
 
 .modeBtnActive {
-	background: #3B82F6;
+	background: var(--color-blue-500);
 	color: #FFFFFF;
 	box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+}
+
+.modeBtn span {
+	line-height: 1;
+}
+
+.modeBtnIcon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 14px;
+	height: 14px;
+	flex-shrink: 0;
+	line-height: 1;
+}
+
+.modeBtnIcon svg,
+.modeBtn svg {
+	display: block;
+	flex-shrink: 0;
 }
 
 .filterToggleBtn {

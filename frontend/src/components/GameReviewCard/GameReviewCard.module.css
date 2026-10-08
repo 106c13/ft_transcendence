@@ -140,14 +140,22 @@
 }
 
 .reviewBtnIcon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	font-size: 15px;
 	flex-shrink: 0;
+	line-height: 1;
+	transform: translateY(1px);
 }
 
 .reviewBtnText {
+	display: inline-flex;
+	align-items: center;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	line-height: 1.2;
 }
 
 /* ── Empty & Loading States ── */
