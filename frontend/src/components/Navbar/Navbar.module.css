@@ -31,14 +31,11 @@
 }
 
 .activeNavAction {
-	background: rgba(96, 165, 250, 0.18) !important;
-	border: 1px solid rgba(96, 165, 250, 0.35);
+	background: transparent !important;
 }
 
 .activeNavAction .navActionIcon {
 	color: var(--color-blue-400);
-	transform: scale(1.1);
-	filter: drop-shadow(0 2px 8px rgba(96, 165, 250, 0.4));
 }
 
 .navbarActions {
@@ -53,15 +50,15 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	border-radius: 12px;
+	border-radius: var(--radius-2xl);
 	cursor: pointer;
-	transition: background 0.2s ease, transform 0.15s ease;
+	transition: color var(--transition-normal);
 	position: relative;
+	background: transparent;
 }
 
 .navActionItem:hover {
-	background: rgba(96, 165, 250, 0.12);
-	transform: translateY(-1px);
+	background: transparent;
 }
 
 .navActionIcon {
@@ -113,81 +110,105 @@
 	border-color: #60A5FA;
 }
 
-/* Dropdown menus */
-.profileDropdown,
+/* Language Dropdown */
 .languageDropdown {
 	position: absolute;
-	top: 52px;
-	right: 0;
-	background: #1E293B;
+	top: 64px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: var(--color-bg-card);
 	border: 1px solid rgba(148, 163, 184, 0.2);
-	border-radius: 12px;
+	border-radius: var(--radius-2xl);
 	min-width: 170px;
 	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 	z-index: 10000;
-	overflow: hidden;
-	animation: fadeInDown 0.15s ease-out;
+	animation: languageDropdownFadeIn 0.15s ease-out;
 }
 
-@keyframes fadeInDown {
+.languageDropdown::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: -4px;
+	width: 8px;
+	height: 8px;
+	background: var(--color-bg-card);
+	transform: translateX(-50%) rotate(45deg);
+	border-left: 1px solid rgba(148, 163, 184, 0.2);
+	border-top: 1px solid rgba(148, 163, 184, 0.2);
+	z-index: 2;
+	transition: background var(--transition-fast);
+}
+
+.languageDropdown:has(div:first-child:hover)::after {
+	background: color-mix(in srgb, var(--color-blue-400) 12%, var(--color-bg-card));
+}
+
+@keyframes languageDropdownFadeIn {
 	from {
 		opacity: 0;
-		transform: translateY(-8px);
+		transform: translateX(-50%) translateY(-8px);
 	}
 	to {
 		opacity: 1;
-		transform: translateY(0);
+		transform: translateX(-50%) translateY(0);
 	}
 }
 
-.profileDropdown div,
-.languageDropdown div {
-	padding: 12px 18px;
-	cursor: pointer;
-	color: #E2E8F0;
-	font-size: 14px;
-	font-weight: 500;
-	transition: background 0.15s ease;
-	display: flex;
-	align-items: center;
-	gap: 10px;
+.languageDropdown div:first-child {
+	border-top-left-radius: var(--radius-2xl);
+	border-top-right-radius: var(--radius-2xl);
 }
 
-.profileDropdown div:hover,
+.languageDropdown div:last-child {
+	border-bottom-left-radius: var(--radius-2xl);
+	border-bottom-right-radius: var(--radius-2xl);
+}
+
+.languageDropdown div {
+	padding: var(--padding-md) var(--padding-lg);
+	cursor: pointer;
+	color: var(--color-slate-200);
+	font-size: var(--font-size-base);
+	font-weight: 500;
+	transition: background var(--transition-fast);
+	display: flex;
+	align-items: center;
+	gap: var(--gap-md);
+}
+
 .languageDropdown div:hover {
 	background: rgba(96, 165, 250, 0.12);
 }
 
-.profileDropdown div svg {
-	color: var(--color-slate-400);
-	flex-shrink: 0;
-	transition: color var(--transition-fast);
-}
-
-.profileDropdown div:hover svg {
-	color: var(--color-blue-400);
-}
-
-.profileDropdown .danger svg,
-.profileDropdown .danger:hover svg {
-	color: currentColor;
-}
-
-.profileDropdown .danger {
-	color: #F87171;
-	border-top: 1px solid rgba(148, 163, 184, 0.12);
-}
-
-.profileDropdown .danger:hover {
-	background: rgba(248, 113, 113, 0.12);
-}
-
 .langCode {
-	font-size: 11px;
+	font-size: var(--font-size-xs);
 	font-weight: 700;
 	padding: 2px 5px;
-	border-radius: 4px;
+	border-radius: var(--radius-sm);
 	background: rgba(148, 163, 184, 0.2);
-	color: #94A3B8;
+	color: var(--color-slate-400);
 	letter-spacing: 0.5px;
 }
+
+@media (max-width: 768px) {
+	.navbar {
+		padding: 0 var(--padding-md);
+	}
+	.navbarActions {
+		gap: var(--gap-sm);
+	}
+}
+
+@media (max-width: 480px) {
+	.navbar {
+		padding: 0 var(--padding-sm);
+	}
+	.navbarActions {
+		gap: var(--gap-xs);
+	}
+	.navbarBrand h2 {
+		font-size: var(--font-size-md);
+	}
+}
+

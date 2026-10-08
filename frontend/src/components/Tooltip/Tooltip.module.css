@@ -1,0 +1,84 @@
+.tooltipContainer {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.tooltipContainer.inline {
+	display: inline-block;
+}
+
+.tooltipBubble {
+	position: absolute;
+	left: 50%;
+	background: var(--color-slate-900);
+	border: 1px solid rgba(148, 163, 184, 0.25);
+	color: var(--color-slate-50);
+	font-size: var(--font-size-sm);
+	font-weight: 600;
+	padding: var(--padding-xs) var(--padding-md);
+	border-radius: var(--radius-md);
+	white-space: nowrap;
+	pointer-events: none;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+	z-index: var(--z-modal);
+}
+
+/* Pointy arrow */
+.tooltipBubble::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	width: 8px;
+	height: 8px;
+	background: var(--color-slate-900);
+}
+
+/* Position: TOP */
+.top {
+	bottom: calc(100% + 9px);
+	transform: translateX(-50%) translateY(4px);
+}
+
+.top::after {
+	bottom: -5px;
+	transform: translateX(-50%) rotate(45deg);
+	border-right: 1px solid rgba(148, 163, 184, 0.25);
+	border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+/* Position: BOTTOM */
+.bottom {
+	top: calc(100% + 9px);
+	transform: translateX(-50%) translateY(-4px);
+}
+
+.bottom::after {
+	top: -5px;
+	transform: translateX(-50%) rotate(45deg);
+	border-left: 1px solid rgba(148, 163, 184, 0.25);
+	border-top: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+/* Navbar Offset: exactly matches container dropdown distance */
+.navbarOffset.bottom {
+	top: 64px;
+}
+
+/* Visible State */
+.visible {
+	opacity: 1;
+	visibility: visible;
+}
+
+.visible.top {
+	transform: translateX(-50%) translateY(0);
+}
+
+.visible.bottom {
+	transform: translateX(-50%) translateY(0);
+}

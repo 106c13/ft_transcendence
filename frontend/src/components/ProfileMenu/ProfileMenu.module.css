@@ -1,0 +1,133 @@
+.profileMenuContainer {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.navActionItem {
+	width: 42px;
+	height: 42px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--radius-2xl);
+	cursor: pointer;
+	transition: color var(--transition-normal);
+	position: relative;
+	background: transparent;
+}
+
+.navProfileAvatar {
+	width: 36px;
+	height: 36px;
+	border-radius: var(--radius-full);
+	object-fit: cover;
+	border: 2px solid transparent;
+	transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.profileMenu:hover .navProfileAvatar {
+	border-color: var(--color-blue-400);
+}
+
+.profileMenu.active .navProfileAvatar,
+.profileMenu:focus-visible .navProfileAvatar {
+	border-color: var(--color-blue-400);
+}
+
+/* Profile Dropdown */
+.profileDropdown {
+	position: absolute;
+	top: 64px;
+	right: 0;
+	background: var(--color-bg-card);
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	border-radius: var(--radius-2xl);
+	min-width: 170px;
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+	z-index: 10000;
+	animation: profileDropdownFadeIn 0.15s ease-out;
+}
+
+/* Pointy arrow joining seamlessly with card top border */
+.profileDropdown::after {
+	content: '';
+	position: absolute;
+	right: 17px;
+	top: -4px;
+	width: 8px;
+	height: 8px;
+	background: var(--color-bg-card);
+	transform: rotate(45deg);
+	border-left: 1px solid rgba(148, 163, 184, 0.2);
+	border-top: 1px solid rgba(148, 163, 184, 0.2);
+	z-index: 2;
+	transition: background var(--transition-fast);
+}
+
+/* Match arrow color seamlessly when hovering "My Profile" */
+.profileDropdown:has(div:first-child:hover)::after,
+.profileDropdown.firstItemHovered::after {
+	background: color-mix(in srgb, var(--color-blue-400) 12%, var(--color-bg-card));
+}
+
+@keyframes profileDropdownFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.profileDropdown div:first-child {
+	border-top-left-radius: var(--radius-2xl);
+	border-top-right-radius: var(--radius-2xl);
+}
+
+.profileDropdown div:last-child {
+	border-bottom-left-radius: var(--radius-2xl);
+	border-bottom-right-radius: var(--radius-2xl);
+}
+
+.profileDropdown div {
+	padding: var(--padding-md) var(--padding-lg);
+	cursor: pointer;
+	color: var(--color-slate-200);
+	font-size: var(--font-size-base);
+	font-weight: 500;
+	transition: background var(--transition-fast);
+	display: flex;
+	align-items: center;
+	gap: var(--gap-md);
+}
+
+.profileDropdown div:hover {
+	background: rgba(96, 165, 250, 0.12);
+}
+
+.profileDropdown div svg {
+	color: var(--color-slate-400);
+	flex-shrink: 0;
+	transition: color var(--transition-fast);
+}
+
+.profileDropdown div:hover svg {
+	color: var(--color-blue-400);
+}
+
+.profileDropdown .danger svg,
+.profileDropdown .danger:hover svg {
+	color: currentColor;
+}
+
+.profileDropdown .danger {
+	color: var(--color-red-400);
+	border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.profileDropdown .danger:hover {
+	background: rgba(248, 113, 113, 0.12);
+}

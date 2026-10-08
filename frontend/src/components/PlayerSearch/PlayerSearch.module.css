@@ -10,34 +10,29 @@
 	align-items: center;
 	height: 42px;
 	width: 42px;
-	border-radius: 12px;
+	border-radius: var(--radius-2xl);
 	background: transparent;
-	border: 1.5px solid transparent;
+	border: none;
 	transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-	            background 0.25s ease,
-	            border-color 0.25s ease,
-	            box-shadow 0.25s ease,
-	            transform 0.15s ease;
+	            background var(--transition-normal),
+	            box-shadow var(--transition-normal);
 	overflow: hidden;
 	box-sizing: border-box;
 	cursor: pointer;
 }
 
 .searchBox:hover:not(.expanded) {
-	background: rgba(96, 165, 250, 0.12);
-	transform: translateY(-1px);
+	background: transparent;
 }
 
 .searchBox.expanded {
 	width: 260px;
 	background: rgba(30, 41, 59, 0.95);
-	border-color: rgba(59, 130, 246, 0.4);
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 16px rgba(59, 130, 246, 0.15);
 	cursor: default;
 }
 
 .searchBox.expanded:focus-within {
-	border-color: #3B82F6;
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
@@ -70,7 +65,7 @@
 	left: 12px;
 	transform: translate(0, -50%);
 	font-size: 15px;
-	color: #64748B;
+	color: var(--color-blue-400);
 }
 
 .searchBox.expanded:focus-within .searchIcon {
@@ -156,7 +151,7 @@
 
 .navSearchResults {
 	position: absolute;
-	top: calc(100% + 8px);
+	top: 64px;
 	left: 0;
 	right: 0;
 	width: 100%;
@@ -164,7 +159,7 @@
 	background: rgba(30, 41, 59, 0.98);
 	backdrop-filter: blur(20px);
 	border: 1px solid rgba(148, 163, 184, 0.2);
-	border-radius: 14px;
+	border-radius: var(--radius-2xl);
 	max-height: 320px;
 	overflow-y: auto;
 	z-index: 10000;

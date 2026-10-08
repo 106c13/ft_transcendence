@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { ScrollText, Play, Pause, SkipBack, ChevronLeft, ChevronRight, SkipForward } from 'lucide-react';
 import { MOVE_STEPS } from '../../utils/aboutUtils';
+import Tooltip from '../Tooltip/Tooltip';
 import styles from './AboutMoveLog.module.css';
 
 interface Props {
@@ -132,60 +133,70 @@ const AboutMoveLog = ({
 
 			{/* Navigation Buttons Row */}
 			<div className={styles.navRow}>
-				<button
-					type="button"
-					className={styles.navBtn}
-					onClick={() => onSelectPly(0)}
-					disabled={currentPly === 0}
-					title="Start Position (Down Arrow)"
-				>
-					<SkipBack size={14} aria-hidden="true" />
-				</button>
-				<button
-					type="button"
-					className={styles.navBtn}
-					onClick={() => onSelectPly(Math.max(0, currentPly - 1))}
-					disabled={currentPly === 0}
-					title="Previous Move (Left Arrow)"
-				>
-					<ChevronLeft size={14} aria-hidden="true" />
-				</button>
-				<button
-					type="button"
-					className={`${styles.navBtn} ${styles.playPauseBtn}`}
-					onClick={onTogglePlay}
-					title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
-				>
-					{isPlaying ? (
-						<>
-							<Pause size={13} aria-hidden="true" />
-							<span>Pause</span>
-						</>
-					) : (
-						<>
-							<Play size={13} fill="currentColor" aria-hidden="true" />
-							<span>Play</span>
-						</>
-					)}
-				</button>
-				<button
-					type="button"
-					className={styles.navBtn}
-					onClick={() => onSelectPly(Math.min(maxPly, currentPly + 1))}
-					disabled={currentPly === maxPly}
-					title="Next Move (Right Arrow)"
-				>
-					<ChevronRight size={14} aria-hidden="true" />
-				</button>
-				<button
-					type="button"
-					className={styles.navBtn}
-					onClick={() => onSelectPly(maxPly)}
-					disabled={currentPly === maxPly}
-					title="Checkmate (Up Arrow)"
-				>
-					<SkipForward size={14} aria-hidden="true" />
-				</button>
+				<Tooltip content="Start Position (Down Arrow)" position="top">
+					<button
+						type="button"
+						className={styles.navBtn}
+						onClick={() => onSelectPly(0)}
+						disabled={currentPly === 0}
+						aria-label="Start Position (Down Arrow)"
+					>
+						<SkipBack size={14} aria-hidden="true" />
+					</button>
+				</Tooltip>
+				<Tooltip content="Previous Move (Left Arrow)" position="top">
+					<button
+						type="button"
+						className={styles.navBtn}
+						onClick={() => onSelectPly(Math.max(0, currentPly - 1))}
+						disabled={currentPly === 0}
+						aria-label="Previous Move (Left Arrow)"
+					>
+						<ChevronLeft size={14} aria-hidden="true" />
+					</button>
+				</Tooltip>
+				<Tooltip content={isPlaying ? 'Pause (Space)' : 'Play (Space)'} position="top">
+					<button
+						type="button"
+						className={`${styles.navBtn} ${styles.playPauseBtn}`}
+						onClick={onTogglePlay}
+						aria-label={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
+					>
+						{isPlaying ? (
+							<>
+								<Pause size={13} aria-hidden="true" />
+								<span>Pause</span>
+							</>
+						) : (
+							<>
+								<Play size={13} fill="currentColor" aria-hidden="true" />
+								<span>Play</span>
+							</>
+						)}
+					</button>
+				</Tooltip>
+				<Tooltip content="Next Move (Right Arrow)" position="top">
+					<button
+						type="button"
+						className={styles.navBtn}
+						onClick={() => onSelectPly(Math.min(maxPly, currentPly + 1))}
+						disabled={currentPly === maxPly}
+						aria-label="Next Move (Right Arrow)"
+					>
+						<ChevronRight size={14} aria-hidden="true" />
+					</button>
+				</Tooltip>
+				<Tooltip content="Checkmate (Up Arrow)" position="top">
+					<button
+						type="button"
+						className={styles.navBtn}
+						onClick={() => onSelectPly(maxPly)}
+						disabled={currentPly === maxPly}
+						aria-label="Checkmate (Up Arrow)"
+					>
+						<SkipForward size={14} aria-hidden="true" />
+					</button>
+				</Tooltip>
 			</div>
 		</div>
 	);

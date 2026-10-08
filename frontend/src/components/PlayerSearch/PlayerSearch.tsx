@@ -1,7 +1,8 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Search, X } from 'lucide-react';
+import Tooltip from '../Tooltip/Tooltip';
 import styles from './PlayerSearch.module.css';
 
 export type SearchUser = {
@@ -14,167 +15,169 @@ export type SearchUser = {
 };
 
 const PlayerSearch = () => {
-	const { t } = useTranslation()
-	const navigate = useNavigate()
-	const [isExpanded, setIsExpanded] = useState(false)
-	const [searchQuery, setSearchQuery] = useState('')
-	const [searchResults, setSearchResults] = useState<SearchUser[]>([])
-	const [showResults, setShowResults] = useState(false)
-	const [isSearching, setIsSearching] = useState(false)
+	const { t } = useTranslation();
+	const navigate = useNavigate();
+	const [isExpanded, setIsExpanded] = useState(false);
+	const [searchQuery, setSearchQuery] = useState('');
+	const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
+	const [showResults, setShowResults] = useState(false);
+	const [isSearching, setIsSearching] = useState(false);
 
-	const containerRef = useRef<HTMLDivElement>(null)
-	const inputRef = useRef<HTMLInputElement>(null)
+	const containerRef = useRef<HTMLDivElement>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	// Focus input when expanded
 	useEffect(() => {
 		if (isExpanded) {
-			inputRef.current?.focus()
+			inputRef.current?.focus();
 		}
-	}, [isExpanded])
+	}, [isExpanded]);
 
 	// Click outside to collapse
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-				setShowResults(false)
+				setShowResults(false);
 				if (!searchQuery.trim()) {
-					setIsExpanded(false)
+					setIsExpanded(false);
 				}
 			}
-		}
+		};
 
-		document.addEventListener('mousedown', handleClickOutside)
-		return () => document.removeEventListener('mousedown', handleClickOutside)
-	}, [searchQuery])
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	}, [searchQuery]);
 
 	// Escape key to close
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.key === 'Escape') {
-				setShowResults(false)
-				setIsExpanded(false)
-				setSearchQuery('')
+				setShowResults(false);
+				setIsExpanded(false);
+				setSearchQuery('');
 			}
-		}
+		};
 
 		if (isExpanded) {
-			document.addEventListener('keydown', handleKeyDown)
+			document.addEventListener('keydown', handleKeyDown);
 		}
-		return () => document.removeEventListener('keydown', handleKeyDown)
-	}, [isExpanded])
+		return () => document.removeEventListener('keydown', handleKeyDown);
+	}, [isExpanded]);
 
-	const handleSearch = async () => {
+	const handleSearch = useCallback(async () => {
 		if (!searchQuery.trim()) {
-			setSearchResults([])
-			setShowResults(false)
-			return
+			setSearchResults([]);
+			setShowResults(false);
+			return;
 		}
 
-		setIsSearching(true)
+		setIsSearching(true);
 		try {
-			const token = localStorage.getItem('token')
+			const token = localStorage.getItem('token');
 			const res = await fetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}`, {
 				headers: { Authorization: `Bearer ${token}` },
-			})
+			});
 
 			if (res.ok) {
-				const data = await res.json()
-				setSearchResults(data)
-				setShowResults(true)
+				const data = await res.json();
+				setSearchResults(data);
+				setShowResults(true);
 			}
 		} catch (error) {
-			console.error('Search error:', error)
+			console.error('Search error:', error);
 		} finally {
-			setIsSearching(false)
+			setIsSearching(false);
 		}
-	}
+	}, [searchQuery]);
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			if (searchQuery) {
-				handleSearch()
+				handleSearch();
 			} else {
-				setShowResults(false)
+				setShowResults(false);
 			}
-		}, 300)
-		return () => clearTimeout(timer)
-	}, [searchQuery])
+		}, 300);
+		return () => clearTimeout(timer);
+	}, [searchQuery, handleSearch]);
 
 	const handleUserClick = (username: string) => {
-		setShowResults(false)
-		setSearchQuery('')
-		setIsExpanded(false)
-		navigate(`/profile/${username}`)
-	}
+		setShowResults(false);
+		setSearchQuery('');
+		setIsExpanded(false);
+		navigate(`/profile/${username}`);
+	};
 
 	const handleBoxClick = () => {
 		if (!isExpanded) {
-			setIsExpanded(true)
+			setIsExpanded(true);
 		}
-	}
+	};
 
 	const handleClose = (e: React.MouseEvent) => {
-		e.stopPropagation()
+		e.stopPropagation();
 		if (searchQuery) {
-			setSearchQuery('')
-			inputRef.current?.focus()
+			setSearchQuery('');
+			inputRef.current?.focus();
 		} else {
-			setIsExpanded(false)
-			setShowResults(false)
+			setIsExpanded(false);
+			setShowResults(false);
 		}
-	}
+	};
 
 	const getStatusDot = (status?: string) => {
 		switch (status) {
 			case 'ONLINE':
-				return <span className={`${styles.statusDot} ${styles.online}`}></span>
+				return <span className={`${styles.statusDot} ${styles.online}`}></span>;
 			case 'INGAME':
-				return <span className={`${styles.statusDot} ${styles.ingame}`}></span>
+				return <span className={`${styles.statusDot} ${styles.ingame}`}></span>;
 			default:
-				return <span className={`${styles.statusDot} ${styles.offline}`}></span>
+				return <span className={`${styles.statusDot} ${styles.offline}`}></span>;
 		}
-	}
+	};
 
 	return (
 		<div
 			ref={containerRef}
 			className={styles.navSearchContainer}
 		>
-			<div
-				className={`${styles.searchBox} ${isExpanded ? styles.expanded : ''}`}
-				onClick={handleBoxClick}
-				role="button"
-				tabIndex={isExpanded ? -1 : 0}
-				onKeyDown={(e) => {
-					if (!isExpanded && (e.key === 'Enter' || e.key === ' ')) {
-						setIsExpanded(true)
-					}
-				}}
-				title={!isExpanded ? t('search_players') : undefined}
-			>
-				<span className={styles.searchIcon}>
-					<Search size={18} aria-hidden="true" />
-				</span>
-				<input
-					ref={inputRef}
-					type="text"
-					placeholder={isExpanded ? t('search_placeholder') : ''}
-					value={searchQuery}
-					onChange={(e) => setSearchQuery(e.target.value)}
-					className={styles.navbarSearchInput}
-					tabIndex={isExpanded ? 0 : -1}
-				/>
-				{isSearching && isExpanded && <span className={styles.searchSpinner}></span>}
-				<button
-					type="button"
-					className={`${styles.searchCloseBtn} ${isExpanded ? styles.showClose : ''}`}
-					onClick={handleClose}
-					title={t('close')}
-					tabIndex={isExpanded ? 0 : -1}
+			<Tooltip content={t('search_players')} position="bottom" disabled={isExpanded} offset="navbar">
+				<div
+					className={`${styles.searchBox} ${isExpanded ? styles.expanded : ''}`}
+					onClick={handleBoxClick}
+					role="button"
+					tabIndex={isExpanded ? -1 : 0}
+					aria-label={t('search_players')}
+					onKeyDown={(e) => {
+						if (!isExpanded && (e.key === 'Enter' || e.key === ' ')) {
+							setIsExpanded(true);
+						}
+					}}
 				>
-					<X size={14} aria-hidden="true" />
-				</button>
-			</div>
+					<span className={styles.searchIcon}>
+						<Search size={18} aria-hidden="true" />
+					</span>
+					<input
+						ref={inputRef}
+						type="text"
+						placeholder={isExpanded ? t('search_placeholder') : ''}
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+						className={styles.navbarSearchInput}
+						tabIndex={isExpanded ? 0 : -1}
+					/>
+					{isSearching && isExpanded && <span className={styles.searchSpinner}></span>}
+					<button
+						type="button"
+						className={`${styles.searchCloseBtn} ${isExpanded ? styles.showClose : ''}`}
+						onClick={handleClose}
+						title={t('close')}
+						tabIndex={isExpanded ? 0 : -1}
+					>
+						<X size={14} aria-hidden="true" />
+					</button>
+				</div>
+			</Tooltip>
 
 			{isExpanded && showResults && searchResults.length > 0 && (
 				<div className={styles.navSearchResults}>

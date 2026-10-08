@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell, BellOff, Users, UserCheck, MessageSquare, Swords, Check, X } from 'lucide-react';
+import Tooltip from '../Tooltip/Tooltip';
 import styles from './NotificationBell.module.css';
 
 
@@ -13,15 +14,15 @@ export type Notification = {
     created_at: string
 }
 
-function NotificationBell({ userId }: { userId: number }) {
-    const { t } = useTranslation()
-    const [notifications, setNotifications] = useState<Notification[]>([])
-    const [unreadCount, setUnreadCount] = useState(0)
-    const [isOpen, setIsOpen] = useState(false)
-    const [filter, setFilter] = useState<'all' | 'unread'>('all')
-    const [loading, setLoading] = useState(false)
-    const [actionLoading, setActionLoading] = useState<Record<number, boolean>>({})
-    const [actionFeedback, setActionFeedback] = useState<Record<number, string>>({})
+const NotificationBell = ({ userId }: { userId: number }) => {
+    const { t } = useTranslation();
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [isOpen, setIsOpen] = useState(false);
+    const [filter, setFilter] = useState<'all' | 'unread'>('all');
+    const [loading, setLoading] = useState(false);
+    const [actionLoading, setActionLoading] = useState<Record<number, boolean>>({});
+    const [actionFeedback, setActionFeedback] = useState<Record<number, string>>({});
 
     const containerRef = useRef<HTMLDivElement>(null)
     const navigate = useNavigate()
@@ -83,63 +84,68 @@ function NotificationBell({ userId }: { userId: number }) {
 
     // Initial fetch on mount
     useEffect(() => {
-        if (userId) {
-            fetchNotifications(true)
-            fetchUnreadCount()
-        }
-    }, [userId, fetchNotifications, fetchUnreadCount])
+        if (!userId) return;
+        const initialTimer = setTimeout(() => {
+            fetchNotifications(true);
+            fetchUnreadCount();
+        }, 0);
+        return () => clearTimeout(initialTimer);
+    }, [userId, fetchNotifications, fetchUnreadCount]);
 
     // Polling interval:
     // If dropdown is open -> fetch full notifications list every 3s so live updates show in real-time
     // If dropdown is closed -> poll unread count every 3s
     useEffect(() => {
-        if (!userId) return
+        if (!userId) return;
 
         const interval = setInterval(() => {
             if (isOpen) {
-                fetchNotifications(false)
+                fetchNotifications(false);
             } else {
-                fetchUnreadCount()
+                fetchUnreadCount();
             }
-        }, 3000)
+        }, 3000);
 
-        return () => clearInterval(interval)
-    }, [userId, isOpen, fetchNotifications, fetchUnreadCount])
+        return () => clearInterval(interval);
+    }, [userId, isOpen, fetchNotifications, fetchUnreadCount]);
 
     // Fetch immediately when opening dropdown
     const toggleDropdown = () => {
         setIsOpen((prev) => {
-            const next = !prev
+            const next = !prev;
             if (next) {
-                fetchNotifications(false)
+                fetchNotifications(false);
             }
-            return next
-        })
-    }
+            return next;
+        });
+    };
 
     // Refresh when user focuses or returns to tab
     useEffect(() => {
         const handleFocus = () => {
             if (userId) {
-                fetchUnreadCount()
+                fetchUnreadCount();
                 if (isOpen) {
-                    fetchNotifications(false)
+                    fetchNotifications(false);
                 }
             }
-        }
+        };
 
-        window.addEventListener('focus', handleFocus)
-        document.addEventListener('visibilitychange', handleFocus)
+        window.addEventListener('focus', handleFocus);
+        document.addEventListener('visibilitychange', handleFocus);
         return () => {
-            window.removeEventListener('focus', handleFocus)
-            document.removeEventListener('visibilitychange', handleFocus)
-        }
-    }, [userId, isOpen, fetchUnreadCount, fetchNotifications])
+            window.removeEventListener('focus', handleFocus);
+            document.removeEventListener('visibilitychange', handleFocus);
+        };
+    }, [userId, isOpen, fetchUnreadCount, fetchNotifications]);
 
     // Close dropdown on route change
     useEffect(() => {
-        setIsOpen(false)
-    }, [location.pathname])
+        const routeTimer = setTimeout(() => {
+            setIsOpen(false);
+        }, 0);
+        return () => clearTimeout(routeTimer);
+    }, [location.pathname]);
 
     // Click outside and Escape key to close dropdown
     useEffect(() => {
@@ -262,41 +268,47 @@ function NotificationBell({ userId }: { userId: number }) {
         }
         if (notif.message.startsWith('{')) {
             try {
-                const parsed = JSON.parse(notif.message)
-                return parsed.key === 'notification_friend_request'
-            } catch {}
+                const parsed = JSON.parse(notif.message);
+                return parsed.key === 'notification_friend_request';
+            } catch {
+                // Ignore JSON parse errors for plain text messages
+            }
         }
-        return false
-    }
+        return false;
+    };
 
     // Helper to extract username from friend request notification
     const extractUsername = (notif: Notification): string | null => {
         if (notif.link && notif.link.startsWith('/profile/')) {
-            const parts = notif.link.replace('/profile/', '').split('/')
-            if (parts[0]) return parts[0]
+            const parts = notif.link.replace('/profile/', '').split('/');
+            if (parts[0]) return parts[0];
         }
         if (notif.message.startsWith('{')) {
             try {
-                const parsed = JSON.parse(notif.message)
-                if (parsed.username) return parsed.username
-            } catch {}
+                const parsed = JSON.parse(notif.message);
+                if (parsed.username) return parsed.username;
+            } catch {
+                // Ignore JSON parse errors for plain text messages
+            }
         }
-        const match = notif.message.match(/^(.+?)\s+sent you a friend request/)
-        return match ? match[1] : null
-    }
+        const match = notif.message.match(/^(.+?)\s+sent you a friend request/);
+        return match ? match[1] : null;
+    };
 
     // Helper to render notification message (either JSON key or plain text)
     const renderNotificationMessage = (msg: string): string => {
         if (msg.startsWith('{')) {
             try {
-                const parsed = JSON.parse(msg)
+                const parsed = JSON.parse(msg);
                 if (parsed.key) {
-                    return String(t(parsed.key, parsed))
+                    return String(t(parsed.key, parsed));
                 }
-            } catch {}
+            } catch {
+                // Ignore JSON parse errors for plain text messages
+            }
         }
-        return String(t(msg, msg))
-    }
+        return String(t(msg, msg));
+    };
 
     // Quick Accept friend request
     const handleAcceptFriend = async (notif: Notification, e: React.MouseEvent) => {
@@ -419,27 +431,29 @@ function NotificationBell({ userId }: { userId: number }) {
 
     return (
         <div className={styles.notificationBellContainer} ref={containerRef}>
-            <div
-                className={`${styles.bellIcon} ${isOpen ? styles.active : ''}`}
-                onClick={toggleDropdown}
-                role="button"
-                tabIndex={0}
-                aria-label={t('notifications')}
-                aria-expanded={isOpen}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        toggleDropdown();
-                    }
-                }}
-            >
-                <Bell size={20} className={styles.bellSymbol} aria-hidden="true" />
-                {unreadCount > 0 && (
-                    <span className={styles.notificationBadge}>
-                        {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                )}
-            </div>
+            <Tooltip content={t('notifications')} position="bottom" disabled={isOpen} offset="navbar">
+                <div
+                    className={`${styles.bellIcon} ${isOpen ? styles.active : ''}`}
+                    onClick={toggleDropdown}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={t('notifications')}
+                    aria-expanded={isOpen}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            toggleDropdown();
+                        }
+                    }}
+                >
+                    <Bell size={20} className={styles.bellSymbol} aria-hidden="true" />
+                    {unreadCount > 0 && (
+                        <span className={styles.notificationBadge}>
+                            {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
+                    )}
+                </div>
+            </Tooltip>
 
             {isOpen && (
                 <div className={styles.notificationDropdown}>
@@ -591,7 +605,7 @@ function NotificationBell({ userId }: { userId: number }) {
                 </div>
             )}
         </div>
-    )
-}
+    );
+};
 
-export default NotificationBell
+export default NotificationBell;

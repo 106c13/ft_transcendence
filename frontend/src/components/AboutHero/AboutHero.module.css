@@ -36,62 +36,18 @@
 	margin-top: 2px;
 }
 
-.nicknameWrapper {
-	position: relative;
-	display: inline-block;
-}
-
 .nicknameLink {
 	color: #60A5FA;
 	text-decoration: none;
 	font-weight: 600;
 	padding: 2px 4px;
-	border-radius: 4px;
-	transition: color 0.15s ease, background 0.15s ease;
+	border-radius: var(--radius-sm);
+	transition: color var(--transition-fast), background var(--transition-fast);
 }
 
 .nicknameLink:hover {
 	color: #93C5FD;
 	background: rgba(96, 165, 250, 0.12);
-}
-
-.nameTooltip {
-	position: absolute;
-	bottom: calc(100% + 9px);
-	left: 50%;
-	transform: translateX(-50%) translateY(4px);
-	background: #0F172A;
-	border: 1px solid rgba(148, 163, 184, 0.25);
-	color: #F8FAFC;
-	font-size: 12px;
-	font-weight: 600;
-	padding: 4px 10px;
-	border-radius: 6px;
-	white-space: nowrap;
-	pointer-events: none;
-	opacity: 0;
-	transition: opacity 0.15s ease, transform 0.15s ease;
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
-	z-index: 50;
-}
-
-/* Pointy arrow with matching border */
-.nameTooltip::after {
-	content: '';
-	position: absolute;
-	bottom: -5px;
-	left: 50%;
-	transform: translateX(-50%) rotate(45deg);
-	width: 8px;
-	height: 8px;
-	background: #0F172A;
-	border-right: 1px solid rgba(148, 163, 184, 0.25);
-	border-bottom: 1px solid rgba(148, 163, 184, 0.25);
-}
-
-.nicknameWrapper:hover .nameTooltip {
-	opacity: 1;
-	transform: translateX(-50%) translateY(0);
 }
 
 @media (max-width: 768px) {

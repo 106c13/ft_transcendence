@@ -129,34 +129,6 @@
 	background: var(--color-slate-500);
 }
 
-.tooltip {
-	position: absolute;
-	bottom: -28px;
-	left: 50%;
-	transform: translateX(-50%) translateY(4px);
-	background: rgba(15, 23, 42, 0.95);
-	backdrop-filter: blur(6px);
-	border: 1px solid var(--color-border-subtle);
-	color: var(--color-slate-50);
-	font-size: var(--font-size-xs);
-	font-weight: 600;
-	padding: 2px var(--padding-sm);
-	border-radius: var(--radius-md);
-	white-space: nowrap;
-	pointer-events: none;
-	opacity: 0;
-	visibility: hidden;
-	transition: all var(--transition-fast);
-	z-index: var(--z-dropdown);
-	box-shadow: var(--shadow-lg);
-}
-
-.avatarItem:hover .tooltip {
-	opacity: 1;
-	visibility: visible;
-	transform: translateX(-50%) translateY(0);
-}
-
 .emptyState {
 	display: flex;
 	align-items: center;

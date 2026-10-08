@@ -1,9 +1,10 @@
-import { useTranslation } from 'react-i18next'
-import { DEVS } from '../../utils/aboutUtils'
-import styles from './AboutHero.module.css'
+import { useTranslation } from 'react-i18next';
+import { DEVS } from '../../utils/aboutUtils';
+import Tooltip from '../Tooltip/Tooltip';
+import styles from './AboutHero.module.css';
 
-export default function AboutHero() {
-	const { t } = useTranslation()
+const AboutHero = () => {
+	const { t } = useTranslation();
 
 	return (
 		<section className={styles.heroSection}>
@@ -11,7 +12,7 @@ export default function AboutHero() {
 
 			<p className={styles.heroLead}>
 				This project has been created as part of the 42 curriculum by{' '}
-				<span className={styles.nicknameWrapper}>
+				<Tooltip content={DEVS.arman.name} position="top" inline>
 					<a
 						href={DEVS.arman.intraUrl}
 						target="_blank"
@@ -20,10 +21,9 @@ export default function AboutHero() {
 					>
 						{DEVS.arman.handle}
 					</a>
-					<span className={styles.nameTooltip}>{DEVS.arman.name}</span>
-				</span>
+				</Tooltip>
 				,{' '}
-				<span className={styles.nicknameWrapper}>
+				<Tooltip content={DEVS.narek.name} position="top" inline>
 					<a
 						href={DEVS.narek.intraUrl}
 						target="_blank"
@@ -32,10 +32,9 @@ export default function AboutHero() {
 					>
 						{DEVS.narek.handle}
 					</a>
-					<span className={styles.nameTooltip}>{DEVS.narek.name}</span>
-				</span>{' '}
+				</Tooltip>{' '}
 				and{' '}
-				<span className={styles.nicknameWrapper}>
+				<Tooltip content={DEVS.hakob.name} position="top" inline>
 					<a
 						href={DEVS.hakob.intraUrl}
 						target="_blank"
@@ -44,8 +43,7 @@ export default function AboutHero() {
 					>
 						{DEVS.hakob.handle}
 					</a>
-					<span className={styles.nameTooltip}>{DEVS.hakob.name}</span>
-				</span>
+				</Tooltip>
 				.
 			</p>
 
@@ -53,5 +51,8 @@ export default function AboutHero() {
 				{t('about_curriculum_badge')}
 			</div>
 		</section>
-	)
-}
+	);
+};
+
+export default AboutHero;
+

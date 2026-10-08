@@ -11,17 +11,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
+    border-radius: var(--radius-2xl);
     cursor: pointer;
     position: relative;
     user-select: none;
-    transition: background 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+    transition: color var(--transition-normal);
     outline: none;
+    background: transparent;
 }
 
 .bellIcon:hover {
-    background: rgba(96, 165, 250, 0.12);
-    transform: translateY(-1px);
+    background: transparent;
 }
 
 .bellIcon:focus-visible {
@@ -29,7 +29,7 @@
 }
 
 .bellIcon.active {
-    background: rgba(96, 165, 250, 0.18);
+    background: transparent;
 }
 
 .bellSymbol {
@@ -42,7 +42,8 @@
     color: var(--color-slate-100);
 }
 
-.bellIcon.active .bellSymbol {
+.bellIcon.active .bellSymbol,
+.bellIcon.active:hover .bellSymbol {
     color: var(--color-blue-400);
 }
 
@@ -82,29 +83,44 @@
 /* Dropdown */
 .notificationDropdown {
     position: absolute;
-    top: 52px;
-    right: 0;
+    top: 64px;
+    left: 50%;
+    transform: translateX(-50%);
     width: 360px;
     max-height: 490px;
-    background: #1E293B;
-    border-radius: 14px;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-2xl);
     border: 1px solid rgba(148, 163, 184, 0.2);
     box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
     z-index: 10001;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
     animation: fadeInDown 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Pointy arrow */
+.notificationDropdown::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -4px;
+    width: 8px;
+    height: 8px;
+    background: var(--color-bg-card);
+    transform: translateX(-50%) rotate(45deg);
+    border-left: 1px solid rgba(148, 163, 184, 0.2);
+    border-top: 1px solid rgba(148, 163, 184, 0.2);
+    z-index: 2;
+}
+
 @keyframes fadeInDown {
     from {
         opacity: 0;
-        transform: translateY(-8px);
+        transform: translateX(-50%) translateY(-8px);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(-50%) translateY(0);
     }
 }
 
@@ -116,6 +132,8 @@
     padding: 14px 16px 10px 16px;
     border-bottom: 1px solid rgba(148, 163, 184, 0.12);
     gap: 8px;
+    border-top-left-radius: var(--radius-2xl);
+    border-top-right-radius: var(--radius-2xl);
 }
 
 .headerTitleGroup {
@@ -209,6 +227,8 @@
     max-height: 380px;
     overflow-y: auto;
     overflow-x: hidden;
+    border-bottom-left-radius: var(--radius-2xl);
+    border-bottom-right-radius: var(--radius-2xl);
 }
 
 .notificationList::-webkit-scrollbar {
@@ -428,6 +448,8 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
+    border-bottom-left-radius: var(--radius-2xl);
+    border-bottom-right-radius: var(--radius-2xl);
 }
 
 .emptyIcon {
@@ -448,6 +470,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border-bottom-left-radius: var(--radius-2xl);
+    border-bottom-right-radius: var(--radius-2xl);
 }
 
 .spinner {
@@ -462,6 +486,14 @@
 @keyframes spin {
     to {
         transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 480px) {
+    .notificationDropdown {
+        width: min(340px, calc(100vw - 32px));
+        left: 50%;
+        transform: translateX(-50%);
     }
 }
 

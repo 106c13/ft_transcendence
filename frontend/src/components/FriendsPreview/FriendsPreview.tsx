@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Users, ArrowRight } from 'lucide-react';
 import type { User } from '../../utils/profileUtils';
+import Tooltip from '../Tooltip/Tooltip';
 import styles from './FriendsPreview.module.css';
 
 type Props = {
@@ -39,35 +40,35 @@ const FriendsPreview = ({ friends, onFriendClick, onSeeAll }: Props) => {
 			) : (
 				<div className={styles.avatarsList}>
 					{displayedFriends.map((friend) => (
-						<div
-							key={friend.username}
-							className={styles.avatarItem}
-							onClick={() => onFriendClick(friend.username)}
-							role="button"
-							tabIndex={0}
-						>
-							<img
-								src={friend.avatar && friend.avatar !== 'default.jpg' ? `/uploads/${friend.avatar}` : '/assets/default.jpg'}
-								alt={friend.username}
-								className={styles.avatarImg}
-								onError={(e) => {
-									const target = e.currentTarget;
-									if (!target.src.endsWith('/assets/default.jpg')) {
-										target.src = '/assets/default.jpg';
-									}
-								}}
-							/>
-							<span
-								className={`${styles.statusDot} ${
-									friend.status === 'ONLINE'
-										? styles.online
-										: friend.status === 'INGAME'
-										? styles.ingame
-										: styles.offline
-								}`}
-							/>
-							<div className={styles.tooltip}>{friend.username}</div>
-						</div>
+						<Tooltip key={friend.username} content={friend.username} position="bottom">
+							<div
+								className={styles.avatarItem}
+								onClick={() => onFriendClick(friend.username)}
+								role="button"
+								tabIndex={0}
+							>
+								<img
+									src={friend.avatar && friend.avatar !== 'default.jpg' ? `/uploads/${friend.avatar}` : '/assets/default.jpg'}
+									alt={friend.username}
+									className={styles.avatarImg}
+									onError={(e) => {
+										const target = e.currentTarget;
+										if (!target.src.endsWith('/assets/default.jpg')) {
+											target.src = '/assets/default.jpg';
+										}
+									}}
+								/>
+								<span
+									className={`${styles.statusDot} ${
+										friend.status === 'ONLINE'
+											? styles.online
+											: friend.status === 'INGAME'
+											? styles.ingame
+											: styles.offline
+									}`}
+								/>
+							</div>
+						</Tooltip>
 					))}
 				</div>
 			)}
