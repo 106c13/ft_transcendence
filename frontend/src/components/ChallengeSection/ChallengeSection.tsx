@@ -6,6 +6,7 @@ import styles from './ChallengeSection.module.css';
 type Friend = {
 	username: string;
 	avatar: string | null;
+	status?: string;
 };
 
 type Props = {
@@ -82,6 +83,20 @@ const ChallengeSection = ({
 		f.username.toLocaleLowerCase().includes(searchQuery.trim().toLowerCase())
 	)
 
+	const getStatusDotClass = (status?: string) => {
+		const s = status?.toUpperCase();
+		if (s === 'ONLINE') return styles.online;
+		if (s === 'INGAME') return styles.ingame;
+		return styles.offline;
+	};
+
+	const getStatusLabel = (status?: string) => {
+		const s = status?.toUpperCase();
+		if (s === 'ONLINE') return t('online');
+		if (s === 'INGAME') return t('in_game');
+		return t('offline');
+	};
+
 	return (
 		<div className={styles.challengeSection}>
 			<div className={styles.challengeRow}>
@@ -110,17 +125,23 @@ const ChallengeSection = ({
 						<div className={styles.triggerContent}>
 							{selectedFriendObj ? (
 								<>
-									<img
-										src={selectedFriendObj.avatar && selectedFriendObj.avatar !== 'default.jpg' ? `/uploads/${selectedFriendObj.avatar}` : '/assets/default.jpg'}
-										alt={selectedFriendObj.username}
-										className={styles.triggerAvatar}
-										onError={(e) => {
-											const target = e.currentTarget;
-											if (!target.src.endsWith('/assets/default.jpg')) {
-												target.src = '/assets/default.jpg';
-											}
-										}}
-									/>
+									<div className={styles.triggerAvatarWrapper}>
+										<img
+											src={selectedFriendObj.avatar && selectedFriendObj.avatar !== 'default.jpg' ? `/uploads/${selectedFriendObj.avatar}` : '/assets/default.jpg'}
+											alt={selectedFriendObj.username}
+											className={styles.triggerAvatar}
+											onError={(e) => {
+												const target = e.currentTarget;
+												if (!target.src.endsWith('/assets/default.jpg')) {
+													target.src = '/assets/default.jpg';
+												}
+											}}
+										/>
+										<span
+											className={`${styles.statusDot} ${getStatusDotClass(selectedFriendObj.status)}`}
+											title={getStatusLabel(selectedFriendObj.status)}
+										/>
+									</div>
 									<span className={styles.triggerSelectedName}>{selectedFriendObj.username}</span>
 								</>
 							) : (
@@ -222,17 +243,23 @@ const ChallengeSection = ({
 												className={`${styles.dropdownOption} ${isSelected ? styles.optionSelected : ''}`}
 												onClick={() => handleSelect(friend.username)}
 											>
-												<img
-													src={friend.avatar && friend.avatar !== 'default.jpg' ? `/uploads/${friend.avatar}` : '/assets/default.jpg'}
-													alt={friend.username}
-													className={styles.optionAvatar}
-													onError={(e) => {
-														const target = e.currentTarget;
-														if (!target.src.endsWith('/assets/default.jpg')) {
-															target.src = '/assets/default.jpg';
-														}
-													}}
-												/>
+												<div className={styles.optionAvatarWrapper}>
+													<img
+														src={friend.avatar && friend.avatar !== 'default.jpg' ? `/uploads/${friend.avatar}` : '/assets/default.jpg'}
+														alt={friend.username}
+														className={styles.optionAvatar}
+														onError={(e) => {
+															const target = e.currentTarget;
+															if (!target.src.endsWith('/assets/default.jpg')) {
+																target.src = '/assets/default.jpg';
+															}
+														}}
+													/>
+													<span
+														className={`${styles.statusDot} ${getStatusDotClass(friend.status)}`}
+														title={getStatusLabel(friend.status)}
+													/>
+												</div>
 												<span className={styles.optionUsername}>{friend.username}</span>
 												{isSelected && (
 													<span className={styles.optionCheck}>

@@ -79,8 +79,9 @@ const HomePage = () => {
 		return friends.map(f => ({
 			username: f.username,
 			avatar: f.avatar || null,
-		}))
-	}, [friends])
+			status: f.status,
+		}));
+	}, [friends]);
 
 	const handlePlayMode = (mode: GameModeType) => {
 		if (challengeActive) {
