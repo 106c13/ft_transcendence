@@ -41,6 +41,47 @@
 	color: #F1F5F9;
 }
 
+.headerActions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.reanalyzeBtn {
+	background: rgba(56, 189, 248, 0.1);
+	color: #38BDF8;
+	border: 1px solid rgba(56, 189, 248, 0.3);
+	padding: 5px 12px;
+	border-radius: 8px;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	transition: all 0.2s ease;
+}
+
+.reanalyzeBtn:hover:not(:disabled) {
+	background: rgba(56, 189, 248, 0.2);
+	border-color: #38BDF8;
+	color: #E0F2FE;
+}
+
+.reanalyzeBtn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.spinIcon {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
 .modeBadge {
 	font-size: 11px;
 	font-weight: 700;
@@ -409,6 +450,7 @@
 }
 
 .chipBrilliant { background: rgba(56, 189, 248, 0.15); color: #38BDF8; }
+.chipGreat { background: rgba(14, 165, 233, 0.15); color: #38BDF8; }
 .chipBest { background: rgba(34, 197, 94, 0.15); color: #4ADE80; }
 .chipMistake { background: rgba(249, 115, 22, 0.15); color: #FB923C; }
 .chipBlunder { background: rgba(239, 68, 68, 0.15); color: #F87171; }

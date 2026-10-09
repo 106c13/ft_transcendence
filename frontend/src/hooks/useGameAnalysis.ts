@@ -21,12 +21,12 @@ export function useGameAnalysis() {
 
 	const moveListRef = useRef<HTMLDivElement>(null)
 
-	const selectGame = useCallback(async (match: MatchRecord) => {
+	const selectGame = useCallback(async (match: MatchRecord, force = false) => {
 		setSelectedGame(match)
 		setCurrentPly(-1)
 		setShowBestMoveHint(true)
 
-		if (match.analysis) {
+		if (!force && match.analysis) {
 			setAnalysisData(match.analysis)
 			setIsAnalyzing(false)
 			return
@@ -37,7 +37,8 @@ export function useGameAnalysis() {
 
 		try {
 			const token = localStorage.getItem('token')
-			const res = await fetch(`/api/game/analyze/${match.id}`, {
+			const url = force ? `/api/game/analyze/${match.id}?force=true` : `/api/game/analyze/${match.id}`
+			const res = await fetch(url, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
@@ -171,12 +172,37 @@ export function useGameAnalysis() {
 			}
 		}
 
-		const winChanceWhite = currentPosition.winChance
-		const winChanceBlack = Math.round((100 - winChanceWhite) * 10) / 10
+		// Checkmate condition
+		if (displayChess.isCheckmate() || currentPosition.mate === 0) {
+			const isWhiteWinner = displayChess.turn() === 'b' || currentPosition.score > 0
+			return {
+				winChanceWhite: isWhiteWinner ? 100 : 0,
+				winChanceBlack: isWhiteWinner ? 0 : 100,
+				scoreText: isWhiteWinner ? '1-0' : '0-1',
+				isWhiteAdvantage: isWhiteWinner,
+			}
+		}
 
+		// Stalemate / draw
+		if (displayChess.isDraw()) {
+			return {
+				winChanceWhite: 50,
+				winChanceBlack: 50,
+				scoreText: '½-½',
+				isWhiteAdvantage: true,
+			}
+		}
+
+		let winChanceWhite = currentPosition.winChance
+		let winChanceBlack = Math.round((100 - winChanceWhite) * 10) / 10
 		let scoreText = '0.0'
+		let isWhiteAdvantage = currentPosition.score >= 0
+
 		if (currentPosition.mate !== null) {
 			scoreText = `M${Math.abs(currentPosition.mate)}`
+			isWhiteAdvantage = currentPosition.mate > 0
+			winChanceWhite = currentPosition.mate > 0 ? 100 : 0
+			winChanceBlack = currentPosition.mate > 0 ? 0 : 100
 		} else {
 			const pawns = currentPosition.score / 100
 			scoreText = pawns > 0 ? `+${pawns.toFixed(1)}` : `${pawns.toFixed(1)}`
@@ -186,9 +212,9 @@ export function useGameAnalysis() {
 			winChanceWhite,
 			winChanceBlack,
 			scoreText,
-			isWhiteAdvantage: currentPosition.score >= 0,
+			isWhiteAdvantage,
 		}
-	}, [currentPosition])
+	}, [currentPosition, displayChess])
 
 	const isSuboptimalMove = currentPosition && ['inaccuracy', 'mistake', 'blunder'].includes(currentPosition.classification)
 

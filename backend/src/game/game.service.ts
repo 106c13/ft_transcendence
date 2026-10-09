@@ -1064,7 +1064,7 @@ export class GameService {
 		};
 	}
 
-	async analyzeMatch(id: number): Promise<any> {
+	async analyzeMatch(id: number, force = false): Promise<any> {
 		const match = await this.matchRepo.findOne({
 			where: { id },
 			relations: ['white', 'black', 'winner'],
@@ -1074,7 +1074,7 @@ export class GameService {
 			throw new NotFoundException('match_not_found');
 		}
 
-		if (match.analysis) {
+		if (!force && match.analysis) {
 			return match.analysis;
 		}
 

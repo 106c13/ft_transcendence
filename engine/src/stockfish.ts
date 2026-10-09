@@ -69,12 +69,24 @@ export class StockfishService {
 
 					const mateMatch = line.match(/score mate (-?\d+)/);
 					if (mateMatch) {
-						let mateIn = parseInt(mateMatch[1], 10);
-						if (turn === 'b') {
-							mateIn = -mateIn;
+						const mateIn = parseInt(mateMatch[1], 10);
+						if (mateIn === 0) {
+							// Side to move is checkmated
+							if (turn === 'b') {
+								latestMate = 0;
+								latestScore = 10000; // White delivered mate
+							} else {
+								latestMate = 0;
+								latestScore = -10000; // Black delivered mate
+							}
+						} else if (turn === 'w') {
+							latestMate = mateIn;
+							latestScore = mateIn > 0 ? 10000 - mateIn * 100 : -10000 + Math.abs(mateIn) * 100;
+						} else {
+							// turn === 'b'
+							latestMate = -mateIn;
+							latestScore = mateIn > 0 ? -10000 + mateIn * 100 : 10000 - Math.abs(mateIn) * 100;
 						}
-						latestMate = mateIn;
-						latestScore = mateIn > 0 ? 10000 - mateIn * 100 : -10000 - mateIn * 100;
 					}
 
 					const pvIndex = line.indexOf(' pv ');

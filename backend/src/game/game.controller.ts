@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { GameService } from './game.service';
 import { RatingService } from './rating.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -17,8 +17,8 @@ export class GameController {
 	}
 
 	@Get('analyze/:id')
-	async analyzeMatch(@Param('id') id: string) {
-		return this.gameService.analyzeMatch(parseInt(id, 10));
+	async analyzeMatch(@Param('id') id: string, @Query('force') force?: string) {
+		return this.gameService.analyzeMatch(parseInt(id, 10), force === 'true');
 	}
 
 	@Get('ratings/:username')

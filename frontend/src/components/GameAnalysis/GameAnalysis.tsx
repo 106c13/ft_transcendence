@@ -91,6 +91,7 @@ const GameAnalysis = ({ username, analysis, history, onBack }: Props) => {
 		displayChess,
 		evalInfo,
 		isSuboptimalMove,
+		selectGame,
 		closeAnalysis,
 		goToPly,
 		toggleBestMove,
@@ -280,9 +281,21 @@ const GameAnalysis = ({ username, analysis, history, onBack }: Props) => {
 						<ArrowLeft size={14} aria-hidden="true" />
 						<span>{t('back_to_games')}</span>
 					</button>
-					<span className={`${styles.modeBadge} ${styles[`mode${selectedGame.mode.replace('+', 'Plus')}`] || ''}`}>
-						{t(selectedGame.mode.toLowerCase())}
-					</span>
+					<div className={styles.headerActions}>
+						<button
+							type="button"
+							className={styles.reanalyzeBtn}
+							onClick={() => selectGame(selectedGame, true)}
+							disabled={isAnalyzing}
+							title={t('reanalyze_game')}
+						>
+							<RotateCw size={13} className={isAnalyzing ? styles.spinIcon : ''} aria-hidden="true" />
+							<span>{t('reanalyze')}</span>
+						</button>
+						<span className={`${styles.modeBadge} ${styles[`mode${selectedGame.mode.replace('+', 'Plus')}`] || ''}`}>
+							{t(selectedGame.mode.toLowerCase())}
+						</span>
+					</div>
 				</div>
 
 				<div className={styles.matchup}>
@@ -369,6 +382,12 @@ const GameAnalysis = ({ username, analysis, history, onBack }: Props) => {
 										<span>{analysisData.summary.white.brilliant}</span>
 									</span>
 								)}
+								{analysisData.summary.white.great > 0 && (
+									<span className={`${styles.chip} ${styles.chipGreat}`}>
+										<Sparkles size={12} aria-hidden="true" />
+										<span>{analysisData.summary.white.great}</span>
+									</span>
+								)}
 								<span className={`${styles.chip} ${styles.chipBest}`}>
 									<Star size={12} aria-hidden="true" />
 									<span>{analysisData.summary.white.best}</span>
@@ -398,6 +417,12 @@ const GameAnalysis = ({ username, analysis, history, onBack }: Props) => {
 									<span className={`${styles.chip} ${styles.chipBrilliant}`}>
 										<Gem size={12} aria-hidden="true" />
 										<span>{analysisData.summary.black.brilliant}</span>
+									</span>
+								)}
+								{analysisData.summary.black.great > 0 && (
+									<span className={`${styles.chip} ${styles.chipGreat}`}>
+										<Sparkles size={12} aria-hidden="true" />
+										<span>{analysisData.summary.black.great}</span>
 									</span>
 								)}
 								<span className={`${styles.chip} ${styles.chipBest}`}>
