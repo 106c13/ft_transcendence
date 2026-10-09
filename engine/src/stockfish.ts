@@ -1,12 +1,22 @@
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import * as readline from 'readline';
 
+export interface EngineLine {
+	score: number;
+	mate: number | null;
+	bestMove: string;
+	pv: string[];
+	depth: number;
+	multipv: number;
+}
+
 export interface EvalResult {
 	score: number; // centipawns from White's perspective (+ White, - Black)
 	mate: number | null; // mate in N from White's perspective (+ White mates, - Black mates)
 	bestMove: string; // e.g. "e2e4"
 	pv: string[]; // principal variation line e.g. ["e2e4", "e7e5", "g1f3"]
 	depth: number;
+	lines?: EngineLine[];
 }
 
 export class StockfishService {
@@ -16,8 +26,7 @@ export class StockfishService {
 		this.enginePath = enginePath;
 	}
 
-	async evaluatePosition(fen: string, depth: number = 15): Promise<EvalResult> {
-
+	async evaluatePosition(fen: string, depth: number = 15, multiPv: number = 1): Promise<EvalResult> {
 		return new Promise((resolve, reject) => {
 			let process: ChildProcessWithoutNullStreams;
 			try {
@@ -28,6 +37,7 @@ export class StockfishService {
 
 			const rl = readline.createInterface({ input: process.stdout });
 
+			const linesMap = new Map<number, EngineLine>();
 			let latestScore = 0;
 			let latestMate: number | null = null;
 			let latestPv: string[] = [];
@@ -40,22 +50,33 @@ export class StockfishService {
 				try {
 					process.kill();
 				} catch {}
+				const sortedLines = Array.from(linesMap.entries())
+					.sort(([a], [b]) => a - b)
+					.map(([_, l]) => l);
 				resolve({
-					score: latestScore,
-					mate: latestMate,
-					bestMove: bestMove || '0000',
-					pv: latestPv,
-					depth: latestDepth,
+					score: sortedLines[0]?.score ?? latestScore,
+					mate: sortedLines[0]?.mate ?? latestMate,
+					bestMove: sortedLines[0]?.bestMove || bestMove || '0000',
+					pv: sortedLines[0]?.pv ?? latestPv,
+					depth: sortedLines[0]?.depth ?? latestDepth,
+					lines: sortedLines,
 				});
 			}, 6000);
-
 
 			rl.on('line', (line: string) => {
 				if (line.startsWith('info') && line.includes('score')) {
 					const depthMatch = line.match(/depth (\d+)/);
+					let curDepth = latestDepth;
 					if (depthMatch) {
-						latestDepth = parseInt(depthMatch[1], 10);
+						curDepth = parseInt(depthMatch[1], 10);
+						latestDepth = curDepth;
 					}
+
+					const multipvMatch = line.match(/multipv (\d+)/);
+					const multipvNum = multipvMatch ? parseInt(multipvMatch[1], 10) : 1;
+
+					let lineScore = 0;
+					let lineMate: number | null = null;
 
 					const cpMatch = line.match(/score cp (-?\d+)/);
 					if (cpMatch) {
@@ -63,36 +84,57 @@ export class StockfishService {
 						if (turn === 'b') {
 							cp = -cp;
 						}
-						latestScore = cp;
-						latestMate = null;
+						lineScore = cp;
+						lineMate = null;
+						if (multipvNum === 1) {
+							latestScore = cp;
+							latestMate = null;
+						}
 					}
 
 					const mateMatch = line.match(/score mate (-?\d+)/);
 					if (mateMatch) {
 						const mateIn = parseInt(mateMatch[1], 10);
 						if (mateIn === 0) {
-							// Side to move is checkmated
 							if (turn === 'b') {
-								latestMate = 0;
-								latestScore = 10000; // White delivered mate
+								lineMate = 0;
+								lineScore = 10000;
 							} else {
-								latestMate = 0;
-								latestScore = -10000; // Black delivered mate
+								lineMate = 0;
+								lineScore = -10000;
 							}
 						} else if (turn === 'w') {
-							latestMate = mateIn;
-							latestScore = mateIn > 0 ? 10000 - mateIn * 100 : -10000 + Math.abs(mateIn) * 100;
+							lineMate = mateIn;
+							lineScore = mateIn > 0 ? 10000 - mateIn * 100 : -10000 + Math.abs(mateIn) * 100;
 						} else {
-							// turn === 'b'
-							latestMate = -mateIn;
-							latestScore = mateIn > 0 ? -10000 + mateIn * 100 : 10000 - Math.abs(mateIn) * 100;
+							lineMate = -mateIn;
+							lineScore = mateIn > 0 ? -10000 + mateIn * 100 : 10000 - Math.abs(mateIn) * 100;
+						}
+						if (multipvNum === 1) {
+							latestMate = lineMate;
+							latestScore = lineScore;
 						}
 					}
 
+					let linePv: string[] = [];
 					const pvIndex = line.indexOf(' pv ');
 					if (pvIndex !== -1) {
 						const pvStr = line.substring(pvIndex + 4).trim();
-						latestPv = pvStr.split(/\s+/).filter(Boolean);
+						linePv = pvStr.split(/\s+/).filter(Boolean);
+						if (multipvNum === 1) {
+							latestPv = linePv;
+						}
+					}
+
+					if (linePv.length > 0) {
+						linesMap.set(multipvNum, {
+							score: lineScore,
+							mate: lineMate,
+							bestMove: linePv[0],
+							pv: linePv,
+							depth: curDepth,
+							multipv: multipvNum,
+						});
 					}
 				}
 
@@ -104,12 +146,17 @@ export class StockfishService {
 						process.kill();
 					} catch {}
 
+					const sortedLines = Array.from(linesMap.entries())
+						.sort(([a], [b]) => a - b)
+						.map(([_, l]) => l);
+
 					resolve({
-						score: latestScore,
-						mate: latestMate,
-						bestMove: bestMove,
-						pv: latestPv,
-						depth: latestDepth,
+						score: sortedLines[0]?.score ?? latestScore,
+						mate: sortedLines[0]?.mate ?? latestMate,
+						bestMove: sortedLines[0]?.bestMove || bestMove,
+						pv: sortedLines[0]?.pv ?? latestPv,
+						depth: sortedLines[0]?.depth ?? latestDepth,
+						lines: sortedLines,
 					});
 				}
 			});
@@ -120,6 +167,9 @@ export class StockfishService {
 			});
 
 			process.stdin.write('uci\n');
+			if (multiPv > 1) {
+				process.stdin.write(`setoption name MultiPV value ${multiPv}\n`);
+			}
 			process.stdin.write('isready\n');
 			process.stdin.write(`position fen ${fen}\n`);
 			process.stdin.write(`go depth ${depth}\n`);

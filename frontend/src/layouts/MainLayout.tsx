@@ -36,7 +36,7 @@ export default function MainLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const token = localStorage.getItem('token')
-  const isPublicRoute = location.pathname === '/about'
+  const isPublicRoute = location.pathname === '/about' || location.pathname.startsWith('/analyze')
 
   useEffect(() => {
     if (!token) {
@@ -94,7 +94,8 @@ export default function MainLayout() {
 
   const isChatRoute = location.pathname.startsWith('/chat')
   const isGameRoute = location.pathname.startsWith('/game') && !location.pathname.startsWith('/game/analysis')
-  const showFooter = !isChatRoute && !isGameRoute
+  const isAnalyzeRoute = location.pathname.startsWith('/analyze') || location.pathname.startsWith('/game/analysis')
+  const showFooter = !isChatRoute && !isGameRoute && !isAnalyzeRoute
 
   return (
     <div className="app-layout">

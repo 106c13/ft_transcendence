@@ -171,6 +171,7 @@
 
 @media (max-width: 950px) {
   .gameContainer {
+    --board-size: min(92vw, 480px);
     height: auto;
     min-height: 100vh;
     max-height: none;

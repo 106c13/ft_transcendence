@@ -25,6 +25,7 @@ type Props = {
 	selectedMode?: string
 	capturedPieces?: PieceCapture[]
 	materialDiff?: number
+	hideClock?: boolean
 }
 
 export function formatTime(timeMs: number) {
@@ -58,6 +59,7 @@ const PlayerBanner = ({
 	selectedMode = 'blitz',
 	capturedPieces,
 	materialDiff,
+	hideClock = false,
 }: Props) => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
@@ -309,7 +311,7 @@ const PlayerBanner = ({
 				</div>
 
 				{/* Clock */}
-				<div className={styles.gameClock}>{formatTime(time)}</div>
+				{!hideClock && <div className={styles.gameClock}>{formatTime(time)}</div>}
 			</div>
 		</div>
 	);

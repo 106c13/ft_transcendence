@@ -1107,6 +1107,44 @@ export class GameService {
 
 		return analysisData;
 	}
+
+	async analyzePgn(pgn: string, depth = 15): Promise<any> {
+		if (!pgn) {
+			return { accuracy: { white: 100, black: 100 }, summary: { white: {}, black: {} }, positions: [] };
+		}
+		const engineUrl = process.env.ENGINE_URL || 'http://engine:5000/analyze';
+		const response = await fetch(engineUrl, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ pgn, depth }),
+		});
+
+		if (!response.ok) {
+			const errText = await response.text();
+			throw new Error(`Engine analysis failed: ${errText}`);
+		}
+
+		return response.json();
+	}
+
+	async evaluatePosition(fen: string, depth = 12): Promise<any> {
+		if (!fen) {
+			return { score: 0, mate: null, bestMove: '', bestMoveSan: '', pv: [], pvSan: [], depth: 0 };
+		}
+		const engineBase = (process.env.ENGINE_URL || 'http://engine:5000/analyze').replace(/\/analyze\/?$/, '');
+		const response = await fetch(`${engineBase}/evaluate`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ fen, depth }),
+		});
+
+		if (!response.ok) {
+			const errText = await response.text();
+			throw new Error(`Position evaluation failed: ${errText}`);
+		}
+
+		return response.json();
+	}
 }
 
 

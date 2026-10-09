@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Info, Globe } from 'lucide-react';
+import { Trophy, Info, Globe, Brain } from 'lucide-react';
 import MessagesIcon from '../MessagesIcon/MessagesIcon';
 import NotificationBell from '../NotificationBell/NotificationBell';
 import PlayerSearch from '../PlayerSearch/PlayerSearch';
@@ -40,6 +40,7 @@ const Navbar = ({ currentUser }: Props) => {
 
 	const isAboutActive = location.pathname === '/about';
 	const isLeaderboardActive = location.pathname === '/leaderboard';
+	const isAnalyzeActive = location.pathname.startsWith('/analyze');
 
 	return (
 		<header className={styles.navbar}>
@@ -116,6 +117,27 @@ const Navbar = ({ currentUser }: Props) => {
 
 				{/* 5. Messages / Chat */}
 				{currentUser && <MessagesIcon userId={currentUser.id} />}
+
+				{/* Analysis */}
+				<Tooltip content={t('analysis', 'Analysis')} position="bottom" offset="navbar">
+					<div
+						className={`${styles.navActionItem} ${isAnalyzeActive ? styles.activeNavAction : ''}`}
+						onClick={() => navigate('/analyze')}
+						role="button"
+						tabIndex={0}
+						aria-label={t('analysis', 'Analysis')}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								navigate('/analyze');
+							}
+						}}
+					>
+						<span className={styles.navActionIcon}>
+							<Brain size={18} aria-hidden="true" />
+						</span>
+					</div>
+				</Tooltip>
 
 				{/* 6. Leaderboard */}
 				{currentUser && (

@@ -11,7 +11,7 @@ import ChatPage from './pages/ChatPage/ChatPage'
 import GameLayout from './layouts/GameLayout'
 import GamePage from './pages/GamePage/GamePage'
 import MatchmakingPage from './pages/MatchmakingPage/MatchmakingPage'
-import GameAnalysisPage from './pages/GameAnalysisPage/GameAnalysisPage'
+import AnalyzePage from './pages/AnalyzePage/AnalyzePage'
 import RatingHistoryPage from './pages/RatingHistoryPage/RatingHistoryPage'
 import AboutPage from './pages/AboutPage/AboutPage'
 import LeaderboardPage from './pages/LeaderboardPage/LeaderboardPage'
@@ -43,9 +43,11 @@ export default function App() {
           <Route path="/profile/:username" element={<ProfilePage />} />
           <Route path="/profile/:username/rating" element={<RatingHistoryPage />} />
           <Route path="/profile/:username/games" element={<ProfilePage defaultTab="games" />} />
-          <Route path="/profile/:username/analysis/:id" element={<GameAnalysisPage />} />
-          <Route path="/profile/:username/games/:id" element={<GameAnalysisPage />} />
-          <Route path="/game/analysis/:id" element={<GameAnalysisPage />} />
+          <Route path="/profile/:username/analysis/:id" element={<AnalyzePage />} />
+          <Route path="/profile/:username/games/:id" element={<AnalyzePage />} />
+          <Route path="/game/analysis/:id" element={<AnalyzePage />} />
+          <Route path="/analyze" element={<AnalyzePage />} />
+          <Route path="/analyze/:id" element={<AnalyzePage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/chat/:user_id" element={<ChatPage />} />
           

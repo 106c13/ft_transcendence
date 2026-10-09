@@ -118,16 +118,23 @@ function ChessBoard({
     const getSquareFromCoords = (clientX: number, clientY: number): string | null => {
         if (!boardRef.current) return null
         const rect = boardRef.current.getBoundingClientRect()
+        const borderLeft = boardRef.current.clientLeft || 0
+        const borderTop = boardRef.current.clientTop || 0
+        const innerWidth = boardRef.current.clientWidth || (rect.width - 2 * borderLeft)
+        const innerHeight = boardRef.current.clientHeight || (rect.height - 2 * borderTop)
+        const innerLeft = rect.left + borderLeft
+        const innerTop = rect.top + borderTop
+
         if (
-            clientX < rect.left ||
-            clientX > rect.right ||
-            clientY < rect.top ||
-            clientY > rect.bottom
+            clientX < innerLeft ||
+            clientX > innerLeft + innerWidth ||
+            clientY < innerTop ||
+            clientY > innerTop + innerHeight
         ) {
             return null
         }
-        const col = Math.floor(((clientX - rect.left) / rect.width) * 8)
-        const row = Math.floor(((clientY - rect.top) / rect.height) * 8)
+        const col = Math.floor(((clientX - innerLeft) / innerWidth) * 8)
+        const row = Math.floor(((clientY - innerTop) / innerHeight) * 8)
         if (col >= 0 && col < 8 && row >= 0 && row < 8) {
             return `${files[col]}${ranks[row]}`
         }
@@ -614,7 +621,6 @@ function ChessBoard({
             <svg
                 className={styles.annotationsOverlay}
                 viewBox="0 0 800 800"
-                preserveAspectRatio="none"
             >
                 {/* User Drawn Arrows */}
                 {userArrows.map((arrow, idx) =>
@@ -631,7 +637,7 @@ function ChessBoard({
                     renderArrow(
                         arrow.from,
                         arrow.to,
-                        arrow.color || '#10b981',
+                        arrow.color || '#22c55e',
                         `custom-arrow-${idx}`
                     )
                 )}
