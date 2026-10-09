@@ -105,13 +105,11 @@
 .evalWhiteSide {
   bottom: 6px;
   color: #0F172A;
-  background: rgba(255, 255, 255, 0.85);
 }
 
 .evalBlackSide {
   top: 6px;
   color: #F8FAFC;
-  background: rgba(15, 23, 42, 0.85);
 }
 
 .evalSideHint {
@@ -183,9 +181,9 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  background: rgba(56, 189, 248, 0.15);
-  color: #38BDF8;
-  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(148, 163, 184, 0.12);
+  color: #CBD5E1;
+  border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 /* ── Live Engine Telemetry Banner ── */
@@ -214,7 +212,7 @@
 .engineScore {
   font-size: 15px;
   font-weight: 800;
-  color: #38BDF8;
+  color: #F8FAFC;
   font-family: monospace;
 }
 
@@ -243,29 +241,29 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(15, 23, 42, 0.45);
-  border: 1px solid rgba(148, 163, 184, 0.08);
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.1);
   border-radius: 6px;
-  padding: 3px 8px;
+  padding: 4px 8px;
   font-size: 12px;
   transition: all 0.15s ease;
   cursor: pointer;
 }
 
 .engineLineItem:hover {
-  background: rgba(30, 41, 59, 0.7);
-  border-color: rgba(96, 165, 250, 0.3);
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(148, 163, 184, 0.25);
 }
 
 .engineLineItem.activeLine {
-  background: rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(51, 65, 85, 0.65);
+  border-color: rgba(148, 163, 184, 0.4);
 }
 
 .engineLineRank {
   font-size: 10px;
   font-weight: 700;
-  color: #64748B;
+  color: #94A3B8;
   min-width: 10px;
 }
 
@@ -273,10 +271,10 @@
   font-size: 11px;
   font-weight: 800;
   font-family: monospace;
-  padding: 1px 4px;
+  padding: 1px 5px;
   border-radius: 4px;
-  background: rgba(148, 163, 184, 0.12);
-  color: #38BDF8;
+  background: rgba(148, 163, 184, 0.15);
+  color: #F1F5F9;
   min-width: 36px;
   text-align: center;
 }
@@ -573,7 +571,6 @@
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -654,7 +651,7 @@
 .gamesList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
 }
 
 .gameItem {

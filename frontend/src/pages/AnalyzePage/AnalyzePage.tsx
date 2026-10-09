@@ -22,6 +22,7 @@ import { usePageTitle } from '../../hooks/usePageTitle'
 import { useToast } from '../../context/ToastContext'
 import { playSound } from '../../utils/sound'
 import type { MatchRecord, GameAnalysisResult } from '../../utils/gameUtils'
+import SimpleGameRow from '../../components/GameRow/SimpleGameRow'
 import styles from './AnalyzePage.module.css'
 
 const STARTING_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
@@ -423,6 +424,7 @@ export default function AnalyzePage() {
     // ── Initial Load by :id (if provided in route) ──
     useEffect(() => {
         if (!id) return
+        let isCancelled = false
 
         const fetchGameById = async () => {
             try {
@@ -437,18 +439,22 @@ export default function AnalyzePage() {
                     }),
                 ])
 
+                if (isCancelled) return
+
                 if (matchRes.ok) {
                     const matchData: MatchRecord = await matchRes.json()
+                    if (isCancelled) return
                     if (matchData.white?.username) setWhitePlayerName(matchData.white.username)
                     if (matchData.black?.username) setBlackPlayerName(matchData.black.username)
 
                     if (matchData.pgn) {
-                        loadPgnString(matchData.pgn, false)
+                        loadPgnString(matchData.pgn, false, false)
                     }
                 }
 
                 if (analysisRes.ok) {
                     const data: GameAnalysisResult = await analysisRes.json()
+                    if (isCancelled) return
                     setAnalysisData(data)
                     for (const pos of data.positions) {
                         evalCacheRef.current.set(pos.fenAfter, {
@@ -461,14 +467,21 @@ export default function AnalyzePage() {
                     }
                 }
             } catch (err) {
+                if (isCancelled) return
                 console.error('Failed to load game analysis for id:', id, err)
                 showToast('error', t('game_not_found'))
             } finally {
-                setIsEvaluating(false)
+                if (!isCancelled) {
+                    setIsEvaluating(false)
+                }
             }
         }
 
         fetchGameById()
+
+        return () => {
+            isCancelled = true
+        }
     }, [id])
 
     // ── Interactive Piece Movement ──
@@ -616,7 +629,7 @@ export default function AnalyzePage() {
     }
 
     // ── Load PGN Logic ──
-    const loadPgnString = (pgnString: string, requestFullAnalysis = true) => {
+    const loadPgnString = (pgnString: string, requestFullAnalysis = true, showNotification = true) => {
         try {
             const parser = new Chess()
             const trimmed = pgnString.trim()
@@ -669,7 +682,9 @@ export default function AnalyzePage() {
             setValidMoves([])
             setShowPgnModal(false)
             setPgnInput('')
-            showToast('success', t('pgn_loaded_success'))
+            if (showNotification) {
+                showToast('success', t('pgn_loaded_success'))
+            }
 
             if (requestFullAnalysis) {
                 fetchFullPgnAnalysis(trimmed)
@@ -1261,59 +1276,14 @@ export default function AnalyzePage() {
                                                 (gamesPage - 1) * GAMES_PER_PAGE,
                                                 gamesPage * GAMES_PER_PAGE
                                             )
-                                             .map((game) => {
-                                                const isWhiteUser =
-                                                    game.white?.username === currentUsername ||
-                                                    whitePlayerName === game.white?.username
-                                                const oppName = isWhiteUser
-                                                    ? game.black?.username || t('opponent')
-                                                    : game.white?.username || t('opponent')
-
-                                                let outcome: 'win' | 'loss' | 'draw' = 'draw'
-                                                if (game.winner_id) {
-                                                    outcome =
-                                                        (isWhiteUser && game.winner_id === game.white_id) ||
-                                                        (!isWhiteUser && game.winner_id === game.black_id)
-                                                            ? 'win'
-                                                            : 'loss'
-                                                }
-
-                                                return (
-                                                    <div
-                                                        key={game.id}
-                                                        className={styles.gameItem}
-                                                        onClick={() => handleSelectPastGame(game)}
-                                                    >
-                                                        <div className={styles.gameItemLeft}>
-                                                            <span className={styles.gameItemOpponent}>
-                                                                vs {oppName}
-                                                            </span>
-                                                            <div className={styles.gameItemDetails}>
-                                                                <span>{game.mode || 'blitz'}</span>
-                                                                <span>•</span>
-                                                                <span>
-                                                                    {game.played_at
-                                                                        ? new Date(game.played_at).toLocaleDateString()
-                                                                        : ''}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div className={styles.gameItemRight}>
-                                                            <span
-                                                                className={`${styles.resultTag} ${
-                                                                    outcome === 'win'
-                                                                        ? styles.resultWin
-                                                                        : outcome === 'loss'
-                                                                        ? styles.resultLoss
-                                                                        : styles.resultDraw
-                                                                }`}
-                                                            >
-                                                                {outcome}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                )
-                                            })}
+                                            .map((game) => (
+                                                <SimpleGameRow
+                                                    key={game.id}
+                                                    match={game}
+                                                    currentUsername={currentUsername}
+                                                    onSelect={handleSelectPastGame}
+                                                />
+                                            ))}
                                     </div>
                                 )}
 

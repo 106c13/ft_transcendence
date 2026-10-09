@@ -1,0 +1,182 @@
+.simpleGameRow {
+	display: grid;
+	grid-template-columns: 68px 1fr 64px;
+	align-items: center;
+	gap: 12px;
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.1);
+	border-bottom: none;
+	padding: 8px 14px;
+	transition: background 0.15s ease;
+	cursor: pointer;
+	user-select: none;
+	box-sizing: border-box;
+}
+
+.simpleGameRow:first-child {
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+}
+
+.simpleGameRow:last-child {
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+	border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.simpleGameRow:only-child {
+	border-radius: 8px;
+	border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.simpleGameRow:nth-child(even) {
+	background: #192335;
+}
+
+.simpleGameRow:hover {
+	background: #253347;
+}
+
+/* 1. Mode column */
+.modeCol {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	text-align: center;
+}
+
+.modeIcon {
+	font-size: 16px;
+	line-height: 1;
+}
+
+.modeName {
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.3px;
+	line-height: 1.2;
+	text-transform: capitalize;
+}
+
+.modeBullet {
+	color: #F59E0B;
+}
+
+.modeBlitz {
+	color: #38BDF8;
+}
+
+.modeRapid {
+	color: #818CF8;
+}
+
+.modeDefault {
+	color: #CBD5E1;
+}
+
+/* 2. Players column */
+.playersCol {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	min-width: 0;
+	width: 100%;
+}
+
+.playerRow {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	min-width: 0;
+	font-size: 12px;
+	line-height: 1.2;
+}
+
+.playerAvatar {
+	width: 18px;
+	height: 18px;
+	min-width: 18px;
+	min-height: 18px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 1px solid rgba(148, 163, 184, 0.25);
+	flex-shrink: 0;
+	background: #334155;
+}
+
+.colorSquare {
+	width: 9px;
+	height: 9px;
+	min-width: 9px;
+	min-height: 9px;
+	border-radius: 2px;
+	flex-shrink: 0;
+}
+
+.squareWhite {
+	background-color: #FFFFFF;
+	border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.squareBlack {
+	background-color: #0F172A;
+	border: 1.5px solid #94A3B8;
+}
+
+.playerName {
+	font-size: 12px;
+	font-weight: 600;
+	color: #F1F5F9;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 160px;
+}
+
+.currentUser {
+	color: #60A5FA;
+	font-weight: 700;
+}
+
+.playerRating {
+	font-size: 10.5px;
+	color: #94A3B8;
+	font-family: monospace;
+	flex-shrink: 0;
+}
+
+/* 3. Result column */
+.resultCol {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.resultText {
+	font-size: 11px;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	padding: 3px 8px;
+	border-radius: 4px;
+	text-align: center;
+	min-width: 44px;
+}
+
+.resultWin {
+	color: #22C55E;
+	background: rgba(34, 197, 94, 0.12);
+}
+
+.resultLoss {
+	color: #EF4444;
+	background: rgba(239, 68, 68, 0.12);
+}
+
+.resultDraw {
+	color: #94A3B8;
+	background: rgba(148, 163, 184, 0.12);
+}
+
