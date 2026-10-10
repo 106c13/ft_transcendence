@@ -25,7 +25,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       }
 
       setToasts((prev) => {
-        const filtered = prev.filter((t) => t.id !== id)
+        const filtered = prev.filter((t) => t.id !== id && !(t.type === type && t.message === message))
         const updated = [...filtered, newToast]
         return updated.slice(-5)
       })

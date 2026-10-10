@@ -169,6 +169,7 @@ export function useGameSocket() {
     const hasWarnedLowTimeRef = useRef(false)
     const isLiveMoveRef = useRef(false)
     const prevViewIndexRef = useRef<number | null>(null)
+    const hasHandledNotFoundRef = useRef(false)
 
     const handleIllegalMove = () => {
         playSound('illegal')
@@ -191,8 +192,9 @@ export function useGameSocket() {
     }, [])
 
     useEffect(() => {
-        if (!activeGameId) {
-            toast.error(t('game_not_found'))
+        if (!activeGameId && !hasHandledNotFoundRef.current) {
+            hasHandledNotFoundRef.current = true
+            toast.error(t('game_not_found'), { id: 'game_not_found' })
             navigate('/home', { replace: true })
         }
     }, [activeGameId, navigate, t, toast])
@@ -517,8 +519,11 @@ export function useGameSocket() {
             if (err.message === 'invalid_move') {
                 handleIllegalMove()
             } else if (err.message === 'game_not_found' || err.message === 'missing_game_id') {
-                toast.error(t('game_not_found'))
-                navigate('/home', { replace: true })
+                if (!hasHandledNotFoundRef.current) {
+                    hasHandledNotFoundRef.current = true
+                    toast.error(t('game_not_found'), { id: 'game_not_found' })
+                    navigate('/home', { replace: true })
+                }
                 return
             } else {
                 toast.error(err.message || 'something_went_wrong')
