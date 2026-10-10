@@ -188,6 +188,124 @@ export default function AnalyzePage() {
     const isExecutingMoveRef = useRef<boolean>(false)
     const skipSoundRef = useRef<boolean>(false)
 
+    const currentMoveClassification = useMemo(() => {
+        if (viewIndex === 0) return null
+        const playedMove = moveDetails[viewIndex - 1]
+        if (!playedMove || !playedMove.to) return null
+
+        // The icon must ALWAYS be on the piece that moved in this turn
+        const targetSquare = playedMove.to
+
+        const fenBefore = moveHistory[viewIndex - 1]
+        const fenAfter = moveHistory[viewIndex]
+        const analysis = analysisData?.positions[viewIndex - 1]
+
+        // 1. If this move matches the actual recorded game at this ply
+        if (
+            analysis &&
+            analysis.classification &&
+            analysis.from === playedMove.from &&
+            analysis.to === playedMove.to &&
+            (!analysis.fenBefore || analysis.fenBefore === fenBefore)
+        ) {
+            return {
+                square: targetSquare,
+                classification: analysis.classification,
+            }
+        }
+
+        // 2. The move was different from the game (or game analysis is not available)
+        // Evaluate the alternative move using cached engine telemetry
+        const evalBefore = fenBefore ? evalCacheRef.current.get(fenBefore) : undefined
+        const evalAfter = fenAfter ? evalCacheRef.current.get(fenAfter) : undefined
+
+        const bestMoveUci =
+            (analysis?.fenBefore === fenBefore && analysis?.bestMove
+                ? `${analysis.bestMove.from}${analysis.bestMove.to}`
+                : null) ||
+            evalBefore?.bestMove ||
+            evalBefore?.lines?.[0]?.bestMove
+
+        const playedUci = `${playedMove.from}${playedMove.to}`
+
+        // Check if the played move matches the recommended best move
+        if (bestMoveUci && playedUci === bestMoveUci) {
+            return {
+                square: targetSquare,
+                classification: 'best',
+            }
+        }
+
+        // Check checkmate delivered by played move
+        if (fenAfter) {
+            try {
+                const cAfter = new Chess(fenAfter)
+                if (cAfter.isCheckmate()) {
+                    return {
+                        square: targetSquare,
+                        classification: 'best',
+                    }
+                }
+            } catch {}
+        }
+
+        // Compute centipawn loss if evaluations before and after are available
+        const scoreBefore =
+            (analysis?.fenBefore === fenBefore ? analysis?.score : undefined) ?? evalBefore?.score
+        const scoreAfter = evalAfter?.score
+
+        if (scoreBefore !== undefined && scoreAfter !== undefined && fenBefore) {
+            try {
+                const cBefore = new Chess(fenBefore)
+                const playerColor = cBefore.turn() // 'w' | 'b'
+                const bestEval = playerColor === 'w' ? scoreBefore : -scoreBefore
+                const playedEval = playerColor === 'w' ? scoreAfter : -scoreAfter
+                const mateBefore = evalBefore?.mate ?? null
+                const mateAfter = evalAfter?.mate ?? null
+
+                let centipawnLoss = 0
+                if (mateBefore !== null && mateAfter !== null) {
+                    const myBeforeMate = playerColor === 'w' ? mateBefore : -mateBefore
+                    const myAfterMate = playerColor === 'w' ? mateAfter : -mateAfter
+                    if (myBeforeMate > 0 && myAfterMate > 0) {
+                        const delayed = myAfterMate - (myBeforeMate - 1)
+                        centipawnLoss = Math.max(0, delayed * 40)
+                    } else {
+                        centipawnLoss = Math.max(0, bestEval - playedEval)
+                    }
+                } else if (mateBefore !== null && mateAfter === null) {
+                    const myBeforeMate = playerColor === 'w' ? mateBefore : -mateBefore
+                    if (myBeforeMate > 0) {
+                        centipawnLoss = Math.max(250, bestEval - playedEval)
+                    } else {
+                        centipawnLoss = Math.max(0, bestEval - playedEval)
+                    }
+                } else {
+                    centipawnLoss = Math.max(0, bestEval - playedEval)
+                }
+
+                let classification = 'good'
+                if (centipawnLoss <= 8) classification = 'best'
+                else if (centipawnLoss <= 25) classification = 'excellent'
+                else if (centipawnLoss <= 60) classification = 'good'
+                else if (centipawnLoss <= 150) classification = 'inaccuracy'
+                else if (centipawnLoss <= 300) classification = 'mistake'
+                else classification = 'blunder'
+
+                return {
+                    square: targetSquare,
+                    classification,
+                }
+            } catch {}
+        }
+
+        // Default to a good move indicator on the moved piece while live evaluation loads
+        return {
+            square: targetSquare,
+            classification: 'good',
+        }
+    }, [viewIndex, analysisData, moveDetails, moveHistory, evalInfo])
+
     // ── Modals State ──
     const [showPgnModal, setShowPgnModal] = useState<boolean>(false)
     const [pgnInput, setPgnInput] = useState<string>('')
@@ -1016,6 +1134,7 @@ export default function AnalyzePage() {
                                 isViewer={false}
                                 winnerColor={winnerColor}
                                 customArrows={customArrows}
+                                moveClassification={currentMoveClassification}
                             />
 
                             {/* Bottom Banner (White if normal orientation, Black if flipped) */}

@@ -203,17 +203,17 @@
 .kingBadgeWinner,
 .kingBadgeLoser {
 	position: absolute;
-	top: 3px;
-	right: 3px;
-	width: clamp(18px, 26%, 26px);
-	height: clamp(18px, 26%, 26px);
+	top: 2px;
+	right: 2px;
+	width: clamp(24px, 36%, 36px);
+	height: clamp(24px, 36%, 36px);
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	z-index: 10;
 	pointer-events: none;
-	border: 1.5px solid #FFFFFF;
+	border: 2px solid #FFFFFF;
 }
 
 .kingBadgeWinner {
@@ -232,8 +232,8 @@
 }
 
 .kingBadgeIcon {
-	width: 62%;
-	height: 62%;
+	width: 68%;
+	height: 68%;
 }
 
 @keyframes kingBadgePop {
@@ -261,4 +261,124 @@
 	100% {
 		box-shadow: 0 0 14px rgba(16, 185, 129, 0.95), 0 0 4px #34D399, 0 2px 6px rgba(0, 0, 0, 0.4);
 	}
+}
+
+/* Move Classification Indicators (Analysis) */
+.classificationBadge {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	width: clamp(22px, 34%, 34px);
+	height: clamp(22px, 34%, 34px);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 9;
+	pointer-events: none;
+	border: 2px solid #FFFFFF;
+	color: #FFFFFF;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+	will-change: transform, opacity;
+}
+
+.badgeEnter {
+	animation: classificationPop 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+.badgeExit {
+	animation: classificationFadeOut 0.22s ease-out both;
+}
+
+@keyframes classificationPop {
+	0% {
+		opacity: 0;
+		transform: scale(0.3) rotate(-15deg);
+	}
+	65% {
+		opacity: 1;
+		transform: scale(1.18) rotate(4deg);
+	}
+	85% {
+		opacity: 1;
+		transform: scale(0.95) rotate(-2deg);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1) rotate(0deg);
+	}
+}
+
+@keyframes classificationFadeOut {
+	0% {
+		opacity: 1;
+		transform: scale(1) rotate(0deg);
+	}
+	100% {
+		opacity: 0;
+		transform: scale(0.35) rotate(15deg);
+	}
+}
+
+.classificationIcon {
+	width: 62%;
+	height: 62%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.classificationIcon svg {
+	width: 100%;
+	height: 100%;
+}
+
+.badge_brilliant {
+	background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+	box-shadow: 0 0 10px rgba(6, 182, 212, 0.75), 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.badge_great {
+	background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%);
+	box-shadow: 0 0 10px rgba(14, 165, 233, 0.75), 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.badge_best {
+	background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+	box-shadow: 0 0 10px rgba(16, 185, 129, 0.75), 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.badge_excellent {
+	background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+	box-shadow: 0 0 10px rgba(34, 197, 94, 0.75), 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.badge_good {
+	background: linear-gradient(135deg, #84CC16 0%, #65A30D 100%);
+	box-shadow: 0 0 10px rgba(132, 204, 22, 0.75), 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.badge_inaccuracy {
+	background: linear-gradient(135deg, #EAB308 0%, #CA8A04 100%);
+	box-shadow: 0 0 10px rgba(234, 179, 8, 0.75), 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.badge_mistake {
+	background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+	box-shadow: 0 0 10px rgba(249, 115, 22, 0.75), 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.badge_blunder {
+	background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+	box-shadow: 0 0 10px rgba(239, 68, 68, 0.75), 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.badge_book {
+	background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+	box-shadow: 0 0 10px rgba(217, 119, 6, 0.75), 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.badge_default {
+	background: linear-gradient(135deg, #64748B 0%, #475569 100%);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }

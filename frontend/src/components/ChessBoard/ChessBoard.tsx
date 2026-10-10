@@ -1,6 +1,17 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Chess, Square, PieceSymbol } from 'chess.js'
+import {
+    Gem,
+    Sparkles,
+    Star,
+    CheckCheck,
+    Check,
+    AlertCircle,
+    AlertTriangle,
+    XCircle,
+    BookOpen,
+} from 'lucide-react'
 import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils'
 import PromotionOverlay from '../PromotionOverlay/PromotionOverlay'
 import DisconnectWarning from '../DisconnectWarning/DisconnectWarning'
@@ -10,6 +21,11 @@ export type BoardArrow = {
     from: string
     to: string
     color?: string
+}
+
+export type MoveClassificationInfo = {
+    square: string
+    classification: string
 }
 
 type Props = {
@@ -42,6 +58,7 @@ type Props = {
     winnerColor?: 'w' | 'b' | null
     customArrows?: BoardArrow[]
     customHighlights?: Record<string, string> | Set<string>
+    moveClassification?: MoveClassificationInfo | null
 }
 
 interface DragState {
@@ -63,6 +80,31 @@ interface RightDragState {
     currentSq: string
     startX: number
     startY: number
+}
+
+function renderClassificationIcon(classification: string) {
+    switch (classification) {
+        case 'brilliant':
+            return <Gem aria-hidden="true" />
+        case 'great':
+            return <Sparkles aria-hidden="true" />
+        case 'best':
+            return <Star aria-hidden="true" fill="currentColor" />
+        case 'excellent':
+            return <CheckCheck aria-hidden="true" />
+        case 'good':
+            return <Check aria-hidden="true" />
+        case 'inaccuracy':
+            return <AlertCircle aria-hidden="true" />
+        case 'mistake':
+            return <AlertTriangle aria-hidden="true" />
+        case 'blunder':
+            return <XCircle aria-hidden="true" />
+        case 'book':
+            return <BookOpen aria-hidden="true" />
+        default:
+            return <Star aria-hidden="true" fill="currentColor" />
+    }
 }
 
 function ChessBoard({
@@ -92,10 +134,39 @@ function ChessBoard({
     winnerColor = null,
     customArrows,
     customHighlights,
+    moveClassification,
 }: Props) {
     const { t } = useTranslation()
     const [dragState, setDragState] = useState<DragState | null>(null)
     const boardRef = useRef<HTMLDivElement>(null)
+
+    // Move classification badge state for smooth enter/exit transitions
+    const [activeBadge, setActiveBadge] = useState<MoveClassificationInfo | null>(null)
+    const [fadingBadge, setFadingBadge] = useState<MoveClassificationInfo | null>(null)
+    const prevBadgeRef = useRef<MoveClassificationInfo | null>(null)
+
+    useEffect(() => {
+        const prev = prevBadgeRef.current
+        const next = moveClassification ?? null
+
+        if (prev?.square === next?.square && prev?.classification === next?.classification) {
+            return
+        }
+
+        prevBadgeRef.current = next
+
+        if (prev) {
+            setFadingBadge(prev)
+            setActiveBadge(next)
+            const timer = setTimeout(() => {
+                setFadingBadge(null)
+            }, 220)
+            return () => clearTimeout(timer)
+        } else {
+            setActiveBadge(next)
+            setFadingBadge(null)
+        }
+    }, [moveClassification])
     const dragStateRef = useRef<DragState | null>(null)
     dragStateRef.current = dragState
     const justDraggedRef = useRef(false)
@@ -537,6 +608,13 @@ function ChessBoard({
                     const isWinnerKing = Boolean(winnerColor && isKingPiece && piece?.color === winnerColor)
                     const isLoserKing = Boolean(winnerColor && isKingPiece && piece?.color !== winnerColor)
 
+                    const badgeToRender =
+                        activeBadge && activeBadge.square === sq
+                            ? { badge: activeBadge, isExiting: false }
+                            : fadingBadge && fadingBadge.square === sq
+                            ? { badge: fadingBadge, isExiting: true }
+                            : null
+
                     const isRedHighlighted =
                         userHighlights.has(sq) ||
                         (customHighlights instanceof Set
@@ -607,6 +685,20 @@ function ChessBoard({
                                             d="M10 4L8 20M16 4l-2 20M4 9.5h16M3.5 14.5h16"
                                         />
                                     </svg>
+                                </div>
+                            )}
+
+                            {/* Move Classification Badge (Analysis) */}
+                            {badgeToRender && !isWinnerKing && !isLoserKing && (
+                                <div
+                                    className={`${styles.classificationBadge} ${
+                                        styles[`badge_${badgeToRender.badge.classification}`] || styles.badge_default
+                                    } ${badgeToRender.isExiting ? styles.badgeExit : styles.badgeEnter}`}
+                                    title={t(badgeToRender.badge.classification, badgeToRender.badge.classification)}
+                                >
+                                    <div className={styles.classificationIcon}>
+                                        {renderClassificationIcon(badgeToRender.badge.classification)}
+                                    </div>
                                 </div>
                             )}
 
