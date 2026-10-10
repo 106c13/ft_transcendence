@@ -145,7 +145,6 @@ export function useGameSocket() {
     // Chess Rules engine
     const [localChess] = useState(() => new Chess())
     const [boardFen, setBoardFen] = useState(localChess.fen())
-    const [lastMove, setLastMove] = useState<{ from: string; to: string } | null>(null)
 
     // Premove States & Refs
     const [premoves, setPremoves] = useState<Premove[]>([])
@@ -163,6 +162,7 @@ export function useGameSocket() {
     const [displayChess] = useState(() => new Chess())
     const [moveSAN, setMoveSAN] = useState<string[]>([])
     const [moveTimes, setMoveTimes] = useState<number[]>([])
+    const [moveList, setMoveList] = useState<{ from: string; to: string }[]>([])
 
     const socketRef = useRef<Socket | null>(null)
 
@@ -299,7 +299,6 @@ export function useGameSocket() {
             setShowConfetti(false)
             setWinnerColor(data.winner ?? null)
             setGameOverReason(data.reason ?? '')
-            setLastMove(null)
             setIsPaused(data.isPaused || false)
             setSelectedMode(data.mode)
             setPremoves([])
@@ -312,14 +311,19 @@ export function useGameSocket() {
 
             const startFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
             const historyFens: string[] = [startFen]
+            const moves: { from: string; to: string }[] = []
             if (data.history && data.history.length > 0) {
                 const replayChess = new Chess()
                 for (const san of data.history) {
-                    try { replayChess.move(san) } catch { }
+                    try {
+                        const m = replayChess.move(san)
+                        if (m) moves.push({ from: m.from, to: m.to })
+                    } catch { }
                     historyFens.push(replayChess.fen())
                 }
             }
             setMoveHistory(historyFens)
+            setMoveList(moves)
             isLiveMoveRef.current = true
             prevViewIndexRef.current = historyFens.length - 1
             setViewIndex(historyFens.length - 1)
@@ -348,7 +352,7 @@ export function useGameSocket() {
             setWhiteTime(data.whiteTime)
             setBlackTime(data.blackTime)
             setIsCheck(data.isCheck)
-            setLastMove(data.lastMove)
+            setMoveList(prev => [...prev, data.lastMove])
 
             setMoveHistory(prev => {
                 const next = [...prev, data.fen]
@@ -715,6 +719,11 @@ export function useGameSocket() {
         return set
     }, [premoves])
 
+    const displayedLastMove = useMemo(() => {
+        if (viewIndex === 0) return null
+        return moveList[viewIndex - 1] ?? null
+    }, [viewIndex, moveList])
+
     const ranks = playerColor === 'b' ? ['1', '2', '3', '4', '5', '6', '7', '8'] : ['8', '7', '6', '5', '4', '3', '2', '1']
     const files = playerColor === 'b' ? ['h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'] : ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
@@ -850,7 +859,7 @@ export function useGameSocket() {
         isPaused,
         pauseCountdown,
         boardFen,
-        lastMove,
+        lastMove: displayedLastMove,
         premoves,
         setPremoves,
         moveHistory,

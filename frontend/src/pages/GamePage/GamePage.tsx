@@ -9,6 +9,7 @@ import PlayerBanner from '../../components/PlayerBanner/Playerbanner'
 import ChessBoard from '../../components/ChessBoard/ChessBoard'
 import ChessInfoPanel from '../../components/ChessInfoPanel/ChessInfoPanel'
 import GameOverDialog from '../../components/GameOverDialog/GameOverDialog'
+import ChessSkeleton from '../../components/ChessSkeleton/ChessSkeleton'
 import styles from './GamePage.module.css'
 
 export default function GamePage() {
@@ -35,6 +36,18 @@ export default function GamePage() {
         sendMove: game.sendMove,
         onIllegalMove: game.handleIllegalMove,
     })
+
+    if (game.gameState === 'searching') {
+        return (
+            <div className={styles.gameContainer}>
+                <main className={styles.gameMain}>
+                    <div className={styles.gamePlayArea}>
+                        <ChessSkeleton mode="game" />
+                    </div>
+                </main>
+            </div>
+        )
+    }
 
     // Player mode calculations
     const opponentColor = game.playerColor === 'w' ? 'b' : 'w'

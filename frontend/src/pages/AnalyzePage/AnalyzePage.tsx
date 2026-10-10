@@ -23,6 +23,7 @@ import { useToast } from '../../context/ToastContext'
 import { playSound, type SoundType } from '../../utils/sound'
 import type { MatchRecord, GameAnalysisResult } from '../../utils/gameUtils'
 import SimpleGameRow from '../../components/GameRow/SimpleGameRow'
+import ChessSkeleton from '../../components/ChessSkeleton/ChessSkeleton'
 import styles from './AnalyzePage.module.css'
 
 function getSoundForSan(san?: string): SoundType {
@@ -133,12 +134,18 @@ export default function AnalyzePage() {
     // ── Board & Moves State ──
     const [moveHistory, setMoveHistory] = useState<string[]>([STARTING_FEN])
     const [moveSAN, setMoveSAN] = useState<string[]>([])
+    const [moveDetails, setMoveDetails] = useState<{ from: string; to: string }[]>([])
     const [viewIndex, setViewIndex] = useState<number>(0)
     const [orientation, setOrientation] = useState<'w' | 'b'>('w')
+    const [isLoadingGame, setIsLoadingGame] = useState<boolean>(Boolean(id))
 
     const [selectedSquare, setSelectedSquare] = useState<string | null>(null)
     const [validMoves, setValidMoves] = useState<string[]>([])
-    const [lastMove, setLastMove] = useState<{ from: string; to: string } | null>(null)
+
+    const currentLastMove = useMemo(() => {
+        if (viewIndex === 0) return null
+        return moveDetails[viewIndex - 1] ?? null
+    }, [viewIndex, moveDetails])
 
     // Promotion handling
     const [showPromotion, setShowPromotion] = useState<boolean>(false)
@@ -301,6 +308,11 @@ export default function AnalyzePage() {
         return () => window.removeEventListener('keydown', handleKeyDown)
     }, [moveHistory.length])
 
+    // Clear best-move suggestion arrow when navigating moves
+    useEffect(() => {
+        setCustomArrows([])
+    }, [viewIndex])
+
     // ── Position Evaluation Logic ──
     const applyEvaluation = useCallback((data: EvaluationResult, fen: string) => {
         try {
@@ -364,7 +376,7 @@ export default function AnalyzePage() {
             })
 
             const lines: EvaluationLine[] = (data.lines && data.lines.length > 0)
-                ? data.lines.slice(0, 3)
+                ? data.lines
                 : (data.pvSan && data.pvSan.length > 0)
                     ? [{
                         score: data.score,
@@ -440,6 +452,8 @@ export default function AnalyzePage() {
             return
         }
 
+        let isCancelled = false
+
         // 2. Check if cached in memory
         const cached = evalCacheRef.current.get(currentFen)
         if (cached) {
@@ -447,7 +461,7 @@ export default function AnalyzePage() {
             return
         }
 
-        // 3. Debounce live position evaluation
+        // 3. Debounce live position evaluation (fetches all engine lines)
         const timer = setTimeout(async () => {
             try {
                 setIsEvaluating(true)
@@ -460,19 +474,29 @@ export default function AnalyzePage() {
                     },
                     body: JSON.stringify({ fen: currentFen, depth: 14 }),
                 })
+                if (isCancelled) return
                 if (res.ok) {
                     const data: EvaluationResult = await res.json()
                     evalCacheRef.current.set(currentFen, data)
-                    applyEvaluation(data, currentFen)
+                    if (!isCancelled) {
+                        applyEvaluation(data, currentFen)
+                    }
                 }
             } catch (err) {
-                console.error('Failed to evaluate position:', err)
+                if (!isCancelled) {
+                    console.error('Failed to evaluate position:', err)
+                }
             } finally {
-                setIsEvaluating(false)
+                if (!isCancelled) {
+                    setIsEvaluating(false)
+                }
             }
-        }, 180)
+        }, 150)
 
-        return () => clearTimeout(timer)
+        return () => {
+            isCancelled = true
+            clearTimeout(timer)
+        }
     }, [currentFen, displayChess, applyEvaluation])
 
     // ── Initial Load by :id (if provided in route) ──
@@ -482,6 +506,7 @@ export default function AnalyzePage() {
 
         const fetchGameById = async () => {
             try {
+                setIsLoadingGame(true)
                 setIsEvaluating(true)
                 const token = localStorage.getItem('token')
                 const [matchRes, analysisRes] = await Promise.all([
@@ -516,15 +541,6 @@ export default function AnalyzePage() {
                     const data: GameAnalysisResult = await analysisRes.json()
                     if (isCancelled) return
                     setAnalysisData(data)
-                    for (const pos of data.positions) {
-                        evalCacheRef.current.set(pos.fenAfter, {
-                            score: pos.score,
-                            mate: pos.mate,
-                            bestMove: pos.bestMove ? `${pos.bestMove.from}${pos.bestMove.to}` : undefined,
-                            bestMoveSan: pos.bestMove?.san,
-                            pvSan: pos.continuation,
-                        })
-                    }
                 }
             } catch (err) {
                 if (isCancelled) return
@@ -533,6 +549,7 @@ export default function AnalyzePage() {
             } finally {
                 if (!isCancelled) {
                     setIsEvaluating(false)
+                    setIsLoadingGame(false)
                 }
             }
         }
@@ -572,12 +589,13 @@ export default function AnalyzePage() {
             const nextFen = currentPositionChess.fen()
             const newHistory = moveHistory.slice(0, viewIndex + 1).concat(nextFen)
             const newSAN = moveSAN.slice(0, viewIndex).concat(moveRes.san)
+            const newDetails = moveDetails.slice(0, viewIndex).concat({ from, to })
             const nextIdx = viewIndex + 1
 
             setMoveHistory(newHistory)
             setMoveSAN(newSAN)
+            setMoveDetails(newDetails)
             setViewIndex(nextIdx)
-            setLastMove({ from, to })
             setSelectedSquare(null)
             setValidMoves([])
             setShowPromotion(false)
@@ -728,25 +746,20 @@ export default function AnalyzePage() {
             const historyMoves = parser.history({ verbose: true })
             const fens: string[] = [STARTING_FEN]
             const sans: string[] = []
+            const details: { from: string; to: string }[] = []
 
             const replay = new Chess()
             for (const m of historyMoves) {
                 replay.move(m)
                 fens.push(replay.fen())
                 sans.push(m.san)
+                details.push({ from: m.from, to: m.to })
             }
 
             setMoveHistory(fens)
             setMoveSAN(sans)
+            setMoveDetails(details)
             setViewIndex(fens.length - 1)
-            setLastMove(
-                historyMoves.length > 0
-                    ? {
-                          from: historyMoves[historyMoves.length - 1].from,
-                          to: historyMoves[historyMoves.length - 1].to,
-                      }
-                    : null
-            )
             setSelectedSquare(null)
             setValidMoves([])
             setShowPgnModal(false)
@@ -782,15 +795,6 @@ export default function AnalyzePage() {
             if (res.ok) {
                 const data: GameAnalysisResult = await res.json()
                 setAnalysisData(data)
-                for (const pos of data.positions) {
-                    evalCacheRef.current.set(pos.fenAfter, {
-                        score: pos.score,
-                        mate: pos.mate,
-                        bestMove: pos.bestMove ? `${pos.bestMove.from}${pos.bestMove.to}` : undefined,
-                        bestMoveSan: pos.bestMove?.san,
-                        pvSan: pos.continuation,
-                    })
-                }
             }
         } catch (err) {
             console.error('Failed to run full PGN analysis:', err)
@@ -874,8 +878,8 @@ export default function AnalyzePage() {
         skipSoundRef.current = true
         setMoveHistory([STARTING_FEN])
         setMoveSAN([])
+        setMoveDetails([])
         setViewIndex(0)
-        setLastMove(null)
         setSelectedSquare(null)
         setValidMoves([])
         setShowPromotion(false)
@@ -922,6 +926,18 @@ export default function AnalyzePage() {
         }
         return rows
     }, [halfMoves, moveSAN])
+
+    if (isLoadingGame) {
+        return (
+            <div className={styles.container}>
+                <main className={styles.main}>
+                    <div className={styles.playArea}>
+                        <ChessSkeleton mode="analyze" />
+                    </div>
+                </main>
+            </div>
+        )
+    }
 
     return (
         <div className={styles.container}>
@@ -981,7 +997,7 @@ export default function AnalyzePage() {
                                 files={files}
                                 selectedSquare={selectedSquare}
                                 validMoves={validMoves}
-                                lastMove={lastMove}
+                                lastMove={currentLastMove}
                                 premoveSquares={new Set()}
                                 isReviewing={false}
                                 isCheck={isCheck}

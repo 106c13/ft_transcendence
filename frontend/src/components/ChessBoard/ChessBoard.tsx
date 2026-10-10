@@ -632,15 +632,19 @@ function ChessBoard({
                     )
                 )}
 
-                {/* External Custom Arrows (Analysis) */}
-                {customArrows?.map((arrow, idx) =>
-                    renderArrow(
-                        arrow.from,
-                        arrow.to,
-                        arrow.color || '#22c55e',
-                        `custom-arrow-${idx}`
+                {/* External Custom Arrows (Analysis) - hidden only while actively dragging the piece */}
+                {customArrows
+                    ?.filter(
+                        (arrow) => !(dragState?.isDragging && arrow.from === dragState.fromSquare)
                     )
-                )}
+                    .map((arrow, idx) =>
+                        renderArrow(
+                            arrow.from,
+                            arrow.to,
+                            arrow.color || '#22c55e',
+                            `custom-arrow-${idx}`
+                        )
+                    )}
 
                 {/* Live Arrow Preview while Right-Dragging */}
                 {rightDrag && rightDrag.startSq !== rightDrag.currentSq &&

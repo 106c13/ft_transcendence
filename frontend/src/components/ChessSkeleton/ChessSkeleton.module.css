@@ -1,0 +1,235 @@
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+.boardContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: var(--board-size);
+  height: var(--game-content-h);
+  max-height: var(--game-content-h);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+/* Banner Skeleton */
+.bannerSkeleton {
+  width: 100%;
+  height: var(--banner-h, 56px);
+  background: var(--color-bg-card, #1e293b);
+  border: 1px solid var(--color-border-subtle, rgba(148, 163, 184, 0.12));
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px var(--padding-md);
+  box-sizing: border-box;
+}
+
+.bannerLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+}
+
+.avatarSkeleton {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.bannerText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xs);
+}
+
+.nameSkeleton {
+  width: 110px;
+  height: 14px;
+}
+
+.ratingSkeleton {
+  width: 55px;
+  height: 12px;
+}
+
+.clockSkeleton {
+  width: 72px;
+  height: 28px;
+  border-radius: var(--radius-md);
+}
+
+/* Board Skeleton */
+.boardSkeleton {
+  width: var(--board-size);
+  height: var(--board-size);
+  background: var(--color-bg-card, #1e293b);
+  border: 1px solid var(--color-border-subtle, rgba(148, 163, 184, 0.12));
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.boardGrid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: 100%;
+  height: 100%;
+}
+
+.boardCell {
+  width: 100%;
+  height: 100%;
+}
+
+.boardCellLight {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.boardCellDark {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.boardShimmerOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Info Panel Skeleton */
+.infoPanel {
+  width: 390px;
+  flex: 1;
+  max-width: 440px;
+  background: var(--color-bg-card, #1e293b);
+  border: 1px solid var(--color-border-subtle, rgba(148, 163, 184, 0.12));
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  height: var(--game-content-h);
+  max-height: var(--game-content-h);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--padding-md) var(--padding-lg);
+  border-bottom: 1px solid var(--color-border-subtle, rgba(148, 163, 184, 0.12));
+}
+
+.headerTitleSkeleton {
+  width: 140px;
+  height: 20px;
+}
+
+.headerBadgeSkeleton {
+  width: 80px;
+  height: 22px;
+  border-radius: var(--radius-md);
+}
+
+.engineBannerSkeleton {
+  padding: var(--padding-md);
+  margin: var(--margin-md);
+  margin-bottom: var(--margin-sm);
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid var(--color-border-subtle, rgba(148, 163, 184, 0.12));
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.engineScoreSkeleton {
+  width: 64px;
+  height: 26px;
+}
+
+.engineDepthSkeleton {
+  width: 90px;
+  height: 18px;
+}
+
+.moveListSkeleton {
+  flex: 1;
+  padding: var(--padding-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.moveRowSkeleton {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  padding: 4px var(--padding-sm);
+}
+
+.moveNumSkeleton {
+  width: 28px;
+  height: 14px;
+}
+
+.moveColSkeleton {
+  flex: 1;
+  height: 28px;
+  border-radius: var(--radius-sm);
+}
+
+.footerActionsSkeleton {
+  padding: var(--padding-md);
+  border-top: 1px solid var(--color-border-subtle, rgba(148, 163, 184, 0.12));
+  display: flex;
+  gap: var(--gap-md);
+  justify-content: center;
+}
+
+.actionBtnSkeleton {
+  width: 120px;
+  height: 38px;
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 960px) {
+  .infoPanel {
+    display: none;
+  }
+}
