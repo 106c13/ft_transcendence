@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Eye, Search, Home, Check, X, Clock, Ban, Flag } from 'lucide-react';
+import { Eye, Search, Check, X, Clock, Ban, Flag, Download, RotateCcw } from 'lucide-react';
 import type { DrawOfferState } from '../../hooks/useGameSocket';
 import styles from './GameActions.module.css';
 
@@ -14,6 +14,8 @@ type Props = {
 	onAcceptDraw?: () => void;
 	onDeclineDraw?: () => void;
 	onAnalyze?: () => void;
+	onExportPgn?: () => void;
+	onPlayAgain?: () => void;
 	movesCount?: number;
 };
 
@@ -26,6 +28,8 @@ const GameActions = ({
 	onAcceptDraw,
 	onDeclineDraw,
 	onAnalyze,
+	onExportPgn,
+	onPlayAgain,
 	movesCount,
 }: Props) => {
 	const { t } = useTranslation();
@@ -33,6 +37,14 @@ const GameActions = ({
 	const [showResignModal, setShowResignModal] = useState(false)
 	const resignContainerRef = useRef<HTMLDivElement>(null)
 	const isAbandon = (movesCount ?? 0) < 2
+
+	const handlePlayAgain = () => {
+		if (onPlayAgain) {
+			onPlayAgain();
+		} else {
+			navigate('/game');
+		}
+	};
 
 	useEffect(() => {
 		if (!showResignModal) return
@@ -84,13 +96,23 @@ const GameActions = ({
 								<span>{t('analyze_game')}</span>
 							</button>
 						)}
+						{onExportPgn && (
+							<button
+								type="button"
+								className={styles.exportPgnBtn}
+								onClick={onExportPgn}
+							>
+								<Download size={15} aria-hidden="true" />
+								<span>{t('export_pgn')}</span>
+							</button>
+						)}
 						<button
 							type="button"
-							className={styles.lobbyBtn}
-							onClick={() => navigate('/home')}
+							className={styles.playAgainBtn}
+							onClick={handlePlayAgain}
 						>
-							<Home size={15} aria-hidden="true" />
-							<span>{t('back_to_lobby')}</span>
+							<RotateCcw size={15} aria-hidden="true" />
+							<span>{t('play_again')}</span>
 						</button>
 					</>
 				)}
@@ -101,21 +123,33 @@ const GameActions = ({
 	if (isGameOver) {
 		return (
 			<div className={styles.gameActions}>
+				{onAnalyze && (
+					<button
+						type="button"
+						className={styles.analyzeBtn}
+						onClick={onAnalyze}
+					>
+						<Search size={15} aria-hidden="true" />
+						<span>{t('analyze_game')}</span>
+					</button>
+				)}
+				{onExportPgn && (
+					<button
+						type="button"
+						className={styles.exportPgnBtn}
+						onClick={onExportPgn}
+					>
+						<Download size={15} aria-hidden="true" />
+						<span>{t('export_pgn')}</span>
+					</button>
+				)}
 				<button
 					type="button"
-					className={styles.analyzeBtn}
-					onClick={onAnalyze}
+					className={styles.playAgainBtn}
+					onClick={handlePlayAgain}
 				>
-					<Search size={15} aria-hidden="true" />
-					<span>{t('analyze_game')}</span>
-				</button>
-				<button
-					type="button"
-					className={styles.lobbyBtn}
-					onClick={() => navigate('/home')}
-				>
-					<Home size={15} aria-hidden="true" />
-					<span>{t('back_to_lobby')}</span>
+					<RotateCcw size={15} aria-hidden="true" />
+					<span>{t('play_again')}</span>
 				</button>
 			</div>
 		);

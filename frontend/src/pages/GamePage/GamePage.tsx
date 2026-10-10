@@ -215,6 +215,11 @@ export default function GamePage() {
                         onAcceptDraw={game.acceptDraw}
                         onDeclineDraw={game.declineDraw}
                         onAnalyze={game.analyzeGame}
+                        onExportPgn={game.exportPgn}
+                        onPlayAgain={() => {
+                            game.setIsGameOver(false)
+                            game.startMatchmaking()
+                        }}
                     />
                 </div>
 

@@ -1,3 +1,5 @@
+import { Chess } from 'chess.js';
+
 const PIECE_ASSET_DIR = '/assets/pieces';
 
 export const getPieceImageSrc = (type: string, color: 'w' | 'b'): string => {
@@ -36,6 +38,167 @@ export const downloadPgn = (match: MatchRecord): void => {
 	const filename = `${whiteName}_vs_${blackName}_${dateStr}.pgn`;
 
 	const blob = new Blob([match.pgn], { type: 'application/x-chess-pgn;charset=utf-8' });
+	const url = URL.createObjectURL(blob);
+	const link = document.createElement('a');
+	link.href = url;
+	link.download = filename;
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	URL.revokeObjectURL(url);
+};
+
+export type ExportPgnParams = {
+	event?: string;
+	site?: string;
+	date?: Date | string;
+	whiteUsername: string;
+	blackUsername: string;
+	winnerColor: 'w' | 'b' | null;
+	gameOverReason?: string;
+	isGameOver?: boolean;
+	mode?: string;
+	whiteElo?: number | string | null;
+	blackElo?: number | string | null;
+	moveSAN: string[];
+};
+
+export const formatTimeControl = (mode?: string): string => {
+	switch (mode) {
+		case 'bullet': return '60';
+		case 'bullet+2': return '60+2';
+		case 'blitz': return '180';
+		case 'blitz+2': return '180+2';
+		case 'rapid': return '600';
+		case 'rapid+2': return '600+2';
+		default: return '180';
+	}
+};
+
+export const formatPgnDate = (inputDate?: Date | string): string => {
+	const d = inputDate ? new Date(inputDate) : new Date();
+	if (isNaN(d.getTime())) return new Date().toISOString().split('T')[0].replace(/-/g, '.');
+	const y = d.getFullYear();
+	const m = String(d.getMonth() + 1).padStart(2, '0');
+	const day = String(d.getDate()).padStart(2, '0');
+	return `${y}.${m}.${day}`;
+};
+
+export const formatPgnResult = (winnerColor: 'w' | 'b' | null, isGameOver = true): string => {
+	if (!isGameOver) return '*';
+	if (winnerColor === 'w') return '1-0';
+	if (winnerColor === 'b') return '0-1';
+	return '1/2-1/2';
+};
+
+export const formatPgnTermination = (
+	reason: string | undefined,
+	winnerColor: 'w' | 'b' | null,
+	whiteName: string,
+	blackName: string
+): string => {
+	const winnerName = winnerColor === 'w' ? whiteName : winnerColor === 'b' ? blackName : null;
+	const upper = (reason || '').toUpperCase();
+
+	if (upper.includes('TIME') || upper.includes('TIMEOUT')) {
+		return winnerName ? `${winnerName} won on time` : 'Game drawn on time';
+	}
+	if (upper.includes('CHECKMATE')) {
+		return winnerName ? `${winnerName} won by checkmate` : 'Game drawn';
+	}
+	if (upper.includes('RESIGN')) {
+		return winnerName ? `${winnerName} won by resignation` : 'Game drawn';
+	}
+	if (upper.includes('DISCONNECT')) {
+		return winnerName ? `${winnerName} won by disconnection` : 'Game drawn by disconnection';
+	}
+	if (upper.includes('ABANDON')) {
+		return winnerName ? `${winnerName} won - game abandoned` : 'Game abandoned';
+	}
+	if (upper.includes('STALEMATE')) {
+		return 'Game drawn by stalemate';
+	}
+	if (upper.includes('INSUFFICIENT')) {
+		return 'Game drawn by insufficient material';
+	}
+	if (upper.includes('REPETITION')) {
+		return 'Game drawn by repetition';
+	}
+	if (upper.includes('AGREED') || upper.includes('DRAW')) {
+		return 'Game drawn by agreement';
+	}
+
+	if (winnerName) {
+		return `${winnerName} won`;
+	}
+	return 'Game drawn';
+};
+
+export const generatePgnString = (params: ExportPgnParams): string => {
+	const {
+		event = 'Live Chess',
+		site = 'ft_transcendence',
+		date,
+		whiteUsername,
+		blackUsername,
+		winnerColor,
+		gameOverReason,
+		isGameOver = true,
+		mode,
+		whiteElo,
+		blackElo,
+		moveSAN = [],
+	} = params;
+
+	const pgnDate = formatPgnDate(date);
+	const result = formatPgnResult(winnerColor, isGameOver);
+	const timeControl = formatTimeControl(mode);
+	const termination = formatPgnTermination(gameOverReason, winnerColor, whiteUsername, blackUsername);
+
+	const formattedWhiteElo = whiteElo != null && whiteElo !== '' ? String(Math.round(Number(whiteElo))) : '?';
+	const formattedBlackElo = blackElo != null && blackElo !== '' ? String(Math.round(Number(blackElo))) : '?';
+
+	const headers = [
+		`[Event "${event}"]`,
+		`[Site "${site}"]`,
+		`[Date "${pgnDate}"]`,
+		`[White "${whiteUsername}"]`,
+		`[Black "${blackUsername}"]`,
+		`[Result "${result}"]`,
+		`[TimeControl "${timeControl}"]`,
+		`[WhiteElo "${formattedWhiteElo}"]`,
+		`[BlackElo "${formattedBlackElo}"]`,
+		`[Termination "${termination}"]`,
+	];
+
+	const replay = new Chess();
+	for (const san of moveSAN) {
+		try {
+			replay.move(san);
+		} catch {
+			// ignore illegal/malformed moves
+		}
+	}
+	replay.header('Result', result);
+	const rawPgn = replay.pgn();
+	const movesOnly = rawPgn
+		.split(/\r?\n/)
+		.filter((line) => !line.startsWith('['))
+		.join('\n')
+		.trim();
+
+	const movesText = movesOnly || result;
+	return `${headers.join('\n')}\n\n${movesText}\n`;
+};
+
+export const exportPgnFile = (params: ExportPgnParams): void => {
+	const pgnString = generatePgnString(params);
+	const whiteName = params.whiteUsername || 'White';
+	const blackName = params.blackUsername || 'Black';
+	const dateStr = formatPgnDate(params.date).replace(/\./g, '-');
+	const filename = `${whiteName}_vs_${blackName}_${dateStr}.pgn`;
+
+	const blob = new Blob([pgnString], { type: 'application/x-chess-pgn;charset=utf-8' });
 	const url = URL.createObjectURL(blob);
 	const link = document.createElement('a');
 	link.href = url;

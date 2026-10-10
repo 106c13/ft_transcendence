@@ -7,7 +7,7 @@ import { Chess } from 'chess.js'
 import type { Square } from 'chess.js'
 import { useToast } from '../context/ToastContext'
 
-import { getPieceImageSrc } from '../utils/gameUtils'
+import { getPieceImageSrc, exportPgnFile } from '../utils/gameUtils'
 import type { GameModeType } from '../utils/gameModeUtils'
 import { playSound, type SoundType } from '../utils/sound'
 
@@ -790,6 +790,44 @@ export function useGameSocket() {
         }
     }
 
+    const exportPgn = () => {
+        const whiteUsername = isViewer
+            ? (whitePlayer?.username || (playerColor === 'w' ? currentUser?.username : opponentName) || 'White')
+            : (playerColor === 'w' ? (currentUser?.username || 'White') : (opponentName || 'White'))
+
+        const blackUsername = isViewer
+            ? (blackPlayer?.username || (playerColor === 'w' ? opponentName : currentUser?.username) || 'Black')
+            : (playerColor === 'w' ? (opponentName || 'Black') : (currentUser?.username || 'Black'))
+
+        const whiteElo = isViewer
+            ? (whitePlayer?.rating ?? whiteRatingAfter ?? (playerColor === 'w' ? playerRating : opponentRating))
+            : (playerColor === 'w' ? (playerRating ?? whiteRatingAfter) : (opponentRating ?? whiteRatingAfter))
+
+        const blackElo = isViewer
+            ? (blackPlayer?.rating ?? blackRatingAfter ?? (playerColor === 'w' ? opponentRating : playerRating))
+            : (playerColor === 'w' ? (opponentRating ?? blackRatingAfter) : (playerRating ?? blackRatingAfter))
+
+        const site = typeof window !== 'undefined'
+            ? (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'ft_transcendence' : window.location.hostname || 'ft_transcendence')
+            : 'ft_transcendence'
+
+        exportPgnFile({
+            event: 'Live Chess',
+            site,
+            date: new Date(),
+            whiteUsername,
+            blackUsername,
+            winnerColor,
+            gameOverReason,
+            isGameOver,
+            mode: selectedMode,
+            whiteElo,
+            blackElo,
+            moveSAN,
+        })
+        toast.success(t('pgn_exported'))
+    }
+
     return {
         currentUser,
         isViewer,
@@ -840,6 +878,7 @@ export function useGameSocket() {
         declineDraw,
         savedMatchId,
         analyzeGame,
+        exportPgn,
         playerRating,
         playerIsProvisional,
         opponentRating,

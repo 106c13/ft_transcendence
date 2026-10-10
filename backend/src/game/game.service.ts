@@ -935,9 +935,54 @@ export class GameService {
 
 			match.winner_id = winnerId;
 			match.result = result;
-			match.pgn = game.board.pgn();
-			match.move_times = game.moveTimes && game.moveTimes.length > 0 ? game.moveTimes : null;
 			match.played_at = new Date();
+
+			const baseMode = game.mode.replace('+2', '');
+			const tcSeconds = baseMode === 'bullet' ? '60' : baseMode === 'blitz' ? '180' : '600';
+			const timeControl = game.mode.endsWith('+2') ? `${tcSeconds}+2` : tcSeconds;
+
+			const playedAtDate = match.played_at;
+			const pgnDate = playedAtDate.toISOString().split('T')[0].replace(/-/g, '.');
+			const pgnResult = winnerColor === 'w' ? '1-0' : winnerColor === 'b' ? '0-1' : '1/2-1/2';
+			const winnerName = winnerColor === 'w' ? game.white.username : winnerColor === 'b' ? game.black.username : null;
+			let termination = 'Game drawn';
+			const upperReason = (result || '').toUpperCase();
+			if (upperReason.includes('TIMEOUT') || upperReason.includes('TIME')) {
+				termination = winnerName ? `${winnerName} won on time` : 'Game drawn on time';
+			} else if (upperReason.includes('CHECKMATE')) {
+				termination = winnerName ? `${winnerName} won by checkmate` : 'Game drawn';
+			} else if (upperReason.includes('RESIGN')) {
+				termination = winnerName ? `${winnerName} won by resignation` : 'Game drawn';
+			} else if (upperReason.includes('DISCONNECT')) {
+				termination = winnerName ? `${winnerName} won by disconnection` : 'Game drawn by disconnection';
+			} else if (upperReason.includes('ABANDON')) {
+				termination = winnerName ? `${winnerName} won - game abandoned` : 'Game abandoned';
+			} else if (upperReason.includes('STALEMATE')) {
+				termination = 'Game drawn by stalemate';
+			} else if (upperReason.includes('INSUFFICIENT')) {
+				termination = 'Game drawn by insufficient material';
+			} else if (upperReason.includes('REPETITION')) {
+				termination = 'Game drawn by repetition';
+			} else if (upperReason.includes('AGREED') || upperReason.includes('DRAW')) {
+				termination = 'Game drawn by agreement';
+			}
+
+			const rawPgn = game.board.pgn();
+			const movesOnly = rawPgn.split(/\r?\n/).filter(line => !line.startsWith('[')).join('\n').trim();
+			const headerLines = [
+				`[Event "Live Chess"]`,
+				`[Site "ft_transcendence"]`,
+				`[Date "${pgnDate}"]`,
+				`[White "${game.white.username}"]`,
+				`[Black "${game.black.username}"]`,
+				`[Result "${pgnResult}"]`,
+				`[TimeControl "${timeControl}"]`,
+				`[WhiteElo "${game.white.rating}"]`,
+				`[BlackElo "${game.black.rating}"]`,
+				`[Termination "${termination}"]`,
+			];
+			match.pgn = `${headerLines.join('\n')}\n\n${movesOnly || pgnResult}\n`;
+			match.move_times = game.moveTimes && game.moveTimes.length > 0 ? game.moveTimes : null;
 
 			const category = getRatingCategory(game.mode);
 			const whiteBefore = await this.leaderboardService.getUserLeaderboardInfo(game.white.userId);

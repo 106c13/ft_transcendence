@@ -146,6 +146,8 @@
   "user_no_games": "This user has not played any games yet.",
   "loading": "Loading...",
   "download_pgn": "Download PGN",
+  "export_pgn": "Export PGN",
+  "pgn_exported": "PGN downloaded successfully",
   "analyzing_game": "Analyzing game...",
   "evaluating_moves": "Evaluating moves and critical moments with chess engine...",
   "invalid_email_format": "Invalid email format",
