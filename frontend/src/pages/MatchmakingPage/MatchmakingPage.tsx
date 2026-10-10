@@ -18,13 +18,14 @@ const MatchmakingPage = () => {
 
     const modeParam = (searchParams.get('mode') || 'blitz') as GameModeType
     const { currentUser } = useOutletContext<LayoutContextType>()
+    const currentUserId = currentUser?.id
     const { socket } = useGameSocketContext()
     const socketRef = useRef<Socket | null>(null)
     const matchFoundRef = useRef(false)
 
     // Matchmaking socket connection
     useEffect(() => {
-        if (!currentUser || !socket) return
+        if (!currentUserId || !socket) return
 
         matchFoundRef.current = false
         socketRef.current = socket
@@ -57,7 +58,7 @@ const MatchmakingPage = () => {
             }
             socketRef.current = null
         }
-    }, [socket, currentUser, modeParam, navigate])
+    }, [socket, currentUserId, modeParam, navigate])
 
     const handleCancel = () => {
         const activeSocket = socketRef.current || socket

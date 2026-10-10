@@ -332,7 +332,6 @@ export function useGameSocket() {
         }
 
         socket.on('game_state', handleGameState)
-        socket.on('match_found', handleGameState)
 
         const handleMoveMade = (data: {
             fen: string
@@ -530,7 +529,6 @@ export function useGameSocket() {
         return () => {
             socket.off('connect', onConnect)
             socket.off('game_state', handleGameState)
-            socket.off('match_found', handleGameState)
             socket.off('move_made', handleMoveMade)
             socket.off('opponent_disconnected', handleOpponentDisconnected)
             socket.off('opponent_reconnected', handleOpponentReconnected)

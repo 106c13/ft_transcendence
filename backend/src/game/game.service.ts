@@ -199,7 +199,10 @@ export class GameService {
 
 		const existingGame = this.getGameByUserId(userId);
 		if (existingGame) {
-			if (existingGame.board.isGameOver()) {
+			if (existingGame.board.history().length < 2) {
+				console.log(`Game Service: User ${userId} requested queue, abandoning stale game ${existingGame.gameId}`);
+				await this.abandonGame(existingGame);
+			} else if (existingGame.board.isGameOver()) {
 				this.activeGames.delete(existingGame.gameId);
 			} else {
 				if (existingGame.white.userId === userId) {
@@ -230,6 +233,9 @@ export class GameService {
 	}
 
 	private async createGameInstance(white: ChessPlayer, black: ChessPlayer, mode: GameModeType): Promise<ChessGame> {
+		this.removeFromQueue(white.userId);
+		this.removeFromQueue(black.userId);
+
 		const matchRecord = this.matchRepo.create({
 			white_id: white.userId,
 			black_id: black.userId,
@@ -326,6 +332,9 @@ export class GameService {
 		blackUserId: number, blackSocketId: string, blackUsername: string,
 		mode: GameModeType,
 	): Promise<ChessGame> {
+		this.removeFromQueue(whiteUserId);
+		this.removeFromQueue(blackUserId);
+
 		const gameId = `game_${Date.now()}_${whiteUserId}_${blackUserId}`;
 		const baseMode = mode.replace('+2', '') as 'bullet' | 'blitz' | 'rapid';
 		const initialTime = baseMode === 'bullet' ? 60000 : baseMode === 'blitz' ? 180000 : 600000;
@@ -486,6 +495,10 @@ export class GameService {
 	}
 
 	async abandonGame(game: ChessGame) {
+		this.activeGames.delete(game.gameId);
+		this.removeFromQueue(game.white.userId);
+		this.removeFromQueue(game.black.userId);
+
 		if (game.timer) {
 			clearTimeout(game.timer);
 			game.timer = null;
@@ -504,7 +517,6 @@ export class GameService {
 			console.error('Failed to delete abandoned match from DB:', e);
 		}
 
-		this.activeGames.delete(game.gameId);
 		this.gameEventsCallback('game_over', game, {
 			winner: null,
 			reason: 'ABANDONED',
@@ -518,13 +530,16 @@ export class GameService {
 	}
 
 	// Handle resignation / abandon
-	resign(gameId: string, userId: number) {
+	async resign(gameId: string, userId: number) {
 		const game = this.activeGames.get(gameId);
 		if (!game) return;
 
+		this.removeFromQueue(game.white.userId);
+		this.removeFromQueue(game.black.userId);
+
 		if (game.board.history().length < 2) {
 			console.log(`Game ${gameId}: Abandoning game (< 2 moves made)`);
-			this.abandonGame(game);
+			await this.abandonGame(game);
 			return;
 		}
 
@@ -634,10 +649,10 @@ export class GameService {
 
 	// Handle user disconnection from websocket
 	handleUserDisconnect(userId: number, socketId?: string) {
+		this.removeFromQueue(userId);
+
 		const game = this.getGameByUserId(userId);
 		if (!game) {
-			// Just remove from matchmaking queue if there
-			this.removeFromQueue(userId);
 			return;
 		}
 
