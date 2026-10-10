@@ -78,15 +78,21 @@ const MatchmakingPage = () => {
         <div className={styles.pageContainer}>
             <main className={styles.mainContent}>
                 <div className={styles.searchingCard}>
-                    <div className={styles.searchingPulse}>
-                        <img
-                            src={getPieceImageSrc('p', 'w')}
-                            alt=""
-                            className={styles.searchingPulseIcon}
-                        />
+                    <div className={styles.visualContainer} aria-hidden="true">
+                        <div className={styles.loaderRing} />
+                        <div className={styles.pedestal}>
+                            <div className={styles.pawnWrapper}>
+                                <img
+                                    src={getPieceImageSrc('p', 'w')}
+                                    alt=""
+                                    className={styles.pawnImage}
+                                />
+                                <div className={styles.pawnShadow} />
+                            </div>
+                        </div>
                     </div>
                     <h3>{t('searching_match')}</h3>
-                    <p>
+                    <p className={styles.searchingDesc}>
                         {t('searching_desc')}{' '}
                         <span className={styles.modeBadge}>{modeParam}</span>
                     </p>
