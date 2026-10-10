@@ -221,9 +221,9 @@ export type MatchRecord = {
 	move_times?: number[] | null;
 	played_at: string;
 	analysis?: GameAnalysisResult;
-	white?: { id: number; username: string; avatar?: string };
-	black?: { id: number; username: string; avatar?: string };
-	winner?: { id: number; username: string; avatar?: string };
+	white?: { id: number; username: string; avatar?: string; rating?: number | null };
+	black?: { id: number; username: string; avatar?: string; rating?: number | null };
+	winner?: { id: number; username: string; avatar?: string; rating?: number | null };
 	white_rating_after?: number | null;
 	black_rating_after?: number | null;
 	white_rating_delta?: number | null;

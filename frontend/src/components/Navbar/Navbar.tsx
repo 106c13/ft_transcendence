@@ -119,25 +119,27 @@ const Navbar = ({ currentUser }: Props) => {
 				{currentUser && <MessagesIcon userId={currentUser.id} />}
 
 				{/* Analysis */}
-				<Tooltip content={t('analysis', 'Analysis')} position="bottom" offset="navbar">
-					<div
-						className={`${styles.navActionItem} ${isAnalyzeActive ? styles.activeNavAction : ''}`}
-						onClick={() => navigate('/analyze')}
-						role="button"
-						tabIndex={0}
-						aria-label={t('analysis', 'Analysis')}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								navigate('/analyze');
-							}
-						}}
-					>
-						<span className={styles.navActionIcon}>
-							<Brain size={18} aria-hidden="true" />
-						</span>
-					</div>
-				</Tooltip>
+				{currentUser && (
+					<Tooltip content={t('analysis', 'Analysis')} position="bottom" offset="navbar">
+						<div
+							className={`${styles.navActionItem} ${isAnalyzeActive ? styles.activeNavAction : ''}`}
+							onClick={() => navigate('/analyze')}
+							role="button"
+							tabIndex={0}
+							aria-label={t('analysis', 'Analysis')}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									navigate('/analyze');
+								}
+							}}
+						>
+							<span className={styles.navActionIcon}>
+								<Brain size={18} aria-hidden="true" />
+							</span>
+						</div>
+					</Tooltip>
+				)}
 
 				{/* 6. Leaderboard */}
 				{currentUser && (

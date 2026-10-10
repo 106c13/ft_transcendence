@@ -20,10 +20,19 @@ import ChessBoard, { type BoardArrow } from '../../components/ChessBoard/ChessBo
 import PlayerBanner from '../../components/PlayerBanner/Playerbanner'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import { useToast } from '../../context/ToastContext'
-import { playSound } from '../../utils/sound'
+import { playSound, type SoundType } from '../../utils/sound'
 import type { MatchRecord, GameAnalysisResult } from '../../utils/gameUtils'
 import SimpleGameRow from '../../components/GameRow/SimpleGameRow'
 import styles from './AnalyzePage.module.css'
+
+function getSoundForSan(san?: string): SoundType {
+    if (!san) return 'move-self'
+    if (san.includes('+') || san.includes('#')) return 'move-check'
+    if (san.includes('O-O')) return 'castle'
+    if (san.includes('=')) return 'promote'
+    if (san.includes('x')) return 'capture'
+    return 'move-self'
+}
 
 const STARTING_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 
@@ -136,9 +145,11 @@ export default function AnalyzePage() {
     const [promotionSquare, setPromotionSquare] = useState<string | null>(null)
     const [pendingMove, setPendingMove] = useState<{ from: string; to: string } | null>(null)
 
-    // Players banner names
+    // Players banner names and ratings
     const [whitePlayerName, setWhitePlayerName] = useState<string>('White')
     const [blackPlayerName, setBlackPlayerName] = useState<string>('Black')
+    const [whiteRating, setWhiteRating] = useState<number | string | undefined>(undefined)
+    const [blackRating, setBlackRating] = useState<number | string | undefined>(undefined)
     const [currentUsername, setCurrentUsername] = useState<string>('')
 
     // ── Engine Evaluation & Analysis State ──
@@ -166,6 +177,9 @@ export default function AnalyzePage() {
     const evalCacheRef = useRef<Map<string, EvaluationResult>>(new Map())
     const moveListRef = useRef<HTMLDivElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const prevViewIndexRef = useRef<number | null>(null)
+    const isExecutingMoveRef = useRef<boolean>(false)
+    const skipSoundRef = useRef<boolean>(false)
 
     // ── Modals State ──
     const [showPgnModal, setShowPgnModal] = useState<boolean>(false)
@@ -231,6 +245,40 @@ export default function AnalyzePage() {
         }
     }, [viewIndex])
 
+    // ── Board Move Sounds on Step Navigation ──
+    useEffect(() => {
+        if (prevViewIndexRef.current === null) {
+            prevViewIndexRef.current = viewIndex
+            return
+        }
+        if (prevViewIndexRef.current === viewIndex) return
+
+        const prev = prevViewIndexRef.current
+        prevViewIndexRef.current = viewIndex
+
+        if (skipSoundRef.current) {
+            skipSoundRef.current = false
+            return
+        }
+
+        if (isExecutingMoveRef.current) {
+            isExecutingMoveRef.current = false
+            return
+        }
+
+        if (viewIndex === 0) {
+            playSound('move-self')
+            return
+        }
+
+        if (viewIndex > prev) {
+            const san = moveSAN[viewIndex - 1]
+            playSound(getSoundForSan(san))
+        } else {
+            playSound('move-self')
+        }
+    }, [viewIndex, moveSAN])
+
     // ── Keyboard Arrow Navigation ──
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -241,6 +289,12 @@ export default function AnalyzePage() {
             } else if (e.key === 'ArrowRight') {
                 e.preventDefault()
                 setViewIndex((prev) => Math.min(moveHistory.length - 1, prev + 1))
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault()
+                setViewIndex(moveHistory.length - 1)
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault()
+                setViewIndex(0)
             }
         }
         window.addEventListener('keydown', handleKeyDown)
@@ -446,6 +500,12 @@ export default function AnalyzePage() {
                     if (isCancelled) return
                     if (matchData.white?.username) setWhitePlayerName(matchData.white.username)
                     if (matchData.black?.username) setBlackPlayerName(matchData.black.username)
+                    if (matchData.white?.rating !== undefined && matchData.white?.rating !== null) {
+                        setWhiteRating(matchData.white.rating)
+                    }
+                    if (matchData.black?.rating !== undefined && matchData.black?.rating !== null) {
+                        setBlackRating(matchData.black.rating)
+                    }
 
                     if (matchData.pgn) {
                         loadPgnString(matchData.pgn, false, false)
@@ -489,7 +549,10 @@ export default function AnalyzePage() {
         try {
             const currentPositionChess = new Chess(moveHistory[viewIndex])
             const moveRes = currentPositionChess.move({ from, to, promotion: promotion || 'q' })
-            if (!moveRes) return false
+            if (!moveRes) {
+                playSound('illegal')
+                return false
+            }
 
             // Play appropriate chess sound
             if (moveRes.captured) {
@@ -503,6 +566,8 @@ export default function AnalyzePage() {
             } else {
                 playSound('move-self')
             }
+
+            isExecutingMoveRef.current = true
 
             const nextFen = currentPositionChess.fen()
             const newHistory = moveHistory.slice(0, viewIndex + 1).concat(nextFen)
@@ -521,6 +586,7 @@ export default function AnalyzePage() {
 
             return true
         } catch {
+            playSound('illegal')
             return false
         }
     }
@@ -630,6 +696,7 @@ export default function AnalyzePage() {
 
     // ── Load PGN Logic ──
     const loadPgnString = (pgnString: string, requestFullAnalysis = true, showNotification = true) => {
+        skipSoundRef.current = true
         try {
             const parser = new Chess()
             const trimmed = pgnString.trim()
@@ -655,6 +722,8 @@ export default function AnalyzePage() {
             const headers = parser.header()
             if (headers['White']) setWhitePlayerName(headers['White'])
             if (headers['Black']) setBlackPlayerName(headers['Black'])
+            setWhiteRating(headers['WhiteElo'] || undefined)
+            setBlackRating(headers['BlackElo'] || undefined)
 
             const historyMoves = parser.history({ verbose: true })
             const fens: string[] = [STARTING_FEN]
@@ -779,8 +848,19 @@ export default function AnalyzePage() {
 
     const handleSelectPastGame = (game: MatchRecord) => {
         setShowGamesModal(false)
+        skipSoundRef.current = true
         if (game.white?.username) setWhitePlayerName(game.white.username)
         if (game.black?.username) setBlackPlayerName(game.black.username)
+        if (game.white?.rating !== undefined && game.white?.rating !== null) {
+            setWhiteRating(game.white.rating)
+        } else {
+            setWhiteRating(undefined)
+        }
+        if (game.black?.rating !== undefined && game.black?.rating !== null) {
+            setBlackRating(game.black.rating)
+        } else {
+            setBlackRating(undefined)
+        }
 
         if (game.pgn) {
             loadPgnString(game.pgn, true)
@@ -791,6 +871,7 @@ export default function AnalyzePage() {
 
     // ── Reset Board ──
     const handleReset = () => {
+        skipSoundRef.current = true
         setMoveHistory([STARTING_FEN])
         setMoveSAN([])
         setViewIndex(0)
@@ -802,6 +883,8 @@ export default function AnalyzePage() {
         setPendingMove(null)
         setWhitePlayerName('White')
         setBlackPlayerName('Black')
+        setWhiteRating(undefined)
+        setBlackRating(undefined)
         setAnalysisData(null)
         setCustomArrows([])
         setEngineLines([])
@@ -821,8 +904,8 @@ export default function AnalyzePage() {
         setOrientation((prev) => (prev === 'w' ? 'b' : 'w'))
     }
 
-    // Eval bar white height percentage (adjusted for orientation)
-    const whiteBarHeight = orientation === 'w' ? evalInfo.winChanceWhite : 100 - evalInfo.winChanceWhite
+    // Eval bar white height percentage (fixed: White is always at bottom, Black is always at top)
+    const whiteBarHeight = evalInfo.winChanceWhite
 
     // Move rows grouping for move history log
     const halfMoves = moveHistory.length - 1
@@ -848,7 +931,7 @@ export default function AnalyzePage() {
                     <div className={styles.boardAreaWithEval}>
                         {/* Evaluation Bar */}
                         <div className={styles.evalBarWrapper}>
-                            <span className={styles.evalSideHint}>{orientation === 'w' ? 'B' : 'W'}</span>
+                            <span className={styles.evalSideHint}>B</span>
                             <div className={styles.evalBarContainer}>
                                 <div
                                     className={styles.evalBarWhite}
@@ -864,7 +947,7 @@ export default function AnalyzePage() {
                                     {evalInfo.scoreText}
                                 </span>
                             </div>
-                            <span className={styles.evalSideHint}>{orientation === 'w' ? 'W' : 'B'}</span>
+                            <span className={styles.evalSideHint}>W</span>
                         </div>
 
                         {/* Chess Board Container with Top and Bottom Player Banners */}
@@ -881,6 +964,7 @@ export default function AnalyzePage() {
                             <PlayerBanner
                                 name={orientation === 'w' ? blackPlayerName : whitePlayerName}
                                 username={orientation === 'w' ? blackPlayerName : whitePlayerName}
+                                rating={orientation === 'w' ? blackRating : whiteRating}
                                 color={orientation === 'w' ? 'b' : 'w'}
                                 time={0}
                                 isActive={currentTurn === (orientation === 'w' ? 'b' : 'w')}
@@ -922,6 +1006,7 @@ export default function AnalyzePage() {
                             <PlayerBanner
                                 name={orientation === 'w' ? whitePlayerName : blackPlayerName}
                                 username={orientation === 'w' ? whitePlayerName : blackPlayerName}
+                                rating={orientation === 'w' ? whiteRating : blackRating}
                                 color={orientation === 'w' ? 'w' : 'b'}
                                 time={0}
                                 isActive={currentTurn === (orientation === 'w' ? 'w' : 'b')}

@@ -17,7 +17,7 @@ type Props = {
 	time: number
 	isActive: boolean
 	isBottom?: boolean
-	rating?: number | null
+	rating?: number | string | null
 	ratingDelta?: number | null
 	isGameOver?: boolean
 	isProvisional?: boolean
@@ -66,17 +66,26 @@ const PlayerBanner = ({
 	const [isOpen, setIsOpen] = useState(false)
 	const [ratings, setRatings] = useState<Record<string, RatingInfo | null> | null>(initialRatings || null)
 	const [userAvatar, setUserAvatar] = useState<string | null>(avatar || null)
-	const [isLoadingDetails, setIsLoadingDetails] = useState(false)
 	const wrapperRef = useRef<HTMLDivElement>(null)
 
 	const actualUsername = username || name
 	const modeColor = getModeColor(selectedMode)
 
+	const isAnonymousPlaceholder = !actualUsername ||
+		['White', 'Black', 'Opponent', 'AI', 'Anonymous', '?', 'You'].includes(actualUsername) ||
+		actualUsername === t('opponent') ||
+		actualUsername === t('you');
+
+	const [userExists, setUserExists] = useState<boolean>(() => {
+		if (initialRatings) return true
+		if (isAnonymousPlaceholder) return false
+		return false
+	})
+
 	const canViewProfile = Boolean(
+		userExists &&
 		actualUsername &&
-		actualUsername !== 'Opponent' &&
-		actualUsername !== t('opponent') &&
-		actualUsername !== 'AI'
+		!isAnonymousPlaceholder
 	)
 
 	const handleSeeProfile = (e: React.MouseEvent) => {
@@ -95,6 +104,7 @@ const PlayerBanner = ({
 	useEffect(() => {
 		if (initialRatings) {
 			setRatings(initialRatings)
+			setUserExists(true)
 		}
 	}, [initialRatings])
 
@@ -104,25 +114,51 @@ const PlayerBanner = ({
 		}
 	}, [avatar])
 
-	// Fetch ratings and avatar from backend on open if missing
+	// Check if user exists in our DB and fetch ratings/avatar if not supplied
 	useEffect(() => {
-		if (isOpen && actualUsername && (!ratings || !userAvatar) && actualUsername !== 'Opponent' && actualUsername !== 'You') {
-			setIsLoadingDetails(true)
-			const token = localStorage.getItem('token')
-			fetch(`/api/users/${actualUsername}`, {
-				headers: token ? { Authorization: `Bearer ${token}` } : {},
-			})
-				.then(res => res.ok ? res.json() : null)
-				.then(data => {
-					if (data) {
-						if (data.ratings) setRatings(data.ratings)
-						if (data.avatar) setUserAvatar(data.avatar)
-					}
-				})
-				.catch(err => console.error('Failed to load user info:', err))
-				.finally(() => setIsLoadingDetails(false))
+		if (initialRatings) {
+			setUserExists(true)
+			setRatings(initialRatings)
+			return
 		}
-	}, [isOpen, actualUsername, ratings, userAvatar])
+		if (isAnonymousPlaceholder) {
+			setUserExists(false)
+			setIsOpen(false)
+			return
+		}
+
+		let isSubscribed = true
+		const token = localStorage.getItem('token')
+		fetch(`/api/users/${encodeURIComponent(actualUsername)}`, {
+			headers: token ? { Authorization: `Bearer ${token}` } : {},
+		})
+			.then(res => {
+				if (!isSubscribed) return
+				if (res.ok) {
+					setUserExists(true)
+					return res.json()
+				} else {
+					setUserExists(false)
+					setIsOpen(false)
+					return null
+				}
+			})
+			.then(data => {
+				if (!isSubscribed || !data) return
+				if (data.ratings) setRatings(data.ratings)
+				if (data.avatar) setUserAvatar(data.avatar)
+			})
+			.catch(() => {
+				if (isSubscribed) {
+					setUserExists(false)
+					setIsOpen(false)
+				}
+			})
+
+		return () => {
+			isSubscribed = false
+		}
+	}, [actualUsername, initialRatings, isAnonymousPlaceholder])
 
 	// Close on outside click or Escape
 	useEffect(() => {
@@ -155,9 +191,6 @@ const PlayerBanner = ({
 		if (mode === selectedMode && rating !== undefined && rating !== null) {
 			return isProvisional ? `~${rating}` : `${rating}`
 		}
-		if (isLoadingDetails) {
-			return '···'
-		}
 		return '—'
 	}
 
@@ -173,19 +206,23 @@ const PlayerBanner = ({
 				{/* Left Group: User info + Captured pieces right beside it */}
 				<div className={styles.leftGroup}>
 					<div className={styles.userInfoAnchor} ref={wrapperRef}>
-						{/* User row: click avatar or name to toggle minimalistic ratings popup */}
+						{/* User row: click avatar or name to toggle minimalistic ratings popup if user exists */}
 						<div
-							className={`${styles.userMainRow} ${isOpen ? styles.userMainRowActive : ''}`}
-							onClick={() => setIsOpen(prev => !prev)}
+							className={`${styles.userMainRow} ${
+								userExists ? styles.userMainRowClickable : styles.userMainRowDisabled
+							} ${isOpen ? styles.userMainRowActive : ''}`}
+							onClick={() => {
+								if (userExists) setIsOpen(prev => !prev)
+							}}
 							role="button"
-							tabIndex={0}
+							tabIndex={userExists ? 0 : -1}
 							onKeyDown={e => {
-								if (e.key === 'Enter' || e.key === ' ') {
+								if (userExists && (e.key === 'Enter' || e.key === ' ')) {
 									e.preventDefault()
 									setIsOpen(prev => !prev)
 								}
 							}}
-							title={isOpen ? t('click_to_collapse') : t('click_to_view_ratings')}
+							title={userExists ? (isOpen ? t('click_to_collapse') : t('click_to_view_ratings')) : undefined}
 						>
 							<img
 								src={getAvatarUrl(userAvatar)}
@@ -226,7 +263,7 @@ const PlayerBanner = ({
 							</div>
 
 							{/* Minimalistic Ratings Popup */}
-							{isOpen && (
+							{isOpen && userExists && (
 								<div
 									className={`${styles.ratingPopup} ${isBottom ? styles.popupAbove : styles.popupBelow}`}
 									onClick={e => e.stopPropagation()}

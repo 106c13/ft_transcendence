@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollText, Eye, SkipBack, ChevronLeft, ChevronRight, SkipForward } from 'lucide-react';
+import { ScrollText, SkipBack, ChevronLeft, ChevronRight, SkipForward } from 'lucide-react';
 import styles from './MoveHistory.module.css';
 
 
@@ -29,7 +29,7 @@ function MoveHistory({
 	moveSAN,
 	moveTimes,
 	viewIndex,
-	isReviewing,
+	isReviewing: _isReviewing,
 	onSelectIndex,
 }: Props) {
 	const { t } = useTranslation()
@@ -140,13 +140,6 @@ function MoveHistory({
 					})
 				)}
 			</div>
-
-			{isReviewing && (
-				<div className={styles.reviewingBanner}>
-					<Eye size={14} aria-hidden="true" />
-					<span>{t('reviewing_banner')}</span>
-				</div>
-			)}
 
 			<div className={styles.moveNavRow}>
 				<button
