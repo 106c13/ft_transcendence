@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Eye, EyeOff } from 'lucide-react'
 import styles from './PasswordInput.module.css'
 
 type Props = {
@@ -31,12 +32,11 @@ function PasswordInput({ value, onChange, placeholder, name = 'password', requir
 				onClick={() => setShowPassword(prev => !prev)}
 				aria-label={showPassword ? t('hide_password') : t('show_password')}
 			>
-				<img
-					src={showPassword ? '/assets/eye-off.svg' : '/assets/eye.svg'}
-					alt={showPassword ? t('hide_password') : t('show_password')}
-					width={18}
-					height={18}
-				/>
+				{showPassword ? (
+					<EyeOff size={18} aria-hidden="true" />
+				) : (
+					<Eye size={18} aria-hidden="true" />
+				)}
 			</button>
 		</div>
 	)
