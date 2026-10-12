@@ -9,10 +9,7 @@ import {
 	Star,
 	Sparkles,
 	CheckCheck,
-	Check,
-	AlertCircle,
 	AlertTriangle,
-	XCircle,
 	Circle,
 	Lightbulb,
 	SkipBack,
@@ -49,21 +46,86 @@ const BADGE_STYLES: Record<string, string> = {
 const renderClassificationIcon = (classification: string, size = 12) => {
 	switch (classification) {
 		case 'brilliant':
-			return <Gem size={size} aria-hidden="true" />;
+			return <Gem size={size} aria-hidden="true" strokeWidth={2.4} />;
 		case 'great':
-			return <Sparkles size={size} aria-hidden="true" />;
+			return <Sparkles size={size} aria-hidden="true" strokeWidth={2.4} />;
 		case 'best':
-			return <Star size={size} aria-hidden="true" />;
+			return (
+				<svg
+					width={size}
+					height={size}
+					viewBox="0 0 24 24"
+					fill="currentColor"
+					aria-hidden="true"
+				>
+					<polygon points="12,3.2 14.4,9.1 20.6,9.6 15.7,13.6 17.3,19.6 12,16.2 6.7,19.6 8.3,13.6 3.4,9.6 9.6,9.1" />
+				</svg>
+			);
 		case 'excellent':
-			return <CheckCheck size={size} aria-hidden="true" />;
+			return <CheckCheck size={size} aria-hidden="true" strokeWidth={2.8} />;
 		case 'good':
-			return <Check size={size} aria-hidden="true" />;
+			return (
+				<svg
+					width={size}
+					height={size}
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="3.2"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					aria-hidden="true"
+				>
+					<polyline points="20 6.5 9 17.5 4 12.5" />
+				</svg>
+			);
 		case 'inaccuracy':
-			return <AlertCircle size={size} aria-hidden="true" />;
+			return (
+				<svg
+					width={size}
+					height={size}
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="3"
+					strokeLinecap="round"
+					aria-hidden="true"
+				>
+					<line x1="12" y1="5.2" x2="12" y2="13.5" />
+					<circle cx="12" cy="18" r="1.5" fill="currentColor" stroke="none" />
+				</svg>
+			);
 		case 'mistake':
-			return <AlertTriangle size={size} aria-hidden="true" />;
+			return (
+				<svg
+					width={size}
+					height={size}
+					viewBox="0 0 24 24"
+					fill="none"
+					aria-hidden="true"
+				>
+					<path d="M12 4.2L3.2 19.5h17.6L12 4.2z" fill="currentColor" />
+					<line x1="12" y1="9.8" x2="12" y2="14.2" stroke="#F97316" strokeWidth="2.4" strokeLinecap="round" />
+					<circle cx="12" cy="17.2" r="1.1" fill="#F97316" />
+				</svg>
+			);
 		case 'blunder':
-			return <XCircle size={size} aria-hidden="true" />;
+			return (
+				<svg
+					width={size}
+					height={size}
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="3"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					aria-hidden="true"
+				>
+					<path d="M8.8 8.8a3.4 3.4 0 0 1 6.4 1.2c0 2-3.2 2.8-3.2 4.5" />
+					<circle cx="12" cy="18" r="1.5" fill="currentColor" stroke="none" />
+				</svg>
+			);
 		default:
 			return <Circle size={Math.max(6, size - 2)} aria-hidden="true" />;
 	}
@@ -397,7 +459,7 @@ const GameAnalysis = ({ username, analysis, history, onBack }: Props) => {
 									<span>{analysisData.summary.white.mistake}</span>
 								</span>
 								<span className={`${styles.chip} ${styles.chipBlunder}`}>
-									<XCircle size={12} aria-hidden="true" />
+									{renderClassificationIcon('blunder', 12)}
 									<span>{analysisData.summary.white.blunder}</span>
 								</span>
 							</div>
@@ -434,7 +496,7 @@ const GameAnalysis = ({ username, analysis, history, onBack }: Props) => {
 									<span>{analysisData.summary.black.mistake}</span>
 								</span>
 								<span className={`${styles.chip} ${styles.chipBlunder}`}>
-									<XCircle size={12} aria-hidden="true" />
+									{renderClassificationIcon('blunder', 12)}
 									<span>{analysisData.summary.black.blunder}</span>
 								</span>
 							</div>

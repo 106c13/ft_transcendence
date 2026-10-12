@@ -636,6 +636,10 @@
 	justify-content: center;
 	z-index: 5;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+	border: 1.5px solid #FFFFFF;
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
 }
 
 /* ── Classification Badge Styles ── */

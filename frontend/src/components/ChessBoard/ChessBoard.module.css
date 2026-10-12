@@ -13,6 +13,7 @@
 	box-sizing: border-box;
 	touch-action: none;
 	user-select: none;
+	container-type: inline-size;
 }
 
 .chessBoard.isDragging,
@@ -29,7 +30,7 @@
 	height: 100%;
 	min-width: 0;
 	min-height: 0;
-	overflow: hidden;
+	overflow: visible;
 	user-select: none;
 	cursor: pointer;
 	transition: background-color 0.1s ease;
@@ -78,11 +79,14 @@
 }
 
 .validMoveDot {
-	width: 14px;
-	height: 14px;
+	width: 32%;
+	height: 32%;
+	min-width: 10px;
+	min-height: 10px;
 	border-radius: 50%;
 	background-color: rgba(0, 0, 0, 0.15);
 	pointer-events: none;
+	z-index: 12;
 }
 
 .square.light .validMoveDot {
@@ -98,8 +102,10 @@
 	width: 80%;
 	height: 80%;
 	border-radius: 50%;
-	border: 4px solid rgba(0, 0, 0, 0.15);
+	border: clamp(3px, 0.8cqi, 6px) solid rgba(0, 0, 0, 0.15);
+	box-sizing: border-box;
 	pointer-events: none;
+	z-index: 12;
 }
 
 .square.light .validMoveCapture {
@@ -203,17 +209,22 @@
 .kingBadgeWinner,
 .kingBadgeLoser {
 	position: absolute;
-	top: 2px;
-	right: 2px;
-	width: clamp(24px, 36%, 36px);
-	height: clamp(24px, 36%, 36px);
+	top: 3%;
+	right: 3%;
+	width: 32%;
+	height: 32%;
+	min-width: 18px;
+	min-height: 18px;
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	z-index: 10;
+	z-index: 25;
 	pointer-events: none;
 	border: 2px solid #FFFFFF;
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
 }
 
 .kingBadgeWinner {
@@ -266,20 +277,25 @@
 /* Move Classification Indicators (Analysis) */
 .classificationBadge {
 	position: absolute;
-	top: 2px;
-	right: 2px;
-	width: clamp(22px, 34%, 34px);
-	height: clamp(22px, 34%, 34px);
+	top: 3%;
+	right: 3%;
+	width: 32%;
+	height: 32%;
+	min-width: 18px;
+	min-height: 18px;
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	z-index: 9;
+	z-index: 25;
 	pointer-events: none;
 	border: 2px solid #FFFFFF;
 	color: #FFFFFF;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
 	will-change: transform, opacity;
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
 }
 
 .badgeEnter {
@@ -321,16 +337,22 @@
 }
 
 .classificationIcon {
-	width: 62%;
-	height: 62%;
+	width: 68%;
+	height: 68%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	flex-shrink: 0;
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
 }
 
 .classificationIcon svg {
 	width: 100%;
 	height: 100%;
+	display: block;
+	flex-shrink: 0;
 }
 
 .badge_brilliant {
