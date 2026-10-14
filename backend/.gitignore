@@ -3,6 +3,9 @@
 /node_modules
 /build
 
+# admin panel
+/.adminjs
+
 # Logs
 logs
 *.log

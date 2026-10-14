@@ -9,7 +9,7 @@ export class GameController {
 	constructor(
 		private readonly gameService: GameService,
 		private readonly ratingService: RatingService
-	) {}
+	) { }
 
 	@Get('history/:username')
 	async getHistory(@Param('username') username: string) {

@@ -19,7 +19,7 @@ export class MessagesService {
 		@InjectRepository(Notification)
 		private notificationRepo: Repository<Notification>,
 		private chatGateway: ChatGateway,
-	) {}
+	) { }
 
 	async getMessages(chatId: string, options: { limit: number; offset: number }) {
 		const [messages, total] = await this.messageRepository.findAndCount({

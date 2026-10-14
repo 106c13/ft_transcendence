@@ -3,7 +3,7 @@ import { LeaderboardService, LeaderboardQueryDto } from './leaderboard.service';
 
 @Controller('leaderboard')
 export class LeaderboardController {
-	constructor(private readonly leaderboardService: LeaderboardService) {}
+	constructor(private readonly leaderboardService: LeaderboardService) { }
 
 	@Get()
 	async getLeaderboard(

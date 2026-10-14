@@ -1,5 +1,6 @@
 import {
 	Entity,
+	BaseEntity,
 	PrimaryGeneratedColumn,
 	ManyToOne,
 	Column,
@@ -14,7 +15,7 @@ export enum FriendRequestStatus {
 }
 
 @Entity()
-export class FriendRequest {
+export class FriendRequest extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number
 

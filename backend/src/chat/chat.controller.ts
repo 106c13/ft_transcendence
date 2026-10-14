@@ -21,7 +21,7 @@ export class ChatController {
 		private readonly usersService: UsersService,
 		private readonly chatService: ChatService,
 		private readonly messagesService: MessagesService,
-	) {}
+	) { }
 
 	private formatChat(chat: any) {
 		return {
@@ -53,36 +53,36 @@ export class ChatController {
 	) {
 		const currentUserId = req.user.userId
 		const otherUserId = parseInt(userIdParam)
-		
+
 		if (isNaN(otherUserId)) {
 			throw new BadRequestException('invalid_user_id')
 		}
-		
+
 		if (currentUserId === otherUserId) {
 			throw new BadRequestException('cannot_chat_with_yourself')
 		}
-		
+
 		const id1 = Math.min(currentUserId, otherUserId)
 		const id2 = Math.max(currentUserId, otherUserId)
 		const chatId = `${id1}_${id2}`
-		
+
 		let chat = await this.chatService.getChat(chatId)
-		
+
 		if (chat) {
 			return this.formatChat(chat)
 		}
-		
+
 		const otherUser = await this.usersService.findById(otherUserId)
 		if (!otherUser) {
 			throw new NotFoundException('user_not_found')
 		}
-		
+
 		let newChat = await this.chatService.createChat(currentUserId, otherUserId)
-		
+
 		if (!newChat) {
 			throw new NotFoundException('cannot_create_chat')
 		}
-			
+
 		return this.formatChat(newChat)
 	}
 

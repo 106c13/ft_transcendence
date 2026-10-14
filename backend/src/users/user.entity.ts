@@ -1,12 +1,13 @@
 import {
 	Entity,
+	BaseEntity,
 	PrimaryGeneratedColumn,
 	Column,
 	CreateDateColumn
 } from 'typeorm';
 
 @Entity()
-export class User {
+export class User extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
@@ -36,4 +37,7 @@ export class User {
 
 	@Column({ default: false })
 	email_verified: boolean;
+
+	@Column({ default: false })
+	is_admin: boolean;
 }

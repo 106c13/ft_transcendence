@@ -20,6 +20,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@adminjs/express": "^6.1.1",
+    "@adminjs/nestjs": "^7.0.0",
+    "@adminjs/typeorm": "^5.0.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
@@ -29,6 +32,7 @@
     "@nestjs/platform-socket.io": "^11.1.26",
     "@nestjs/typeorm": "^11.0.1",
     "@nestjs/websockets": "^11.1.26",
+    "adminjs": "^7.8.17",
     "bcrypt": "^6.0.0",
     "chess.js": "^1.4.0",
     "multer": "^2.1.1",

@@ -24,4 +24,4 @@ import { Notification } from '../notification/notification.entity'
 	providers: [FriendsService],
 	exports: [FriendsService],
 })
-export class FriendsModule {}
+export class FriendsModule { }

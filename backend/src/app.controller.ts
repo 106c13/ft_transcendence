@@ -13,11 +13,11 @@ export class AppController {
     private readonly appService: AppService,
     private readonly usersService: UsersService,
     private readonly authService: AuthService,
-	private readonly friendsService: FriendsService,
-	private readonly notificationService: NotificationService,
-	private readonly chatService: ChatService,
-	private readonly messagesService: MessagesService,
-  ) {}
+    private readonly friendsService: FriendsService,
+    private readonly notificationService: NotificationService,
+    private readonly chatService: ChatService,
+    private readonly messagesService: MessagesService,
+  ) { }
 
   @Get()
   getHello(): string {

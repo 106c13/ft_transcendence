@@ -17,7 +17,7 @@ export class ChatService {
 		private notificationRepo: Repository<Notification>,
 		@InjectRepository(Message)
 		private messageRepository: Repository<Message>,
-	) {}
+	) { }
 
 	async getChat(chatId: string) {
 		const chat = await this.chatRepository
@@ -91,17 +91,17 @@ export class ChatService {
 					created_at: chat.created_at,
 					user1: chat.user1
 						? {
-								id: chat.user1.id,
-								username: chat.user1.username,
-								avatar: chat.user1.avatar,
-						  }
+							id: chat.user1.id,
+							username: chat.user1.username,
+							avatar: chat.user1.avatar,
+						}
 						: null,
 					user2: chat.user2
 						? {
-								id: chat.user2.id,
-								username: chat.user2.username,
-								avatar: chat.user2.avatar,
-						  }
+							id: chat.user2.id,
+							username: chat.user2.username,
+							avatar: chat.user2.avatar,
+						}
 						: null,
 					unreadCount,
 					lastMessage,

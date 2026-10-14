@@ -23,7 +23,7 @@ export class FriendsService {
 		private notificationRepo: Repository<Notification>,
 
 		private readonly presenceService: PresenceService,
-	) {}
+	) { }
 
 	async sendRequest(senderId: number, receiverUsername: string) {
 		const receiver = await this.userRepo.findOne({
@@ -221,10 +221,10 @@ export class FriendsService {
 
 	async getRequestStatus(senderId: number, receiverId: number) {
 		return this.friendRequestRepo.findOne({
-		where: [
-			{ sender: { id: senderId }, receiver: { id: receiverId } },
-			{ sender: { id: receiverId }, receiver: { id: senderId } },
-		],
+			where: [
+				{ sender: { id: senderId }, receiver: { id: receiverId } },
+				{ sender: { id: receiverId }, receiver: { id: senderId } },
+			],
 		});
 	}
 

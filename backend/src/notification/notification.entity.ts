@@ -1,5 +1,6 @@
 import {
 	Entity,
+	BaseEntity,
 	PrimaryGeneratedColumn,
 	Column,
 	CreateDateColumn,
@@ -9,7 +10,7 @@ import {
 import { User } from '../users/user.entity'
 
 @Entity()
-export class Notification {
+export class Notification extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 

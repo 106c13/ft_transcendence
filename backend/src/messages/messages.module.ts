@@ -15,4 +15,4 @@ import { Notification } from '../notification/notification.entity'
 	providers: [MessagesService],
 	exports: [MessagesService],
 })
-export class MessagesModule {}
+export class MessagesModule { }

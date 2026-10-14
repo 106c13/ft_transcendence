@@ -1,5 +1,6 @@
 import {
 	Entity,
+	BaseEntity,
 	PrimaryGeneratedColumn,
 	ManyToOne,
 	CreateDateColumn,
@@ -9,7 +10,7 @@ import { User } from '../users/user.entity'
 
 @Entity()
 @Unique(['user1', 'user2'])
-export class Friendship {
+export class Friendship extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number
 

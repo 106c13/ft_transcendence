@@ -65,7 +65,7 @@ export class LeaderboardService {
 		private readonly ratingRepo: Repository<UserRating>,
 
 		private readonly presenceService: PresenceService,
-	) {}
+	) { }
 
 	invalidateCache(): void {
 		this.cacheTimestamp = 0;

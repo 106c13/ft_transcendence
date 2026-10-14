@@ -1,9 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 import { User } from './user.entity'
 
 @Entity()
 @Unique(['user_id', 'category'])
-export class UserRating {
+export class UserRating extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 

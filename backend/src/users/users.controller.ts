@@ -34,7 +34,7 @@ export class UsersController {
 		private readonly ratingService: RatingService,
 		private readonly leaderboardService: LeaderboardService,
 		private readonly presenceService: PresenceService,
-	) {}
+	) { }
 
 	@Get('me')
 	@UseGuards(JwtAuthGuard)
@@ -177,7 +177,7 @@ export class UsersController {
 		}
 
 		await this.usersService.updateUser(userId, updateData)
-		
+
 		return { success: true }
 	}
 

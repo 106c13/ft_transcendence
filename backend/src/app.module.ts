@@ -11,6 +11,7 @@ import { ChatModule } from './chat/chat.module';
 import { MessagesModule } from './messages/messages.module';
 import { GameModule } from './game/game.module';
 import { PresenceModule } from './presence/presence.module';
+import { AdminModule } from './admin/admin.module';
 
 	@Module({
   imports: [
@@ -37,6 +38,7 @@ import { PresenceModule } from './presence/presence.module';
     MessagesModule,
     GameModule,
     PresenceModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

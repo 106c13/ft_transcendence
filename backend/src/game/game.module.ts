@@ -36,5 +36,5 @@ import { forwardRef } from '@nestjs/common';
 		LeaderboardService,
 	],
 })
-export class GameModule {}
+export class GameModule { }
 
