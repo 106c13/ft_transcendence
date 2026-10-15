@@ -183,7 +183,9 @@ function GameOverDialog({
 
 							{gameOverReason !== 'ABANDONED' && onAnalyze && (
 								<button className={styles.analyzeBtn} onClick={onAnalyze}>
-									<Search size={16} aria-hidden="true" />
+									<span className={styles.analyzeBtnIcon}>
+										<Search size={16} aria-hidden="true" />
+									</span>
 									<span>{t('analyze_game')}</span>
 								</button>
 							)}

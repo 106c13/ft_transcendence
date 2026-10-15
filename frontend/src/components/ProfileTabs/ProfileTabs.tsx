@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Swords, RotateCw, ArrowRight } from 'lucide-react';
 import profileStyles from './ProfileTabs.module.css';
 
 import type { TabType, User } from '../../utils/profileUtils';
@@ -10,7 +9,7 @@ import FriendsList from '../FriendsList/FriendsList';
 import GamesList from '../GamesList/GamesList';
 import MiniRatingChart from '../MiniRatingChart/MiniRatingChart';
 import FriendsPreview from '../FriendsPreview/FriendsPreview';
-import GameRow from '../GameRow/GameRow';
+import RecentGames from '../RecentGames/RecentGames';
 import type { RatingCategory } from '../../utils/gameUtils';
 
 type Props = {
@@ -47,8 +46,6 @@ const ProfileTabs = ({
 			navigate(`/profile/${username}/rating?mode=${mode}`);
 		}
 	};
-
-	const recentMatches = history.matches.slice(0, 6);
 
 	return (
 		<div className={profileStyles.tabsWrapper}>
@@ -87,84 +84,13 @@ const ProfileTabs = ({
 						onSeeAll={() => onSelectTab('friends')}
 					/>
 
-					{/* Recent Games List (Last 5-7 games played) */}
-					<div className={profileStyles.recentGamesCard}>
-						<div className={profileStyles.recentGamesHeader}>
-							<div className={profileStyles.titleGroup}>
-								<h3 className={profileStyles.sectionTitle}>
-									{t('recent_games')}
-								</h3>
-								<span className={profileStyles.countBadge}>
-									{history.matches.length}
-								</span>
-							</div>
-
-							{history.matches.length > 0 && (
-								<button
-									className={profileStyles.seeAllBtn}
-									onClick={() => onSelectTab('games')}
-									type="button"
-								>
-									<span>{t('see_all')}</span>
-									<ArrowRight size={14} aria-hidden="true" />
-								</button>
-							)}
-						</div>
-
-						{history.loading ? (
-							<div className={profileStyles.emptyCard}>
-								<RotateCw size={24} className={profileStyles.spinnerIcon} aria-hidden="true" />
-								<p className={profileStyles.emptySubtitle}>
-									{t('loading')}
-								</p>
-							</div>
-						) : recentMatches.length === 0 ? (
-							<div className={profileStyles.emptyCard}>
-								<div className={profileStyles.emptyIcon}>
-									<Swords size={36} aria-hidden="true" />
-								</div>
-								<h4 className={profileStyles.emptyTitle}>
-									{t('no_games_yet')}
-								</h4>
-								<p className={profileStyles.emptySubtitle}>
-									{isOwnProfile
-										? t('play_first_game_prompt')
-										: t('user_no_games')}
-								</p>
-								{isOwnProfile && (
-									<button
-										className={profileStyles.playNowBtn}
-										onClick={() => navigate('/home')}
-										type="button"
-									>
-										<Swords size={16} aria-hidden="true" />
-										<span>{t('play_now')}</span>
-									</button>
-								)}
-							</div>
-						) : (
-							<div className={profileStyles.gamesListRows}>
-								<div className={profileStyles.listHeader}>
-									<span>{t('mode')}</span>
-									<span>{t('players')}</span>
-									<span>{t('moves')}</span>
-									<span>{t('result')}</span>
-									<span>{t('review')}</span>
-									<span>{t('date')}</span>
-								</div>
-
-								<div className={profileStyles.rowsContainer}>
-									{recentMatches.map((match) => (
-										<GameRow
-											key={match.id}
-											match={match}
-											username={username || ''}
-										/>
-									))}
-								</div>
-							</div>
-						)}
-					</div>
+					{/* Recent Games List */}
+					<RecentGames
+						matches={history.matches}
+						username={username}
+						isOwnProfile={isOwnProfile}
+						loading={history.loading}
+					/>
 				</div>
 			)}
 

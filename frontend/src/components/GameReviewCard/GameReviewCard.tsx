@@ -250,7 +250,7 @@ const GameReviewCard = ({ games, currentUsername, loading }: Props) => {
 				<span className={styles.reviewBtnIcon}>
 					<Search size={15} aria-hidden="true" />
 				</span>
-				<span className={styles.reviewBtnText}>
+				<span>
 					{t('review_against_opponent', {
 						opponent: opponentName,
 					})}

@@ -24,9 +24,7 @@ const GameRow = ({ match, username }: Props) => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 
-	const isUserWhite = match.white?.username === username
-	const isUserBlack = match.black?.username === username
-	const isWhite = isUserWhite
+	const isListOwnerWhite = username === match.white?.username
 	const whitePlayer = match.white
 	const blackPlayer = match.black
 	const whiteRating = match.white_rating_after
@@ -36,8 +34,8 @@ const GameRow = ({ match, username }: Props) => {
 	let outcome: 'win' | 'loss' | 'draw' = 'draw'
 	if (match.winner_id) {
 		outcome =
-			(isWhite && match.winner_id === match.white_id) ||
-			(!isWhite && match.winner_id === match.black_id)
+			(isListOwnerWhite && match.winner_id === match.white_id) ||
+			(!isListOwnerWhite && match.winner_id === match.black_id)
 				? 'win'
 				: 'loss'
 	}
@@ -68,7 +66,7 @@ const GameRow = ({ match, username }: Props) => {
 	// Accuracy
 	const accuracy =
 		match.analysis && match.analysis.accuracy
-			? (isWhite ? match.analysis.accuracy.white : match.analysis.accuracy.black)
+			? (isListOwnerWhite ? match.analysis.accuracy.white : match.analysis.accuracy.black)
 			: null;
 
 	// Mode badge details
@@ -121,7 +119,7 @@ const GameRow = ({ match, username }: Props) => {
 							title={t('white')}
 							aria-label={t('white')}
 						/>
-						<span className={`${styles.playerName} ${isUserWhite ? styles.currentUser : ''}`}>
+						<span className={`${styles.playerName} ${isListOwnerWhite ? styles.listOwner : ''}`}>
 							{whitePlayer?.username || t('unknown')}
 						</span>
 						{whiteRating !== null && whiteRating !== undefined && (
@@ -147,7 +145,7 @@ const GameRow = ({ match, username }: Props) => {
 							title={t('black')}
 							aria-label={t('black')}
 						/>
-						<span className={`${styles.playerName} ${isUserBlack ? styles.currentUser : ''}`}>
+						<span className={`${styles.playerName} ${!isListOwnerWhite ? styles.listOwner : ''}`}>
 							{blackPlayer?.username || t('unknown')}
 						</span>
 						{blackRating !== null && blackRating !== undefined && (

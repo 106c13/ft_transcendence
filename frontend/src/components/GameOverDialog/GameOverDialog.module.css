@@ -309,6 +309,10 @@
 	border-color: #3B82F6;
 }
 
+.analyzeBtnIcon {
+	transform: translateY(2px);
+}
+
 .reviewBtn {
 	width: 100%;
 	padding: 12px;

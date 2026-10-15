@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { RotateCw, Swords, X, Search } from 'lucide-react';
+import { RotateCw, X, Search } from 'lucide-react';
 import type { MatchRecord } from '../../utils/gameUtils';
 import GameRow from '../GameRow/GameRow';
 import CustomSelect from '../CustomSelect/CustomSelect';
 import GameModeIcon from '../GameModeIcon/GameModeIcon';
+import NoGamesPlayed from '../NoGamesPlayed/NoGamesPlayed';
 import type { SelectOption } from '../../utils/selectUtils';
 import styles from './GamesList.module.css';
 
@@ -28,7 +28,6 @@ const GamesList = ({
 	loading,
 }: Props) => {
 	const { t } = useTranslation()
-	const navigate = useNavigate()
 
 	// Filter states
 	const [colorFilter, setColorFilter] = useState<'all' | 'white' | 'black'>('all')
@@ -120,20 +119,7 @@ const GamesList = ({
 	if (matches.length === 0) {
 		return (
 			<div className={styles.container}>
-				<div className={styles.emptyCard}>
-					<Swords size={36} className={styles.emptyIcon} aria-hidden="true" />
-					<h4 className={styles.emptyTitle}>{t('no_games_yet')}</h4>
-					<p className={styles.emptySubtitle}>
-						{isOwnProfile
-							? t('play_first_game_prompt')
-							: t('user_no_games')}
-					</p>
-					{isOwnProfile && (
-						<button className={styles.playNowBtn} onClick={() => navigate('/home')} type="button">
-							<Swords size={15} aria-hidden="true" /> {t('play_now')}
-						</button>
-					)}
-				</div>
+				<NoGamesPlayed isOwnProfile={isOwnProfile} />
 			</div>
 		);
 	}

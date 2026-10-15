@@ -9,7 +9,7 @@ import { usePageTitle } from '../../hooks/usePageTitle';
 import GameModesGrid from '../../components/GameModesGrid/GameModesGrid';
 import ChallengeSection from '../../components/ChallengeSection/ChallengeSection';
 import GameReviewCard from '../../components/GameReviewCard/GameReviewCard';
-import HomeRecentGames from '../../components/HomeRecentGames/HomeRecentGames';
+import RecentGames from '../../components/RecentGames/RecentGames';
 import PlayerRatingsCard from '../../components/PlayerRatingsCard/PlayerRatingsCard';
 import FriendsPreview from '../../components/FriendsPreview/FriendsPreview';
 import type { GameModeType, ModeItem } from '../../utils/gameModeUtils';
@@ -165,9 +165,10 @@ const HomePage = () => {
 					<div className={styles.statsLayout}>
 						{/* Left subsection (70%): Recent games list like in profile */}
 						<div className={styles.statsLeft}>
-							<HomeRecentGames
+							<RecentGames
 								matches={history.matches}
 								username={currentUser?.username || ''}
+								isOwnProfile={true}
 								loading={history.loading}
 							/>
 						</div>

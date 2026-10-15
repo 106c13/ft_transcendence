@@ -1,17 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Swords, RotateCw, ArrowRight } from 'lucide-react';
+import { RotateCw, ArrowRight } from 'lucide-react';
 import type { MatchRecord } from '../../utils/gameUtils';
 import GameRow from '../GameRow/GameRow';
-import styles from './HomeRecentGames.module.css';
+import styles from './RecentGames.module.css';
+import NoGamesPlayed from '../NoGamesPlayed/NoGamesPlayed';
 
 type Props = {
 	matches: MatchRecord[];
 	username: string;
+	isOwnProfile: boolean;
 	loading?: boolean;
 };
 
-const HomeRecentGames = ({ matches, username, loading }: Props) => {
+const RecentGames = ({ matches, username, isOwnProfile, loading }: Props) => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 
@@ -43,13 +45,7 @@ const HomeRecentGames = ({ matches, username, loading }: Props) => {
 					<p>{t('loading')}</p>
 				</div>
 			) : recentMatches.length === 0 ? (
-				<div className={styles.emptyState}>
-					<div className={styles.emptyIcon}>
-						<Swords size={36} aria-hidden="true" />
-					</div>
-					<p className={styles.emptyText}>{t('no_games_yet')}</p>
-					<p className={styles.emptySub}>{t('play_a_game_hint')}</p>
-				</div>
+				<NoGamesPlayed isOwnProfile={isOwnProfile} />
 			) : (
 				<div className={styles.gamesListRows}>
 					<div className={styles.listHeader}>
@@ -76,5 +72,5 @@ const HomeRecentGames = ({ matches, username, loading }: Props) => {
 	);
 };
 
-export default HomeRecentGames;
+export default RecentGames;
 

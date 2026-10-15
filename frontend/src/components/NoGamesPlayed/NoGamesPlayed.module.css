@@ -1,0 +1,62 @@
+.emptyCard {
+	background: #1E293B;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	border-radius: 12px;
+	padding: 36px 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	gap: 8px;
+	box-sizing: border-box;
+}
+
+.emptyIcon {
+	color: var(--color-slate-400);
+	font-size: 38px;
+	opacity: 0.75;
+	margin-bottom: 2px;
+}
+
+.emptyCard h4,
+.emptyTitle {
+	font-size: 16px;
+	font-weight: 700;
+	color: #E2E8F0;
+	margin: 0;
+}
+
+.emptyCard p,
+.emptySubtitle {
+	font-size: 13px;
+	color: #94A3B8;
+	max-width: 380px;
+	margin: 0;
+	line-height: 1.45;
+}
+
+.playNowBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+	margin-top: 6px;
+	background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+	color: white;
+	border: none;
+	padding: 8px 18px;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 13px;
+	cursor: pointer;
+	transition: 0.2s;
+	box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+}
+
+.playNowBtn:hover {
+	box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+.playNowBtnIcon {
+	transform: translateY(2px);
+}
