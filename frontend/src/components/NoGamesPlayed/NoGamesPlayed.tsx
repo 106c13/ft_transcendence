@@ -21,7 +21,7 @@ const NoGamesPlayed = ({ isOwnProfile }: Props) => {
                     : t('user_no_games')}
             </p>
             {isOwnProfile && (
-                <button className={styles.playNowBtn} onClick={() => navigate('/home')} type="button">
+                <button className={styles.playNowBtn} onClick={() => navigate('/game?mode=blitz')} type="button">
                     <span className={styles.playNowBtnIcon}>
                         <Swords size={15} aria-hidden="true" />
                     </span>
