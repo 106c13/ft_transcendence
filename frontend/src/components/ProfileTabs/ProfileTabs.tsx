@@ -11,7 +11,7 @@ import GamesList from '../GamesList/GamesList';
 import MiniRatingChart from '../MiniRatingChart/MiniRatingChart';
 import FriendsPreview from '../FriendsPreview/FriendsPreview';
 import GameRow from '../GameRow/GameRow';
-import type { MatchRecord, RatingCategory } from '../../utils/gameUtils';
+import type { RatingCategory } from '../../utils/gameUtils';
 
 type Props = {
 	activeTab: TabType;
@@ -41,12 +41,6 @@ const ProfileTabs = ({
 	const internalHistory = useGameHistory(username || '');
 	const history = historyData || internalHistory;
 	const ratingData = useRatingHistory(history.matches, username || '', ratings);
-
-	const handleSelectGame = (match: MatchRecord) => {
-		navigate(`/game/analysis/${match.id}`, {
-			state: { match, fromUsername: username },
-		});
-	};
 
 	const handleChartClick = (mode: RatingCategory) => {
 		if (username) {
@@ -165,8 +159,6 @@ const ProfileTabs = ({
 											key={match.id}
 											match={match}
 											username={username || ''}
-											onSelect={handleSelectGame}
-											onRowClick={(m) => navigate(`/game/${m.id}`)}
 										/>
 									))}
 								</div>
@@ -183,7 +175,6 @@ const ProfileTabs = ({
 					username={username}
 					isOwnProfile={isOwnProfile}
 					loading={history.loading}
-					onSelectGame={handleSelectGame}
 				/>
 			)}
 

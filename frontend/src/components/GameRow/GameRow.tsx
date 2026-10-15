@@ -2,13 +2,12 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import GameModeIcon from '../GameModeIcon/GameModeIcon';
 import type { MatchRecord } from '../../utils/gameUtils';
+import { ArrowRight } from 'lucide-react';
 import styles from './GameRow.module.css';
 
 type Props = {
 	match: MatchRecord;
 	username: string;
-	onSelect: (match: MatchRecord) => void;
-	onRowClick?: (match: MatchRecord) => void;
 };
 
 function getAvatarUrl(avatar?: string | null) {
@@ -21,17 +20,9 @@ function getAvatarUrl(avatar?: string | null) {
 	return `/uploads/${avatar}`;
 }
 
-const GameRow = ({ match, username, onSelect, onRowClick }: Props) => {
+const GameRow = ({ match, username }: Props) => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-
-	const handleRowClick = () => {
-		if (onRowClick) {
-			onRowClick(match)
-		} else {
-			navigate(`/game/${match.id}`)
-		}
-	}
 
 	const isUserWhite = match.white?.username === username
 	const isUserBlack = match.black?.username === username
@@ -74,6 +65,12 @@ const GameRow = ({ match, username, onSelect, onRowClick }: Props) => {
 		? Math.ceil(match.move_times.length / 2)
 		: null
 
+	// Accuracy
+	const accuracy =
+		match.analysis && match.analysis.accuracy
+			? (isWhite ? match.analysis.accuracy.white : match.analysis.accuracy.black)
+			: null;
+
 	// Mode badge details
 	const rawMode = match.mode.toLowerCase()
 	const isBullet = rawMode.startsWith('bullet')
@@ -91,15 +88,9 @@ const GameRow = ({ match, username, onSelect, onRowClick }: Props) => {
 	return (
 		<div
 			className={styles.gameRow}
-			onClick={handleRowClick}
+			onClick={() => navigate(`/game/${match.id}`)}
 			role="button"
 			tabIndex={0}
-			onKeyDown={(e) => {
-				if (e.key === 'Enter' || e.key === ' ') {
-					e.preventDefault()
-					handleRowClick()
-				}
-			}}
 		>
 			{/* 1. Game Mode (First) - Icon on top, mode name under icon */}
 			<div className={styles.modeCol}>
@@ -195,21 +186,22 @@ const GameRow = ({ match, username, onSelect, onRowClick }: Props) => {
 				</span>
 			</div>
 
-			{/* 4. Review Column (To the left of Date column) */}
+			{/* 5. Review Column (To the left of Date column) */}
 			<div className={styles.reviewCol}>
 				<button
 					type="button"
 					className={styles.reviewBtn}
 					onClick={(e) => {
 						e.stopPropagation()
-						onSelect(match)
+						navigate(`/game/analysis/${match.id}`)
 					}}
 				>
-					{t('review')}
+					<span>{accuracy ? accuracy : t('review')}</span>
+					<ArrowRight size={14} aria-hidden="true" />
 				</button>
 			</div>
 
-			{/* 5. Date Played (Moved to end of data columns) */}
+			{/* 6. Date Played (Moved to end of data columns) */}
 			<div className={styles.dateCol}>
 				<span className={styles.dateFull}>{dateStr}</span>
 				{timeStr && <span className={styles.dateSub}>{timeStr}</span>}

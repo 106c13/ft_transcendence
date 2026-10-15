@@ -14,7 +14,6 @@ type Props = {
 	username: string;
 	isOwnProfile: boolean;
 	loading: boolean;
-	onSelectGame: (match: MatchRecord) => void;
 	getOutcome?: (match: MatchRecord) => { label: string; className: string };
 	formatDate?: (dateStr: string) => string;
 	formatReason?: (reason: string) => string;
@@ -27,7 +26,6 @@ const GamesList = ({
 	username,
 	isOwnProfile,
 	loading,
-	onSelectGame,
 }: Props) => {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
@@ -245,8 +243,6 @@ const GamesList = ({
 								key={match.id}
 								match={match}
 								username={username}
-								onSelect={onSelectGame}
-								onRowClick={(m) => navigate(`/game/${m.id}`)}
 							/>
 						))}
 					</div>

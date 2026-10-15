@@ -22,7 +22,7 @@ import { usePageTitle } from '../../hooks/usePageTitle'
 import { useToast } from '../../context/ToastContext'
 import { playSound, type SoundType } from '../../utils/sound'
 import type { MatchRecord, GameAnalysisResult } from '../../utils/gameUtils'
-import SimpleGameRow from '../../components/GameRow/SimpleGameRow'
+import SimpleGameRow from '../../components/SimpleGameRow/SimpleGameRow'
 import ChessSkeleton from '../../components/ChessSkeleton/ChessSkeleton'
 import styles from './AnalyzePage.module.css'
 

@@ -224,26 +224,23 @@
 }
 
 .reviewBtn {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	padding: 5px 14px;
-	background: rgba(59, 130, 246, 0.1);
-	color: #60A5FA;
-	border: 1px solid rgba(96, 165, 250, 0.25);
-	border-radius: 6px;
-	font-size: 11.5px;
+	background: none;
+	border: none;
+	color: var(--color-blue-400);
+	font-size: var(--font-size-sm);
 	font-weight: 600;
 	cursor: pointer;
-	transition: all 0.18s ease;
-	line-height: 1.2;
+	padding: var(--padding-xs) var(--padding-sm);
+	border-radius: var(--radius-md);
+	transition: all var(--transition-normal);
+	display: inline-flex;
+	align-items: center;
+	gap: var(--gap-xs);
 }
 
 .reviewBtn:hover {
-	background: #3B82F6;
-	color: #FFFFFF;
-	border-color: #3B82F6;
-	box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+	background: rgba(96, 165, 250, 0.1);
+	color: var(--color-slate-100);
 }
 
 /* 5. Date column */

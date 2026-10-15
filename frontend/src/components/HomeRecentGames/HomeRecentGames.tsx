@@ -17,12 +17,6 @@ const HomeRecentGames = ({ matches, username, loading }: Props) => {
 
 	const recentMatches = matches.slice(0, 6);
 
-	const handleSelectGame = (match: MatchRecord) => {
-		navigate(`/game/analysis/${match.id}`, {
-			state: { match, fromUsername: username },
-		});
-	};
-
 	const handleSeeAll = () => {
 		navigate(`/profile/${username}`, { state: { defaultTab: 'games' } });
 	};
@@ -63,7 +57,7 @@ const HomeRecentGames = ({ matches, username, loading }: Props) => {
 						<span>{t('players')}</span>
 						<span>{t('moves')}</span>
 						<span>{t('result')}</span>
-						<span>{t('review')}</span>
+						<span>{t('accuracy')}</span>
 						<span>{t('date')}</span>
 					</div>
 
@@ -73,8 +67,6 @@ const HomeRecentGames = ({ matches, username, loading }: Props) => {
 								key={match.id}
 								match={match}
 								username={username}
-								onSelect={handleSelectGame}
-								onRowClick={(m) => navigate(`/game/${m.id}`)}
 							/>
 						))}
 					</div>
