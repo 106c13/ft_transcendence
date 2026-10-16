@@ -16,6 +16,7 @@
 	border-radius: 12px;
 	background: rgba(30, 41, 59, 0.65);
 	border: 1px solid rgba(148, 163, 184, 0.14);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 	color: var(--stat-color);
 }
 
@@ -83,11 +84,31 @@
 	}
 }
 
-.stat_brilliant  { --stat-color: #38BDF8; }
-.stat_great      { --stat-color: #38BDF8; }
-.stat_best       { --stat-color: #4ADE80; }
-.stat_excellent  { --stat-color: #86EFAC; }
-.stat_good       { --stat-color: #4ADE80; }
-.stat_inaccuracy { --stat-color: #EAB308; }
-.stat_mistake    { --stat-color: #FB923C; }
-.stat_blunder    { --stat-color: #F87171; }
+.stat_brilliant {
+	--stat-color: #38BDF8;
+}
+
+.stat_great {
+	--stat-color: #38BDF8;
+}
+
+.stat_best,
+.stat_excellent {
+	--stat-color: #4ADE80;
+}
+
+.stat_good {
+	--stat-color: #4ADE80;
+}
+
+.stat_inaccuracy {
+	--stat-color: #EAB308;
+}
+
+.stat_mistake {
+	--stat-color: #FB923C;
+}
+
+.stat_blunder {
+	--stat-color: #F87171;
+}
