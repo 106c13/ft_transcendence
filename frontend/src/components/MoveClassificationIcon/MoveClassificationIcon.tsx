@@ -11,9 +11,10 @@ type Props = {
     classification: string;
     withBackground?: boolean;
     size?: number;
+    className?: string;
 }
 
-const MoveClassificationIcon = ({ classification, withBackground = false, size = 34 }: Props) => {
+const MoveClassificationIcon = ({ classification, withBackground = false, size = 34, className }: Props) => {
 	const icon = (() => {
 		switch (classification) {
 		case 'brilliant':
@@ -64,7 +65,7 @@ const MoveClassificationIcon = ({ classification, withBackground = false, size =
 
 	if (!withBackground) {
 		return (
-			<span className={styles.iconOnly} style={{ width: size, height: size }}>
+			<span className={`${styles.iconOnly} ${className ?? ''}`} style={{ width: size, height: size }}>
 				{icon}
 			</span>
 		)
