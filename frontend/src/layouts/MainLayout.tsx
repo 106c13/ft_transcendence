@@ -89,7 +89,7 @@ export default function MainLayout() {
   }, [setTopSlot])
 
   if (!currentUser && !isPublicRoute) {
-    return <div className="layout-loading">{t('loading')}</div>
+    return null
   }
 
   const isChatRoute = location.pathname.startsWith('/chat')

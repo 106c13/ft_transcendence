@@ -1,11 +1,27 @@
 import { useTranslation } from 'react-i18next';
 import { X, Search } from 'lucide-react';
+import { useGameHistory } from '../../hooks/useGameHistory';
 import ModalConfetti from '../ModalConfetti/ModalConfetti';
 import TopRankBadge from '../TopRankBadge/TopRankBadge';
+import MoveSummaryCard from '../MoveSummaryCard/MoveSummaryCard'
 import styles from './GameOverDialog.module.css';
+import type { User } from '../../utils/profileUtils';
+import type { GameAnalysisResult } from '../../utils/gameUtils';
 
+// Most "notable" first
+const CLASSIFICATION_PRIORITY = [
+	'brilliant', 'great', 'blunder', 'mistake',
+	'inaccuracy', 'best', 'excellent', 'good',
+] as const
+
+const LABEL_FALLBACKS: Record<string, string> = {
+	brilliant: 'Brilliant', great: 'Great', best: 'Best', excellent: 'Excellent',
+	good: 'Good', inaccuracy: 'Inaccuracy', mistake: 'Mistake', blunder: 'Blunder',
+}
 
 type Props = {
+	gameId: string
+	currentUser: User
 	winnerColor: 'w' | 'b' | null
 	playerColor: 'w' | 'b'
 	gameOverReason: string
@@ -23,9 +39,13 @@ type Props = {
 	isViewer?: boolean
 	showConfetti?: boolean
 	onConfettiComplete?: () => void
+	analysis?: GameAnalysisResult | null
+	isAnalysisLoading?: boolean
 }
 
 function GameOverDialog({
+	gameId,
+	currentUser,
 	winnerColor,
 	playerColor,
 	gameOverReason,
@@ -43,9 +63,17 @@ function GameOverDialog({
 	isViewer = false,
 	showConfetti = false,
 	onConfettiComplete,
+	analysis,
+	isAnalysisLoading = false,
 }: Props) {
 	const { t } = useTranslation()
 	const isWaiting = rematchState === 'sent'
+
+	const { matches } = useGameHistory(currentUser.username)
+	const relevantMatch = matches.find(m => m.id.toString() === gameId)
+	const colorKey = playerColor === 'w' ? 'white' : 'black'
+	const analysisSummary: Record<string, number> | null =
+		analysis?.summary?.[colorKey] ?? relevantMatch?.analysis?.summary?.[colorKey] ?? null
 
 	const getResultText = () => {
 		if (gameOverReason === 'ABANDONED') return t('reason_abandoned')
@@ -85,76 +113,98 @@ function GameOverDialog({
 	const isWinner = winnerColor !== null && winnerColor === playerColor && !isViewer
 	const isAbandoned = gameOverReason === 'ABANDONED'
 
+	const moveHighlights = analysisSummary ? CLASSIFICATION_PRIORITY
+		.filter((key) => (analysisSummary[key] ?? 0) > 0)
+		.slice(0, 3)
+		.map((key) => ({ key, count: analysisSummary![key] })) : []
+
 	return (
 		<div className={styles.gameOverModal}>
 			{showConfetti && isWinner && <ModalConfetti onComplete={onConfettiComplete} />}
 
-			<div className={`${styles.gameOverBox} ${isAbandoned ? styles.gameOverBoxAbandoned : ''}`}>
+			<div className={`${styles.gameOverBox} ${isAbandoned ? styles.gameOverBoxAbandoned : ''} ${isViewer ? styles.gameOverBoxViewer : ''}`}>
 				<button className={styles.closeModalX} onClick={onClose} aria-label={t('close')}>
 					<X size={16} aria-hidden="true" />
 				</button>
 
 				<div className={`${styles.modalBody} ${isViewer ? styles.modalBodyViewer : ''}`}>
 					<div className={styles.resultHeader}>
-						<h2 className={styles.gameOverTitle}>{t('game_over')}</h2>
+						{/* <h2 className={styles.gameOverTitle}>{t('game_over')}</h2> */}
 						<div className={styles.gameOverResult}>{getResultText()}</div>
 						{getReasonText() && <div className={styles.gameOverReason}>{getReasonText()}</div>}
 					</div>
 
 					{/* Dual Rating Display: Format rating on Left, Leaderboard Place & Position Delta on Right */}
 					{!isViewer && !isAbandoned && (ratingDelta !== null || ratingAfter !== null || leaderboardRank !== null) && (
-						<div className={styles.ratingsComparisonSection}>
-							{/* Left: Format Elo */}
-							<div className={styles.ratingCard}>
-								<div className={styles.ratingCategoryTitle}>
-									{modeLabel} {t('rating_label')}
+						<>
+							<div className={styles.ratingsComparisonSection}>
+								{/* Left: Format Elo */}
+								<div className={styles.ratingCard}>
+									<div className={styles.ratingCategoryTitle}>
+										{modeLabel} {t('rating_label')}
+									</div>
+									<div className={styles.ratingDisplay}>
+										<span className={styles.bigRatingValue}>{ratingAfter ?? '—'}</span>
+										{ratingDelta !== undefined && ratingDelta !== null && ratingDelta !== 0 && (
+											<span
+												className={`${styles.ratingDeltaInline} ${ratingDelta > 0
+														? styles.deltaPositive
+														: styles.deltaNegative
+													}`}
+											>
+												{ratingDelta > 0 ? `↑${ratingDelta}` : `↓${Math.abs(ratingDelta)}`}
+											</span>
+										)}
+									</div>
 								</div>
-								<div className={styles.ratingDisplay}>
-									<span className={styles.bigRatingValue}>{ratingAfter ?? '—'}</span>
-									{ratingDelta !== undefined && ratingDelta !== null && ratingDelta !== 0 && (
-										<span
-											className={`${styles.ratingDeltaInline} ${
-												ratingDelta > 0
-													? styles.deltaPositive
-													: styles.deltaNegative
-											}`}
-										>
-											{ratingDelta > 0 ? `↑${ratingDelta}` : `↓${Math.abs(ratingDelta)}`}
+
+								<div className={styles.ratingsDivider} />
+
+								{/* Right: Leaderboard Place & Position Delta */}
+								<div className={styles.ratingCard}>
+									<div className={styles.ratingCategoryTitle}>
+										{t('leaderboard')}
+									</div>
+									<div className={styles.ratingDisplay}>
+										<span className={styles.bigRatingValue}>
+											#{leaderboardRank ?? '—'}
 										</span>
-									)}
+										{leaderboardRank !== undefined && leaderboardRank !== null && leaderboardRank <= 3 && (
+											<TopRankBadge rank={leaderboardRank} size="sm" className={styles.dialogTopBadge} />
+										)}
+										{leaderboardRankDelta !== undefined && leaderboardRankDelta !== null && leaderboardRankDelta !== 0 && (
+											<span
+												className={`${styles.positionDeltaInline} ${leaderboardRankDelta > 0
+														? styles.posDeltaGain
+														: styles.posDeltaLoss
+													}`}
+											>
+												{leaderboardRankDelta > 0
+													? `↑${leaderboardRankDelta}`
+													: `↓${Math.abs(leaderboardRankDelta)}`}
+											</span>
+										)}
+									</div>
 								</div>
 							</div>
 
-							<div className={styles.ratingsDivider} />
-
-							{/* Right: Leaderboard Place & Position Delta */}
-							<div className={styles.ratingCard}>
-								<div className={styles.ratingCategoryTitle}>
-									{t('leaderboard')}
+							{(moveHighlights.length > 0 || isAnalysisLoading) && (
+								<div className={`${styles.moveStatsRow} ${styles[`moveStatsRow${isAnalysisLoading ? 3 : moveHighlights.length}`]}`}>
+									{isAnalysisLoading && !analysisSummary
+										? [0, 1, 2].map((slot) => (
+											<MoveSummaryCard key={`loading-${slot}`} loading />
+										))
+										: moveHighlights.map((slot) => (
+											<MoveSummaryCard
+												key={slot.key}
+												classification={slot.key}
+												count={slot.count}
+												label={t(`move_${slot.key}`, { defaultValue: LABEL_FALLBACKS[slot.key] })}
+											/>
+										))}
 								</div>
-								<div className={styles.ratingDisplay}>
-									<span className={styles.bigRatingValue}>
-										#{leaderboardRank ?? '—'}
-									</span>
-									{leaderboardRank !== undefined && leaderboardRank !== null && leaderboardRank <= 3 && (
-										<TopRankBadge rank={leaderboardRank} size="sm" className={styles.dialogTopBadge} />
-									)}
-									{leaderboardRankDelta !== undefined && leaderboardRankDelta !== null && leaderboardRankDelta !== 0 && (
-										<span
-											className={`${styles.positionDeltaInline} ${
-												leaderboardRankDelta > 0
-													? styles.posDeltaGain
-													: styles.posDeltaLoss
-											}`}
-										>
-											{leaderboardRankDelta > 0
-												? `↑${leaderboardRankDelta}`
-												: `↓${Math.abs(leaderboardRankDelta)}`}
-										</span>
-									)}
-								</div>
-							</div>
-						</div>
+							)}
+						</>
 					)}
 				</div>
 

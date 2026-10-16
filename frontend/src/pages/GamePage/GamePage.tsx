@@ -238,6 +238,8 @@ export default function GamePage() {
 
                 {game.isGameOver && !game.hideGameOverModal && (
                     <GameOverDialog
+                        gameId={game.gameId}
+                        currentUser={game.currentUser}
                         winnerColor={game.winnerColor}
                         playerColor={game.playerColor}
                         gameOverReason={game.gameOverReason}
@@ -250,6 +252,8 @@ export default function GamePage() {
                         isViewer={game.isViewer}
                         showConfetti={game.showConfetti}
                         onConfettiComplete={() => game.setShowConfetti(false)}
+                        analysis={game.gameAnalysis}
+                        isAnalysisLoading={game.isAnalysisLoading}
                         onClose={() => game.setHideGameOverModal(true)}
                         onPlayAgain={() => {
                             game.setIsGameOver(false)

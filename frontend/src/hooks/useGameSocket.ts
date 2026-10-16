@@ -8,6 +8,7 @@ import type { Square } from 'chess.js'
 import { useToast } from '../context/ToastContext'
 
 import { getPieceImageSrc, exportPgnFile } from '../utils/gameUtils'
+import type { GameAnalysisResult } from '../utils/gameUtils'
 import type { GameModeType } from '../utils/gameModeUtils'
 import { playSound, type SoundType } from '../utils/sound'
 
@@ -118,6 +119,8 @@ export function useGameSocket() {
 
     // Finished Match Database ID
     const [savedMatchId, setSavedMatchId] = useState<number | null>(null)
+    const [gameAnalysis, setGameAnalysis] = useState<GameAnalysisResult | null>(null)
+    const [isAnalysisLoading, setIsAnalysisLoading] = useState(false)
 
     // Rating States
     const [playerRating, setPlayerRating] = useState<number | null>(null)
@@ -306,6 +309,8 @@ export function useGameSocket() {
             setPremoves([])
             setDrawOfferState('idle')
             setSavedMatchId(data.savedMatchId ?? (data.gameId ? parseInt(data.gameId, 10) : null))
+            setGameAnalysis(null)
+            setIsAnalysisLoading(false)
             hasWarnedLowTimeRef.current = false
             if (!data.isGameOver) {
                 playSound('game-start')
@@ -544,6 +549,39 @@ export function useGameSocket() {
             socketRef.current = null
         }
     }, [socket, currentUserId, activeGameId, navigate])
+
+    useEffect(() => {
+        if (!isGameOver || !savedMatchId || gameOverReason === 'ABANDONED') return
+
+        const controller = new AbortController()
+        const loadAnalysis = async () => {
+            setIsAnalysisLoading(true)
+            try {
+                const token = localStorage.getItem('token')
+                const response = await fetch(`/api/game/analyze/${savedMatchId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                    signal: controller.signal,
+                })
+
+                if (!response.ok) {
+                    throw new Error(`Analysis request failed with status ${response.status}`)
+                }
+
+                setGameAnalysis(await response.json() as GameAnalysisResult)
+            } catch (error) {
+                if (!controller.signal.aborted) {
+                    console.error('Failed to analyze finished game:', error)
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setIsAnalysisLoading(false)
+                }
+            }
+        }
+
+        void loadAnalysis()
+        return () => controller.abort()
+    }, [gameOverReason, isGameOver, savedMatchId])
 
 
     // Pause countdown timer
@@ -889,6 +927,8 @@ export function useGameSocket() {
         acceptDraw,
         declineDraw,
         savedMatchId,
+        gameAnalysis,
+        isAnalysisLoading,
         analyzeGame,
         exportPgn,
         playerRating,

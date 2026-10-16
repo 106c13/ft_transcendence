@@ -41,6 +41,12 @@
 	gap: 16px;
 }
 
+.gameOverBoxViewer {
+	min-height: auto;
+	padding: 20px;
+	gap: 12px;
+}
+
 .closeModalX {
 	position: absolute;
 	top: 14px;
@@ -94,6 +100,12 @@
 	padding-top: 0;
 }
 
+.gameOverBoxViewer .modalBody {
+	flex: 0 0 auto;
+	padding: 0;
+	gap: 8px;
+}
+
 .resultHeader {
 	display: flex;
 	flex-direction: column;
@@ -130,7 +142,6 @@
 /* Side-by-side Dual Rating Section - Centralized vertically and horizontally */
 .ratingsComparisonSection {
 	width: 100%;
-	max-width: 380px;
 	margin: auto 0;
 	display: flex;
 	align-items: center;
@@ -180,7 +191,7 @@
 }
 
 .bigRatingValue {
-	font-size: 34px;
+	font-size: 24px;
 	font-weight: 900;
 	font-family: var(--mono, monospace);
 	color: #F8FAFC;
@@ -233,6 +244,24 @@
 
 .posDeltaSame {
 	color: #94A3B8;
+}
+
+.moveStatsRow {
+	width: 100%;
+	display: grid;
+	gap: 12px;
+}
+
+.moveStatsRow1 {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+.moveStatsRow2 {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.moveStatsRow3 {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .modalFooter {
