@@ -299,11 +299,8 @@ export default function AnalyzePage() {
             } catch {}
         }
 
-        // Default to a good move indicator on the moved piece while live evaluation loads
-        return {
-            square: targetSquare,
-            classification: 'good',
-        }
+        // Wait for the live evaluation instead of showing a temporary classification.
+        return null
     }, [viewIndex, analysisData, moveDetails, moveHistory, evalInfo])
 
     // ── Modals State ──
@@ -1547,4 +1544,3 @@ export default function AnalyzePage() {
         </div>
     )
 }
-
