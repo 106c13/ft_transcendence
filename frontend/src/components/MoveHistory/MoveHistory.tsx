@@ -146,7 +146,7 @@ function MoveHistory({
 					type="button"
 					className={styles.navBtn}
 					title={t('start')}
-					disabled={halfMoves <= 0}
+					disabled={viewIndex === 0}
 					onClick={() => onSelectIndex(0)}
 				>
 					<SkipBack size={14} aria-hidden="true" />
@@ -155,7 +155,7 @@ function MoveHistory({
 					type="button"
 					className={styles.navBtn}
 					title={t('previous')}
-					disabled={halfMoves <= 0}
+					disabled={viewIndex === 0}
 					onClick={() => onSelectIndex(Math.max(0, viewIndex - 1))}
 				>
 					<ChevronLeft size={14} aria-hidden="true" />
@@ -164,7 +164,7 @@ function MoveHistory({
 					type="button"
 					className={styles.navBtn}
 					title={t('next')}
-					disabled={halfMoves <= 0}
+					disabled={viewIndex >= moveHistory.length - 1}
 					onClick={() => onSelectIndex(Math.min(moveHistory.length - 1, viewIndex + 1))}
 				>
 					<ChevronRight size={14} aria-hidden="true" />
@@ -173,7 +173,7 @@ function MoveHistory({
 					type="button"
 					className={styles.navBtn}
 					title={t('latest')}
-					disabled={halfMoves <= 0}
+					disabled={viewIndex >= moveHistory.length - 1}
 					onClick={() => onSelectIndex(moveHistory.length - 1)}
 				>
 					<SkipForward size={14} aria-hidden="true" />
@@ -184,4 +184,3 @@ function MoveHistory({
 };
 
 export default MoveHistory;
-

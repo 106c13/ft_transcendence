@@ -28,6 +28,7 @@ type Props = {
 	onAnalyze?: () => void
 	onExportPgn?: () => void
 	onPlayAgain?: () => void
+	onFlipBoard?: () => void
 }
 
 const modeTagClassMap: Record<string, keyof typeof styles> = {
@@ -61,6 +62,7 @@ function ChessInfoPanel({
 	onAnalyze,
 	onExportPgn,
 	onPlayAgain,
+	onFlipBoard,
 }: Props) {
 	const { t } = useTranslation()
 
@@ -93,6 +95,7 @@ function ChessInfoPanel({
 				onAnalyze={onAnalyze}
 				onExportPgn={onExportPgn}
 				onPlayAgain={onPlayAgain}
+				onFlipBoard={onFlipBoard}
 				movesCount={moveSAN.length}
 			/>
 		</div>

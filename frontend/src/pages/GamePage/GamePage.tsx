@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useOutletContext } from 'react-router-dom'
 import type { LayoutContextType } from '../../layouts/MainLayout'
@@ -18,6 +19,7 @@ export default function GamePage() {
 
     const layoutContext = useOutletContext<LayoutContextType | undefined>()
     const challengeSocket = layoutContext?.challengeSocket
+    const [isBoardFlipped, setIsBoardFlipped] = useState(false)
 
     const rematchState: 'idle' | 'sent' = challengeSocket?.outgoingChallenge?.isRematch ? 'sent' : 'idle'
 
@@ -145,8 +147,8 @@ export default function GamePage() {
                         <ChessBoard
                             displayChess={game.displayChess}
                             displayFen={game.displayFen}
-                            ranks={game.ranks}
-                            files={game.files}
+                            ranks={isBoardFlipped ? [...game.ranks].reverse() : game.ranks}
+                            files={isBoardFlipped ? [...game.files].reverse() : game.files}
                             selectedSquare={board.selectedSquare}
                             validMoves={board.validMoves}
                             lastMove={game.lastMove}
@@ -233,6 +235,7 @@ export default function GamePage() {
                             game.setIsGameOver(false)
                             game.startMatchmaking()
                         }}
+                        onFlipBoard={() => setIsBoardFlipped((prev) => !prev)}
                     />
                 </div>
 

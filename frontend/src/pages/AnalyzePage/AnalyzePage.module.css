@@ -464,7 +464,6 @@
   background: rgba(59, 130, 246, 0.25);
   border-color: #3B82F6;
   color: #60A5FA;
-  transform: translateY(-1px);
 }
 
 .navBtn:active:not(:disabled) {
@@ -483,40 +482,22 @@
 /* ── Action Toolbar (Matching GameActions) ── */
 .gameActions {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: row;
+  gap: 6px;
   width: 100%;
-  margin-top: 2px;
+  margin-top: -2px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .actionRow {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
 }
 
-.actionBtnPrimary {
+.actionTooltip {
   flex: 1;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(59, 130, 246, 0.4);
-  background: rgba(59, 130, 246, 0.1);
-  color: #60A5FA;
-  font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  box-sizing: border-box;
-}
-
-.actionBtnPrimary:hover:not(:disabled) {
-  background: rgba(59, 130, 246, 0.25);
-  border-color: #60A5FA;
-  color: #93C5FD;
 }
 
 .actionBtnNeutral {
@@ -541,29 +522,6 @@
   background: rgba(51, 65, 85, 0.85);
   border-color: rgba(148, 163, 184, 0.4);
   color: #FFFFFF;
-}
-
-.actionBtnDanger {
-  flex: 1;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  background: rgba(239, 68, 68, 0.1);
-  color: #EF4444;
-  font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  box-sizing: border-box;
-}
-
-.actionBtnDanger:hover:not(:disabled) {
-  background: #EF4444;
-  color: white;
 }
 
 /* ── Modals (Past Games & Load PGN) ── */
@@ -865,4 +823,3 @@
     height: 480px;
   }
 }
-

@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Eye, Search, Check, X, Clock, Ban, Flag, Download, RotateCcw } from 'lucide-react';
+import { Eye, Search, Check, X, Clock, Ban, Flag, Download, FlipHorizontal2, RotateCcw } from 'lucide-react';
 import type { DrawOfferState } from '../../hooks/useGameSocket';
+import Tooltip from '../Tooltip/Tooltip';
 import styles from './GameActions.module.css';
 
 type Props = {
@@ -16,6 +17,7 @@ type Props = {
 	onAnalyze?: () => void;
 	onExportPgn?: () => void;
 	onPlayAgain?: () => void;
+	onFlipBoard?: () => void;
 	movesCount?: number;
 };
 
@@ -30,6 +32,7 @@ const GameActions = ({
 	onAnalyze,
 	onExportPgn,
 	onPlayAgain,
+	onFlipBoard,
 	movesCount,
 }: Props) => {
 	const { t } = useTranslation();
@@ -79,44 +82,74 @@ const GameActions = ({
 		return (
 			<div className={styles.gameActions}>
 				{!isGameOver && (
-					<div className={styles.viewerBadge}>
-						<Eye size={16} aria-hidden="true" />
-						<span>{t('viewer_mode_desc')}</span>
+					<div className={styles.actionRow}>
+						<div className={styles.viewerBadge}>
+							<Eye size={16} aria-hidden="true" />
+							<span>{t('viewer_mode_desc')}</span>
+						</div>
+						{onFlipBoard && (
+							<Tooltip content={t('flip_board')} position="top" className={styles.actionTooltip}>
+								<button
+									type="button"
+									className={styles.flipBoardBtn}
+									onClick={onFlipBoard}
+									aria-label={t('flip_board')}
+								>
+									<FlipHorizontal2 size={15} aria-hidden="true" />
+								</button>
+							</Tooltip>
+						)}
 					</div>
 				)}
 				{isGameOver && (
-					<>
+					<div className={styles.actionRow}>
 						{onAnalyze && (
-							<button
-								type="button"
-								className={styles.analyzeBtn}
-								onClick={onAnalyze}
-							>
-								<Search size={15} aria-hidden="true" />
-								<span>{t('analyze_game')}</span>
-							</button>
-						)}
-						<div className={styles.actionRow}>
-							<button
-								type="button"
-								className={styles.playAgainBtn}
-								onClick={handlePlayAgain}
-							>
-								<RotateCcw size={15} aria-hidden="true" />
-								<span>{t('play_again')}</span>
-							</button>
-							{onExportPgn && (
+							<Tooltip content={t('analyze_game')} position="top" className={styles.actionTooltip}>
 								<button
 									type="button"
-									className={styles.exportPgnBtn}
+									className={styles.flipBoardBtn}
+									onClick={onAnalyze}
+									aria-label={t('analyze_game')}
+								>
+									<Search size={15} aria-hidden="true" />
+								</button>
+							</Tooltip>
+						)}
+						<Tooltip content={t('play_again')} position="top" className={styles.actionTooltip}>
+							<button
+								type="button"
+								className={styles.flipBoardBtn}
+								onClick={handlePlayAgain}
+								aria-label={t('play_again')}
+							>
+								<RotateCcw size={15} aria-hidden="true" />
+							</button>
+						</Tooltip>
+						{onFlipBoard && (
+							<Tooltip content={t('flip_board')} position="top" className={styles.actionTooltip}>
+								<button
+									type="button"
+									className={styles.flipBoardBtn}
+									onClick={onFlipBoard}
+									aria-label={t('flip_board')}
+								>
+									<FlipHorizontal2 size={15} aria-hidden="true" />
+								</button>
+							</Tooltip>
+						)}
+						{onExportPgn && (
+							<Tooltip content={t('export_pgn')} position="top" className={styles.actionTooltip}>
+								<button
+									type="button"
+									className={styles.flipBoardBtn}
 									onClick={onExportPgn}
+									aria-label={t('export_pgn')}
 								>
 									<Download size={15} aria-hidden="true" />
-									<span>{t('export_pgn')}</span>
 								</button>
-							)}
-						</div>
-					</>
+							</Tooltip>
+						)}
+					</div>
 				)}
 			</div>
 		);
@@ -125,34 +158,59 @@ const GameActions = ({
 	if (isGameOver) {
 		return (
 			<div className={styles.gameActions}>
-				{onAnalyze && (
-					<button
-						type="button"
-						className={styles.analyzeBtn}
-						onClick={onAnalyze}
-					>
-						<Search size={15} aria-hidden="true" />
-						<span>{t('analyze_game')}</span>
-					</button>
-				)}
+				<div
+					className={`${styles.drawOfferNotice} ${drawOfferState === 'received' ? styles.drawOfferNoticeVisible : ''}`}
+					aria-live="polite"
+					aria-hidden={drawOfferState !== 'received'}
+				>
+					{t('opponent_offered_draw')}
+				</div>
 				<div className={styles.actionRow}>
-					<button
-						type="button"
-						className={styles.playAgainBtn}
-						onClick={handlePlayAgain}
-					>
-						<RotateCcw size={15} aria-hidden="true" />
-						<span>{t('play_again')}</span>
-					</button>
-					{onExportPgn && (
+					{onAnalyze && (
+						<Tooltip content={t('analyze_game')} position="top" className={styles.actionTooltip}>
+							<button
+								type="button"
+								className={styles.flipBoardBtn}
+								onClick={onAnalyze}
+								aria-label={t('analyze_game')}
+							>
+								<Search size={15} aria-hidden="true" />
+							</button>
+						</Tooltip>
+					)}
+					<Tooltip content={t('play_again')} position="top" className={styles.actionTooltip}>
 						<button
 							type="button"
-							className={styles.exportPgnBtn}
-							onClick={onExportPgn}
+							className={styles.flipBoardBtn}
+							onClick={handlePlayAgain}
+							aria-label={t('play_again')}
 						>
-							<Download size={15} aria-hidden="true" />
-							<span>{t('export_pgn')}</span>
+							<RotateCcw size={15} aria-hidden="true" />
 						</button>
+					</Tooltip>
+					{onFlipBoard && (
+						<Tooltip content={t('flip_board')} position="top" className={styles.actionTooltip}>
+							<button
+								type="button"
+								className={styles.flipBoardBtn}
+								onClick={onFlipBoard}
+								aria-label={t('flip_board')}
+							>
+								<FlipHorizontal2 size={15} aria-hidden="true" />
+							</button>
+						</Tooltip>
+					)}
+					{onExportPgn && (
+						<Tooltip content={t('export_pgn')} position="top" className={styles.actionTooltip}>
+							<button
+								type="button"
+								className={styles.flipBoardBtn}
+								onClick={onExportPgn}
+								aria-label={t('export_pgn')}
+							>
+								<Download size={15} aria-hidden="true" />
+							</button>
+						</Tooltip>
 					)}
 				</div>
 			</div>
@@ -161,48 +219,59 @@ const GameActions = ({
 
 	return (
 		<div className={styles.gameActions}>
+			<div
+				className={`${styles.drawOfferNotice} ${drawOfferState === 'received' ? styles.drawOfferNoticeVisible : ''}`}
+				aria-live="polite"
+				aria-hidden={drawOfferState !== 'received'}
+			>
+				{t('opponent_offered_draw')}
+			</div>
 			<div className={styles.actionRow}>
 				{drawOfferState === 'received' ? (
 					<>
-						<button type="button" className={styles.acceptBtn} onClick={onAcceptDraw}>
-							<Check size={14} aria-hidden="true" />
-							<span>{t('accept_draw')}</span>
-						</button>
-						<button type="button" className={styles.declineBtn} onClick={onDeclineDraw}>
-							<X size={14} aria-hidden="true" />
-							<span>{t('decline_draw')}</span>
-						</button>
+						<Tooltip content={t('accept_draw')} position="top" className={styles.actionTooltip}>
+							<button type="button" className={styles.acceptBtn} onClick={onAcceptDraw}>
+								<Check size={14} aria-hidden="true" />
+							</button>
+						</Tooltip>
+						<Tooltip content={t('decline_draw')} position="top" className={styles.actionTooltip}>
+							<button type="button" className={styles.declineBtn} onClick={onDeclineDraw}>
+								<X size={14} aria-hidden="true" />
+							</button>
+						</Tooltip>
 					</>
 				) : drawOfferState === 'sent' ? (
-					<button type="button" className={`${styles.drawBtn} ${styles.drawBtnDisabled}`} disabled>
-						<Clock size={14} aria-hidden="true" />
-						<span>{t('draw_offered')}</span>
-					</button>
+					<Tooltip content={t('draw_offered')} position="top" className={styles.actionTooltip}>
+						<button type="button" className={`${styles.drawBtn} ${styles.drawBtnDisabled}`} disabled>
+							<Clock size={14} aria-hidden="true" />
+						</button>
+					</Tooltip>
 				) : (
-					<button type="button" className={styles.drawBtn} onClick={onOfferDraw}>
-						<span>½</span>
-						<span>{t('offer_draw')}</span>
-					</button>
+					<Tooltip content={t('offer_draw')} position="top" className={styles.actionTooltip}>
+						<button type="button" className={styles.drawBtn} onClick={onOfferDraw}>
+							<span aria-hidden="true">½</span>
+						</button>
+					</Tooltip>
 				)}
 				<div className={styles.resignContainer} ref={resignContainerRef}>
-					<button
-						type="button"
-						className={`${styles.resignBtn} ${isAbandon ? styles.abandonBtn : ''} ${showResignModal ? (isAbandon ? styles.abandonBtnActive : styles.resignBtnActive) : ''}`}
-						onClick={() => setShowResignModal((prev) => !prev)}
-						aria-expanded={showResignModal}
-					>
-						{isAbandon ? (
-							<>
-								<Ban size={14} aria-hidden="true" />
-								<span>{t('abandon')}</span>
-							</>
-						) : (
-							<>
-								<Flag size={14} aria-hidden="true" />
-								<span>{t('resign')}</span>
-							</>
-						)}
-					</button>
+					<Tooltip content={isAbandon ? t('abandon') : t('resign')} position="top" className={styles.actionTooltip}>
+						<button
+							type="button"
+							className={`${styles.resignBtn} ${isAbandon ? styles.abandonBtn : ''} ${showResignModal ? (isAbandon ? styles.abandonBtnActive : styles.resignBtnActive) : ''}`}
+							onClick={() => setShowResignModal((prev) => !prev)}
+							aria-expanded={showResignModal}
+						>
+							{isAbandon ? (
+								<>
+									<Ban size={14} aria-hidden="true" />
+								</>
+							) : (
+								<>
+									<Flag size={14} aria-hidden="true" />
+								</>
+							)}
+						</button>
+					</Tooltip>
 
 					{showResignModal && (
 						<div
@@ -247,6 +316,18 @@ const GameActions = ({
 						</div>
 					)}
 				</div>
+				{onFlipBoard && (
+					<Tooltip content={t('flip_board')} position="top" className={styles.actionTooltip}>
+						<button
+							type="button"
+							className={styles.flipBoardBtn}
+							onClick={onFlipBoard}
+							aria-label={t('flip_board')}
+						>
+							<FlipHorizontal2 size={15} aria-hidden="true" />
+						</button>
+					</Tooltip>
+				)}
 			</div>
 		</div>
 	);

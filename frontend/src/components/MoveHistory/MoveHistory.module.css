@@ -25,7 +25,7 @@
 	display: flex;
 	gap: 6px;
 	width: 100%;
-	margin-top: 6px;
+	margin-top: 4px;
 	box-sizing: border-box;
 }
 
@@ -50,7 +50,6 @@
 	background: rgba(59, 130, 246, 0.25);
 	border-color: #3B82F6;
 	color: #60A5FA;
-	transform: translateY(-1px);
 }
 
 .navBtn:active:not(:disabled) {

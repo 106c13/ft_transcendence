@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { Chess, type Square } from 'chess.js'
 import {
     Brain,
+    FlipHorizontal2,
+    History,
     RotateCcw,
-    RotateCw,
-    Search,
     ScrollText,
     SkipBack,
     ChevronLeft,
@@ -24,6 +24,7 @@ import { playSound, type SoundType } from '../../utils/sound'
 import type { MatchRecord, GameAnalysisResult } from '../../utils/gameUtils'
 import SimpleGameRow from '../../components/SimpleGameRow/SimpleGameRow'
 import ChessSkeleton from '../../components/ChessSkeleton/ChessSkeleton'
+import Tooltip from '../../components/Tooltip/Tooltip'
 import styles from './AnalyzePage.module.css'
 
 function getSoundForSan(san?: string): SoundType {
@@ -1350,47 +1351,49 @@ export default function AnalyzePage() {
                         {/* Action Toolbar */}
                         <div className={styles.gameActions}>
                             <div className={styles.actionRow}>
-                                <button
-                                    type="button"
-                                    className={styles.actionBtnPrimary}
-                                    onClick={() => setShowPgnModal(true)}
-                                    title={t('load_pgn')}
-                                >
-                                    <ScrollText size={15} />
-                                    {t('load_pgn')}
-                                </button>
+                                <Tooltip content={t('load_pgn')} position="top" className={styles.actionTooltip}>
+                                    <button
+                                        type="button"
+                                        className={styles.actionBtnNeutral}
+                                        onClick={() => setShowPgnModal(true)}
+                                        aria-label={t('load_pgn')}
+                                    >
+                                        <ScrollText size={15} />
+                                    </button>
+                                </Tooltip>
 
-                                <button
-                                    type="button"
-                                    className={styles.actionBtnNeutral}
-                                    onClick={openGamesModal}
-                                    title={t('analyze_existing_game')}
-                                >
-                                    <Search size={15} />
-                                    {t('analyze_existing_game')}
-                                </button>
-                            </div>
+                                <Tooltip content={t('analyze_existing_game')} position="top" className={styles.actionTooltip}>
+                                    <button
+                                        type="button"
+                                        className={styles.actionBtnNeutral}
+                                        onClick={openGamesModal}
+                                        aria-label={t('analyze_existing_game')}
+                                    >
+                                        <History size={15} />
+                                    </button>
+                                </Tooltip>
 
-                            <div className={styles.actionRow}>
-                                <button
-                                    type="button"
-                                    className={styles.actionBtnNeutral}
-                                    onClick={handleFlipBoard}
-                                    title={t('flip_board')}
-                                >
-                                    <RotateCw size={15} />
-                                    {t('flip_board')}
-                                </button>
+                                <Tooltip content={t('flip_board')} position="top" className={styles.actionTooltip}>
+                                    <button
+                                        type="button"
+                                        className={styles.actionBtnNeutral}
+                                        onClick={handleFlipBoard}
+                                        aria-label={t('flip_board')}
+                                    >
+                                        <FlipHorizontal2 size={15} />
+                                    </button>
+                                </Tooltip>
 
-                                <button
-                                    type="button"
-                                    className={styles.actionBtnDanger}
-                                    onClick={handleReset}
-                                    title={t('reset_board')}
-                                >
-                                    <RotateCcw size={15} />
-                                    {t('reset_board')}
-                                </button>
+                                <Tooltip content={t('reset_board')} position="top" className={styles.actionTooltip}>
+                                    <button
+                                        type="button"
+                                        className={styles.actionBtnNeutral}
+                                        onClick={handleReset}
+                                        aria-label={t('reset_board')}
+                                    >
+                                        <RotateCcw size={15} />
+                                    </button>
+                                </Tooltip>
                             </div>
                         </div>
                     </div>

@@ -509,7 +509,8 @@ export function useGameSocket() {
         socket.on('game_over', handleGameOver)
 
         // Draw offer events
-        const handleDrawOffered = () => {
+        const handleDrawOffered = (data: { fromUserId?: number }) => {
+            if (data.fromUserId !== undefined && data.fromUserId === currentUserId) return
             setDrawOfferState('received')
             playSound('drawoffer')
         }
@@ -549,6 +550,12 @@ export function useGameSocket() {
             socketRef.current = null
         }
     }, [socket, currentUserId, activeGameId, navigate])
+
+    useEffect(() => {
+        if (drawOfferState !== 'declined') return
+        const timer = setTimeout(() => setDrawOfferState('idle'), 5000)
+        return () => clearTimeout(timer)
+    }, [drawOfferState])
 
     useEffect(() => {
         if (!isGameOver || !savedMatchId || gameOverReason === 'ABANDONED') return
@@ -795,15 +802,6 @@ export function useGameSocket() {
             })
         }
     }
-
-    // Auto-clear declined draw notice after 5 seconds
-    useEffect(() => {
-        if (drawOfferState !== 'declined') return
-        const timer = setTimeout(() => {
-            setDrawOfferState('idle')
-        }, 5000)
-        return () => clearTimeout(timer)
-    }, [drawOfferState])
 
     // Draw actions
     const offerDraw = () => {
