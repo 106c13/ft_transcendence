@@ -87,7 +87,7 @@ const ProfileTabs = ({
 					{/* Recent Games List */}
 					<RecentGames
 						matches={history.matches}
-						username={username}
+						username={username || ''}
 						isOwnProfile={isOwnProfile}
 						loading={history.loading}
 					/>

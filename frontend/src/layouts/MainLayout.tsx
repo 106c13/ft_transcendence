@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import Navbar from '../components/Navbar/Navbar'
 import Footer from '../components/Footer/Footer'
 import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification'
@@ -31,7 +30,6 @@ export type LayoutContextType = {
 }
 
 export default function MainLayout() {
-  const { t } = useTranslation()
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const navigate = useNavigate()
   const location = useLocation()

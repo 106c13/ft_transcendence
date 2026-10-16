@@ -239,7 +239,7 @@ export default function GamePage() {
                     />
                 </div>
 
-                {game.isGameOver && !game.hideGameOverModal && (
+                {game.isGameOver && !game.hideGameOverModal && game.currentUser && (
                     <GameOverDialog
                         gameId={game.gameId}
                         currentUser={game.currentUser}

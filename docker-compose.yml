@@ -1,14 +1,13 @@
 services:
   nginx:
-    build: ./nginx
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: nginx
     ports:
       - "8080:80"
     depends_on:
       - backend
-    volumes:
-      - ./frontend/dist:/usr/share/nginx/html:Z
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:Z
     networks:
       - ft_transcendence
 

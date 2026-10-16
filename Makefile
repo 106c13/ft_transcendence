@@ -37,12 +37,6 @@ dev-logs:
 
 start:
 	@$(COMPOSE_DEV) down 2>/dev/null || true
-	@printf "$(GREEN)[START] Building frontend pages...$(RESET)\n"
-	docker run --rm \
-	-v $(PWD)/frontend:/app:Z \
-	-w /app \
-	node:20-alpine \
-	sh -c "npm install && npm run build"
 	@printf "$(GREEN)[START] Building and starting containers...$(RESET)\n"
 	@$(COMPOSE) up --build -d
 	@printf "$(GREEN)[OK] Project is running$(RESET)\n"
