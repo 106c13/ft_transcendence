@@ -22,16 +22,31 @@ const MatchmakingPage = () => {
     const { socket } = useGameSocketContext()
     const socketRef = useRef<Socket | null>(null)
     const matchFoundRef = useRef(false)
+    const matchmakingStartedRef = useRef(false)
+    const cancelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const matchmakingModeRef = useRef<GameModeType | null>(null)
 
     // Matchmaking socket connection
     useEffect(() => {
         if (!currentUserId || !socket) return
 
-        matchFoundRef.current = false
+        if (matchmakingModeRef.current !== modeParam) {
+            matchmakingModeRef.current = modeParam
+            matchmakingStartedRef.current = false
+            matchFoundRef.current = false
+        }
+
+        if (cancelTimerRef.current) {
+            clearTimeout(cancelTimerRef.current)
+            cancelTimerRef.current = null
+        }
         socketRef.current = socket
 
         const onConnect = () => {
-            socket.emit('find_match', { mode: modeParam })
+            if (!matchmakingStartedRef.current) {
+                matchmakingStartedRef.current = true
+                socket.emit('find_match', { mode: modeParam })
+            }
         }
 
         const onMatchFound = (data: { gameId: string }) => {
@@ -42,7 +57,8 @@ const MatchmakingPage = () => {
         socket.on('connect', onConnect)
         socket.on('match_found', onMatchFound)
 
-        if (socket.connected) {
+        if (socket.connected && !matchmakingStartedRef.current) {
+            matchmakingStartedRef.current = true
             socket.emit('find_match', { mode: modeParam })
         }
 
@@ -50,11 +66,15 @@ const MatchmakingPage = () => {
             socket.off('connect', onConnect)
             socket.off('match_found', onMatchFound)
 
-            // Only cancel queue if unmounted without finding a match
+            // Defer cancellation so StrictMode's setup/cleanup/setup cycle does
+            // not cancel the queue created by the next effect setup.
             if (!matchFoundRef.current) {
-                if (socket.connected) {
-                    socket.emit('cancel_queue')
-                }
+                cancelTimerRef.current = setTimeout(() => {
+                    if (!matchFoundRef.current && socketRef.current === socket && socket.connected) {
+                        socket.emit('cancel_queue')
+                    }
+                    cancelTimerRef.current = null
+                }, 0)
             }
             socketRef.current = null
         }

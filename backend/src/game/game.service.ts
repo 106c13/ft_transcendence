@@ -64,6 +64,8 @@ export class GameService {
 		'rapid+2': [],
 	};
 
+	private matchmakingRequests = new Map<number, Promise<ChessGame | null>>();
+
 	// Pending challenge requests keyed by challengeId
 	private pendingChallenges = new Map<string, PendingChallenge>();
 
@@ -195,14 +197,34 @@ export class GameService {
 	}
 
 	async addToQueue(userId: number, socketId: string, username: string, mode: GameModeType): Promise<ChessGame | null> {
+		const pendingRequest = this.matchmakingRequests.get(userId);
+		if (pendingRequest) {
+			return pendingRequest;
+		}
+
+		const request = this.addToQueueInternal(userId, socketId, username, mode);
+		this.matchmakingRequests.set(userId, request);
+
+		try {
+			return await request;
+		} finally {
+			if (this.matchmakingRequests.get(userId) === request) {
+				this.matchmakingRequests.delete(userId);
+			}
+		}
+	}
+
+	private async addToQueueInternal(
+		userId: number,
+		socketId: string,
+		username: string,
+		mode: GameModeType,
+	): Promise<ChessGame | null> {
 		this.removeFromQueue(userId);
 
 		const existingGame = this.getGameByUserId(userId);
 		if (existingGame) {
-			if (existingGame.board.history().length < 2) {
-				console.log(`Game Service: User ${userId} requested queue, abandoning stale game ${existingGame.gameId}`);
-				await this.abandonGame(existingGame);
-			} else if (existingGame.board.isGameOver()) {
+			if (existingGame.board.isGameOver()) {
 				this.activeGames.delete(existingGame.gameId);
 			} else {
 				if (existingGame.white.userId === userId) {
@@ -1206,5 +1228,4 @@ export class GameService {
 		return response.json();
 	}
 }
-
 
