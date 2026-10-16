@@ -96,24 +96,26 @@ const GameActions = ({
 								<span>{t('analyze_game')}</span>
 							</button>
 						)}
-						{onExportPgn && (
+						<div className={styles.actionRow}>
 							<button
 								type="button"
-								className={styles.exportPgnBtn}
-								onClick={onExportPgn}
+								className={styles.playAgainBtn}
+								onClick={handlePlayAgain}
 							>
-								<Download size={15} aria-hidden="true" />
-								<span>{t('export_pgn')}</span>
+								<RotateCcw size={15} aria-hidden="true" />
+								<span>{t('play_again')}</span>
 							</button>
-						)}
-						<button
-							type="button"
-							className={styles.playAgainBtn}
-							onClick={handlePlayAgain}
-						>
-							<RotateCcw size={15} aria-hidden="true" />
-							<span>{t('play_again')}</span>
-						</button>
+							{onExportPgn && (
+								<button
+									type="button"
+									className={styles.exportPgnBtn}
+									onClick={onExportPgn}
+								>
+									<Download size={15} aria-hidden="true" />
+									<span>{t('export_pgn')}</span>
+								</button>
+							)}
+						</div>
 					</>
 				)}
 			</div>
@@ -133,24 +135,26 @@ const GameActions = ({
 						<span>{t('analyze_game')}</span>
 					</button>
 				)}
-				{onExportPgn && (
+				<div className={styles.actionRow}>
 					<button
 						type="button"
-						className={styles.exportPgnBtn}
-						onClick={onExportPgn}
+						className={styles.playAgainBtn}
+						onClick={handlePlayAgain}
 					>
-						<Download size={15} aria-hidden="true" />
-						<span>{t('export_pgn')}</span>
+						<RotateCcw size={15} aria-hidden="true" />
+						<span>{t('play_again')}</span>
 					</button>
-				)}
-				<button
-					type="button"
-					className={styles.playAgainBtn}
-					onClick={handlePlayAgain}
-				>
-					<RotateCcw size={15} aria-hidden="true" />
-					<span>{t('play_again')}</span>
-				</button>
+					{onExportPgn && (
+						<button
+							type="button"
+							className={styles.exportPgnBtn}
+							onClick={onExportPgn}
+						>
+							<Download size={15} aria-hidden="true" />
+							<span>{t('export_pgn')}</span>
+						</button>
+					)}
+				</div>
 			</div>
 		);
 	}

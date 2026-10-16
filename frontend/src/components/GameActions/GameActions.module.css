@@ -307,9 +307,9 @@
 	width: 100%;
 	padding: 10px;
 	border-radius: 6px;
-	border: 1px solid rgba(59, 130, 246, 0.4);
-	background: rgba(59, 130, 246, 0.15);
-	color: #60A5FA;
+	border: 1px solid rgba(16, 185, 129, 0.4);
+	background: rgba(16, 185, 129, 0.15);
+	color: var(--color-emerald-400);
 	font-weight: 600;
 	cursor: pointer;
 	transition: all 0.2s;
@@ -320,18 +320,18 @@
 }
 
 .analyzeBtn:hover {
-	background: #3B82F6;
+	background: var(--color-emerald-500);
 	color: white;
-	border-color: #3B82F6;
+	border-color: var(--color-emerald-500);
 }
 
 .exportPgnBtn {
 	width: 100%;
 	padding: 10px;
 	border-radius: var(--radius-md);
-	border: 1px solid rgba(16, 185, 129, 0.4);
-	background: rgba(16, 185, 129, 0.15);
-	color: var(--color-emerald-400);
+	border: 1px solid #F59E0B;
+	background: linear-gradient(135deg, #F59E0B, #D97706);
+	color: #ffffff;
 	font-weight: 600;
 	cursor: pointer;
 	transition: all var(--transition-normal);
@@ -342,9 +342,8 @@
 }
 
 .exportPgnBtn:hover {
-	background: var(--color-emerald-500);
-	color: #ffffff;
-	border-color: var(--color-emerald-500);
+	background: linear-gradient(135deg, #D97706, #B45309);
+	border-color: #D97706;
 }
 
 .playAgainBtn {
@@ -405,4 +404,3 @@
 	justify-content: center;
 	gap: 8px;
 }
-

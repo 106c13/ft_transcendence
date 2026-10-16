@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { X, Search } from 'lucide-react';
+import { Repeat2, RotateCcw, Search, X } from 'lucide-react';
 import { useGameHistory } from '../../hooks/useGameHistory';
 import ModalConfetti from '../ModalConfetti/ModalConfetti';
 import TopRankBadge from '../TopRankBadge/TopRankBadge';
@@ -216,8 +216,18 @@ function GameOverDialog({
 						</button>
 					) : (
 						<>
+							{gameOverReason !== 'ABANDONED' && onAnalyze && (
+								<button className={styles.analyzeBtn} onClick={onAnalyze}>
+									<span className={styles.analyzeBtnIcon}>
+										<Search size={20} aria-hidden="true" />
+									</span>
+									<span>{t('analyze_game')}</span>
+								</button>
+							)}
+
 							<div className={styles.buttonRow}>
 								<button className={styles.playAgainBtn} onClick={onPlayAgain}>
+									<RotateCcw size={15} aria-hidden="true" />
 									{t('play_again')}
 								</button>
 								{gameOverReason !== 'ABANDONED' && (
@@ -226,19 +236,11 @@ function GameOverDialog({
 										onClick={onRematch}
 										disabled={isWaiting}
 									>
+										<Repeat2 size={15} aria-hidden="true" />
 										{isWaiting ? t('rematch_waiting') : t('rematch')}
 									</button>
 								)}
 							</div>
-
-							{gameOverReason !== 'ABANDONED' && onAnalyze && (
-								<button className={styles.analyzeBtn} onClick={onAnalyze}>
-									<span className={styles.analyzeBtnIcon}>
-										<Search size={16} aria-hidden="true" />
-									</span>
-									<span>{t('analyze_game')}</span>
-								</button>
-							)}
 						</>
 					)}
 				</div>
