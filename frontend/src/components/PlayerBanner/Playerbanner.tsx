@@ -70,6 +70,7 @@ const PlayerBanner = ({
 
 	const actualUsername = username || name
 	const modeColor = getModeColor(selectedMode)
+	const shouldHideClock = hideClock || isGameOver
 
 	const isAnonymousPlaceholder = !actualUsername ||
 		['White', 'Black', 'Opponent', 'AI', 'Anonymous', '?', 'You'].includes(actualUsername) ||
@@ -348,7 +349,12 @@ const PlayerBanner = ({
 				</div>
 
 				{/* Clock */}
-				{!hideClock && <div className={styles.gameClock}>{formatTime(time)}</div>}
+				<div
+					className={`${styles.clockWrapper} ${shouldHideClock ? styles.clockHidden : ''}`}
+					aria-hidden={shouldHideClock}
+				>
+					<div className={styles.gameClock}>{formatTime(time)}</div>
+				</div>
 			</div>
 		</div>
 	);

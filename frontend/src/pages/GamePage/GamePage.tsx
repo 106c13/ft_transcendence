@@ -121,6 +121,7 @@ export default function GamePage() {
                                 rating={topViewerPlayer.rating}
                                 ratingDelta={topViewerPlayer.ratingDelta}
                                 isGameOver={game.isGameOver}
+                                hideClock
                                 isProvisional={topViewerPlayer.isProvisional}
                                 selectedMode={game.selectedMode}
                                 capturedPieces={topViewerPlayer.captured}
@@ -184,6 +185,7 @@ export default function GamePage() {
                                 rating={bottomViewerPlayer.rating}
                                 ratingDelta={bottomViewerPlayer.ratingDelta}
                                 isGameOver={game.isGameOver}
+                                hideClock
                                 isProvisional={bottomViewerPlayer.isProvisional}
                                 selectedMode={game.selectedMode}
                                 capturedPieces={bottomViewerPlayer.captured}
