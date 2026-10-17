@@ -1122,7 +1122,6 @@ export default function AnalyzePage() {
                                 showPromotion={showPromotion}
                                 promotionSquare={promotionSquare}
                                 isPaused={false}
-                                pauseCountdown={null}
                                 onSquareClick={handleSquareClick}
                                 onSquareSelect={handleSquareSelect}
                                 onPieceDrop={handlePieceDrop}

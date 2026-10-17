@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import type { Chess, Square, PieceSymbol } from 'chess.js'
 import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils'
 import PromotionOverlay from '../PromotionOverlay/PromotionOverlay'
-import DisconnectWarning from '../DisconnectWarning/DisconnectWarning'
 import BoardClassificationBadge from '../BoardClassificationBadge/BoardClassificationBadge'
 import styles from './ChessBoard.module.css'
 
@@ -34,7 +33,6 @@ type Props = {
     showPromotion: boolean
     promotionSquare?: string | null
     isPaused: boolean
-    pauseCountdown: number | null
     onSquareClick: (sq: string) => void
     onSquareSelect?: (sq: string) => void
     onPieceDrop?: (fromSq: string, toSq: string) => void
@@ -88,7 +86,6 @@ function ChessBoard({
     showPromotion,
     promotionSquare,
     isPaused,
-    pauseCountdown,
     onSquareClick,
     onSquareSelect,
     onPieceDrop,
@@ -746,7 +743,6 @@ function ChessBoard({
                 />
             )}
 
-            {isPaused && <DisconnectWarning pauseCountdown={pauseCountdown} />}
         </div>
     )
 }

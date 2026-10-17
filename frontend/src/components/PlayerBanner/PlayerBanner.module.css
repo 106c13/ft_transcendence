@@ -131,6 +131,20 @@
 	display: block;
 }
 
+.disconnectedProfilePic {
+	width: 38px;
+	height: 38px;
+	border-radius: 8px;
+	background: rgba(185, 28, 28, 0.9);
+	border: 1px solid rgba(248, 113, 113, 0.8);
+	color: #FEE2E2;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+}
+
 .playerTextStack {
 	display: flex;
 	flex-direction: column;
@@ -365,11 +379,20 @@
 /* Captured Pieces: directly beside User Info */
 .capturedArea {
 	display: flex;
-	align-items: center;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: center;
 	min-width: 0;
 	padding: 0;
 	gap: 4px;
 	flex-shrink: 0;
+}
+
+.capturedRow {
+	display: flex;
+	align-items: center;
+	min-width: 0;
+	height: 18px;
 }
 
 .capturedList {
@@ -395,6 +418,21 @@
 	font-family: var(--mono, monospace);
 	line-height: 1;
 	flex-shrink: 0;
+}
+
+.disconnectStatus {
+	display: inline-flex;
+	align-items: center;
+	color: #FCA5A5;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1;
+	height: 18px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 190px;
+	margin-left: 12px;
 }
 
 /* Game Clock: Pushed all the way to right edge */

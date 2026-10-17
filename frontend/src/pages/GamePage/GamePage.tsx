@@ -92,6 +92,14 @@ export default function GamePage() {
         diff: game.whiteScore > game.blackScore ? game.whiteScore - game.blackScore : 0,
     }
 
+    const topViewerDisconnected = game.disconnectedUserId !== null &&
+        game.disconnectedUserId === game.blackPlayer?.id
+    const bottomViewerDisconnected = game.disconnectedUserId !== null &&
+        game.disconnectedUserId === game.whitePlayer?.id
+    const opponentPlayer = game.playerColor === 'w' ? game.blackPlayer : game.whitePlayer
+    const opponentDisconnected = game.disconnectedUserId !== null &&
+        game.disconnectedUserId === opponentPlayer?.id
+
     return (
         <div className={styles.gameContainer}>
             <main className={styles.gameMain}>
@@ -122,6 +130,8 @@ export default function GamePage() {
                                 ratingDelta={topViewerPlayer.ratingDelta}
                                 isGameOver={game.isGameOver}
                                 hideClock
+                                isDisconnected={topViewerDisconnected}
+                                disconnectCountdown={game.pauseCountdown}
                                 isProvisional={topViewerPlayer.isProvisional}
                                 selectedMode={game.selectedMode}
                                 capturedPieces={topViewerPlayer.captured}
@@ -138,6 +148,8 @@ export default function GamePage() {
                                 rating={game.opponentRating}
                                 ratingDelta={game.playerColor === 'w' ? game.blackRatingDelta : game.whiteRatingDelta}
                                 isGameOver={game.isGameOver}
+                                isDisconnected={opponentDisconnected}
+                                disconnectCountdown={game.pauseCountdown}
                                 isProvisional={game.opponentIsProvisional}
                                 selectedMode={game.selectedMode}
                                 capturedPieces={opponentCaptured}
@@ -161,7 +173,6 @@ export default function GamePage() {
                             showPromotion={board.showPromotion}
                             promotionSquare={board.promotionSquare}
                             isPaused={game.isPaused}
-                            pauseCountdown={game.pauseCountdown}
                             onSquareClick={board.handleSquareClick}
                             onSquareSelect={board.handleSquareSelect}
                             onPieceDrop={board.handlePieceDrop}
@@ -186,6 +197,8 @@ export default function GamePage() {
                                 ratingDelta={bottomViewerPlayer.ratingDelta}
                                 isGameOver={game.isGameOver}
                                 hideClock
+                                isDisconnected={bottomViewerDisconnected}
+                                disconnectCountdown={game.pauseCountdown}
                                 isProvisional={bottomViewerPlayer.isProvisional}
                                 selectedMode={game.selectedMode}
                                 capturedPieces={bottomViewerPlayer.captured}

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { RatingInfo } from '../../utils/profileUtils';
 import { getAvatarUrl, getModeColor, getPieceImageSrc } from '../../utils/gameUtils';
 import GameModeIcon from '../GameModeIcon/GameModeIcon';
+import { WifiOff } from 'lucide-react';
 import styles from './PlayerBanner.module.css';
 
 
@@ -26,6 +27,8 @@ type Props = {
 	capturedPieces?: PieceCapture[]
 	materialDiff?: number
 	hideClock?: boolean
+	isDisconnected?: boolean
+	disconnectCountdown?: number | null
 }
 
 export function formatTime(timeMs: number) {
@@ -60,6 +63,8 @@ const PlayerBanner = ({
 	capturedPieces,
 	materialDiff,
 	hideClock = false,
+	isDisconnected = false,
+	disconnectCountdown = null,
 }: Props) => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
@@ -225,17 +230,23 @@ const PlayerBanner = ({
 							}}
 							title={userExists ? (isOpen ? t('click_to_collapse') : t('click_to_view_ratings')) : undefined}
 						>
-							<img
-								src={getAvatarUrl(userAvatar)}
-								alt={name}
-								className={styles.profilePic}
-								onError={e => {
-									const target = e.currentTarget
-									if (!target.src.endsWith('/assets/default.jpg')) {
-										target.src = '/assets/default.jpg'
-									}
-								}}
-							/>
+							{isDisconnected ? (
+								<div className={styles.disconnectedProfilePic} aria-label={t('opponent_disconnected_title')}>
+									<WifiOff size={20} strokeWidth={2.25} aria-hidden="true" />
+								</div>
+							) : (
+								<img
+									src={getAvatarUrl(userAvatar)}
+									alt={name}
+									className={styles.profilePic}
+									onError={e => {
+										const target = e.currentTarget
+										if (!target.src.endsWith('/assets/default.jpg')) {
+											target.src = '/assets/default.jpg'
+										}
+									}}
+								/>
+							)}
 							<div className={styles.playerTextStack}>
 								<span className={styles.nickname}>{name}</span>
 								<div className={styles.ratingRow}>
@@ -328,22 +339,28 @@ const PlayerBanner = ({
 						</div>
 					</div>
 
-					{/* Captured Pieces: right beside user info */}
-					{capturedPieces && capturedPieces.length > 0 && (
+					{/* Captured pieces and connection status */}
+					{isDisconnected ? (
+						<span className={styles.disconnectStatus}>
+							{t('opponent_reconnect_wait')} {disconnectCountdown ?? 0}s
+						</span>
+					) : (
 						<div className={styles.capturedArea}>
-							<div className={styles.capturedList}>
-								{capturedPieces.map((p, idx) => (
-									<img
-										key={idx}
-										src={getPieceImageSrc(p.type, p.color)}
-										alt={p.type}
-										className={styles.capturedPiece}
-									/>
-								))}
+							<div className={styles.capturedRow}>
+								<div className={styles.capturedList}>
+									{capturedPieces?.map((p, idx) => (
+										<img
+											key={idx}
+											src={getPieceImageSrc(p.type, p.color)}
+											alt={p.type}
+											className={styles.capturedPiece}
+										/>
+									))}
+								</div>
+								{materialDiff !== undefined && materialDiff > 0 && (
+									<span className={styles.materialDiff}>+{materialDiff}</span>
+								)}
 							</div>
-							{materialDiff !== undefined && materialDiff > 0 && (
-								<span className={styles.materialDiff}>+{materialDiff}</span>
-							)}
 						</div>
 					)}
 				</div>

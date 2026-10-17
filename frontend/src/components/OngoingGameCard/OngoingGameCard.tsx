@@ -310,7 +310,6 @@ const OngoingGameCard = ({
 					showPromotion={false}
 					promotionSquare={null}
 					isPaused={isPaused}
-					pauseCountdown={null}
 					onSquareClick={() => {}}
 					onSquareSelect={() => {}}
 					onPieceDrop={() => {}}

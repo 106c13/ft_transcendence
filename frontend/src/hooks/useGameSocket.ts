@@ -144,6 +144,7 @@ export function useGameSocket() {
     const [blackTime, setBlackTime] = useState(180000)
     const [isPaused, setIsPaused] = useState(false)
     const [pauseCountdown, setPauseCountdown] = useState<number | null>(null)
+    const [disconnectedUserId, setDisconnectedUserId] = useState<number | null>(null)
 
     // Chess Rules engine
     const [localChess] = useState(() => new Chess())
@@ -305,6 +306,7 @@ export function useGameSocket() {
             setWinnerColor(data.winner ?? null)
             setGameOverReason(data.reason ?? '')
             setIsPaused(data.isPaused || false)
+            setDisconnectedUserId(null)
             setSelectedMode(data.mode)
             setPremoves([])
             setDrawOfferState('idle')
@@ -426,12 +428,14 @@ export function useGameSocket() {
         const handleOpponentDisconnected = (data: { userId: number; graceSeconds: number }) => {
             setIsPaused(true)
             setPauseCountdown(data.graceSeconds)
+            setDisconnectedUserId(data.userId)
         }
         socket.on('opponent_disconnected', handleOpponentDisconnected)
 
         const handleOpponentReconnected = () => {
             setIsPaused(false)
             setPauseCountdown(null)
+            setDisconnectedUserId(null)
         }
         socket.on('opponent_reconnected', handleOpponentReconnected)
 
@@ -452,6 +456,7 @@ export function useGameSocket() {
             blackLeaderboardRankDelta?: number
         }) => {
             setIsGameOver(true)
+            setDisconnectedUserId(null)
             setHideGameOverModal(false)
             setWinnerColor(data.winner)
             setGameOverReason(data.reason)
@@ -897,6 +902,7 @@ export function useGameSocket() {
         blackTime,
         isPaused,
         pauseCountdown,
+        disconnectedUserId,
         boardFen,
         lastMove: displayedLastMove,
         premoves,
