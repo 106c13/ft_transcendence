@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Eye, Search, Check, X, Clock, Ban, Flag, Download, FlipHorizontal2, RotateCcw } from 'lucide-react';
+import { Home, Search, Check, X, Clock, Ban, Flag, Download, FlipHorizontal2, RotateCcw } from 'lucide-react';
 import type { DrawOfferState } from '../../hooks/useGameSocket';
 import Tooltip from '../Tooltip/Tooltip';
 import styles from './GameActions.module.css';
@@ -49,6 +49,10 @@ const GameActions = ({
 		}
 	};
 
+	const handleBackHome = () => {
+		navigate('/home');
+	};
+
 	useEffect(() => {
 		if (!showResignModal) return
 
@@ -82,24 +86,38 @@ const GameActions = ({
 		return (
 			<div className={styles.gameActions}>
 				{!isGameOver && (
-					<div className={styles.actionRow}>
-						<div className={styles.viewerBadge}>
-							<Eye size={16} aria-hidden="true" />
-							<span>{t('viewer_mode_desc')}</span>
+					<>
+						<div
+							className={`${styles.drawOfferNotice} ${styles.drawOfferNoticeVisible}`}
+							aria-live="polite"
+						>
+							{t('viewer_mode_desc')}
 						</div>
-						{onFlipBoard && (
-							<Tooltip content={t('flip_board')} position="top" className={styles.actionTooltip}>
+						<div className={styles.actionRow}>
+							<Tooltip content={t('go_back_home')} position="top" className={styles.actionTooltip}>
 								<button
 									type="button"
 									className={styles.flipBoardBtn}
-									onClick={onFlipBoard}
-									aria-label={t('flip_board')}
+									onClick={handleBackHome}
+									aria-label={t('go_back_home')}
 								>
-									<FlipHorizontal2 size={15} aria-hidden="true" />
+									<Home size={15} aria-hidden="true" />
 								</button>
 							</Tooltip>
-						)}
-					</div>
+							{onFlipBoard && (
+								<Tooltip content={t('flip_board')} position="top" className={styles.actionTooltip}>
+									<button
+										type="button"
+										className={styles.flipBoardBtn}
+										onClick={onFlipBoard}
+										aria-label={t('flip_board')}
+									>
+										<FlipHorizontal2 size={15} aria-hidden="true" />
+									</button>
+								</Tooltip>
+							)}
+						</div>
+					</>
 				)}
 				{isGameOver && (
 					<div className={styles.actionRow}>
@@ -115,14 +133,14 @@ const GameActions = ({
 								</button>
 							</Tooltip>
 						)}
-						<Tooltip content={t('play_again')} position="top" className={styles.actionTooltip}>
+						<Tooltip content={t('go_back_home')} position="top" className={styles.actionTooltip}>
 							<button
 								type="button"
 								className={styles.flipBoardBtn}
-								onClick={handlePlayAgain}
-								aria-label={t('play_again')}
+								onClick={handleBackHome}
+								aria-label={t('go_back_home')}
 							>
-								<RotateCcw size={15} aria-hidden="true" />
+								<Home size={15} aria-hidden="true" />
 							</button>
 						</Tooltip>
 						{onFlipBoard && (

@@ -211,7 +211,10 @@ function GameOverDialog({
 				{/* Modal Footer */}
 				<div className={styles.modalFooter}>
 					{isViewer ? (
-						<button className={styles.reviewBtn} onClick={onClose}>
+						<button className={styles.analyzeBtn} onClick={onClose}>
+							<span className={styles.analyzeBtnIcon}>
+								<Search size={20} aria-hidden="true" />
+							</span>
 							{t('review_game')}
 						</button>
 					) : (
