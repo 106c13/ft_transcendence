@@ -222,6 +222,7 @@ export default function GamePage() {
                         viewIndex={game.viewIndex}
                         isReviewing={game.isReviewing}
                         isGameOver={game.isGameOver}
+                        gameOverReason={game.gameOverReason}
                         isViewer={game.isViewer}
                         onSelectIndex={game.setViewIndex}
                         onResign={game.resignGame}

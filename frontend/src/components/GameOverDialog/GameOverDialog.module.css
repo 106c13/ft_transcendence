@@ -280,6 +280,7 @@
 .playAgainBtn {
 	flex: 1;
 	height: 40px;
+	min-height: 40px;
 	padding: 0 11px;
 	border-radius: 8px;
 	border: none;
@@ -292,10 +293,15 @@
 	align-items: center;
 	justify-content: center;
 	gap: 6px;
+	box-sizing: border-box;
 }
 
 .playAgainBtn:hover {
 	background: #2563EB;
+}
+
+.playAgainBtnIcon {
+	transform: translateY(2px);
 }
 
 .rematchBtn {

@@ -8,6 +8,7 @@ import styles from './GameActions.module.css';
 
 type Props = {
 	isGameOver: boolean;
+	gameOverReason?: string;
 	isViewer?: boolean;
 	onResign: () => void;
 	drawOfferState: DrawOfferState;
@@ -23,6 +24,7 @@ type Props = {
 
 const GameActions = ({
 	isGameOver,
+	gameOverReason,
 	isViewer,
 	onResign,
 	drawOfferState,
@@ -121,7 +123,7 @@ const GameActions = ({
 				)}
 				{isGameOver && (
 					<div className={styles.actionRow}>
-						{onAnalyze && (
+						{gameOverReason !== 'ABANDONED' && onAnalyze && (
 							<Tooltip content={t('analyze_game')} position="top" className={styles.actionTooltip}>
 								<button
 									type="button"
@@ -184,7 +186,7 @@ const GameActions = ({
 					{t('opponent_offered_draw')}
 				</div>
 				<div className={styles.actionRow}>
-					{onAnalyze && (
+					{gameOverReason !== 'ABANDONED' && onAnalyze && (
 						<Tooltip content={t('analyze_game')} position="top" className={styles.actionTooltip}>
 							<button
 								type="button"

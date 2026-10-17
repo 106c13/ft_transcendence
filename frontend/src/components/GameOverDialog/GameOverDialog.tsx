@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Repeat2, RotateCcw, Search, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Home, Repeat2, RotateCcw, Search, X } from 'lucide-react';
 import { useGameHistory } from '../../hooks/useGameHistory';
 import ModalConfetti from '../ModalConfetti/ModalConfetti';
 import TopRankBadge from '../TopRankBadge/TopRankBadge';
@@ -67,6 +68,7 @@ function GameOverDialog({
 	isAnalysisLoading = false,
 }: Props) {
 	const { t } = useTranslation()
+	const navigate = useNavigate()
 	const isWaiting = rematchState === 'sent'
 
 	const { matches } = useGameHistory(currentUser.username)
@@ -211,12 +213,21 @@ function GameOverDialog({
 				{/* Modal Footer */}
 				<div className={styles.modalFooter}>
 					{isViewer ? (
-						<button className={styles.analyzeBtn} onClick={onClose}>
-							<span className={styles.analyzeBtnIcon}>
-								<Search size={20} aria-hidden="true" />
-							</span>
-							{t('review_game')}
-						</button>
+						gameOverReason === 'ABANDONED' ? (
+							<button className={styles.playAgainBtn} onClick={() => navigate('/home')}>
+								<span className={styles.playAgainBtnIcon}>
+									<Home size={20} aria-hidden="true" />
+								</span>
+								{t('go_back_home')}
+							</button>
+						) : (
+							<button className={styles.analyzeBtn} onClick={onClose}>
+								<span className={styles.analyzeBtnIcon}>
+									<Search size={20} aria-hidden="true" />
+								</span>
+								{t('review_game')}
+							</button>
+						)
 					) : (
 						<>
 							{gameOverReason !== 'ABANDONED' && onAnalyze && (
@@ -230,7 +241,9 @@ function GameOverDialog({
 
 							<div className={styles.buttonRow}>
 								<button className={styles.playAgainBtn} onClick={onPlayAgain}>
-									<RotateCcw size={15} aria-hidden="true" />
+									<span className={styles.playAgainBtnIcon}>
+										<RotateCcw size={15} aria-hidden="true" />
+									</span>
 									{t('play_again')}
 								</button>
 								{gameOverReason !== 'ABANDONED' && (
