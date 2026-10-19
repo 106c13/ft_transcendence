@@ -235,6 +235,8 @@ export function useGameSocket() {
             moveTimes?: number[]
             mode: GameModeType
             isPaused?: boolean
+            disconnectedUserId?: number | null
+            disconnectSecondsRemaining?: number | null
             isGameOver?: boolean
             winner?: 'w' | 'b' | null
             reason?: string
@@ -306,7 +308,8 @@ export function useGameSocket() {
             setWinnerColor(data.winner ?? null)
             setGameOverReason(data.reason ?? '')
             setIsPaused(data.isPaused || false)
-            setDisconnectedUserId(null)
+            setDisconnectedUserId(data.disconnectedUserId ?? null)
+            setPauseCountdown(data.disconnectSecondsRemaining ?? null)
             setSelectedMode(data.mode)
             setPremoves([])
             setDrawOfferState('idle')

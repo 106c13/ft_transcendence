@@ -45,6 +45,7 @@ export interface ChessGame {
 	moveTimes: number[]; // ms spent on each half-move
 	timer: NodeJS.Timeout | null;
 	disconnectTimers: Map<number, NodeJS.Timeout>;
+	disconnectDeadlines: Map<number, number>;
 	disconnectedPlayerIds: Set<number>;
 	drawOfferUserId?: number | null;
 }
@@ -285,6 +286,7 @@ export class GameService {
 			moveTimes: [],
 			timer: null,
 			disconnectTimers: new Map(),
+			disconnectDeadlines: new Map(),
 			disconnectedPlayerIds: new Set(),
 			drawOfferUserId: null,
 		};
@@ -529,6 +531,7 @@ export class GameService {
 			clearTimeout(timer);
 		}
 		game.disconnectTimers.clear();
+		game.disconnectDeadlines.clear();
 
 		try {
 			const matchId = parseInt(game.gameId, 10);
@@ -714,8 +717,10 @@ export class GameService {
 
 		// Start grace period countdown for this user
 		const graceMs = this.getGraceSeconds(game.mode) * 1000;
+		game.disconnectDeadlines.set(userId, Date.now() + graceMs);
 		const timer = setTimeout(() => {
 			game.disconnectTimers.delete(userId);
+			game.disconnectDeadlines.delete(userId);
 
 			if (game.board.history().length < 2) {
 				console.log(`Game ${game.gameId}: Abandoning game on disconnect (< 2 moves made)`);
@@ -783,6 +788,7 @@ export class GameService {
 				clearTimeout(timer);
 				game.disconnectTimers.delete(userId);
 			}
+			game.disconnectDeadlines.delete(userId);
 			game.disconnectedPlayerIds.delete(userId);
 
 			// Resume turn timer if all players reconnected
@@ -951,6 +957,7 @@ export class GameService {
 			clearTimeout(timer);
 		}
 		game.disconnectTimers.clear();
+		game.disconnectDeadlines.clear();
 
 		let winnerId: number | null = null;
 		if (winnerColor === 'w') {
@@ -1074,6 +1081,23 @@ export class GameService {
 			case 'rapid':
 			case 'rapid+2': return 60;
 		}
+	}
+
+	getDisconnectState(game: ChessGame): {
+		disconnectedUserId: number | null;
+		disconnectSecondsRemaining: number | null;
+	} {
+		const disconnectedUserId = game.disconnectedPlayerIds.values().next().value ?? null;
+		if (disconnectedUserId === null) {
+			return { disconnectedUserId: null, disconnectSecondsRemaining: null };
+		}
+
+		const deadline = game.disconnectDeadlines.get(disconnectedUserId);
+		const disconnectSecondsRemaining = deadline === undefined
+			? null
+			: Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+
+		return { disconnectedUserId, disconnectSecondsRemaining };
 	}
 
 	// Resign a player's active game (used when accepting a challenge while in-game)
@@ -1228,4 +1252,3 @@ export class GameService {
 		return response.json();
 	}
 }
-

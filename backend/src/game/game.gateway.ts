@@ -60,6 +60,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		// Register events callback from service to notify clients
 		this.gameService.setGameEventsCallback((event, game, payload) => {
+			if (event === 'opponent_reconnected') {
+				const reconnectingUserId = payload?.userId;
+				const opponentSocketId = game.white.userId === reconnectingUserId
+					? game.black.socketId
+					: game.white.socketId;
+
+				// Only the other player should resume their UI. The reconnecting
+				// player receives game_state with the current paused state.
+				this.server.to(opponentSocketId).emit(event, payload);
+				return;
+			}
+
 			this.server.to(game.gameId).emit(event, payload);
 
 			if (event === 'game_over') {
@@ -175,6 +187,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const blackUser = await this.usersService.findById(game.black.userId);
 
 			const matchHistory = game.board.history ? game.board.history() : [];
+			const disconnectState = this.gameService.getDisconnectState(game);
 
 			const payloadData = {
 				gameId: game.gameId,
@@ -191,6 +204,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				moveTimes: game.moveTimes || [],
 				mode: game.mode,
 				isPaused: game.disconnectedPlayerIds.size > 0,
+				disconnectedUserId: disconnectState.disconnectedUserId,
+				disconnectSecondsRemaining: disconnectState.disconnectSecondsRemaining,
 				isGameOver: false,
 				playerRating: session.color === 'w' ? whiteRating.rating : blackRating.rating,
 				playerIsProvisional: session.color === 'w' ? whiteRating.isProvisional : blackRating.isProvisional,
