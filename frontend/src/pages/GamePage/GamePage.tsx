@@ -92,13 +92,15 @@ export default function GamePage() {
         diff: game.whiteScore > game.blackScore ? game.whiteScore - game.blackScore : 0,
     }
 
-    const topViewerDisconnected = game.disconnectedUserId !== null &&
-        game.disconnectedUserId === game.blackPlayer?.id
-    const bottomViewerDisconnected = game.disconnectedUserId !== null &&
-        game.disconnectedUserId === game.whitePlayer?.id
+    const topViewerDisconnected = game.blackPlayer?.id !== undefined &&
+        game.disconnectedUserIds.includes(game.blackPlayer.id)
+    const bottomViewerDisconnected = game.whitePlayer?.id !== undefined &&
+        game.disconnectedUserIds.includes(game.whitePlayer.id)
     const opponentPlayer = game.playerColor === 'w' ? game.blackPlayer : game.whitePlayer
-    const opponentDisconnected = game.disconnectedUserId !== null &&
-        game.disconnectedUserId === opponentPlayer?.id
+    const opponentDisconnected = opponentPlayer?.id !== undefined &&
+        game.disconnectedUserIds.includes(opponentPlayer.id)
+    const getDisconnectCountdown = (userId?: number) =>
+        userId === undefined ? null : game.disconnectSecondsRemaining[userId] ?? null
 
     return (
         <div className={styles.gameContainer}>
@@ -131,7 +133,7 @@ export default function GamePage() {
                                 isGameOver={game.isGameOver}
                                 hideClock
                                 isDisconnected={topViewerDisconnected}
-                                disconnectCountdown={game.pauseCountdown}
+                                disconnectCountdown={getDisconnectCountdown(game.blackPlayer?.id)}
                                 isProvisional={topViewerPlayer.isProvisional}
                                 selectedMode={game.selectedMode}
                                 capturedPieces={topViewerPlayer.captured}
@@ -149,7 +151,7 @@ export default function GamePage() {
                                 ratingDelta={game.playerColor === 'w' ? game.blackRatingDelta : game.whiteRatingDelta}
                                 isGameOver={game.isGameOver}
                                 isDisconnected={opponentDisconnected}
-                                disconnectCountdown={game.pauseCountdown}
+                                disconnectCountdown={getDisconnectCountdown(opponentPlayer?.id)}
                                 isProvisional={game.opponentIsProvisional}
                                 selectedMode={game.selectedMode}
                                 capturedPieces={opponentCaptured}
@@ -198,7 +200,7 @@ export default function GamePage() {
                                 isGameOver={game.isGameOver}
                                 hideClock
                                 isDisconnected={bottomViewerDisconnected}
-                                disconnectCountdown={game.pauseCountdown}
+                                disconnectCountdown={getDisconnectCountdown(game.whitePlayer?.id)}
                                 isProvisional={bottomViewerPlayer.isProvisional}
                                 selectedMode={game.selectedMode}
                                 capturedPieces={bottomViewerPlayer.captured}

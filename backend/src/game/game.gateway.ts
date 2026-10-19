@@ -61,14 +61,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Register events callback from service to notify clients
 		this.gameService.setGameEventsCallback((event, game, payload) => {
 			if (event === 'opponent_reconnected') {
-				const reconnectingUserId = payload?.userId;
-				const opponentSocketId = game.white.userId === reconnectingUserId
-					? game.black.socketId
-					: game.white.socketId;
-
-				// Only the other player should resume their UI. The reconnecting
-				// player receives game_state with the current paused state.
-				this.server.to(opponentSocketId).emit(event, payload);
+				// Notify the other player and spectators, but not the socket that
+				// just reconnected; that socket must keep its paused state until
+				// the other player reconnects.
+				this.server.to(game.gameId).except(payload?.socketId).emit(event, payload);
 				return;
 			}
 
@@ -204,7 +200,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				moveTimes: game.moveTimes || [],
 				mode: game.mode,
 				isPaused: game.disconnectedPlayerIds.size > 0,
-				disconnectedUserId: disconnectState.disconnectedUserId,
+				disconnectedUserIds: disconnectState.disconnectedUserIds,
 				disconnectSecondsRemaining: disconnectState.disconnectSecondsRemaining,
 				isGameOver: false,
 				playerRating: session.color === 'w' ? whiteRating.rating : blackRating.rating,

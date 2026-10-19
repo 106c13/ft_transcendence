@@ -44,8 +44,8 @@ export interface ChessGame {
 	lastMoveTime: number; // timestamp
 	moveTimes: number[]; // ms spent on each half-move
 	timer: NodeJS.Timeout | null;
-	disconnectTimers: Map<number, NodeJS.Timeout>;
-	disconnectDeadlines: Map<number, number>;
+	disconnectTimer: NodeJS.Timeout | null;
+	disconnectDeadline: number | null;
 	disconnectedPlayerIds: Set<number>;
 	drawOfferUserId?: number | null;
 }
@@ -281,8 +281,8 @@ export class GameService {
 			lastMoveTime: Date.now(),
 			moveTimes: [],
 			timer: null,
-			disconnectTimers: new Map(),
-			disconnectDeadlines: new Map(),
+			disconnectTimer: null,
+			disconnectDeadline: null,
 			disconnectedPlayerIds: new Set(),
 			drawOfferUserId: null,
 		};
@@ -523,11 +523,11 @@ export class GameService {
 			clearTimeout(game.timer);
 			game.timer = null;
 		}
-		for (const timer of game.disconnectTimers.values()) {
-			clearTimeout(timer);
+		if (game.disconnectTimer) {
+			clearTimeout(game.disconnectTimer);
+			game.disconnectTimer = null;
 		}
-		game.disconnectTimers.clear();
-		game.disconnectDeadlines.clear();
+		game.disconnectDeadline = null;
 
 		try {
 			const matchId = parseInt(game.gameId, 10);
@@ -711,42 +711,52 @@ export class GameService {
 			game.lastMoveTime = now;
 		}
 
+		// Start one shared grace period for the game. A later disconnect does not
+		// reset the deadline, and reconnecting one player does not cancel it while
+		// another player remains disconnected.
+		const graceMs = this.getGraceSeconds(game.mode) * 1000;
+		if (!game.disconnectTimer) {
+			game.disconnectDeadline = Date.now() + graceMs;
+		}
+		const disconnectState = this.getDisconnectState(game);
+
 		// Notify other player (if connected)
 		this.gameEventsCallback('opponent_disconnected', game, {
 			userId,
 			graceSeconds: this.getGraceSeconds(game.mode),
+			disconnectedUserIds: disconnectState.disconnectedUserIds,
+			disconnectSecondsRemaining: disconnectState.disconnectSecondsRemaining,
 		});
 
-		// Start grace period countdown for this user
-		const graceMs = this.getGraceSeconds(game.mode) * 1000;
-		game.disconnectDeadlines.set(userId, Date.now() + graceMs);
-		const timer = setTimeout(() => {
-			game.disconnectTimers.delete(userId);
-			game.disconnectDeadlines.delete(userId);
+		if (!game.disconnectTimer) {
+			game.disconnectTimer = setTimeout(() => {
+				game.disconnectTimer = null;
+				game.disconnectDeadline = null;
 
-			if (game.board.history().length < 2) {
+				if (game.board.history().length < 2) {
 				console.log(`Game ${game.gameId}: Abandoning game on disconnect (< 2 moves made)`);
 				this.abandonGame(game);
 				return;
-			}
+				}
 
-			// Check if the other player is also disconnected
-			const isWhite = game.white.userId === userId;
-			const opponentId = isWhite ? game.black.userId : game.white.userId;
-			const opponentAlsoDisconnected = game.disconnectedPlayerIds.has(opponentId);
+				const disconnectedWhite = game.disconnectedPlayerIds.has(game.white.userId);
+				const disconnectedBlack = game.disconnectedPlayerIds.has(game.black.userId);
 
-			let winnerColor: 'w' | 'b' | null = null;
-			let reason = 'DISCONNECTION';
+				let winnerColor: 'w' | 'b' | null = null;
+				let reason = 'DISCONNECTION';
 
-			if (opponentAlsoDisconnected) {
-				// Both players disconnected and failed to reconnect within grace period
+				if (disconnectedWhite && disconnectedBlack) {
 				winnerColor = null;
 				reason = 'DRAW';
-			} else {
-				winnerColor = isWhite ? 'b' : 'w';
-			}
+				} else if (disconnectedWhite) {
+				winnerColor = 'b';
+				} else if (disconnectedBlack) {
+				winnerColor = 'w';
+				} else {
+				return;
+				}
 
-			this.saveMatch(game, reason, winnerColor).then((result) => {
+				this.saveMatch(game, reason, winnerColor).then((result) => {
 				this.activeGames.delete(game.gameId);
 				this.gameEventsCallback('game_over', game, {
 					winner: winnerColor,
@@ -765,10 +775,9 @@ export class GameService {
 					blackLeaderboardRank: result?.leaderboardResult?.black?.rank,
 					blackLeaderboardRankDelta: result?.leaderboardResult?.black?.rankDelta,
 				});
-			});
-		}, graceMs);
-
-		game.disconnectTimers.set(userId, timer);
+				});
+			}, graceMs);
+		}
 	}
 
 	// Handle player reconnecting to WebSocket
@@ -784,23 +793,26 @@ export class GameService {
 		}
 
 		if (game.disconnectedPlayerIds.has(userId)) {
-			// Clear disconnection grace timer for this user
-			const timer = game.disconnectTimers.get(userId);
-			if (timer) {
-				clearTimeout(timer);
-				game.disconnectTimers.delete(userId);
-			}
-			game.disconnectDeadlines.delete(userId);
 			game.disconnectedPlayerIds.delete(userId);
 
 			// Resume turn timer if all players reconnected
 			if (game.disconnectedPlayerIds.size === 0) {
+				if (game.disconnectTimer) {
+					clearTimeout(game.disconnectTimer);
+					game.disconnectTimer = null;
+				}
+				game.disconnectDeadline = null;
 				game.lastMoveTime = Date.now();
 				this.startTurnTimer(game);
 			}
 
 			// Notify opponent
-			this.gameEventsCallback('opponent_reconnected', game, { userId });
+			this.gameEventsCallback('opponent_reconnected', game, {
+				userId,
+				socketId: newSocketId,
+				disconnectedUserIds: this.getDisconnectState(game).disconnectedUserIds,
+				disconnectSecondsRemaining: this.getDisconnectState(game).disconnectSecondsRemaining,
+			});
 		}
 
 		return game;
@@ -955,11 +967,11 @@ export class GameService {
 			clearTimeout(game.timer);
 			game.timer = null;
 		}
-		for (const timer of game.disconnectTimers.values()) {
-			clearTimeout(timer);
+		if (game.disconnectTimer) {
+			clearTimeout(game.disconnectTimer);
+			game.disconnectTimer = null;
 		}
-		game.disconnectTimers.clear();
-		game.disconnectDeadlines.clear();
+		game.disconnectDeadline = null;
 
 		let winnerId: number | null = null;
 		if (winnerColor === 'w') {
@@ -1086,20 +1098,23 @@ export class GameService {
 	}
 
 	getDisconnectState(game: ChessGame): {
-		disconnectedUserId: number | null;
-		disconnectSecondsRemaining: number | null;
+		disconnectedUserIds: number[];
+		disconnectSecondsRemaining: Record<string, number>;
 	} {
-		const disconnectedUserId = game.disconnectedPlayerIds.values().next().value ?? null;
-		if (disconnectedUserId === null) {
-			return { disconnectedUserId: null, disconnectSecondsRemaining: null };
+		const now = Date.now();
+		const disconnectedUserIds = [...game.disconnectedPlayerIds];
+		const disconnectSecondsRemaining: Record<string, number> = {};
+		const remaining = game.disconnectDeadline === null
+			? null
+			: Math.max(0, Math.ceil((game.disconnectDeadline - now) / 1000));
+
+		for (const userId of disconnectedUserIds) {
+			if (remaining !== null) {
+				disconnectSecondsRemaining[String(userId)] = remaining;
+			}
 		}
 
-		const deadline = game.disconnectDeadlines.get(disconnectedUserId);
-		const disconnectSecondsRemaining = deadline === undefined
-			? null
-			: Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
-
-		return { disconnectedUserId, disconnectSecondsRemaining };
+		return { disconnectedUserIds, disconnectSecondsRemaining };
 	}
 
 	// Resign a player's active game (used when accepting a challenge while in-game)

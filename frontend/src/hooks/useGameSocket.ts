@@ -144,7 +144,8 @@ export function useGameSocket() {
     const [blackTime, setBlackTime] = useState(180000)
     const [isPaused, setIsPaused] = useState(false)
     const [pauseCountdown, setPauseCountdown] = useState<number | null>(null)
-    const [disconnectedUserId, setDisconnectedUserId] = useState<number | null>(null)
+    const [disconnectedUserIds, setDisconnectedUserIds] = useState<number[]>([])
+    const [disconnectSecondsRemaining, setDisconnectSecondsRemaining] = useState<Record<number, number>>({})
 
     // Chess Rules engine
     const [localChess] = useState(() => new Chess())
@@ -235,8 +236,8 @@ export function useGameSocket() {
             moveTimes?: number[]
             mode: GameModeType
             isPaused?: boolean
-            disconnectedUserId?: number | null
-            disconnectSecondsRemaining?: number | null
+            disconnectedUserIds?: number[]
+            disconnectSecondsRemaining?: Record<string, number>
             isGameOver?: boolean
             winner?: 'w' | 'b' | null
             reason?: string
@@ -308,8 +309,13 @@ export function useGameSocket() {
             setWinnerColor(data.winner ?? null)
             setGameOverReason(data.reason ?? '')
             setIsPaused(data.isPaused || false)
-            setDisconnectedUserId(data.disconnectedUserId ?? null)
-            setPauseCountdown(data.disconnectSecondsRemaining ?? null)
+            const disconnectedIds = data.disconnectedUserIds ?? []
+            const countdowns = Object.fromEntries(
+                Object.entries(data.disconnectSecondsRemaining ?? {}).map(([id, seconds]) => [Number(id), seconds])
+            )
+            setDisconnectedUserIds(disconnectedIds)
+            setDisconnectSecondsRemaining(countdowns)
+            setPauseCountdown(disconnectedIds.length > 0 ? countdowns[disconnectedIds[0]] ?? null : null)
             setSelectedMode(data.mode)
             setPremoves([])
             setDrawOfferState('idle')
@@ -428,17 +434,35 @@ export function useGameSocket() {
         }
         socket.on('move_made', handleMoveMade)
 
-        const handleOpponentDisconnected = (data: { userId: number; graceSeconds: number }) => {
+        const handleOpponentDisconnected = (data: {
+            userId: number
+            graceSeconds: number
+            disconnectedUserIds?: number[]
+            disconnectSecondsRemaining?: Record<string, number>
+        }) => {
+            const disconnectedIds = data.disconnectedUserIds ?? [data.userId]
+            const countdowns = Object.fromEntries(
+                Object.entries(data.disconnectSecondsRemaining ?? {}).map(([id, seconds]) => [Number(id), seconds])
+            )
             setIsPaused(true)
-            setPauseCountdown(data.graceSeconds)
-            setDisconnectedUserId(data.userId)
+            setDisconnectedUserIds(disconnectedIds)
+            setDisconnectSecondsRemaining(countdowns)
+            setPauseCountdown(countdowns[disconnectedIds[0]] ?? data.graceSeconds)
         }
         socket.on('opponent_disconnected', handleOpponentDisconnected)
 
-        const handleOpponentReconnected = () => {
-            setIsPaused(false)
-            setPauseCountdown(null)
-            setDisconnectedUserId(null)
+        const handleOpponentReconnected = (data: {
+            disconnectedUserIds?: number[]
+            disconnectSecondsRemaining?: Record<string, number>
+        }) => {
+            const disconnectedIds = data.disconnectedUserIds ?? []
+            const countdowns = Object.fromEntries(
+                Object.entries(data.disconnectSecondsRemaining ?? {}).map(([id, seconds]) => [Number(id), seconds])
+            )
+            setDisconnectedUserIds(disconnectedIds)
+            setDisconnectSecondsRemaining(countdowns)
+            setIsPaused(disconnectedIds.length > 0)
+            setPauseCountdown(disconnectedIds.length > 0 ? countdowns[disconnectedIds[0]] ?? null : null)
         }
         socket.on('opponent_reconnected', handleOpponentReconnected)
 
@@ -459,7 +483,8 @@ export function useGameSocket() {
             blackLeaderboardRankDelta?: number
         }) => {
             setIsGameOver(true)
-            setDisconnectedUserId(null)
+            setDisconnectedUserIds([])
+            setDisconnectSecondsRemaining({})
             setHideGameOverModal(false)
             setWinnerColor(data.winner)
             setGameOverReason(data.reason)
@@ -604,6 +629,9 @@ export function useGameSocket() {
         if (!isPaused || pauseCountdown === null || pauseCountdown <= 0) return
         const timer = setTimeout(() => {
             setPauseCountdown(prev => (prev !== null ? prev - 1 : null))
+            setDisconnectSecondsRemaining(prev => Object.fromEntries(
+                Object.entries(prev).map(([id, seconds]) => [Number(id), Math.max(0, seconds - 1)])
+            ))
         }, 1000)
         return () => clearTimeout(timer)
     }, [isPaused, pauseCountdown])
@@ -905,7 +933,8 @@ export function useGameSocket() {
         blackTime,
         isPaused,
         pauseCountdown,
-        disconnectedUserId,
+        disconnectedUserIds,
+        disconnectSecondsRemaining,
         boardFen,
         lastMove: displayedLastMove,
         premoves,
