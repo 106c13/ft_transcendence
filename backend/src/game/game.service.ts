@@ -228,12 +228,8 @@ export class GameService {
 			if (existingGame.board.isGameOver()) {
 				this.activeGames.delete(existingGame.gameId);
 			} else {
-				if (existingGame.white.userId === userId) {
-					existingGame.white.socketId = socketId;
-				} else if (existingGame.black.userId === userId) {
-					existingGame.black.socketId = socketId;
-				}
-				return existingGame;
+				console.log(`Game Service: User ${userId} requested a new game; resigning ${existingGame.gameId}`);
+				await this.resign(existingGame.gameId, userId);
 			}
 		}
 
@@ -571,25 +567,26 @@ export class GameService {
 		const winnerColor = game.white.userId === userId ? 'b' : 'w';
 		const reason = 'RESIGNATION';
 
-		this.saveMatch(game, reason, winnerColor).then((result) => {
-			this.activeGames.delete(gameId);
-			this.gameEventsCallback('game_over', game, {
-				winner: winnerColor,
-				reason,
-				fen: game.board.fen(),
-				matchId: result?.savedMatch?.id,
+		// Remove the game before awaiting persistence so a concurrent matchmaking
+		// request cannot reconnect the user to this game.
+		this.activeGames.delete(gameId);
+		const result = await this.saveMatch(game, reason, winnerColor);
+		this.gameEventsCallback('game_over', game, {
+			winner: winnerColor,
+			reason,
+			fen: game.board.fen(),
+			matchId: result?.savedMatch?.id,
 
-				whiteRatingAfter: result?.ratingResult?.whiteRating,
-				blackRatingAfter: result?.ratingResult?.blackRating,
-				whiteRatingDelta: result?.ratingResult?.whiteDelta,
-				blackRatingDelta: result?.ratingResult?.blackDelta,
-				whiteLeaderboardRating: result?.leaderboardResult?.white?.leaderboardRating,
-				whiteLeaderboardRank: result?.leaderboardResult?.white?.rank,
-				whiteLeaderboardRankDelta: result?.leaderboardResult?.white?.rankDelta,
-				blackLeaderboardRating: result?.leaderboardResult?.black?.leaderboardRating,
-				blackLeaderboardRank: result?.leaderboardResult?.black?.rank,
-				blackLeaderboardRankDelta: result?.leaderboardResult?.black?.rankDelta,
-			});
+			whiteRatingAfter: result?.ratingResult?.whiteRating,
+			blackRatingAfter: result?.ratingResult?.blackRating,
+			whiteRatingDelta: result?.ratingResult?.whiteDelta,
+			blackRatingDelta: result?.ratingResult?.blackDelta,
+			whiteLeaderboardRating: result?.leaderboardResult?.white?.leaderboardRating,
+			whiteLeaderboardRank: result?.leaderboardResult?.white?.rank,
+			whiteLeaderboardRankDelta: result?.leaderboardResult?.white?.rankDelta,
+			blackLeaderboardRating: result?.leaderboardResult?.black?.leaderboardRating,
+			blackLeaderboardRank: result?.leaderboardResult?.black?.rank,
+			blackLeaderboardRankDelta: result?.leaderboardResult?.black?.rankDelta,
 		});
 	}
 
@@ -692,6 +689,7 @@ export class GameService {
 
 		if (game.disconnectedPlayerIds.has(userId)) return;
 
+		const wasAlreadyPaused = game.disconnectedPlayerIds.size > 0;
 		game.disconnectedPlayerIds.add(userId);
 
 		// Pause turn timer if turn timer is running
@@ -700,13 +698,17 @@ export class GameService {
 			game.timer = null;
 		}
 
-		// Subtract time elapsed before disconnection
-		const now = Date.now();
-		const elapsed = now - game.lastMoveTime;
-		if (game.board.turn() === 'w') {
-			game.whiteTime = Math.max(0, game.whiteTime - elapsed);
-		} else {
-			game.blackTime = Math.max(0, game.blackTime - elapsed);
+		// Only the first disconnect transitions the game from running to paused.
+		// Subsequent disconnects must not deduct the same elapsed time again.
+		if (!wasAlreadyPaused) {
+			const now = Date.now();
+			const elapsed = now - game.lastMoveTime;
+			if (game.board.turn() === 'w') {
+				game.whiteTime = Math.max(0, game.whiteTime - elapsed);
+			} else {
+				game.blackTime = Math.max(0, game.blackTime - elapsed);
+			}
+			game.lastMoveTime = now;
 		}
 
 		// Notify other player (if connected)
