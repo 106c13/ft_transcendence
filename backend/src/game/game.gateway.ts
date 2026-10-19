@@ -100,11 +100,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const blackRating = await this.ratingService.getMatchmakingRating(newGame.black.userId, category);
 
 			const matchHistory = newGame.board.history ? newGame.board.history() : [];
+			const clock = this.gameService.getClockSnapshot(newGame);
 
 			const whitePayload = {
 				gameId: newGame.gameId, color: 'w', opponentName: newGame.black.username,
 				fen: newGame.board.fen(), whiteTime: newGame.whiteTime, blackTime: newGame.blackTime,
 				turn: newGame.board.turn(), history: matchHistory, mode: newGame.mode, isPaused: false,
+				clock,
 				playerRating: whiteRating.rating, playerIsProvisional: whiteRating.isProvisional,
 				opponentRating: blackRating.rating, opponentIsProvisional: blackRating.isProvisional,
 			};
@@ -113,6 +115,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				gameId: newGame.gameId, color: 'b', opponentName: newGame.white.username,
 				fen: newGame.board.fen(), whiteTime: newGame.whiteTime, blackTime: newGame.blackTime,
 				turn: newGame.board.turn(), history: matchHistory, mode: newGame.mode, isPaused: false,
+				clock,
 				playerRating: blackRating.rating, playerIsProvisional: blackRating.isProvisional,
 				opponentRating: whiteRating.rating, opponentIsProvisional: whiteRating.isProvisional,
 			};
@@ -184,6 +187,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 			const matchHistory = game.board.history ? game.board.history() : [];
 			const disconnectState = this.gameService.getDisconnectState(game);
+			const clock = this.gameService.getClockSnapshot(game);
 
 			const payloadData = {
 				gameId: game.gameId,
@@ -193,8 +197,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				opponentAvatar: session.color === 'w' ? blackUser?.avatar : whiteUser?.avatar,
 				playerAvatar: session.color === 'w' ? whiteUser?.avatar : blackUser?.avatar,
 				fen: game.board.fen(),
-				whiteTime: game.whiteTime,
-				blackTime: game.blackTime,
+				whiteTime: clock.whiteTime,
+				blackTime: clock.blackTime,
 				turn: game.board.turn(),
 				history: matchHistory,
 				moveTimes: game.moveTimes || [],
@@ -202,6 +206,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				isPaused: game.disconnectedPlayerIds.size > 0,
 				disconnectedUserIds: disconnectState.disconnectedUserIds,
 				disconnectSecondsRemaining: disconnectState.disconnectSecondsRemaining,
+				clock,
 				isGameOver: false,
 				playerRating: session.color === 'w' ? whiteRating.rating : blackRating.rating,
 				playerIsProvisional: session.color === 'w' ? whiteRating.isProvisional : blackRating.isProvisional,
@@ -426,6 +431,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				isCheck: result.isCheck,
 				isGameOver: result.isGameOver,
 				timeSpent: result.timeSpent,
+				clock: result.clock,
 			});
 		}
 	}

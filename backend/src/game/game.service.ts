@@ -32,6 +32,14 @@ export interface ChessPlayer {
 	queuedAt: number;
 }
 
+export interface GameClockSnapshot {
+	whiteTime: number;
+	blackTime: number;
+	turn: 'w' | 'b';
+	serverTime: number;
+	isPaused: boolean;
+}
+
 export interface ChessGame {
 	gameId: string;
 	white: ChessPlayer;
@@ -132,6 +140,28 @@ export class GameService {
 		return undefined;
 	}
 
+	getClockSnapshot(game: ChessGame, serverTime = Date.now()): GameClockSnapshot {
+		const elapsed = game.disconnectedPlayerIds.size > 0
+			? 0
+			: Math.max(0, serverTime - game.lastMoveTime);
+		let whiteTime = game.whiteTime;
+		let blackTime = game.blackTime;
+
+		if (game.board.turn() === 'w') {
+			whiteTime = Math.max(0, whiteTime - elapsed);
+		} else {
+			blackTime = Math.max(0, blackTime - elapsed);
+		}
+
+		return {
+			whiteTime,
+			blackTime,
+			turn: game.board.turn(),
+			serverTime,
+			isPaused: game.disconnectedPlayerIds.size > 0,
+		};
+	}
+
 	async getLiveGameByUsername(username: string) {
 		let liveGame: ChessGame | undefined;
 		for (const game of this.activeGames.values()) {
@@ -158,27 +188,20 @@ export class GameService {
 			? { from: historyVerbose[historyVerbose.length - 1].from, to: historyVerbose[historyVerbose.length - 1].to }
 			: null;
 
-		const now = Date.now();
-		const elapsed = liveGame.disconnectedPlayerIds.size > 0 ? 0 : now - liveGame.lastMoveTime;
-		let currentWhiteTime = liveGame.whiteTime;
-		let currentBlackTime = liveGame.blackTime;
-		if (liveGame.board.turn() === 'w') {
-			currentWhiteTime = Math.max(0, currentWhiteTime - elapsed);
-		} else {
-			currentBlackTime = Math.max(0, currentBlackTime - elapsed);
-		}
+		const clock = this.getClockSnapshot(liveGame);
 
 		return {
 			gameId: liveGame.gameId,
 			fen: liveGame.board.fen(),
 			turn: liveGame.board.turn(),
 			mode: liveGame.mode,
-			whiteTime: currentWhiteTime,
-			blackTime: currentBlackTime,
+			whiteTime: clock.whiteTime,
+			blackTime: clock.blackTime,
 			lastMoveTime: liveGame.lastMoveTime,
 			lastMove,
 			isCheck: liveGame.board.inCheck(),
 			isPaused: liveGame.disconnectedPlayerIds.size > 0,
+			clock,
 			isGameOver: false,
 			whitePlayer: {
 				id: liveGame.white.userId,
@@ -424,20 +447,9 @@ export class GameService {
 		// Calculate elapsed time and deduct (premove takes exactly 100ms / 0.1s)
 		const now = Date.now();
 		const elapsed = isPremove ? 100 : Math.max(0, now - game.lastMoveTime);
-		if (turn === 'w') {
-			game.whiteTime = Math.max(0, game.whiteTime - elapsed);
-		} else {
-			game.blackTime = Math.max(0, game.blackTime - elapsed);
-		}
-		game.lastMoveTime = now;
-
-		// Check for timeout
-		if (turn === 'w' && game.whiteTime <= 0) {
-			this.handleTimeout(game, 'w');
-			return { error: 'time_out' };
-		}
-		if (turn === 'b' && game.blackTime <= 0) {
-			this.handleTimeout(game, 'b');
+		const timeBeforeMove = turn === 'w' ? game.whiteTime : game.blackTime;
+		if (timeBeforeMove - elapsed <= 0) {
+			this.handleTimeout(game, turn);
 			return { error: 'time_out' };
 		}
 
@@ -457,6 +469,13 @@ export class GameService {
 			if (!move || move.captured === 'k') {
 				return { error: 'invalid_move' };
 			}
+
+			if (turn === 'w') {
+				game.whiteTime = Math.max(0, game.whiteTime - elapsed);
+			} else {
+				game.blackTime = Math.max(0, game.blackTime - elapsed);
+			}
+			game.lastMoveTime = now;
 
 			// Clear current turn timer
 			if (game.timer) {
@@ -487,6 +506,7 @@ export class GameService {
 					fen: game.board.fen(),
 					whiteTime: game.whiteTime,
 					blackTime: game.blackTime,
+					clock: this.getClockSnapshot(game, now),
 					isGameOver: true,
 					timeSpent: elapsed,
 				};
@@ -504,6 +524,7 @@ export class GameService {
 				fen: game.board.fen(),
 				whiteTime: game.whiteTime,
 				blackTime: game.blackTime,
+				clock: this.getClockSnapshot(game),
 				isGameOver: false,
 				turn: game.board.turn(),
 				isCheck: game.board.inCheck(),
@@ -726,6 +747,7 @@ export class GameService {
 			graceSeconds: this.getGraceSeconds(game.mode),
 			disconnectedUserIds: disconnectState.disconnectedUserIds,
 			disconnectSecondsRemaining: disconnectState.disconnectSecondsRemaining,
+			clock: this.getClockSnapshot(game),
 		});
 
 		if (!game.disconnectTimer) {
@@ -812,6 +834,7 @@ export class GameService {
 				socketId: newSocketId,
 				disconnectedUserIds: this.getDisconnectState(game).disconnectedUserIds,
 				disconnectSecondsRemaining: this.getDisconnectState(game).disconnectSecondsRemaining,
+				clock: this.getClockSnapshot(game),
 			});
 		}
 

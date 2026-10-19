@@ -131,7 +131,6 @@ export default function GamePage() {
                                 rating={topViewerPlayer.rating}
                                 ratingDelta={topViewerPlayer.ratingDelta}
                                 isGameOver={game.isGameOver}
-                                hideClock
                                 isDisconnected={topViewerDisconnected}
                                 disconnectCountdown={getDisconnectCountdown(game.blackPlayer?.id)}
                                 isProvisional={topViewerPlayer.isProvisional}
@@ -198,7 +197,6 @@ export default function GamePage() {
                                 rating={bottomViewerPlayer.rating}
                                 ratingDelta={bottomViewerPlayer.ratingDelta}
                                 isGameOver={game.isGameOver}
-                                hideClock
                                 isDisconnected={bottomViewerDisconnected}
                                 disconnectCountdown={getDisconnectCountdown(game.whitePlayer?.id)}
                                 isProvisional={bottomViewerPlayer.isProvisional}

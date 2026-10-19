@@ -48,6 +48,14 @@ export type PlayerInfo = {
     ratingDelta?: number | null
 }
 
+type GameClockSnapshot = {
+    whiteTime: number
+    blackTime: number
+    turn: 'w' | 'b'
+    serverTime: number
+    isPaused: boolean
+}
+
 const getSimulatedChess = (baseFen: string, color: 'w' | 'b' | null, premoveList: Premove[]) => {
     let sim: Chess
     try {
@@ -142,6 +150,8 @@ export function useGameSocket() {
     // Timing States
     const [whiteTime, setWhiteTime] = useState(180000)
     const [blackTime, setBlackTime] = useState(180000)
+    const clockSnapshotRef = useRef<GameClockSnapshot | null>(null)
+    const serverClockOffsetRef = useRef(0)
     const [isPaused, setIsPaused] = useState(false)
     const [pauseCountdown, setPauseCountdown] = useState<number | null>(null)
     const [disconnectedUserIds, setDisconnectedUserIds] = useState<number[]>([])
@@ -175,6 +185,17 @@ export function useGameSocket() {
     const isLiveMoveRef = useRef(false)
     const prevViewIndexRef = useRef<number | null>(null)
     const hasHandledNotFoundRef = useRef(false)
+
+    const applyClockSnapshot = (clock?: GameClockSnapshot) => {
+        if (!clock) return
+        const receivedAt = Date.now()
+        clockSnapshotRef.current = clock
+        serverClockOffsetRef.current = clock.serverTime - receivedAt
+        setWhiteTime(clock.whiteTime)
+        setBlackTime(clock.blackTime)
+        setTurn(clock.turn)
+        setIsPaused(clock.isPaused)
+    }
 
     const handleIllegalMove = () => {
         playSound('illegal')
@@ -238,6 +259,7 @@ export function useGameSocket() {
             isPaused?: boolean
             disconnectedUserIds?: number[]
             disconnectSecondsRemaining?: Record<string, number>
+            clock?: GameClockSnapshot
             isGameOver?: boolean
             winner?: 'w' | 'b' | null
             reason?: string
@@ -299,9 +321,12 @@ export function useGameSocket() {
             localChess.load(data.fen)
             setBoardFen(data.fen)
 
-            setWhiteTime(data.whiteTime)
-            setBlackTime(data.blackTime)
-            setTurn(data.turn)
+            applyClockSnapshot(data.clock)
+            if (!data.clock) {
+                setWhiteTime(data.whiteTime)
+                setBlackTime(data.blackTime)
+                setTurn(data.turn)
+            }
             setGameState('playing')
             setIsGameOver(data.isGameOver || false)
             setHideGameOverModal(false)
@@ -361,13 +386,17 @@ export function useGameSocket() {
             isCheck: boolean
             isGameOver: boolean
             timeSpent?: number
+            clock?: GameClockSnapshot
         }) => {
             isLiveMoveRef.current = true
             localChess.load(data.fen)
             setBoardFen(data.fen)
-            setTurn(data.turn)
-            setWhiteTime(data.whiteTime)
-            setBlackTime(data.blackTime)
+            applyClockSnapshot(data.clock)
+            if (!data.clock) {
+                setTurn(data.turn)
+                setWhiteTime(data.whiteTime)
+                setBlackTime(data.blackTime)
+            }
             setIsCheck(data.isCheck)
             setMoveList(prev => [...prev, data.lastMove])
 
@@ -439,6 +468,7 @@ export function useGameSocket() {
             graceSeconds: number
             disconnectedUserIds?: number[]
             disconnectSecondsRemaining?: Record<string, number>
+            clock?: GameClockSnapshot
         }) => {
             const disconnectedIds = data.disconnectedUserIds ?? [data.userId]
             const countdowns = Object.fromEntries(
@@ -448,12 +478,14 @@ export function useGameSocket() {
             setDisconnectedUserIds(disconnectedIds)
             setDisconnectSecondsRemaining(countdowns)
             setPauseCountdown(countdowns[disconnectedIds[0]] ?? data.graceSeconds)
+            applyClockSnapshot(data.clock)
         }
         socket.on('opponent_disconnected', handleOpponentDisconnected)
 
         const handleOpponentReconnected = (data: {
             disconnectedUserIds?: number[]
             disconnectSecondsRemaining?: Record<string, number>
+            clock?: GameClockSnapshot
         }) => {
             const disconnectedIds = data.disconnectedUserIds ?? []
             const countdowns = Object.fromEntries(
@@ -463,6 +495,7 @@ export function useGameSocket() {
             setDisconnectSecondsRemaining(countdowns)
             setIsPaused(disconnectedIds.length > 0)
             setPauseCountdown(disconnectedIds.length > 0 ? countdowns[disconnectedIds[0]] ?? null : null)
+            applyClockSnapshot(data.clock)
         }
         socket.on('opponent_reconnected', handleOpponentReconnected)
 
@@ -641,24 +674,25 @@ export function useGameSocket() {
         if (gameState !== 'playing' || isGameOver || isPaused) return
 
         const timerInterval = setInterval(() => {
-            if (turn === 'w') {
-                setWhiteTime(prev => {
-                    const next = Math.max(0, prev - 100)
-                    if (playerColorRef.current === 'w' && next <= 10000 && next > 0 && !hasWarnedLowTimeRef.current) {
-                        hasWarnedLowTimeRef.current = true
-                        handleLowTimeWarning()
-                    }
-                    return next
-                })
-            } else {
-                setBlackTime(prev => {
-                    const next = Math.max(0, prev - 100)
-                    if (playerColorRef.current === 'b' && next <= 10000 && next > 0 && !hasWarnedLowTimeRef.current) {
-                        hasWarnedLowTimeRef.current = true
-                        handleLowTimeWarning()
-                    }
-                    return next
-                })
+            const clock = clockSnapshotRef.current
+            if (!clock || clock.isPaused) return
+
+            const serverNow = Date.now() + serverClockOffsetRef.current
+            const elapsed = Math.max(0, serverNow - clock.serverTime)
+            const nextWhiteTime = clock.turn === 'w'
+                ? Math.max(0, clock.whiteTime - elapsed)
+                : clock.whiteTime
+            const nextBlackTime = clock.turn === 'b'
+                ? Math.max(0, clock.blackTime - elapsed)
+                : clock.blackTime
+
+            setWhiteTime(nextWhiteTime)
+            setBlackTime(nextBlackTime)
+
+            const activeTime = clock.turn === 'w' ? nextWhiteTime : nextBlackTime
+            if (!isViewerRef.current && activeTime <= 10000 && activeTime > 0 && !hasWarnedLowTimeRef.current) {
+                hasWarnedLowTimeRef.current = true
+                handleLowTimeWarning()
             }
         }, 100)
 
