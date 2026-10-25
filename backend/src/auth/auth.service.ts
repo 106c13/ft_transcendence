@@ -54,7 +54,7 @@ export class AuthService {
 			throw new BadRequestException('username_too_long');
 		}
 
-		if (/[^a-zA-Z0-9]/.test(username)) {
+		if (/[^a-zA-Z0-9_]/.test(username)) {
 			throw new BadRequestException('username_invalid_chars');
 		}
 

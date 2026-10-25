@@ -149,7 +149,7 @@ export class UsersController {
 	) {
 		const userId = req.user.userId
 
-		if (/[^a-zA-Z0-9]/.test(body.username)) {
+		if (/[^a-zA-Z0-9_]/.test(body.username)) {
 			throw new BadRequestException('username_invalid_chars');
 		}
 

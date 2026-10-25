@@ -221,7 +221,7 @@ function GameOverDialog({
 								{t('go_back_home')}
 							</button>
 						) : (
-							<button className={styles.analyzeBtn} onClick={onClose}>
+							<button className={styles.analyzeBtn} onClick={onAnalyze}>
 								<span className={styles.analyzeBtnIcon}>
 									<Search size={20} aria-hidden="true" />
 								</span>

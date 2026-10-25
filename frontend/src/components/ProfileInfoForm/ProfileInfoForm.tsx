@@ -64,7 +64,7 @@ const ProfileInfoForm = ({ initialUser, onUserUpdated }: Props) => {
 		e.preventDefault()
 
 		// Client validation
-		if (/[^a-zA-Z0-9]/.test(username)) {
+		if (/[^a-zA-Z0-9_]/.test(username)) {
 			toast.error('username_invalid_chars')
 			return
 		}
