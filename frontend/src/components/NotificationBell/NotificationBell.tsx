@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell, BellOff, Users, UserCheck, MessageSquare, Swords, Check, X } from 'lucide-react';
-import Tooltip from '../Tooltip/Tooltip';
+import NavTooltip from '../NavTooltip/NavTooltip';
 import styles from './NotificationBell.module.css';
 
 
@@ -431,7 +431,7 @@ const NotificationBell = ({ userId }: { userId: number }) => {
 
     return (
         <div className={styles.notificationBellContainer} ref={containerRef}>
-            <Tooltip content={t('notifications')} position="bottom" disabled={isOpen} offset="navbar">
+            <NavTooltip content={t('notifications')} position="bottom" disabled={isOpen} offset="navbar">
                 <div
                     className={`${styles.bellIcon} ${isOpen ? styles.active : ''}`}
                     onClick={toggleDropdown}
@@ -446,14 +446,17 @@ const NotificationBell = ({ userId }: { userId: number }) => {
                         }
                     }}
                 >
-                    <Bell size={20} className={styles.bellSymbol} aria-hidden="true" />
+                    <span className={styles.bellIconBox}>
+                        <Bell size={20} className={styles.bellSymbol} aria-hidden="true" />
+                    </span>
+                    <span className={styles.navLabel}>{t('notifications')}</span>
                     {unreadCount > 0 && (
                         <span className={styles.notificationBadge}>
                             {unreadCount > 99 ? '99+' : unreadCount}
                         </span>
                     )}
                 </div>
-            </Tooltip>
+            </NavTooltip>
 
             {isOpen && (
                 <div className={styles.notificationDropdown}>

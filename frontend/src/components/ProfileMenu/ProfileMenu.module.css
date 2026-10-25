@@ -82,6 +82,17 @@
 	}
 }
 
+@keyframes mobileModalIn {
+	from {
+		opacity: 0;
+		transform: translate(-50%, -47%);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, -50%);
+	}
+}
+
 .profileDropdown div:first-child {
 	border-top-left-radius: var(--radius-2xl);
 	border-top-right-radius: var(--radius-2xl);
@@ -130,4 +141,81 @@
 
 .profileDropdown .danger:hover {
 	background: rgba(248, 113, 113, 0.12);
+}
+
+/* Text label is mobile-only */
+.navLabel {
+	display: none;
+}
+
+/* Mobile drawer row + centered modal */
+@media (max-width: 1024px) {
+	.profileMenuContainer {
+		width: 100%;
+	}
+
+	.navActionItem.profileMenu {
+		width: 100%;
+		height: 48px;
+		padding: 0 14px;
+		gap: 14px;
+		justify-content: flex-start;
+		box-sizing: border-box;
+	}
+
+	.navActionItem.profileMenu:hover {
+		background: rgba(148, 163, 184, 0.08);
+	}
+
+	.navActionItem.profileMenu.active {
+		background: rgba(96, 165, 250, 0.12);
+	}
+
+	/* Avatar occupies the same 28px icon box as every other row */
+	.navProfileAvatar {
+		width: 28px;
+		height: 28px;
+		flex: 0 0 28px;
+		box-sizing: border-box;
+	}
+
+	.navLabel {
+		display: block;
+		flex: 1;
+		min-width: 0;
+		text-align: left;
+		color: var(--color-slate-300);
+		font-size: 15px;
+		font-weight: 500;
+		line-height: 1.5;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		transition: color var(--transition-normal);
+	}
+
+	.profileMenu:hover .navLabel {
+		color: var(--color-slate-100);
+	}
+
+	.profileMenu.active .navLabel {
+		color: var(--color-blue-400);
+	}
+
+	/* Dropdown becomes a centered modal */
+	.profileDropdown {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		right: auto;
+		transform: translate(-50%, -50%);
+		width: min(280px, calc(100vw - 32px));
+		min-width: 0;
+		box-shadow: 0 0 0 100vmax rgba(2, 6, 23, 0.6), 0 16px 36px rgba(0, 0, 0, 0.5);
+		animation: mobileModalIn 0.18s ease-out;
+	}
+
+	.profileDropdown::after {
+		display: none;
+	}
 }

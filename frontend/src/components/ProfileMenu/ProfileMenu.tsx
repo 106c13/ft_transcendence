@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { User, Settings, LogOut } from 'lucide-react';
-import Tooltip from '../Tooltip/Tooltip';
+import NavTooltip from '../NavTooltip/NavTooltip';
 import styles from './ProfileMenu.module.css';
 
 type Props = {
@@ -37,6 +37,16 @@ const ProfileMenu = ({ currentUser, onOpen }: Props) => {
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
 
+	// Escape closes the menu from anywhere (needed for the mobile modal)
+	useEffect(() => {
+		if (!isOpen) return;
+		const handleEscape = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') setIsOpen(false);
+		};
+		document.addEventListener('keydown', handleEscape);
+		return () => document.removeEventListener('keydown', handleEscape);
+	}, [isOpen]);
+
 	const toggleMenu = () => {
 		setIsOpen((prev) => {
 			const next = !prev;
@@ -62,10 +72,12 @@ const ProfileMenu = ({ currentUser, onOpen }: Props) => {
 		navigate('/login');
 	};
 
+	const displayName = currentUser.username || t('my_profile');
+
 	return (
 		<div className={styles.profileMenuContainer} ref={menuRef}>
-			<Tooltip
-				content={currentUser.username || t('my_profile')}
+			<NavTooltip
+				content={displayName}
 				position="bottom"
 				disabled={isOpen}
 				offset="navbar"
@@ -75,7 +87,7 @@ const ProfileMenu = ({ currentUser, onOpen }: Props) => {
 					onClick={toggleMenu}
 					role="button"
 					tabIndex={0}
-					aria-label={currentUser.username || t('my_profile')}
+					aria-label={displayName}
 					aria-expanded={isOpen}
 					onKeyDown={handleKeyDown}
 				>
@@ -85,7 +97,7 @@ const ProfileMenu = ({ currentUser, onOpen }: Props) => {
 								? `/uploads/${currentUser.avatar}`
 								: '/assets/default.jpg'
 						}
-						alt={currentUser.username || t('my_profile')}
+						alt={displayName}
 						className={styles.navProfileAvatar}
 						onError={(e) => {
 							const target = e.currentTarget;
@@ -94,8 +106,9 @@ const ProfileMenu = ({ currentUser, onOpen }: Props) => {
 							}
 						}}
 					/>
+					<span className={styles.navLabel}>{displayName}</span>
 				</div>
-			</Tooltip>
+			</NavTooltip>
 
 			{isOpen && (
 				<div className={styles.profileDropdown}>

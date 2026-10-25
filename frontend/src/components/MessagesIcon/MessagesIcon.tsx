@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MessageSquare } from 'lucide-react';
-import Tooltip from '../Tooltip/Tooltip';
+import NavTooltip from '../NavTooltip/NavTooltip';
 import styles from './MessagesIcon.module.css';
 
 type Props = {
@@ -59,7 +59,7 @@ const MessagesIcon = ({ userId }: Props) => {
 	}, [userId, fetchUnreadCount]);
 
 	return (
-		<Tooltip content={t('chat')} position="bottom" offset="navbar">
+		<NavTooltip content={t('chat')} position="bottom" offset="navbar">
 			<div
 				className={`${styles.messagesActionItem} ${isChatActive ? styles.active : ''}`}
 				onClick={() => navigate('/chat')}
@@ -76,13 +76,14 @@ const MessagesIcon = ({ userId }: Props) => {
 				<span className={styles.messagesIcon}>
 					<MessageSquare size={18} aria-hidden="true" />
 				</span>
+				<span className={styles.navLabel}>{t('chat')}</span>
 				{unreadCount > 0 && (
 					<span className={styles.notificationBadge}>
 						{unreadCount > 99 ? '99+' : unreadCount}
 					</span>
 				)}
 			</div>
-		</Tooltip>
+		</NavTooltip>
 	);
 };
 

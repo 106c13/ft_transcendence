@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Search, X } from 'lucide-react';
-import Tooltip from '../Tooltip/Tooltip';
+import NavTooltip, { useIsMobile } from '../NavTooltip/NavTooltip';
 import styles from './PlayerSearch.module.css';
 
 export type SearchUser = {
@@ -17,21 +17,25 @@ export type SearchUser = {
 const PlayerSearch = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-	const [isExpanded, setIsExpanded] = useState(false);
+	const isMobile = useIsMobile();
+	const [isExpandedState, setIsExpanded] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
 	const [showResults, setShowResults] = useState(false);
 	const [isSearching, setIsSearching] = useState(false);
 
+	// On mobile the search is always expanded
+	const isExpanded = isExpandedState || isMobile;
+
 	const containerRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	// Focus input when expanded
+	// Focus input when the user expands it (not when it is expanded by default on mobile)
 	useEffect(() => {
-		if (isExpanded) {
+		if (isExpandedState) {
 			inputRef.current?.focus();
 		}
-	}, [isExpanded]);
+	}, [isExpandedState]);
 
 	// Click outside to collapse
 	useEffect(() => {
@@ -136,16 +140,19 @@ const PlayerSearch = () => {
 		}
 	};
 
+	// On mobile the X is only useful while there is text to clear
+	const showCloseButton = isExpanded && (!isMobile || searchQuery.length > 0);
+
 	return (
 		<div
 			ref={containerRef}
 			className={styles.navSearchContainer}
 		>
-			<Tooltip content={t('search_players')} position="bottom" disabled={isExpanded} offset="navbar">
+			<NavTooltip content={t('search_players')} position="bottom" disabled={isExpanded} offset="navbar">
 				<div
 					className={`${styles.searchBox} ${isExpanded ? styles.expanded : ''}`}
 					onClick={handleBoxClick}
-					role="button"
+					role={isMobile ? undefined : 'button'}
 					tabIndex={isExpanded ? -1 : 0}
 					aria-label={t('search_players')}
 					onKeyDown={(e) => {
@@ -157,6 +164,7 @@ const PlayerSearch = () => {
 					<span className={styles.searchIcon}>
 						<Search size={18} aria-hidden="true" />
 					</span>
+					<span className={styles.navLabel}>{t('search_players')}</span>
 					<input
 						ref={inputRef}
 						type="text"
@@ -169,15 +177,15 @@ const PlayerSearch = () => {
 					{isSearching && isExpanded && <span className={styles.searchSpinner}></span>}
 					<button
 						type="button"
-						className={`${styles.searchCloseBtn} ${isExpanded ? styles.showClose : ''}`}
+						className={`${styles.searchCloseBtn} ${showCloseButton ? styles.showClose : ''}`}
 						onClick={handleClose}
 						title={t('close')}
-						tabIndex={isExpanded ? 0 : -1}
+						tabIndex={showCloseButton ? 0 : -1}
 					>
 						<X size={14} aria-hidden="true" />
 					</button>
 				</div>
-			</Tooltip>
+			</NavTooltip>
 
 			{isExpanded && showResults && searchResults.length > 0 && (
 				<div className={styles.navSearchResults}>
@@ -212,4 +220,3 @@ const PlayerSearch = () => {
 };
 
 export default PlayerSearch;
-

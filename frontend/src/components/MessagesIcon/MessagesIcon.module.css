@@ -73,3 +73,63 @@
 		opacity: 1;
 	}
 }
+
+/* Text label is mobile-only */
+.navLabel {
+	display: none;
+}
+
+/* Mobile drawer row */
+@media (max-width: 1024px) {
+	.messagesActionItem {
+		width: 100%;
+		height: 48px;
+		padding: 0 14px;
+		gap: 14px;
+		justify-content: flex-start;
+		box-sizing: border-box;
+	}
+
+	.messagesActionItem:hover {
+		background: rgba(148, 163, 184, 0.08);
+	}
+
+	.messagesActionItem.active {
+		background: rgba(96, 165, 250, 0.12);
+	}
+
+	.messagesIcon {
+		width: 28px;
+		flex: 0 0 28px;
+	}
+
+	.navLabel {
+		display: block;
+		flex: 1;
+		min-width: 0;
+		text-align: left;
+		color: var(--color-slate-300);
+		font-size: 15px;
+		font-weight: 500;
+		line-height: 1.5;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		transition: color var(--transition-normal);
+	}
+
+	.messagesActionItem:hover .navLabel {
+		color: var(--color-slate-100);
+	}
+
+	.messagesActionItem.active .navLabel {
+		color: var(--color-blue-400);
+	}
+
+	/* Badge sits at the right end of the row */
+	.notificationBadge {
+		position: static;
+		margin-left: auto;
+		flex: none;
+	}
+}
