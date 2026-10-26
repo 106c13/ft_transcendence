@@ -118,13 +118,14 @@
 	height: 100%;
 }
 
-/* Responsive Breakpoints */
-@media (max-width: 960px) {
-	.playOnlineLayout {
+@media (max-width: 1120px) {
+	.statsLayout {
 		grid-template-columns: 1fr;
 	}
+}
 
-	.statsLayout {
+@media (max-width: 960px) {
+	.playOnlineLayout {
 		grid-template-columns: 1fr;
 	}
 
