@@ -132,7 +132,7 @@ export default function AnalyzePage() {
     const navigate = useNavigate()
     const { showToast } = useToast()
 
-    // ── Board & Moves State ──
+    // Board & Moves State 
     const [moveHistory, setMoveHistory] = useState<string[]>([STARTING_FEN])
     const [moveSAN, setMoveSAN] = useState<string[]>([])
     const [moveDetails, setMoveDetails] = useState<{ from: string; to: string }[]>([])
@@ -160,7 +160,7 @@ export default function AnalyzePage() {
     const [blackRating, setBlackRating] = useState<number | string | undefined>(undefined)
     const [currentUsername, setCurrentUsername] = useState<string>('')
 
-    // ── Engine Evaluation & Analysis State ──
+    // Engine Evaluation & Analysis State 
     const [isEvaluating, setIsEvaluating] = useState<boolean>(false)
     const [evalInfo, setEvalInfo] = useState<{
         winChanceWhite: number
@@ -304,7 +304,7 @@ export default function AnalyzePage() {
         return null
     }, [viewIndex, analysisData, moveDetails, moveHistory, evalInfo])
 
-    // ── Modals State ──
+    // Modals State 
     const [showPgnModal, setShowPgnModal] = useState<boolean>(false)
     const [pgnInput, setPgnInput] = useState<string>('')
     const [showGamesModal, setShowGamesModal] = useState<boolean>(false)
@@ -344,7 +344,7 @@ export default function AnalyzePage() {
         [currentFen]
     )
 
-    // ── Move List Auto-Scrolling ──
+    // Move List Auto-Scrolling 
     useEffect(() => {
         const container = moveListRef.current
         if (!container) return
@@ -368,7 +368,7 @@ export default function AnalyzePage() {
         }
     }, [viewIndex])
 
-    // ── Board Move Sounds on Step Navigation ──
+    // Board Move Sounds on Step Navigation 
     useEffect(() => {
         if (prevViewIndexRef.current === null) {
             prevViewIndexRef.current = viewIndex
@@ -402,7 +402,7 @@ export default function AnalyzePage() {
         }
     }, [viewIndex, moveSAN])
 
-    // ── Keyboard Arrow Navigation ──
+    // Keyboard Arrow Navigation 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
@@ -429,7 +429,7 @@ export default function AnalyzePage() {
         setCustomArrows([])
     }, [viewIndex])
 
-    // ── Position Evaluation Logic ──
+    // Position Evaluation Logic 
     const applyEvaluation = useCallback((data: EvaluationResult, fen: string) => {
         try {
             const c = new Chess(fen)
@@ -615,7 +615,7 @@ export default function AnalyzePage() {
         }
     }, [currentFen, displayChess, applyEvaluation])
 
-    // ── Initial Load by :id (if provided in route) ──
+    // Initial Load by :id (if provided in route) 
     useEffect(() => {
         if (!id) return
         let isCancelled = false
@@ -677,7 +677,7 @@ export default function AnalyzePage() {
         }
     }, [id])
 
-    // ── Interactive Piece Movement ──
+    // Interactive Piece Movement 
     const executeMove = (from: string, to: string, promotion?: string) => {
         try {
             const currentPositionChess = new Chess(moveHistory[viewIndex])
@@ -828,7 +828,7 @@ export default function AnalyzePage() {
         setPendingMove(null)
     }
 
-    // ── Load PGN Logic ──
+    // Load PGN Logic 
     const loadPgnString = (pgnString: string, requestFullAnalysis = true, showNotification = true) => {
         skipSoundRef.current = true
         try {
@@ -934,7 +934,7 @@ export default function AnalyzePage() {
         e.target.value = ''
     }
 
-    // ── Analyze Past Games Modal ──
+    // Analyze Past Games Modal 
     const openGamesModal = async () => {
         setShowGamesModal(true)
         setIsLoadingGames(true)
@@ -989,7 +989,7 @@ export default function AnalyzePage() {
         }
     }
 
-    // ── Reset Board ──
+    // Reset Board 
     const handleReset = () => {
         skipSoundRef.current = true
         setMoveHistory([STARTING_FEN])
@@ -1059,7 +1059,7 @@ export default function AnalyzePage() {
         <div className={styles.container}>
             <main className={styles.main}>
                 <div className={styles.playArea}>
-                    {/* ── Left Board & Eval Bar Area ── */}
+                    {/* Left Board & Eval Bar Area */}
                     <div className={styles.boardAreaWithEval}>
                         {/* Evaluation Bar */}
                         <div className={styles.evalBarWrapper}>
@@ -1150,7 +1150,7 @@ export default function AnalyzePage() {
                         </div>
                     </div>
 
-                    {/* ── Right Side Info Panel ── */}
+                    {/* Right Side Info Panel */}
                     <div className={styles.infoPanel}>
                         <div className={styles.panelHeader}>
                             <h3>
@@ -1407,7 +1407,7 @@ export default function AnalyzePage() {
                     onChange={handleFileInputChange}
                 />
 
-                {/* ── Modal: Load PGN / Upload ── */}
+                {/* Modal: Load PGN / Upload */}
                 {showPgnModal && (
                     <div className={styles.modalBackdrop} onClick={() => setShowPgnModal(false)}>
                         <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
@@ -1461,7 +1461,7 @@ export default function AnalyzePage() {
                     </div>
                 )}
 
-                {/* ── Modal: Analyze Existing Games ── */}
+                {/* Modal: Analyze Existing Games */}
                 {showGamesModal && (
                     <div className={styles.modalBackdrop} onClick={() => setShowGamesModal(false)}>
                         <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>

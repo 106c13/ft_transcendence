@@ -45,7 +45,7 @@
   box-sizing: border-box;
 }
 
-/* ── Board & Eval Bar Area ── */
+/* Board & Eval Bar Area */
 .boardAreaWithEval {
   display: flex;
   align-items: center;
@@ -133,7 +133,7 @@
   box-sizing: border-box;
 }
 
-/* ── Side Info Panel ── */
+/* Side Info Panel */
 .infoPanel {
   width: 390px;
   flex: 1;
@@ -186,7 +186,7 @@
   border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
-/* ── Live Engine Telemetry Banner ── */
+/* Live Engine Telemetry Banner */
 .engineBanner {
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(148, 163, 184, 0.12);
@@ -289,7 +289,7 @@
   flex: 1;
 }
 
-/* ── Move Log Section (Matching GamePage MoveHistory) ── */
+/* Move Log Section (Matching GamePage MoveHistory) */
 .moveLogWrapper {
   flex: 1;
   min-height: 0;
@@ -434,7 +434,7 @@
   height: 100%;
 }
 
-/* ── Navigation Bar (Matching MoveHistory moveNavRow) ── */
+/* Navigation Bar (Matching MoveHistory moveNavRow) */
 .moveNavRow {
   display: flex;
   gap: 6px;
@@ -479,7 +479,7 @@
   transform: none;
 }
 
-/* ── Action Toolbar (Matching GameActions) ── */
+/* Action Toolbar (Matching GameActions) */
 .gameActions {
   display: flex;
   flex-direction: row;
@@ -524,7 +524,7 @@
   color: #FFFFFF;
 }
 
-/* ── Modals (Past Games & Load PGN) ── */
+/* Modals (Past Games & Load PGN) */
 .modalBackdrop {
   position: fixed;
   inset: 0;

@@ -26,11 +26,11 @@ import type { useGameAnalysis } from '../../hooks/useGameAnalysis';
 import type { useGameHistory } from '../../hooks/useGameHistory';
 import styles from './GameAnalysis.module.css';
 
-// ── Shared types from utils ──
+// Shared types from utils 
 import type { MatchRecord, MoveAnalysis, GameAnalysisResult } from '../../utils/gameUtils';
 export type { MatchRecord, MoveAnalysis, GameAnalysisResult };
 
-// ── Badge color mapping ──
+// Badge color mapping 
 const BADGE_STYLES: Record<string, string> = {
 	brilliant: styles.badgeBrilliant,
 	great: styles.badgeGreat,

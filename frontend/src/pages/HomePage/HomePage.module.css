@@ -69,7 +69,7 @@
 	color: var(--color-blue-400);
 }
 
-/* ── Section 1: Play Online Layout ── */
+/* Section 1: Play Online Layout */
 .playOnlineLayout {
 	display: grid;
 	grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
@@ -94,7 +94,7 @@
 	height: 100%;
 }
 
-/* ── Section 2: Stats & More Layout ── */
+/* Section 2: Stats & More Layout */
 .statsLayout {
 	display: grid;
 	grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);

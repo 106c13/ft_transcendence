@@ -7,7 +7,7 @@
 	gap: 16px;
 }
 
-/* ── Header Card ── */
+/* Header Card */
 .headerCard {
 	background: #1E293B;
 	border: 1px solid rgba(148, 163, 184, 0.12);
@@ -210,7 +210,7 @@
 	font-size: 12px;
 }
 
-/* ── Loading Card ── */
+/* Loading Card */
 .placeholderCard {
 	background: #1E293B;
 	border: 1px solid rgba(148, 163, 184, 0.12);
@@ -352,7 +352,7 @@
 	transform: translateY(0);
 }
 
-/* ── Analysis Workspace ── */
+/* Analysis Workspace */
 .workspace {
 	display: flex;
 	flex-direction: column;
@@ -455,7 +455,7 @@
 .chipMistake { background: rgba(249, 115, 22, 0.15); color: #FB923C; }
 .chipBlunder { background: rgba(239, 68, 68, 0.15); color: #F87171; }
 
-/* ── Main Board & Panel Area ── */
+/* Main Board & Panel Area */
 .mainArea {
 	display: flex;
 	gap: 16px;
@@ -524,7 +524,7 @@
 	text-transform: uppercase;
 }
 
-/* ── Chess Board ── */
+/* Chess Board */
 .boardWrapper {
 	flex-shrink: 0;
 }
@@ -642,7 +642,7 @@
 	margin: 0;
 }
 
-/* ── Classification Badge Styles ── */
+/* Classification Badge Styles */
 .badgeBrilliant { background: #0284C7; color: #FFFFFF; }
 .badgeGreat { background: #0EA5E9; color: #FFFFFF; }
 .badgeBest { background: #16A34A; color: #FFFFFF; }
@@ -653,7 +653,7 @@
 .badgeBlunder { background: #DC2626; color: #FFFFFF; }
 .badgeDefault { background: #475569; color: #FFFFFF; }
 
-/* ── Control Panel & Details ── */
+/* Control Panel & Details */
 .controlPanel {
 	flex: 1;
 	display: flex;
@@ -936,7 +936,7 @@
 	font-weight: 700;
 }
 
-/* ── Responsive ── */
+/* Responsive */
 @media (max-width: 900px) {
 	.mainArea {
 		flex-direction: column;

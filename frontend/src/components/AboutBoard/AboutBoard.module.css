@@ -82,7 +82,7 @@
 	color: #E2E8F0;
 }
 
-/* ── Checkmate / Check Animations (Same as Game Page) ── */
+/* Checkmate / Check Animations (Same as Game Page) */
 .checkedKing {
 	filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.95)) drop-shadow(0 0 16px rgba(239, 68, 68, 0.7)) !important;
 }

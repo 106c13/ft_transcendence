@@ -209,7 +209,7 @@ export const exportPgnFile = (params: ExportPgnParams): void => {
 	URL.revokeObjectURL(url);
 };
 
-// ── Match and Game Analysis Types ──
+// Match and Game Analysis Types 
 export type MatchRecord = {
 	id: number;
 	white_id: number;
@@ -267,7 +267,7 @@ export interface GameAnalysisResult {
 	positions: MoveAnalysis[];
 }
 
-// ── Live Game Types ──
+// Live Game Types 
 export interface LiveGamePlayer {
 	id: number;
 	username: string;
@@ -292,7 +292,7 @@ export interface LiveGameData {
 	blackPlayer: LiveGamePlayer;
 }
 
-// ── Rating Types ──
+// Rating Types 
 export type RatingCategory = 'bullet' | 'blitz' | 'rapid';
 
 export type SparklinePoint = {
