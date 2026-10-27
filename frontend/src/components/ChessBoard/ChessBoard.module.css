@@ -200,8 +200,8 @@
 
 @media (max-width: 950px) {
 	.chessBoard {
-		width: min(92vw, 480px);
-		height: min(92vw, 480px);
+		width: var(--board-size, min(92vw, 480px));
+		height: var(--board-size, min(92vw, 480px));
 	}
 }
 

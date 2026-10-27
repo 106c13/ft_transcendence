@@ -1,4 +1,6 @@
 .container {
+  --eval-w: 26px;
+  --eval-gap: 12px;
   --game-gap: 10px;
   --banner-h: 56px;
   --banner-gap: 8px;
@@ -49,7 +51,7 @@
 .boardAreaWithEval {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--eval-gap);
   height: var(--game-content-h);
   max-height: var(--game-content-h);
   box-sizing: border-box;
@@ -64,8 +66,10 @@
 }
 
 .evalBarContainer {
-  width: 26px;
-  height: 100%;
+  width: var(--eval-w);
+  flex: 1;
+  min-height: 0;
+  height: auto;
   background: #1E293B;
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 8px;
@@ -781,7 +785,9 @@
 /* Responsive */
 @media (max-width: 950px) {
   .container {
-    --board-size: min(92vw, 440px);
+    /* screen width - side padding - eval bar - gap */
+    --board-size: min(calc(100vw - 24px - var(--eval-w) - var(--eval-gap)), 440px);
+    --game-content-h: auto;
     height: auto;
     min-height: 100vh;
     max-height: none;
@@ -805,21 +811,23 @@
   .boardAreaWithEval {
     height: auto;
     max-height: none;
-  }
-
-  .evalBarWrapper {
-    height: 380px;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
   }
 
   .boardContainer {
-    width: min(92vw, 440px);
+    width: var(--board-size);
     height: auto;
     max-height: none;
   }
 
   .infoPanel {
     width: 100%;
-    max-width: 440px;
+    max-width: calc(var(--board-size) + var(--eval-w) + var(--eval-gap));
+    min-width: 0;
+    flex: none;
     height: 480px;
+    max-height: none;
   }
 }
