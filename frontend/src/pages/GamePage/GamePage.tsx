@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useOutletContext } from 'react-router-dom'
 import type { LayoutContextType } from '../../layouts/MainLayout'
@@ -13,13 +13,29 @@ import GameOverDialog from '../../components/GameOverDialog/GameOverDialog'
 import ChessSkeleton from '../../components/ChessSkeleton/ChessSkeleton'
 import styles from './GamePage.module.css'
 
+type BannerData = {
+    name: string;
+    username: string | undefined;
+    avatar: string | null | undefined;
+    time: number;
+    color: "w" | "b";
+    isActive: boolean;
+    rating: number | null;
+    ratingDelta: number | null;
+    isProvisional: boolean;
+    captured: {
+        type: string;
+        color: "w" | "b";
+    }[];
+    diff: number;
+};
+
 export default function GamePage() {
     const { t } = useTranslation()
     usePageTitle('page_title_game')
 
     const layoutContext = useOutletContext<LayoutContextType | undefined>()
     const challengeSocket = layoutContext?.challengeSocket
-    const [isBoardFlipped, setIsBoardFlipped] = useState(false)
 
     const rematchState: 'idle' | 'sent' = challengeSocket?.outgoingChallenge?.isRematch ? 'sent' : 'idle'
 
@@ -38,6 +54,23 @@ export default function GamePage() {
         sendMove: game.sendMove,
         onIllegalMove: game.handleIllegalMove,
     })
+
+    const [isFlipped, setIsFlipped] = useState(false)
+
+    // Players start with themselves at the bottom, viewers with white
+    const baseBottom: 'w' | 'b' = game.isViewer ? 'w' : game.playerColor
+    const bottomColor: 'w' | 'b' = isFlipped ? (baseBottom === 'w' ? 'b' : 'w') : baseBottom
+
+    const handleFlipBoard = () => setIsFlipped((prev) => !prev)
+
+    const ranks = useMemo(
+        () => (bottomColor === 'w' ? ['8', '7', '6', '5', '4', '3', '2', '1'] : ['1', '2', '3', '4', '5', '6', '7', '8']),
+        [bottomColor]
+    )
+    const files = useMemo(
+        () => (bottomColor === 'w' ? ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] : ['h', 'g', 'f', 'e', 'd', 'c', 'b', 'a']),
+        [bottomColor]
+    )
 
     if (game.gameState === 'searching') {
         return (
@@ -64,7 +97,7 @@ export default function GamePage() {
         : (game.blackScore > game.whiteScore ? game.blackScore - game.whiteScore : 0)
 
     // Viewer mode banner data
-    const topViewerPlayer = {
+    const blackBanner: BannerData = {
         name: game.blackPlayer?.username || (game.playerColor === 'w' ? game.opponentName : game.currentUser?.username) || 'Black',
         username: game.blackPlayer?.username || (game.playerColor === 'w' ? game.opponentName : game.currentUser?.username),
         avatar: game.blackPlayer?.avatar ?? (game.playerColor === 'w' ? game.opponentAvatar : game.currentUser?.avatar),
@@ -78,7 +111,7 @@ export default function GamePage() {
         diff: game.blackScore > game.whiteScore ? game.blackScore - game.whiteScore : 0,
     }
 
-    const bottomViewerPlayer = {
+    const whiteBanner: BannerData = {
         name: game.whitePlayer?.username || (game.playerColor === 'w' ? game.currentUser?.username : game.opponentName) || 'White',
         username: game.whitePlayer?.username || (game.playerColor === 'w' ? game.currentUser?.username : game.opponentName),
         avatar: game.whitePlayer?.avatar ?? (game.playerColor === 'w' ? game.currentUser?.avatar : game.opponentAvatar),
@@ -92,15 +125,92 @@ export default function GamePage() {
         diff: game.whiteScore > game.blackScore ? game.whiteScore - game.blackScore : 0,
     }
 
-    const topViewerDisconnected = game.blackPlayer?.id !== undefined &&
-        game.disconnectedUserIds.includes(game.blackPlayer.id)
-    const bottomViewerDisconnected = game.whitePlayer?.id !== undefined &&
-        game.disconnectedUserIds.includes(game.whitePlayer.id)
+    const viewerTop = bottomColor === 'w' ? blackBanner : whiteBanner
+    const viewerBottom = bottomColor === 'w' ? whiteBanner : blackBanner
+
+    // Disconnected players for viewer
+    const blackDisconnected = game.blackPlayer?.id !== undefined && game.disconnectedUserIds.includes(game.blackPlayer.id)
+    const whiteDisconnected = game.whitePlayer?.id !== undefined && game.disconnectedUserIds.includes(game.whitePlayer.id)
+
+    const viewerTopDisconnected = bottomColor === 'w' ? blackDisconnected : whiteDisconnected
+    const viewerBottomDisconnected = bottomColor === 'w' ? whiteDisconnected : blackDisconnected
+
+    const viewerTopId = bottomColor === 'w' ? game.blackPlayer?.id : game.whitePlayer?.id
+    const viewerBottomId = bottomColor === 'w' ? game.whitePlayer?.id : game.blackPlayer?.id
+
     const opponentPlayer = game.playerColor === 'w' ? game.blackPlayer : game.whitePlayer
     const opponentDisconnected = opponentPlayer?.id !== undefined &&
         game.disconnectedUserIds.includes(opponentPlayer.id)
+
     const getDisconnectCountdown = (userId?: number) =>
         userId === undefined ? null : game.disconnectSecondsRemaining[userId] ?? null
+
+    const renderViewerBanner = (
+        player: BannerData,
+        disconnected: boolean,
+        playerId: number | undefined,
+        isBottom: boolean
+    ) => (
+        <PlayerBanner
+            name={player.name}
+            username={player.username}
+            avatar={player.avatar}
+            color={player.color}
+            time={player.time}
+            isActive={player.isActive}
+            isBottom={isBottom}
+            rating={player.rating}
+            ratingDelta={player.ratingDelta}
+            isGameOver={game.isGameOver}
+            isDisconnected={disconnected}
+            disconnectCountdown={getDisconnectCountdown(playerId)}
+            isProvisional={player.isProvisional}
+            selectedMode={game.selectedMode}
+            capturedPieces={player.captured}
+            materialDiff={player.diff}
+        />
+    )
+
+    const renderOpponentBanner = (isBottom: boolean) => (
+        <PlayerBanner
+            name={game.opponentName || t('opponent')}
+            username={game.opponentName}
+            avatar={game.opponentAvatar}
+            color={opponentColor}
+            time={game.playerColor === 'w' ? game.blackTime : game.whiteTime}
+            isActive={game.turn !== game.playerColor && !game.isGameOver && game.gameState === 'playing'}
+            isBottom={isBottom}
+            rating={game.opponentRating}
+            ratingDelta={game.playerColor === 'w' ? game.blackRatingDelta : game.whiteRatingDelta}
+            isGameOver={game.isGameOver}
+            isDisconnected={opponentDisconnected}
+            disconnectCountdown={getDisconnectCountdown(opponentPlayer?.id)}
+            isProvisional={game.opponentIsProvisional}
+            selectedMode={game.selectedMode}
+            capturedPieces={opponentCaptured}
+            materialDiff={opponentDiff}
+        />
+    )
+
+    const renderMyBanner = (isBottom: boolean) => (
+        <PlayerBanner
+            name={game.currentUser?.username || t('you')}
+            username={game.currentUser?.username}
+            avatar={game.currentUser?.avatar}
+            color={game.playerColor}
+            time={game.playerColor === 'w' ? game.whiteTime : game.blackTime}
+            isActive={game.turn === game.playerColor && !game.isGameOver && game.gameState === 'playing'}
+            isBottom={isBottom}
+            rating={game.playerRating}
+            ratingDelta={game.playerRatingDelta ?? (game.playerColor === 'w' ? game.whiteRatingDelta : game.blackRatingDelta)}
+            isGameOver={game.isGameOver}
+            isProvisional={game.playerIsProvisional}
+            initialRatings={game.currentUser?.ratings}
+            selectedMode={game.selectedMode}
+            capturedPieces={playerCaptured}
+            materialDiff={playerDiff}
+        />
+    )
 
     return (
         <div className={styles.gameContainer}>
@@ -119,50 +229,16 @@ export default function GamePage() {
                             }
                         }}
                     >
-                        {/* Top Banner: Black in viewer mode, or Opponent in player mode */}
-                        {game.isViewer ? (
-                            <PlayerBanner
-                                name={topViewerPlayer.name}
-                                username={topViewerPlayer.username}
-                                avatar={topViewerPlayer.avatar}
-                                color={topViewerPlayer.color}
-                                time={topViewerPlayer.time}
-                                isActive={topViewerPlayer.isActive}
-                                rating={topViewerPlayer.rating}
-                                ratingDelta={topViewerPlayer.ratingDelta}
-                                isGameOver={game.isGameOver}
-                                isDisconnected={topViewerDisconnected}
-                                disconnectCountdown={getDisconnectCountdown(game.blackPlayer?.id)}
-                                isProvisional={topViewerPlayer.isProvisional}
-                                selectedMode={game.selectedMode}
-                                capturedPieces={topViewerPlayer.captured}
-                                materialDiff={topViewerPlayer.diff}
-                            />
-                        ) : (
-                            <PlayerBanner
-                                name={game.opponentName || t('opponent')}
-                                username={game.opponentName}
-                                avatar={game.opponentAvatar}
-                                color={opponentColor}
-                                time={game.playerColor === 'w' ? game.blackTime : game.whiteTime}
-                                isActive={game.turn !== game.playerColor && !game.isGameOver && game.gameState === 'playing'}
-                                rating={game.opponentRating}
-                                ratingDelta={game.playerColor === 'w' ? game.blackRatingDelta : game.whiteRatingDelta}
-                                isGameOver={game.isGameOver}
-                                isDisconnected={opponentDisconnected}
-                                disconnectCountdown={getDisconnectCountdown(opponentPlayer?.id)}
-                                isProvisional={game.opponentIsProvisional}
-                                selectedMode={game.selectedMode}
-                                capturedPieces={opponentCaptured}
-                                materialDiff={opponentDiff}
-                            />
-                        )}
+                        
+                        {game.isViewer
+                            ? renderViewerBanner(viewerTop, viewerTopDisconnected, viewerTopId, false)
+                            : isFlipped ? renderMyBanner(false) : renderOpponentBanner(false)}
 
                         <ChessBoard
                             displayChess={game.displayChess}
                             displayFen={game.displayFen}
-                            ranks={isBoardFlipped ? [...game.ranks].reverse() : game.ranks}
-                            files={isBoardFlipped ? [...game.files].reverse() : game.files}
+                            ranks={ranks}
+                            files={files}
                             selectedSquare={board.selectedSquare}
                             validMoves={board.validMoves}
                             lastMove={game.lastMove}
@@ -184,45 +260,9 @@ export default function GamePage() {
                             winnerColor={game.isGameOver && game.viewIndex === game.moveHistory.length - 1 ? game.winnerColor : null}
                         />
 
-                        {/* Bottom Banner: White in viewer mode, or Current User in player mode */}
-                        {game.isViewer ? (
-                            <PlayerBanner
-                                name={bottomViewerPlayer.name}
-                                username={bottomViewerPlayer.username}
-                                avatar={bottomViewerPlayer.avatar}
-                                color={bottomViewerPlayer.color}
-                                time={bottomViewerPlayer.time}
-                                isActive={bottomViewerPlayer.isActive}
-                                isBottom={true}
-                                rating={bottomViewerPlayer.rating}
-                                ratingDelta={bottomViewerPlayer.ratingDelta}
-                                isGameOver={game.isGameOver}
-                                isDisconnected={bottomViewerDisconnected}
-                                disconnectCountdown={getDisconnectCountdown(game.whitePlayer?.id)}
-                                isProvisional={bottomViewerPlayer.isProvisional}
-                                selectedMode={game.selectedMode}
-                                capturedPieces={bottomViewerPlayer.captured}
-                                materialDiff={bottomViewerPlayer.diff}
-                            />
-                        ) : (
-                            <PlayerBanner
-                                name={game.currentUser?.username || t('you')}
-                                username={game.currentUser?.username}
-                                avatar={game.currentUser?.avatar}
-                                color={game.playerColor === 'w' ? 'w' : 'b'}
-                                time={game.playerColor === 'w' ? game.whiteTime : game.blackTime}
-                                isActive={game.turn === game.playerColor && !game.isGameOver && game.gameState === 'playing'}
-                                isBottom={true}
-                                rating={game.playerRating}
-                                ratingDelta={game.playerRatingDelta ?? (game.playerColor === 'w' ? game.whiteRatingDelta : game.blackRatingDelta)}
-                                isGameOver={game.isGameOver}
-                                isProvisional={game.playerIsProvisional}
-                                initialRatings={game.currentUser?.ratings}
-                                selectedMode={game.selectedMode}
-                                capturedPieces={playerCaptured}
-                                materialDiff={playerDiff}
-                            />
-                        )}
+                        {game.isViewer
+                            ? renderViewerBanner(viewerBottom, viewerBottomDisconnected, viewerBottomId, true)
+                            : isFlipped ? renderOpponentBanner(true) : renderMyBanner(true)}
                     </div>
 
                     <ChessInfoPanel
@@ -251,7 +291,7 @@ export default function GamePage() {
                             game.setIsGameOver(false)
                             game.startMatchmaking()
                         }}
-                        onFlipBoard={() => setIsBoardFlipped((prev) => !prev)}
+                        onFlipBoard={handleFlipBoard}
                     />
                 </div>
 

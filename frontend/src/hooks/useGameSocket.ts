@@ -842,9 +842,6 @@ export function useGameSocket() {
         return moveList[viewIndex - 1] ?? null
     }, [viewIndex, moveList])
 
-    const ranks = playerColor === 'b' ? ['1', '2', '3', '4', '5', '6', '7', '8'] : ['8', '7', '6', '5', '4', '3', '2', '1']
-    const files = playerColor === 'b' ? ['h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'] : ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-
     const startMatchmaking = (modeOverride?: GameModeType) => {
         const mode = modeOverride || selectedMode
         navigate(`/game?mode=${encodeURIComponent(mode)}`)
@@ -981,8 +978,6 @@ export function useGameSocket() {
         moveSAN,
         moveTimes,
         premoveSquares,
-        ranks,
-        files,
         isReviewing,
         captured,
         whiteScore,
