@@ -1,0 +1,44 @@
+.gameActions {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  width: 100%;
+  margin-top: -2px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.actionRow {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.actionTooltip {
+  flex: 1;
+}
+
+.actionBtnNeutral {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(30, 41, 59, 0.75);
+  color: #E2E8F0;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+}
+
+.actionBtnNeutral:hover:not(:disabled) {
+  background: rgba(51, 65, 85, 0.85);
+  border-color: rgba(148, 163, 184, 0.4);
+  color: #FFFFFF;
+}
+

@@ -1,0 +1,67 @@
+.evalBarWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: var(--board-size);
+}
+
+.evalBarContainer {
+  width: var(--eval-w);
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  background: #1E293B;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.evalBarWhite {
+  width: 100%;
+  background: #FFFFFF;
+  transition: height 0.25s ease-out;
+}
+
+.evalBarBlack {
+  width: 100%;
+  flex: 1;
+  background: #0F172A;
+}
+
+.evalBarLabel {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  padding: 2px 3px;
+  border-radius: 4px;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.evalWhiteSide {
+  bottom: 6px;
+  color: #0F172A;
+}
+
+.evalBlackSide {
+  top: 6px;
+  color: #F8FAFC;
+}
+
+.evalSideHint {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748B;
+  letter-spacing: 0.5px;
+}
+

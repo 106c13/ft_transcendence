@@ -1,0 +1,63 @@
+.infoPanel {
+  width: 390px;
+  flex: 1;
+  max-width: 440px;
+  min-width: 320px;
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(14px);
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: var(--game-content-h);
+  max-height: var(--game-content-h);
+  box-sizing: border-box;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  padding-bottom: 10px;
+}
+
+.panelHeader h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #F8FAFC;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modeBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(148, 163, 184, 0.12);
+  color: #CBD5E1;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+@media (max-width: 950px) {
+  .infoPanel {
+    width: 100%;
+    max-width: calc(var(--board-size) + var(--eval-w) + var(--eval-gap));
+    min-width: 0;
+    flex: none;
+    height: 480px;
+    max-height: none;
+  }
+}
+
