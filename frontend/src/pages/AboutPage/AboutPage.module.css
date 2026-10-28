@@ -75,14 +75,48 @@
 	flex-shrink: 0;
 }
 
-/* Responsive Breakpoints */
+/* Intermediate: board + log on top, showcase full width below */
 @media (max-width: 1040px) {
 	.interactiveSection {
-		flex-direction: column;
-		align-items: center;
+		display: grid;
+		grid-template-columns: 380px minmax(0, 1fr);
+		grid-template-areas:
+			"board    log"
+			"showcase showcase";
+		align-items: stretch;
+		width: 100%;
+		max-width: 860px;
 		padding: 14px;
 		gap: 14px;
+	}
+
+	.boardColumn {
+		grid-area: board;
+		width: 380px;
+		height: 380px;
+	}
+
+	.rightColumn {
+		grid-area: log;
 		width: 100%;
+		max-width: none;
+		height: 380px;
+	}
+
+	.showcaseWrapper {
+		grid-area: showcase;
+		width: 100%;
+		max-width: none;
+		height: auto;
+	}
+}
+
+/* Narrow: single column */
+@media (max-width: 760px) {
+	.interactiveSection {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 		max-width: 480px;
 	}
 

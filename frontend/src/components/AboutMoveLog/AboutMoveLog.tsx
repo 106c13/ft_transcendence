@@ -52,19 +52,6 @@ const AboutMoveLog = ({
 					<ScrollText size={16} aria-hidden="true" />
 					<span>Move History</span>
 				</h4>
-				<span className={`${styles.statusBadge} ${isPlaying ? styles.playing : ''}`}>
-					{isPlaying ? (
-						<>
-							<Play size={11} fill="currentColor" aria-hidden="true" />
-							<span>Auto</span>
-						</>
-					) : (
-						<>
-							<Pause size={11} aria-hidden="true" />
-							<span>Paused</span>
-						</>
-					)}
-				</span>
 			</div>
 
 			{/* Vertical Moves Table */}
