@@ -31,6 +31,9 @@
 
 /* Header & Live Game Side-by-Side Wrapper using CSS Grid for 100% fluid track interpolation */
 .headerWrapper {
+	container-type: inline-size; 
+	display: grid;
+	grid-template-columns: 1fr 0px;
 	display: grid;
 	grid-template-columns: 1fr 0px;
 	column-gap: 0px;
@@ -48,7 +51,6 @@
 }
 
 .headerContainer {
-	container-type: inline-size;
 	min-width: 0;
 	width: 100%;
 	display: flex;
