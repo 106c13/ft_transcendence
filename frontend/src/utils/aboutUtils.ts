@@ -1,3 +1,5 @@
+import type { TFunction } from 'i18next';
+
 export type DevKey = 'arman' | 'narek' | 'hakob';
 
 export interface DevProfile {
@@ -13,6 +15,27 @@ export interface DevProfile {
 	statement: string;
 	tacticalMotto: string;
 	highlights: string[];
+	nameKey: string;
+	pieceRoleKey: string;
+	roleKey: string;
+	statementKey: string;
+	mottoKey: string;
+	highlightKeys: string[];
+}
+
+export function getTranslatedDev(
+	dev: DevProfile,
+	t: TFunction
+): DevProfile {
+	return {
+		...dev,
+		name: t(dev.nameKey, dev.name),
+		pieceRoleName: t(dev.pieceRoleKey, dev.pieceRoleName),
+		shortRole: t(dev.roleKey, dev.shortRole),
+		statement: t(dev.statementKey, dev.statement),
+		tacticalMotto: t(dev.mottoKey, dev.tacticalMotto),
+		highlights: dev.highlightKeys.map((key, idx) => t(key, dev.highlights[idx])),
+	};
 }
 
 export interface MoveStep {
@@ -48,6 +71,17 @@ export const DEVS: Record<DevKey, DevProfile> = {
 			'Built real-time WebSocket matchmaking, rematch flow & game synchronization',
 			'Engineered interactive board with drag & drop, premoves & sound effects',
 		],
+		nameKey: 'dev_name_arman',
+		pieceRoleKey: 'piece_role_white_king',
+		roleKey: 'role_architecture_gameplay',
+		statementKey: 'about_dev_arman_statement',
+		mottoKey: 'about_dev_arman_motto',
+		highlightKeys: [
+			'about_dev_arman_highlight_1',
+			'about_dev_arman_highlight_2',
+			'about_dev_arman_highlight_3',
+			'about_dev_arman_highlight_4',
+		],
 	},
 	narek: {
 		id: 'narek',
@@ -69,6 +103,17 @@ export const DEVS: Record<DevKey, DevProfile> = {
 			'Built competitive global leaderboard with rating ladders & win rates',
 			'Engineered interactive rating history charts and performance analytics',
 		],
+		nameKey: 'dev_name_narek',
+		pieceRoleKey: 'piece_role_white_queen',
+		roleKey: 'role_analysis_leaderboard',
+		statementKey: 'about_dev_narek_statement',
+		mottoKey: 'about_dev_narek_motto',
+		highlightKeys: [
+			'about_dev_narek_highlight_1',
+			'about_dev_narek_highlight_2',
+			'about_dev_narek_highlight_3',
+			'about_dev_narek_highlight_4',
+		],
 	},
 	hakob: {
 		id: 'hakob',
@@ -89,6 +134,17 @@ export const DEVS: Record<DevKey, DevProfile> = {
 			'Developed real-time direct chat & WebSocket messaging channels',
 			'Implemented trilingual localization for English, Russian, and Armenian',
 			'Crafted live notification bells, friend requests & user presence status',
+		],
+		nameKey: 'dev_name_hakob',
+		pieceRoleKey: 'piece_role_white_knight',
+		roleKey: 'role_auth_messages_translations',
+		statementKey: 'about_dev_hakob_statement',
+		mottoKey: 'about_dev_hakob_motto',
+		highlightKeys: [
+			'about_dev_hakob_highlight_1',
+			'about_dev_hakob_highlight_2',
+			'about_dev_hakob_highlight_3',
+			'about_dev_hakob_highlight_4',
 		],
 	},
 };

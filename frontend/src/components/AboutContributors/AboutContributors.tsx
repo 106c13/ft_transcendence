@@ -1,5 +1,6 @@
 import { Users, ExternalLink } from 'lucide-react';
-import { DEVS } from '../../utils/aboutUtils';
+import { useTranslation } from 'react-i18next';
+import { DEVS, getTranslatedDev } from '../../utils/aboutUtils';
 import type { DevKey } from '../../utils/aboutUtils';
 import styles from './AboutContributors.module.css';
 
@@ -9,16 +10,18 @@ interface Props {
 }
 
 const AboutContributors = ({ selectedDev, onSelectDev }: Props) => {
+	const { t } = useTranslation();
+
 	return (
 		<section>
 			<h2 className={styles.sectionTitle}>
 				<Users size={20} className={styles.sectionTitleIcon} aria-hidden="true" />
-				<span>Contributors & Responsibilities</span>
+				<span>{t('about_contributors_title')}</span>
 			</h2>
 
 			<div className={styles.contributorsGrid}>
 				{(Object.keys(DEVS) as DevKey[]).map((key) => {
-					const dev = DEVS[key];
+					const dev = getTranslatedDev(DEVS[key], t);
 					const isSelected = selectedDev === key;
 
 					return (

@@ -1,5 +1,6 @@
 import { ExternalLink } from 'lucide-react';
-import { DEVS } from '../../utils/aboutUtils';
+import { useTranslation } from 'react-i18next';
+import { DEVS, getTranslatedDev } from '../../utils/aboutUtils';
 import type { DevKey } from '../../utils/aboutUtils';
 import styles from './AboutShowcase.module.css';
 
@@ -9,7 +10,8 @@ interface Props {
 }
 
 const AboutShowcase = ({ selectedDev, currentSquare }: Props) => {
-	const dev = DEVS[selectedDev];
+	const { t } = useTranslation();
+	const dev = getTranslatedDev(DEVS[selectedDev], t);
 
 	return (
 		<div className={styles.showcaseCard} data-about-showcase>
@@ -17,7 +19,7 @@ const AboutShowcase = ({ selectedDev, currentSquare }: Props) => {
 				<div className={styles.showcaseHeader}>
 					<span className={styles.showcaseBadge}>
 						{dev.pieceSymbol} {dev.pieceRoleName}
-						{currentSquare ? ` • Square ${currentSquare}` : ''}
+						{currentSquare ? ` • ${t('about_square', { square: currentSquare })}` : ''}
 					</span>
 					<a
 						href={dev.intraUrl}
@@ -25,7 +27,7 @@ const AboutShowcase = ({ selectedDev, currentSquare }: Props) => {
 						rel="noopener noreferrer"
 						className={styles.intraButton}
 					>
-						<span>42 Intra</span>
+						<span>{t('about_intra', '42 Intra')}</span>
 						<ExternalLink size={12} className={styles.externalIcon} aria-hidden="true" />
 					</a>
 				</div>

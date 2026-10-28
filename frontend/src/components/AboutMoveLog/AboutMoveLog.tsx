@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollText, Play, Pause, SkipBack, ChevronLeft, ChevronRight, SkipForward } from 'lucide-react';
 import { MOVE_STEPS } from '../../utils/aboutUtils';
 import styles from './AboutMoveLog.module.css';
@@ -16,6 +17,7 @@ const AboutMoveLog = ({
 	isPlaying,
 	onTogglePlay,
 }: Props) => {
+	const { t } = useTranslation();
 	const listRef = useRef<HTMLDivElement>(null)
 
 	// Keep active move visible in vertical list
@@ -50,7 +52,7 @@ const AboutMoveLog = ({
 			<div className={styles.header}>
 				<h4 className={styles.title}>
 					<ScrollText size={16} aria-hidden="true" />
-					<span>Move History</span>
+					<span>{t('about_move_history')}</span>
 				</h4>
 			</div>
 
@@ -62,7 +64,7 @@ const AboutMoveLog = ({
 					className={`${styles.startRow} ${currentPly === 0 ? styles.activeMove : ''}`}
 					onClick={() => onSelectPly(0)}
 				>
-					Start Position
+					{t('about_start_position')}
 				</button>
 
 				{/* Move 1: Kd1 Kg1 */}
@@ -124,7 +126,7 @@ const AboutMoveLog = ({
 					className={styles.navBtn}
 					onClick={() => onSelectPly(0)}
 					disabled={currentPly === 0}
-					aria-label="Start Position (Down Arrow)"
+					aria-label={t('about_aria_start_pos')}
 				>
 					<SkipBack size={14} aria-hidden="true" />
 				</button>
@@ -133,7 +135,7 @@ const AboutMoveLog = ({
 					className={styles.navBtn}
 					onClick={() => onSelectPly(Math.max(0, currentPly - 1))}
 					disabled={currentPly === 0}
-					aria-label="Previous Move (Left Arrow)"
+					aria-label={t('about_aria_prev_move')}
 				>
 					<ChevronLeft size={14} aria-hidden="true" />
 				</button>
@@ -141,18 +143,12 @@ const AboutMoveLog = ({
 					type="button"
 					className={`${styles.navBtn} ${styles.playPauseBtn}`}
 					onClick={onTogglePlay}
-					aria-label={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
+					aria-label={isPlaying ? t('about_aria_pause') : t('about_aria_play')}
 				>
 					{isPlaying ? (
-						<>
-							<Pause size={13} aria-hidden="true" />
-							<span>Pause</span>
-						</>
+						<Pause size={14} aria-hidden="true" />
 					) : (
-						<>
-							<Play size={13} fill="currentColor" aria-hidden="true" />
-							<span>Play</span>
-						</>
+						<Play size={14} fill="currentColor" aria-hidden="true" />
 					)}
 				</button>
 				<button
@@ -160,7 +156,7 @@ const AboutMoveLog = ({
 					className={styles.navBtn}
 					onClick={() => onSelectPly(Math.min(maxPly, currentPly + 1))}
 					disabled={currentPly === maxPly}
-					aria-label="Next Move (Right Arrow)"
+					aria-label={t('about_aria_next_move')}
 				>
 					<ChevronRight size={14} aria-hidden="true" />
 				</button>
@@ -169,7 +165,7 @@ const AboutMoveLog = ({
 					className={styles.navBtn}
 					onClick={() => onSelectPly(maxPly)}
 					disabled={currentPly === maxPly}
-					aria-label="Checkmate (Up Arrow)"
+					aria-label={t('about_aria_checkmate')}
 				>
 					<SkipForward size={14} aria-hidden="true" />
 				</button>

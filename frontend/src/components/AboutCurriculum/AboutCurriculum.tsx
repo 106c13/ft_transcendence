@@ -1,59 +1,64 @@
 import { GraduationCap, Zap, Brain, ShieldCheck, Server } from 'lucide-react';
+import { useTranslation, Trans } from 'react-i18next';
 import styles from './AboutCurriculum.module.css';
 
 const AboutCurriculum = () => {
+	const { t } = useTranslation();
+
 	return (
 		<section className={styles.curriculumCard}>
 			<h2 className={styles.sectionTitle}>
 				<GraduationCap size={22} aria-hidden="true" />
-				<span>About the 42 Curriculum & ft_transcendence</span>
+				<span>{t('about_curriculum_title')}</span>
 			</h2>
 
 			<p className={styles.curriculumText}>
-				<strong>ft_transcendence</strong> is the final capstone project of the 42 Common Core curriculum.
-				It challenges students to build a full-fledged, real-time multiplayer web application from scratch,
-				requiring comprehensive mastery over containerized microservices, high-frequency bidirectional WebSockets,
-				cryptographic security standards, and responsive user experience without relying on turnkey full-stack starter templates.
+				<Trans
+					i18nKey="about_curriculum_desc"
+					components={{
+						bold: <strong />,
+					}}
+				/>
 			</p>
 
 			<div className={styles.techStackGrid}>
 				<div className={styles.techItem}>
 					<div className={styles.techItemTitle}>
 						<Zap size={16} aria-hidden="true" />
-						<span>Core Gameplay</span>
+						<span>{t('about_curriculum_gameplay_title')}</span>
 					</div>
 					<p className={styles.techItemDesc}>
-						Full chess rule-set, move validation, clock management, premoves, and live WebSocket matchmaking.
+						{t('about_curriculum_gameplay_desc')}
 					</p>
 				</div>
 
 				<div className={styles.techItem}>
 					<div className={styles.techItemTitle}>
 						<Brain size={16} aria-hidden="true" />
-						<span>Game Analysis & ELO</span>
+						<span>{t('about_curriculum_analysis_title')}</span>
 					</div>
 					<p className={styles.techItemDesc}>
-						Integrated Stockfish engine, centipawn evaluations, brilliant move detection, and dynamic leaderboards.
+						{t('about_curriculum_analysis_desc')}
 					</p>
 				</div>
 
 				<div className={styles.techItem}>
 					<div className={styles.techItemTitle}>
 						<ShieldCheck size={16} aria-hidden="true" />
-						<span>Auth, Chat & i18n</span>
+						<span>{t('about_curriculum_auth_title')}</span>
 					</div>
 					<p className={styles.techItemDesc}>
-						JWT authentication, 2FA, instant messaging rooms, real-time notifications, and trilingual support.
+						{t('about_curriculum_auth_desc')}
 					</p>
 				</div>
 
 				<div className={styles.techItem}>
 					<div className={styles.techItemTitle}>
 						<Server size={16} aria-hidden="true" />
-						<span>Infrastructure</span>
+						<span>{t('about_curriculum_infra_title')}</span>
 					</div>
 					<p className={styles.techItemDesc}>
-						Fully dockerized microservices with NestJS, PostgreSQL, Nginx, and React 19 single-page architecture.
+						{t('about_curriculum_infra_desc')}
 					</p>
 				</div>
 			</div>

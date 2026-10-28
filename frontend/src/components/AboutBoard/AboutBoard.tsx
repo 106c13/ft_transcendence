@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { DEVS } from '../../utils/aboutUtils';
+import { useTranslation } from 'react-i18next';
+import { DEVS, getTranslatedDev } from '../../utils/aboutUtils';
 import type { DevKey } from '../../utils/aboutUtils';
 import styles from './AboutBoard.module.css';
 
@@ -62,6 +63,7 @@ export default function AboutBoard({
 	onSelectDev,
 	onClickEmpty,
 }: Props) {
+	const { t } = useTranslation();
 	const boardState = useMemo(() => parseFenToBoard(fen), [fen])
 
 	const handleSquareClick = (sq: string) => {
@@ -106,9 +108,9 @@ export default function AboutBoard({
 							data-about-piece={piece?.dev || (piece ? 'piece' : undefined)}
 							title={
 								piece?.dev
-									? `${DEVS[piece.dev].name} (${sq})`
+									? `${getTranslatedDev(DEVS[piece.dev], t).name} (${sq})`
 									: piece
-									? `${piece.color === 'w' ? 'White' : 'Black'} ${piece.type.toUpperCase()} (${sq})`
+									? `${piece.color === 'w' ? t('piece_role_white_king') : t('piece_role_black_king')} (${sq})`
 									: sq
 							}
 						>
@@ -135,7 +137,7 @@ export default function AboutBoard({
 
 							{/* King Win / Loss Indicators */}
 							{isWinnerKing && (
-								<div className={styles.kingBadgeWinner} aria-label="Winner">
+								<div className={styles.kingBadgeWinner} aria-label={t('winner')}>
 									<svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
 										<path
 											fill="currentColor"
@@ -146,7 +148,7 @@ export default function AboutBoard({
 							)}
 
 							{isLoserKing && (
-								<div className={styles.kingBadgeLoser} aria-label="Defeated">
+								<div className={styles.kingBadgeLoser} aria-label={t('loser')}>
 									<svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
 										<path
 											fill="none"
