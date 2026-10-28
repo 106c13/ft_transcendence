@@ -15,7 +15,6 @@ type Props = {
 	gameData: LiveGameData;
 	profileUsername: string;
 	currentUserId?: number | null;
-	size?: number | null;
 	onGameOverStartExit?: () => void;
 	onGameOverDone: () => void;
 };
@@ -24,7 +23,6 @@ const OngoingGameCard = ({
 	gameData,
 	profileUsername,
 	currentUserId,
-	size,
 	onGameOverStartExit,
 	onGameOverDone,
 }: Props) => {
@@ -49,16 +47,12 @@ const OngoingGameCard = ({
 	const [isExiting, setIsExiting] = useState(false)
 
 	const prevGameIdRef = useRef<string>(gameData.gameId)
-	const exitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	// If gameData changes to another game (e.g. rematch or next match)
 	useEffect(() => {
 		if (prevGameIdRef.current !== gameData.gameId) {
 			prevGameIdRef.current = gameData.gameId
-			if (exitTimeoutRef.current) {
-				clearTimeout(exitTimeoutRef.current)
-				exitTimeoutRef.current = null
-			}
+			
 			setIsExiting(false)
 			setFen(gameData.fen)
 			setTurn(gameData.turn)
@@ -163,34 +157,26 @@ const OngoingGameCard = ({
 		}
 	}, [gameData.gameId, currentUserId])
 
-	// 5-second countdown on game over with smooth exit transition
+	// Tick the countdown
 	useEffect(() => {
-		if (!gameOverResult) return
+		if (!gameOverResult) return;
+		setCountdown(5);
+	}, [gameOverResult]);
 
-		setCountdown(5)
-		const timer = setInterval(() => {
-			setCountdown((prev) => {
-				if (prev === null || prev <= 1) {
-					clearInterval(timer)
-					setIsExiting(true)
-					onGameOverStartExit?.()
-					exitTimeoutRef.current = setTimeout(() => {
-						onGameOverDone()
-					}, 450)
-					return 0
-				}
-				return prev - 1
-			})
-		}, 1000)
+	useEffect(() => {
+		if (!gameOverResult || countdown === null || countdown <= 0) return;
+		const id = setTimeout(() => setCountdown((c) => (c ?? 1) - 1), 1000);
+		return () => clearTimeout(id);
+	}, [gameOverResult, countdown]);
 
-		return () => {
-			clearInterval(timer)
-			if (exitTimeoutRef.current) {
-				clearTimeout(exitTimeoutRef.current)
-				exitTimeoutRef.current = null
-			}
-		}
-	}, [gameOverResult, onGameOverDone, onGameOverStartExit])
+	// Exit once it hits zero
+	useEffect(() => {
+		if (countdown !== 0) return;
+		setIsExiting(true);
+		onGameOverStartExit?.();
+		const id = setTimeout(() => onGameOverDone(), 450);
+		return () => clearTimeout(id);
+	}, [countdown, onGameOverStartExit, onGameOverDone]);
 
 	// Orientation: Profile user is hero at bottom
 	const isProfileBlack = profileUsername.toLowerCase() === blackPlayer.username.toLowerCase()
@@ -226,16 +212,9 @@ const OngoingGameCard = ({
 		navigate(`/game/${gameData.gameId}`)
 	}
 
-	const cardStyle = {
-		width: '100%',
-		height: size ? `${size}px` : '100%',
-		aspectRatio: '1 / 1',
-	}
-
 	return (
 		<div
 			className={`${styles.ongoingGameCard} ${isExiting ? styles.isExiting : ''}`}
-			style={cardStyle}
 			onClick={handleCardClick}
 			role="button"
 			tabIndex={0}
@@ -243,13 +222,12 @@ const OngoingGameCard = ({
 			{/* Game Over Result Badge in Center */}
 			{gameOverResult && (
 				<div
-					className={`${styles.resultBadge} ${
-						isDraw
+					className={`${styles.resultBadge} ${isDraw
 							? styles.drawBadge
 							: isProfileWinner
-							? styles.victoryBadge
-							: styles.defeatBadge
-					} ${isResultExiting ? styles.resultBadgeExit : ''}`}
+								? styles.victoryBadge
+								: styles.defeatBadge
+						} ${isResultExiting ? styles.resultBadgeExit : ''}`}
 				>
 					<span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
 						{isDraw ? (
@@ -275,9 +253,8 @@ const OngoingGameCard = ({
 			{/* New Match Flash Indicator Centered (only rendered when no game over result) */}
 			{!gameOverResult && newMatchPhase !== 'idle' && (
 				<div
-					className={`${styles.newMatchBanner} ${
-						newMatchPhase === 'exit' ? styles.newMatchBannerExit : ''
-					}`}
+					className={`${styles.newMatchBanner} ${newMatchPhase === 'exit' ? styles.newMatchBannerExit : ''
+						}`}
 				>
 					<Swords size={15} aria-hidden="true" />
 					<span>{t('new_match_started')}</span>
@@ -310,11 +287,11 @@ const OngoingGameCard = ({
 					showPromotion={false}
 					promotionSquare={null}
 					isPaused={isPaused}
-					onSquareClick={() => {}}
-					onSquareSelect={() => {}}
-					onPieceDrop={() => {}}
-					onPromotionSelect={() => {}}
-					onPromotionCancel={() => {}}
+					onSquareClick={() => { }}
+					onSquareSelect={() => { }}
+					onPieceDrop={() => { }}
+					onPromotionSelect={() => { }}
+					onPromotionCancel={() => { }}
 					isGameOver={!!gameOverResult}
 					isViewer={true}
 				/>

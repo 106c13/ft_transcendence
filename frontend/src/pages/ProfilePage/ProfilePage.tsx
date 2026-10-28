@@ -217,7 +217,6 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
                             gameData={activeGame}
                             profileUsername={user.username}
                             currentUserId={currentUserId}
-                            size={headerHeight}
                             onGameOverStartExit={handleStartExit}
                             onGameOverDone={handleDoneExit}
                         />
