@@ -90,8 +90,8 @@
 .kingBadgeWinner,
 .kingBadgeLoser {
 	position: absolute;
-	top: 3px;
-	right: 3px;
+	top: 3%;
+	right: 3%;
 	width: clamp(18px, 26%, 26px);
 	height: clamp(18px, 26%, 26px);
 	border-radius: 50%;

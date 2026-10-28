@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { DEVS } from '../../utils/aboutUtils';
 import type { DevKey } from '../../utils/aboutUtils';
-import Tooltip from '../Tooltip/Tooltip';
 import styles from './AboutBoard.module.css';
 
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
@@ -136,33 +135,29 @@ export default function AboutBoard({
 
 							{/* King Win / Loss Indicators */}
 							{isWinnerKing && (
-								<Tooltip content="Winner" position="top">
-									<div className={styles.kingBadgeWinner} aria-label="Winner">
-										<svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
-											<path
-												fill="currentColor"
-												d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"
-											/>
-										</svg>
-									</div>
-								</Tooltip>
+								<div className={styles.kingBadgeWinner} aria-label="Winner">
+									<svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
+										<path
+											fill="currentColor"
+											d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"
+										/>
+									</svg>
+								</div>
 							)}
 
 							{isLoserKing && (
-								<Tooltip content="Defeated" position="top">
-									<div className={styles.kingBadgeLoser} aria-label="Defeated">
-										<svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
-											<path
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="3.2"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												d="M10 4L8 20M16 4l-2 20M4 9.5h16M3.5 14.5h16"
-											/>
-										</svg>
-									</div>
-								</Tooltip>
+								<div className={styles.kingBadgeLoser} aria-label="Defeated">
+									<svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
+										<path
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="3.2"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											d="M10 4L8 20M16 4l-2 20M4 9.5h16M3.5 14.5h16"
+										/>
+									</svg>
+								</div>
 							)}
 						</div>
 					)

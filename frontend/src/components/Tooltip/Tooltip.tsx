@@ -86,7 +86,7 @@ const Tooltip = ({
 	const effectiveIsOpen = !disabled && Boolean(content) && isOpen;
 
 	return (
-		<div
+		<span
 			className={`${styles.tooltipContainer} ${inline ? styles.inline : ''} ${className || ''}`}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
@@ -107,7 +107,7 @@ const Tooltip = ({
 					{content}
 				</span>
 			)}
-		</div>
+		</span>
 	);
 };
 
