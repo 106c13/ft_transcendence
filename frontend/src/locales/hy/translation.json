@@ -377,6 +377,7 @@
   "other_user_not_found": "Մյուս օգտատերը չի գտնվել",
   "sender_not_found": "Ուղարկողը չի գտնվել",
   "request_already_exists": "Հարցումն արդեն առկա է",
+  "friendship_already_exists": "Ընկերությունը արդեն գոյություն ունի",
   "request_not_found": "Հարցումը չի գտնվել",
   "not_friends": "Ընկերներ չեք",
   "game_paused_opponent_disconnected": "Խաղը կասեցված է: Մրցակիցն անջատվել է",

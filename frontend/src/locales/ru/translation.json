@@ -377,6 +377,7 @@
   "other_user_not_found": "Другой пользователь не найден",
   "sender_not_found": "Отправитель не найден",
   "request_already_exists": "Запрос уже отправлен",
+  "friendship_already_exists": "Дружба уже существует",
   "request_not_found": "Запрос не найден",
   "not_friends": "Не в списке друзей",
   "game_paused_opponent_disconnected": "Игра приостановлена. Соперник отключился",

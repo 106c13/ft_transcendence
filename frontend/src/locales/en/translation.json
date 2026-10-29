@@ -377,6 +377,7 @@
   "other_user_not_found": "Other user not found",
   "sender_not_found": "Sender not found",
   "request_already_exists": "Request already exists",
+  "friendship_already_exists": "Friendship already exists",
   "request_not_found": "Request not found",
   "not_friends": "Not friends",
   "game_paused_opponent_disconnected": "Game paused. Opponent is disconnected",
