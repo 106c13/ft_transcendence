@@ -7,13 +7,16 @@ import NotificationBell from '../NotificationBell/NotificationBell';
 import PlayerSearch from '../PlayerSearch/PlayerSearch';
 import ProfileMenu from '../ProfileMenu/ProfileMenu';
 import NavTooltip, { useIsMobile } from '../NavTooltip/NavTooltip';
+import type { FriendSocketType } from '../../utils/layoutContextUtils';
+import type { User } from '../../utils/profileUtils';
 import styles from './Navbar.module.css';
 
 type Props = {
-	currentUser?: { id: number; username: string; avatar?: string } | null;
+	currentUser?: User | null;
+	friendSocket?: FriendSocketType;
 };
 
-const Navbar = ({ currentUser }: Props) => {
+const Navbar = ({ currentUser, friendSocket }: Props) => {
 	const { t, i18n } = useTranslation();
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -120,7 +123,7 @@ const Navbar = ({ currentUser }: Props) => {
 				{currentUser && <PlayerSearch />}
 
 				{/* 2. Notifications */}
-				{currentUser && <NotificationBell userId={currentUser.id} />}
+				{currentUser && friendSocket && <NotificationBell userId={currentUser.id} friendSocket={friendSocket} />}
 
 				{/* 3. Language Switcher */}
 				<NavTooltip content={t('language')} position="bottom" disabled={showLanguageMenu} offset="navbar">

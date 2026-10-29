@@ -1,211 +1,211 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import type { TabType, User, FriendStatus } from '../utils/profileUtils'
+import { useEffect, useState, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import type { TabType, User, FriendStatus } from '../utils/profileUtils';
+import type { FriendSocketType } from '../utils/layoutContextUtils';
 
-export function useProfile(username?: string, defaultTab: TabType = 'overview') {
-	const location = useLocation()
-	const initialTab: TabType = (location.state as any)?.defaultTab || defaultTab
-	const [user, setUser] = useState<User | null>(null)
-	const [error] = useState('')
-	const [menuOpen, setMenuOpen] = useState(false)
-	const [friendStatus, setFriendStatus] = useState<FriendStatus>('NONE')
-	const [activeTab, setActiveTab] = useState<TabType>(initialTab)
-	const [friends, setFriends] = useState<User[]>([])
-	const isLoggedIn = !!localStorage.getItem('token')
+export function useProfile(friendSocket: FriendSocketType, username?: string, defaultTab: TabType = 'overview') {
+	const location = useLocation();
+	const initialTab: TabType = (location.state as any)?.defaultTab || defaultTab;
+	const [user, setUser] = useState<User | null>(null);
+	const [error] = useState('');
+	const [menuOpen, setMenuOpen] = useState(false);
+	const [friendStatus, setFriendStatus] = useState<FriendStatus>('NONE');
+	const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+	const [friends, setFriends] = useState<User[]>([]);
+	const isLoggedIn = !!localStorage.getItem('token');
 
-	const navigate = useNavigate()
+	const navigate = useNavigate();
 
 	useEffect(() => {
-		const stateTab = (location.state as any)?.defaultTab
+		const stateTab = (location.state as any)?.defaultTab;
 		if (stateTab) {
-			setActiveTab(stateTab)
+			setActiveTab(stateTab);
 		} else if (defaultTab) {
-			setActiveTab(defaultTab)
+			setActiveTab(defaultTab);
 		}
-	}, [location.state, defaultTab])
+	}, [location.state, defaultTab]);
 
-	const loadFriendStatus = async (token: string, targetUsername: string) => {
+	const loadFriendStatus = useCallback(async (token: string, targetUsername: string) => {
 		try {
 			const res = await fetch(`/api/friends/status/${targetUsername}`, {
 				headers: { Authorization: `Bearer ${token}` },
-			})
-			if (!res.ok) return
-			const data = await res.json()
-			setFriendStatus((data?.status?.toUpperCase() as FriendStatus) || 'NONE')
+			});
+			if (!res.ok) return;
+			const data = await res.json();
+			setFriendStatus((data?.status?.toUpperCase() as FriendStatus) || 'NONE');
 		} catch {
-			setFriendStatus('NONE')
+			setFriendStatus('NONE');
 		}
-	}
+	}, []);
 
-	const loadFriends = async () => {
-		if (!user) return
+	const loadFriends = useCallback(async () => {
+		if (!user?.username) return;
 		try {
-			const token = localStorage.getItem('token')
-			if (!token) return
+			const token = localStorage.getItem('token');
+			if (!token) return;
 
 			const res = await fetch(`/api/friends/list/${user.username}`, {
 				headers: { Authorization: `Bearer ${token}` },
-			})
-			if (!res.ok) return
-			const data = await res.json()
-			setFriends(data)
+			});
+			if (!res.ok) return;
+			const data = await res.json();
+			setFriends(data);
 		} catch (err) {
-			console.error(err)
+			console.error(err);
 		}
-	}
+	}, [user?.username]);
 
 	const loadProfile = async () => {
 		try {
-			const token = localStorage.getItem('token')
-			const endpoint = username ? `/api/users/${username}` : '/api/users/me'
-			const headers: HeadersInit = {}
+			const token = localStorage.getItem('token');
+			const endpoint = username ? `/api/users/${username}` : '/api/users/me';
+			const headers: HeadersInit = {};
 
 			if (token) {
-				headers.Authorization = `Bearer ${token}`
+				headers.Authorization = `Bearer ${token}`;
 			}
 
-			const res = await fetch(endpoint, { headers })
+			const res = await fetch(endpoint, { headers });
 
 			if (res.status === 404) {
-				setUser(null)
-				return
+				setUser(null);
+				return;
 			}
 
 			if (!res.ok) {
-				localStorage.removeItem('token')
-				navigate('/login')
-				return
+				localStorage.removeItem('token');
+				navigate('/login');
+				return;
 			}
 
-			const data = await res.json()
+			const data = await res.json();
 			setUser({
 				...data,
 				isOwnProfile: data.isOwnProfile ?? false,
-			})
+			});
 
 			if (token && username && data.isOwnProfile === false) {
-				loadFriendStatus(token, username)
+				loadFriendStatus(token, username);
 			}
 		} catch {
-			localStorage.removeItem('token')
-			navigate('/login')
+			localStorage.removeItem('token');
+			navigate('/login');
 		}
-	}
+	};
 
 	useEffect(() => {
-		loadProfile()
-	}, [username])
+		loadProfile();
+	}, [username]);
 
 	useEffect(() => {
 		if (user?.username) {
-			loadFriends()
+			loadFriends();
 		}
-	}, [user?.username])
+	}, [user?.username, loadFriends]);
+
+	// Join profile room for live friend list synchronization
+	useEffect(() => {
+		if (!user?.username) return;
+
+		const targetUsername = user.username;
+		friendSocket.viewProfile(targetUsername);
+
+		const handleProfileFriendsUpdated = (e: Event) => {
+			const customEvent = e as CustomEvent<{ username: string }>;
+			const updatedUsername = customEvent.detail?.username;
+			if (updatedUsername && updatedUsername.toLowerCase() === targetUsername.toLowerCase()) {
+				loadFriends();
+				const token = localStorage.getItem('token');
+				if (token && user.isOwnProfile === false) {
+					loadFriendStatus(token, targetUsername);
+				}
+			}
+		};
+
+		window.addEventListener('profile_friends_updated', handleProfileFriendsUpdated);
+
+		return () => {
+			friendSocket.leaveProfile(targetUsername);
+			window.removeEventListener('profile_friends_updated', handleProfileFriendsUpdated);
+		};
+	}, [user?.username, user?.isOwnProfile, friendSocket, loadFriends, loadFriendStatus]);
 
 	useEffect(() => {
 		const handleStatusChange = (e: Event) => {
-			const customEvent = e as CustomEvent<{ userId: number; username: string; status: string }>
-			const data = customEvent.detail
-			if (!data) return
+			const customEvent = e as CustomEvent<{ userId: number; username: string; status: string }>;
+			const data = customEvent.detail;
+			if (!data) return;
 
 			setUser(prev => {
-				if (!prev) return null
+				if (!prev) return null;
 				if (prev.id === data.userId || prev.username?.toLowerCase() === data.username?.toLowerCase()) {
-					return { ...prev, status: data.status }
+					return { ...prev, status: data.status };
 				}
-				return prev
-			})
+				return prev;
+			});
 
 			setFriends(prev =>
 				prev.map(friend => {
 					if (friend.id === data.userId || friend.username?.toLowerCase() === data.username?.toLowerCase()) {
-						return { ...friend, status: data.status }
+						return { ...friend, status: data.status };
 					}
-					return friend
+					return friend;
 				})
-			)
-		}
+			);
+		};
 
-		window.addEventListener('user_status_changed', handleStatusChange)
+		window.addEventListener('user_status_changed', handleStatusChange);
 		return () => {
-			window.removeEventListener('user_status_changed', handleStatusChange)
-		}
-	}, [])
+			window.removeEventListener('user_status_changed', handleStatusChange);
+		};
+	}, []);
 
 	const handleSelectTab = (tab: TabType) => {
-		setActiveTab(tab)
+		setActiveTab(tab);
 		if (tab === 'friends') {
-			loadFriends()
+			loadFriends();
 		}
-	}
+	};
 
-	const sendFriendRequest = async () => {
-		if (!user) return
-		const token = localStorage.getItem('token')
-		if (!token) return
+	const sendFriendRequest = () => {
+		if (!user) return;
+		friendSocket.sendFriendRequest(user.username);
+		setFriendStatus('SENT');
+	};
 
-		const res = await fetch(`/api/friends/request/${user.username}`, {
-			method: 'POST',
-			headers: { Authorization: `Bearer ${token}` },
-		})
-		if (res.ok) setFriendStatus('SENT')
-	}
+	const acceptFriendRequest = () => {
+		if (!user) return;
+		friendSocket.acceptFriendRequest(user.username);
+		setFriendStatus('ACCEPTED');
+		loadFriends();
+	};
 
-	const acceptFriendRequest = async () => {
-		if (!user) return
-		const token = localStorage.getItem('token')
-		if (!token) return
+	const rejectFriendRequest = () => {
+		if (!user) return;
+		friendSocket.rejectFriendRequest(user.username);
+		setFriendStatus('NONE');
+	};
 
-		const res = await fetch(`/api/friends/accept/${user.username}`, {
-			method: 'PATCH',
-			headers: { Authorization: `Bearer ${token}` },
-		})
-		if (res.ok) setFriendStatus('ACCEPTED')
-	}
-
-	const rejectFriendRequest = async () => {
-		if (!user) return
-		const token = localStorage.getItem('token')
-		if (!token) return
-
-		const res = await fetch(`/api/friends/reject/${user.username}`, {
-			method: 'DELETE',
-			headers: { Authorization: `Bearer ${token}` },
-		})
-		if (res.ok) setFriendStatus('NONE')
-	}
-
-	const cancelFriendRequest = async () => {
-		if (!user) return
-		const token = localStorage.getItem('token')
-		if (!token) return
-
-		const res = await fetch(`/api/friends/cancel/${user.username}`, {
-			method: 'DELETE',
-			headers: { Authorization: `Bearer ${token}` },
-		})
-		if (res.ok) setFriendStatus('NONE')
-	}
-
-	const unFriendRequest = async () => {
-		if (!user) return
-		const token = localStorage.getItem('token')
-		if (!token) return
-
-		const res = await fetch(`/api/friends/unfriend/${user.username}`, {
-			method: 'DELETE',
-			headers: { Authorization: `Bearer ${token}` },
-		})
-		if (res.ok) setFriendStatus('NONE')
-	}
+	const cancelFriendRequest = () => {
+		if (!user) return;
+		friendSocket.cancelFriendRequest(user.username);
+		setFriendStatus('NONE');
+	};
+	
+	const unFriendRequest = () => {
+		if (!user) return;
+		friendSocket.unfriend(user.username);
+		setFriendStatus('NONE');
+		loadFriends();
+	};
 
 	const logout = () => {
-		localStorage.removeItem('token')
-		navigate('/login')
-	}
+		localStorage.removeItem('token');
+		navigate('/login');
+	};
 
-	const goToSettings = () => navigate('/profile/settings')
-	const goToUserProfile = (targetUsername: string) => navigate(`/profile/${targetUsername}`)
+	const goToSettings = () => navigate('/profile/settings');
+	const goToUserProfile = (targetUsername: string) => navigate(`/profile/${targetUsername}`);
 
 	return {
 		user,
@@ -225,5 +225,5 @@ export function useProfile(username?: string, defaultTab: TabType = 'overview') 
 		logout,
 		goToSettings,
 		goToUserProfile,
-	}
+	};
 }

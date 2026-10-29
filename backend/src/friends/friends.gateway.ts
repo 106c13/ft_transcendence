@@ -6,10 +6,10 @@ import {
     OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Socket, Namespace } from 'socket.io';
-import { FriendsService } from '../friends/friends.service';
+import { FriendsService } from './friends.service';
 import { UsersService } from '../users/users.service';
-import { FriendRequest, FriendRequestStatus } from '../friends/friend-request.entity';
-import { Friendship } from '../friends/friendship.entity';
+import { FriendRequest, FriendRequestStatus } from './friend-request.entity';
+import { Friendship } from './friendship.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from '../notification/notification.entity';
@@ -55,6 +55,18 @@ export class FriendsGateway implements OnGatewayConnection, OnGatewayDisconnect 
         client.leave(`user_${userId}`);
     }
 
+    @SubscribeMessage('view_profile')
+    handleViewProfile(client: Socket, payload: { username: string }) {
+        if (!payload?.username) return;
+        client.join(`profile_${payload.username.toLowerCase()}`);
+    }
+
+    @SubscribeMessage('leave_profile')
+    handleLeaveProfile(client: Socket, payload: { username: string }) {
+        if (!payload?.username) return;
+        client.leave(`profile_${payload.username.toLowerCase()}`);
+    }
+
     @SubscribeMessage('send_friend_request')
     async handleSendFriendRequest(client: Socket, payload: { friendUsername: string }) {
         const userIdStr = client.handshake.query.userId;
@@ -93,8 +105,12 @@ export class FriendsGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			is_read: false,
 		});
 		await this.notificationRepo.save(notification);
+
         this.server.to(`user_${receiver.id}`).emit('friend_request_received', { senderUsername: sender.username });
         this.server.to(`user_${sender.id}`).emit('friend_request_sent', { receiverUsername: receiver.username });
+
+        this.server.to(`profile_${sender.username.toLowerCase()}`).emit('profile_friends_updated', { username: sender.username });
+        this.server.to(`profile_${receiver.username.toLowerCase()}`).emit('profile_friends_updated', { username: receiver.username });
     }
 
     @SubscribeMessage('accept_friend_request')
@@ -121,6 +137,7 @@ export class FriendsGateway implements OnGatewayConnection, OnGatewayDisconnect 
                 receiver: { id: receiver.id },
                 status: FriendRequestStatus.PENDING,
             },
+            relations: ['sender', 'receiver'],
         });
 
         if (!request) {
@@ -155,13 +172,21 @@ export class FriendsGateway implements OnGatewayConnection, OnGatewayDisconnect 
 			is_read: false,
 		})
 
+        await this.friendshipRepo.save({
+            user1: { id: id1 },
+            user2: { id: id2 },
+        })
         await this.notificationRepo.save(acceptedNotification)
 		await this.friendRequestRepo.remove(request)
 
         this.server.to(`user_${sender.id}`).emit('friend_request_accepted', { receiverUsername: receiver.username });
         this.server.to(`user_${receiver.id}`).emit('friend_request_accepted', { senderUsername: sender.username });
+
+        this.server.to(`profile_${sender.username.toLowerCase()}`).emit('profile_friends_updated', { username: sender.username });
+        this.server.to(`profile_${receiver.username.toLowerCase()}`).emit('profile_friends_updated', { username: receiver.username });
     }
 
+    @SubscribeMessage('reject_friend_request')
     async handleRejectFriendRequest(client: Socket, payload: { friendUsername: string }) {
         const userIdStr = client.handshake.query.userId;
         if (!userIdStr) return;
@@ -185,6 +210,7 @@ export class FriendsGateway implements OnGatewayConnection, OnGatewayDisconnect 
                 receiver: { id: receiver.id },
                 status: FriendRequestStatus.PENDING,
             },
+            relations: ['sender', 'receiver'],
         });
 
         if (!request) {
@@ -201,6 +227,9 @@ export class FriendsGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
         this.server.to(`user_${sender.id}`).emit('friend_request_rejected', { receiverUsername: receiver.username });
         this.server.to(`user_${receiver.id}`).emit('friend_request_rejected', { senderUsername: sender.username });
+
+        this.server.to(`profile_${sender.username.toLowerCase()}`).emit('profile_friends_updated', { username: sender.username });
+        this.server.to(`profile_${receiver.username.toLowerCase()}`).emit('profile_friends_updated', { username: receiver.username });
     }
 
     @SubscribeMessage('unfriend')
@@ -231,5 +260,56 @@ export class FriendsGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
         this.server.to(`user_${userId}`).emit('unfriended', { friendUsername: friend.username });
         this.server.to(`user_${friend.id}`).emit('unfriended', { friendUsername: (await this.usersService.findById(userId))?.username });
+
+        const currentUser = await this.usersService.findById(userId);
+        if (currentUser) {
+            this.server.to(`profile_${currentUser.username.toLowerCase()}`).emit('profile_friends_updated', { username: currentUser.username });
+        }
+        this.server.to(`profile_${friend.username.toLowerCase()}`).emit('profile_friends_updated', { username: friend.username });
+    }
+
+    @SubscribeMessage('cancel_friend_request')
+    async handleCancelFriendRequest(client: Socket, payload: { friendUsername: string }) {
+        const userIdStr = client.handshake.query.userId;
+        if (!userIdStr) return;
+
+        const userId = parseInt(userIdStr as string);
+        const sender = await this.usersService.findById(userId);
+        if (!sender) {
+            client.emit('friend_request_error', { message: 'sender_not_found' });
+            return;
+        }
+
+        const receiver = await this.usersService.findByUsername(payload.friendUsername);
+        if (!receiver) {
+            client.emit('friend_request_error', { message: 'user_not_found' });
+            return;
+        }
+
+        const request = await this.friendRequestRepo.findOne({
+            where: {
+                sender: { id: sender.id },
+                receiver: { id: receiver.id },
+                status: FriendRequestStatus.PENDING,
+            },
+        });
+
+        if (!request) {
+            client.emit('friend_request_error', { message: 'request_not_found' });
+            return;
+        }
+
+        await this.notificationRepo.delete({
+            user_id: receiver.id,
+            link: `/profile/${sender.username}`,
+        });
+
+        await this.friendRequestRepo.remove(request);
+
+        this.server.to(`user_${sender.id}`).emit('friend_request_cancelled', { receiverUsername: receiver.username });
+        this.server.to(`user_${receiver.id}`).emit('friend_request_cancelled', { senderUsername: sender.username });
+
+        this.server.to(`profile_${sender.username.toLowerCase()}`).emit('profile_friends_updated', { username: sender.username });
+        this.server.to(`profile_${receiver.username.toLowerCase()}`).emit('profile_friends_updated', { username: receiver.username });
     }
 }

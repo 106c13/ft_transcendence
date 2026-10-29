@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { FriendsController } from './friends.controller'
@@ -9,6 +9,8 @@ import { FriendRequest } from './friend-request.entity'
 import { Friendship } from './friendship.entity'
 import { User } from '../users/user.entity'
 import { Notification } from '../notification/notification.entity'
+import { FriendsGateway } from './friends.gateway'
+import { UsersModule } from '../users/users.module'
 
 @Module({
 	imports: [
@@ -19,9 +21,10 @@ import { Notification } from '../notification/notification.entity'
 			Notification,
 		]),
 		PresenceModule,
+		forwardRef(() => UsersModule),
 	],
 	controllers: [FriendsController],
-	providers: [FriendsService],
+	providers: [FriendsService, FriendsGateway],
 	exports: [FriendsService],
 })
 export class FriendsModule { }

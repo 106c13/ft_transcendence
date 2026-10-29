@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell, BellOff, Users, UserCheck, MessageSquare, Swords, Check, X } from 'lucide-react';
 import NavTooltip from '../NavTooltip/NavTooltip';
+import type { FriendSocketType } from '../../utils/layoutContextUtils';
 import styles from './NotificationBell.module.css';
 
 
@@ -14,7 +15,12 @@ export type Notification = {
     created_at: string
 }
 
-const NotificationBell = ({ userId }: { userId: number }) => {
+type Props = {
+    userId: number
+    friendSocket: FriendSocketType
+}
+
+const NotificationBell = ({ userId, friendSocket }: Props) => {
     const { t } = useTranslation();
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -322,25 +328,20 @@ const NotificationBell = ({ userId }: { userId: number }) => {
 
         setActionLoading((prev) => ({ ...prev, [notif.id]: true }))
         try {
-            const res = await fetch(`/api/friends/accept/${username}`, {
-                method: 'PATCH',
-                headers: { Authorization: `Bearer ${token}` },
-            })
+            friendSocket?.acceptFriendRequest(username)
 
-            if (res.ok) {
-                setActionFeedback((prev) => ({ ...prev, [notif.id]: 'accepted' }))
-                if (!notif.is_read) {
-                    setUnreadCount((prev) => Math.max(0, prev - 1))
-                }
-                setTimeout(() => {
-                    setNotifications((prev) => prev.filter((n) => n.id !== notif.id))
-                    setActionFeedback((prev) => {
-                        const copy = { ...prev }
-                        delete copy[notif.id]
-                        return copy
-                    })
-                }, 1000)
+            setActionFeedback((prev) => ({ ...prev, [notif.id]: 'accepted' }))
+            if (!notif.is_read) {
+                setUnreadCount((prev) => Math.max(0, prev - 1))
             }
+            setTimeout(() => {
+                setNotifications((prev) => prev.filter((n) => n.id !== notif.id))
+                setActionFeedback((prev) => {
+                    const copy = { ...prev }
+                    delete copy[notif.id]
+                    return copy
+                })
+            }, 1000)
         } catch (err) {
             console.error('Error accepting friend request:', err)
         } finally {
@@ -360,25 +361,20 @@ const NotificationBell = ({ userId }: { userId: number }) => {
 
         setActionLoading((prev) => ({ ...prev, [notif.id]: true }))
         try {
-            const res = await fetch(`/api/friends/reject/${username}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` },
-            })
+            friendSocket?.rejectFriendRequest(username)
 
-            if (res.ok) {
-                setActionFeedback((prev) => ({ ...prev, [notif.id]: 'declined' }))
-                if (!notif.is_read) {
-                    setUnreadCount((prev) => Math.max(0, prev - 1))
-                }
-                setTimeout(() => {
-                    setNotifications((prev) => prev.filter((n) => n.id !== notif.id))
-                    setActionFeedback((prev) => {
-                        const copy = { ...prev }
-                        delete copy[notif.id]
-                        return copy
-                    })
-                }, 800)
+            setActionFeedback((prev) => ({ ...prev, [notif.id]: 'declined' }))
+            if (!notif.is_read) {
+                setUnreadCount((prev) => Math.max(0, prev - 1))
             }
+            setTimeout(() => {
+                setNotifications((prev) => prev.filter((n) => n.id !== notif.id))
+                setActionFeedback((prev) => {
+                    const copy = { ...prev }
+                    delete copy[notif.id]
+                    return copy
+                })
+            }, 800)
         } catch (err) {
             console.error('Error rejecting friend request:', err)
         } finally {

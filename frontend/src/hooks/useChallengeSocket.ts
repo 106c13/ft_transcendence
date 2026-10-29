@@ -2,22 +2,8 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import io, { Socket } from 'socket.io-client'
 import { useToast } from '../context/ToastContext'
-
-export interface ChallengeReceived {
-    challengeId: string
-    from: string
-    mode: string
-    isRematch?: boolean
-}
-
-export interface ChallengeSent {
-    challengeId: string
-    friendUsername: string
-    mode: string
-    isRematch?: boolean
-}
-
-export type ChallengeStatus = 'idle' | 'sending' | 'sent' | 'accepted' | 'declined' | 'expired' | 'error'
+import type { ChallengeStatus, ChallengeReceived, ChallengeSent } from '../utils/challengeUtils';
+export type { ChallengeStatus, ChallengeReceived, ChallengeSent };
 
 export function useChallengeSocket(userId: number | undefined) {
     const navigate = useNavigate()

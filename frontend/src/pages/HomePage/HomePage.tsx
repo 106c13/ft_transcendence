@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Swords, BarChart3 } from 'lucide-react';
-import type { LayoutContextType } from '../../layouts/MainLayout';
+import type { LayoutContextType } from '../../utils/layoutContextUtils';
 import { useToast } from '../../context/ToastContext';
 import { useGameHistory } from '../../hooks/useGameHistory';
 import { usePageTitle } from '../../hooks/usePageTitle';
@@ -13,7 +13,6 @@ import RecentGames from '../../components/RecentGames/RecentGames';
 import PlayerRatingsCard from '../../components/PlayerRatingsCard/PlayerRatingsCard';
 import FriendsPreview from '../../components/FriendsPreview/FriendsPreview';
 import type { GameModeType, ModeItem } from '../../utils/gameModeUtils';
-import type { User } from '../../utils/profileUtils';
 import styles from './HomePage.module.css';
 
 const HomePage = () => {
@@ -21,11 +20,11 @@ const HomePage = () => {
 	usePageTitle('page_title_home')
 	const { toast } = useToast()
 	const navigate = useNavigate()
-	const { currentUser, challengeSocket } = useOutletContext<LayoutContextType>()
+	const { currentUser, challengeSocket, friendSocket } = useOutletContext<LayoutContextType>()
+	const friends = friendSocket.friends
 
 	const [challengeActive, setChallengeActive] = useState(false)
 	const [selectedFriend, setSelectedFriend] = useState('')
-	const [friends, setFriends] = useState<User[]>([])
 	const [ratings, setRatings] = useState(currentUser?.ratings || null)
 
 	const history = useGameHistory(currentUser?.username || '')
@@ -34,13 +33,6 @@ const HomePage = () => {
 	useEffect(() => {
 		if (!currentUser) return
 		const token = localStorage.getItem('token')
-
-		fetch(`/api/friends/list/${currentUser.username}`, {
-			headers: { Authorization: `Bearer ${token}` },
-		})
-			.then(res => res.ok ? res.json() : [])
-			.then(data => setFriends(data))
-			.catch(err => console.error('Failed to load friends:', err))
 
 		fetch(`/api/game/ratings/${currentUser.username}`, {
 			headers: { Authorization: `Bearer ${token}` },
@@ -51,29 +43,6 @@ const HomePage = () => {
 			})
 			.catch(err => console.error('Failed to load ratings:', err))
 	}, [currentUser])
-
-	// Listen to real-time friend status updates
-	useEffect(() => {
-		const handleStatusChange = (e: Event) => {
-			const customEvent = e as CustomEvent<{ userId: number; username: string; status: string }>
-			const data = customEvent.detail
-			if (!data) return
-
-			setFriends(prev =>
-				prev.map(friend => {
-					if (friend.id === data.userId || friend.username?.toLowerCase() === data.username?.toLowerCase()) {
-						return { ...friend, status: data.status }
-					}
-					return friend
-				})
-			)
-		}
-
-		window.addEventListener('user_status_changed', handleStatusChange)
-		return () => {
-			window.removeEventListener('user_status_changed', handleStatusChange)
-		}
-	}, [])
 
 	const challengeFriends = useMemo(() => {
 		return friends.map(f => ({

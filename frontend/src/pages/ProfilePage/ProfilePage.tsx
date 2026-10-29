@@ -5,7 +5,7 @@ import { useProfile } from '../../hooks/useProfile';
 import { usePageTitle } from '../../hooks/usePageTitle';
 import { useGameHistory } from '../../hooks/useGameHistory';
 import type { TabType } from '../../utils/profileUtils';
-import type { LayoutContextType } from '../../layouts/MainLayout';
+import type { LayoutContextType } from '../../utils/layoutContextUtils';
 import ProfileHeader from '../../components/ProfileHeader/ProfileHeader';
 import ProfileTabs from '../../components/ProfileTabs/ProfileTabs';
 import OngoingGameCard from '../../components/OngoingGameCard/OngoingGameCard';
@@ -19,8 +19,7 @@ type Props = {
 const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
     const { t } = useTranslation();
     const { username } = useParams();
-    const layoutContext = useOutletContext<LayoutContextType | undefined>();
-    const currentUserId = layoutContext?.currentUser?.id ?? null;
+    const { currentUser, friendSocket } = useOutletContext<LayoutContextType>();
 
     const {
         user,
@@ -40,7 +39,7 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
         logout,
         goToSettings,
         goToUserProfile,
-    } = useProfile(username, defaultTab);
+    } = useProfile(friendSocket, username, defaultTab);
 
     // Load game history to know total games count and pass down to tabs
     const history = useGameHistory(user?.username || '');
@@ -216,7 +215,7 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
                         <OngoingGameCard
                             gameData={activeGame}
                             profileUsername={user.username}
-                            currentUserId={currentUserId}
+                            currentUserId={currentUser?.id}
                             onGameOverStartExit={handleStartExit}
                             onGameOverDone={handleDoneExit}
                         />

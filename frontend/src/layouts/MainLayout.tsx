@@ -4,30 +4,12 @@ import Navbar from '../components/Navbar/Navbar'
 import Footer from '../components/Footer/Footer'
 import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification'
 import { useChallengeSocket } from '../hooks/useChallengeSocket'
-import type { ChallengeStatus, ChallengeReceived, ChallengeSent } from '../hooks/useChallengeSocket'
 import { useToast } from '../context/ToastContext'
 
 import type { User } from '../utils/profileUtils'
-export type { User }
-
-export type LayoutContextType = {
-  currentUser: User | null
-  setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>
-  challengeSocket: {
-    challengeStatus: ChallengeStatus
-    challengeError: string
-    incomingChallenge: ChallengeReceived | null
-    outgoingChallenge: ChallengeSent | null
-    challengeCountdown: number
-    incomingCountdown: number
-    outgoingCountdown: number
-    sendChallenge: (friendUsername: string, mode: string) => void
-    sendRematch: (previousGameId: string) => void
-    acceptChallenge: (challengeId: string) => void
-    declineChallenge: (challengeId: string) => void
-    resetChallengeStatus: () => void
-  }
-}
+import type { LayoutContextType } from '../utils/layoutContextUtils'
+import { useFriends } from '../hooks/useFriends'
+export type { User, LayoutContextType };
 
 export default function MainLayout() {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
@@ -64,6 +46,8 @@ export default function MainLayout() {
   const { incomingChallenge, acceptChallenge, declineChallenge } = challengeSocket
   const { setTopSlot } = useToast()
 
+  const friendSocket = useFriends(currentUser)
+
   useEffect(() => {
     if (incomingChallenge) {
       setTopSlot(
@@ -97,10 +81,10 @@ export default function MainLayout() {
 
   return (
     <div className="app-layout">
-      <Navbar currentUser={currentUser} />
+      <Navbar currentUser={currentUser} friendSocket={friendSocket} />
       <main className="layout-body">
         {/* Child routes render here */}
-        <Outlet context={{ currentUser, setCurrentUser, challengeSocket } satisfies LayoutContextType} />
+        <Outlet context={{ currentUser, setCurrentUser, challengeSocket, friendSocket } satisfies LayoutContextType} />
       </main>
       {showFooter && <Footer currentUser={currentUser} />}
     </div>
