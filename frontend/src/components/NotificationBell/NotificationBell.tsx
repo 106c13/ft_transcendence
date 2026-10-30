@@ -1,121 +1,40 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Bell, BellOff, Users, UserCheck, MessageSquare, Swords, Check, X } from 'lucide-react';
+import { Bell, BellOff } from 'lucide-react';
 import NavTooltip from '../NavTooltip/NavTooltip';
 import type { FriendSocketType } from '../../utils/layoutContextUtils';
+import type { Notification } from '../../utils/notificationUtils';
+import { useNotifications } from '../../hooks/useNotifications';
+import NotificationItem from './NotificationItem';
 import styles from './NotificationBell.module.css';
 
-
-export type Notification = {
-    id: number
-    message: string
-    link: string
-    is_read: boolean
-    created_at: string
-}
-
 type Props = {
-    userId: number
-    friendSocket: FriendSocketType
-}
+    userId: number;
+    friendSocket: FriendSocketType;
+};
 
 const NotificationBell = ({ userId, friendSocket }: Props) => {
     const { t } = useTranslation();
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
     const [filter, setFilter] = useState<'all' | 'unread'>('all');
-    const [loading, setLoading] = useState(false);
-    const [actionLoading, setActionLoading] = useState<Record<number, boolean>>({});
-    const [actionFeedback, setActionFeedback] = useState<Record<number, string>>({});
 
-    const containerRef = useRef<HTMLDivElement>(null)
-    const navigate = useNavigate()
-    const location = useLocation()
+    const containerRef = useRef<HTMLDivElement>(null);
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    const isChatNotification = (n: Notification) =>
-        n.link?.startsWith('/chat') ||
-        n.message.includes('sent you a message') ||
-        n.message.includes('started a new conversation')
+    const {
+        notifications,
+        unreadCount,
+        loading,
+        fetchNotifications,
+        markAsRead,
+        markAllRead,
+        clearAll,
+        deleteNotification,
+        removeNotificationLocally,
+    } = useNotifications(userId);
 
-    // Fetch full notification list
-    const fetchNotifications = useCallback(async (showLoading = false) => {
-        if (!userId) return
-        const token = localStorage.getItem('token')
-        if (!token) return
-
-        if (showLoading) setLoading(true)
-        try {
-            const res = await fetch(`/api/notifications/get/${userId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            })
-            if (res.ok) {
-                const data: Notification[] = await res.json()
-                const nonChat = data.filter((n) => !isChatNotification(n))
-                setNotifications(nonChat)
-                setUnreadCount(nonChat.filter((n) => !n.is_read).length)
-            }
-        } catch (error) {
-            console.error('Error fetching notifications:', error)
-        } finally {
-            if (showLoading) setLoading(false)
-        }
-    }, [userId])
-
-    // Fetch unread count, and if count changed, refresh full notification list
-    const fetchUnreadCount = useCallback(async () => {
-        if (!userId) return
-        const token = localStorage.getItem('token')
-        if (!token) return
-
-        try {
-            const res = await fetch(`/api/notifications/unread/${userId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            })
-            if (res.ok) {
-                const data = await res.json()
-                setUnreadCount((prevCount) => {
-                    if (data.count !== prevCount) {
-                        // Count changed: fetch latest notifications immediately
-                        fetchNotifications(false)
-                    }
-                    return data.count
-                })
-            }
-        } catch (error) {
-            console.error('Error fetching unread count:', error)
-        }
-    }, [userId, fetchNotifications])
-
-    // Initial fetch on mount
-    useEffect(() => {
-        if (!userId) return;
-        const initialTimer = setTimeout(() => {
-            fetchNotifications(true);
-            fetchUnreadCount();
-        }, 0);
-        return () => clearTimeout(initialTimer);
-    }, [userId, fetchNotifications, fetchUnreadCount]);
-
-    // Polling interval:
-    // If dropdown is open -> fetch full notifications list every 3s so live updates show in real-time
-    // If dropdown is closed -> poll unread count every 3s
-    useEffect(() => {
-        if (!userId) return;
-
-        const interval = setInterval(() => {
-            if (isOpen) {
-                fetchNotifications(false);
-            } else {
-                fetchUnreadCount();
-            }
-        }, 3000);
-
-        return () => clearInterval(interval);
-    }, [userId, isOpen, fetchNotifications, fetchUnreadCount]);
-
-    // Fetch immediately when opening dropdown
     const toggleDropdown = () => {
         setIsOpen((prev) => {
             const next = !prev;
@@ -126,300 +45,50 @@ const NotificationBell = ({ userId, friendSocket }: Props) => {
         });
     };
 
-    // Refresh when user focuses or returns to tab
-    useEffect(() => {
-        const handleFocus = () => {
-            if (userId) {
-                fetchUnreadCount();
-                if (isOpen) {
-                    fetchNotifications(false);
-                }
-            }
-        };
-
-        window.addEventListener('focus', handleFocus);
-        document.addEventListener('visibilitychange', handleFocus);
-        return () => {
-            window.removeEventListener('focus', handleFocus);
-            document.removeEventListener('visibilitychange', handleFocus);
-        };
-    }, [userId, isOpen, fetchUnreadCount, fetchNotifications]);
-
     // Close dropdown on route change
     useEffect(() => {
-        const routeTimer = setTimeout(() => {
-            setIsOpen(false);
-        }, 0);
-        return () => clearTimeout(routeTimer);
+        setIsOpen(false);
     }, [location.pathname]);
 
     // Click outside and Escape key to close dropdown
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-                setIsOpen(false)
+                setIsOpen(false);
             }
-        }
+        };
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
-                setIsOpen(false)
+                setIsOpen(false);
             }
-        }
+        };
 
         if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside)
-            document.addEventListener('keydown', handleKeyDown)
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('keydown', handleKeyDown);
         }
 
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside)
-            document.removeEventListener('keydown', handleKeyDown)
-        }
-    }, [isOpen])
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isOpen]);
 
-    // Mark single notification as read
-    const markAsRead = async (notificationId: number) => {
-        const target = notifications.find((n) => n.id === notificationId)
-        if (!target || target.is_read) return
-
-        try {
-            const token = localStorage.getItem('token')
-            const res = await fetch(`/api/notifications/read/${userId}/${notificationId}`, {
-                method: 'PATCH',
-                headers: { Authorization: `Bearer ${token}` },
-            })
-
-            if (res.ok) {
-                setNotifications((prev) =>
-                    prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n))
-                )
-                setUnreadCount((prev) => Math.max(0, prev - 1))
-            } else if (res.status === 404) {
-                // Item deleted on server; remove from local state
-                setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
-                setUnreadCount((prev) => Math.max(0, prev - 1))
-            }
-        } catch (error) {
-            console.error('Error marking as read:', error)
-        }
-    }
-
-    // Mark all notifications as read
-    const markAllRead = async () => {
-        if (unreadCount === 0) return
-        try {
-            const token = localStorage.getItem('token')
-            const res = await fetch(`/api/notifications/read-all/${userId}`, {
-                method: 'PATCH',
-                headers: { Authorization: `Bearer ${token}` },
-            })
-
-            if (res.ok) {
-                setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })))
-                setUnreadCount(0)
-            }
-        } catch (error) {
-            console.error('Error marking all as read:', error)
-        }
-    }
-
-    // Clear all notifications
-    const clearAll = async () => {
-        if (notifications.length === 0) return
-        try {
-            const token = localStorage.getItem('token')
-            const res = await fetch(`/api/notifications/clear-all/${userId}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` },
-            })
-
-            if (res.ok) {
-                setNotifications([])
-                setUnreadCount(0)
-            }
-        } catch (error) {
-            console.error('Error clearing notifications:', error)
-        }
-    }
-
-    // Delete single notification
-    const deleteNotification = async (notificationId: number, e: React.MouseEvent) => {
-        e.stopPropagation()
-        e.preventDefault()
-
-        try {
-            const token = localStorage.getItem('token')
-            const res = await fetch(`/api/notifications/delete/${userId}/${notificationId}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` },
-            })
-
-            if (res.ok || res.status === 404) {
-                const deleted = notifications.find((n) => n.id === notificationId)
-                setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
-                if (deleted && !deleted.is_read) {
-                    setUnreadCount((prev) => Math.max(0, prev - 1))
-                }
-            }
-        } catch (error) {
-            console.error('Error deleting notification:', error)
-        }
-    }
-
-    // Helper to check if a notification is a friend request
-    const isFriendRequest = (notif: Notification) => {
-        if (notif.message.includes('sent you a friend request') || notif.message.includes('notification_friend_request')) {
-            return true
-        }
-        if (notif.message.startsWith('{')) {
-            try {
-                const parsed = JSON.parse(notif.message);
-                return parsed.key === 'notification_friend_request';
-            } catch {
-                // Ignore JSON parse errors for plain text messages
-            }
-        }
-        return false;
-    };
-
-    // Helper to extract username from friend request notification
-    const extractUsername = (notif: Notification): string | null => {
-        if (notif.link && notif.link.startsWith('/profile/')) {
-            const parts = notif.link.replace('/profile/', '').split('/');
-            if (parts[0]) return parts[0];
-        }
-        if (notif.message.startsWith('{')) {
-            try {
-                const parsed = JSON.parse(notif.message);
-                if (parsed.username) return parsed.username;
-            } catch {
-                // Ignore JSON parse errors for plain text messages
-            }
-        }
-        const match = notif.message.match(/^(.+?)\s+sent you a friend request/);
-        return match ? match[1] : null;
-    };
-
-    // Helper to render notification message (either JSON key or plain text)
-    const renderNotificationMessage = (msg: string): string => {
-        if (msg.startsWith('{')) {
-            try {
-                const parsed = JSON.parse(msg);
-                if (parsed.key) {
-                    return String(t(parsed.key, parsed));
-                }
-            } catch {
-                // Ignore JSON parse errors for plain text messages
-            }
-        }
-        return String(t(msg, msg));
-    };
-
-    // Quick Accept friend request
-    const handleAcceptFriend = async (notif: Notification, e: React.MouseEvent) => {
-        e.stopPropagation()
-        e.preventDefault()
-        const username = extractUsername(notif)
-        if (!username) return
-
-        const token = localStorage.getItem('token')
-        if (!token) return
-
-        setActionLoading((prev) => ({ ...prev, [notif.id]: true }))
-        try {
-            friendSocket?.acceptFriendRequest(username)
-
-            setActionFeedback((prev) => ({ ...prev, [notif.id]: 'accepted' }))
-            if (!notif.is_read) {
-                setUnreadCount((prev) => Math.max(0, prev - 1))
-            }
-            setTimeout(() => {
-                setNotifications((prev) => prev.filter((n) => n.id !== notif.id))
-                setActionFeedback((prev) => {
-                    const copy = { ...prev }
-                    delete copy[notif.id]
-                    return copy
-                })
-            }, 1000)
-        } catch (err) {
-            console.error('Error accepting friend request:', err)
-        } finally {
-            setActionLoading((prev) => ({ ...prev, [notif.id]: false }))
-        }
-    }
-
-    // Quick Decline friend request
-    const handleRejectFriend = async (notif: Notification, e: React.MouseEvent) => {
-        e.stopPropagation()
-        e.preventDefault()
-        const username = extractUsername(notif)
-        if (!username) return
-
-        const token = localStorage.getItem('token')
-        if (!token) return
-
-        setActionLoading((prev) => ({ ...prev, [notif.id]: true }))
-        try {
-            friendSocket?.rejectFriendRequest(username)
-
-            setActionFeedback((prev) => ({ ...prev, [notif.id]: 'declined' }))
-            if (!notif.is_read) {
-                setUnreadCount((prev) => Math.max(0, prev - 1))
-            }
-            setTimeout(() => {
-                setNotifications((prev) => prev.filter((n) => n.id !== notif.id))
-                setActionFeedback((prev) => {
-                    const copy = { ...prev }
-                    delete copy[notif.id]
-                    return copy
-                })
-            }, 800)
-        } catch (err) {
-            console.error('Error rejecting friend request:', err)
-        } finally {
-            setActionLoading((prev) => ({ ...prev, [notif.id]: false }))
-        }
-    }
-
-    // Notification click navigation
     const handleNotificationClick = async (notification: Notification) => {
         if (!notification.is_read) {
-            await markAsRead(notification.id)
+            await markAsRead(notification.id);
         }
-        setIsOpen(false)
+        setIsOpen(false);
         if (notification.link) {
-            navigate(notification.link)
+            navigate(notification.link);
         }
-    }
+    };
 
-    // Relative / friendly timestamp formatting
-    const formatTime = (dateStr: string) => {
-        const date = new Date(dateStr)
-        if (isNaN(date.getTime())) return ''
-
-        const now = new Date()
-        const diffSecs = Math.floor((now.getTime() - date.getTime()) / 1000)
-
-        if (diffSecs < 60) return t('just_now')
-        const diffMins = Math.floor(diffSecs / 60)
-        if (diffMins < 60) return t('minutes_ago', { count: diffMins})
-        const diffHours = Math.floor(diffMins / 60)
-        if (diffHours < 24) return t('hours_ago', { count: diffHours})
-        const diffDays = Math.floor(diffHours / 24)
-        if (diffDays === 1) return t('yesterday')
-        if (diffDays < 7) return t('days_ago', { count: diffDays})
-
-        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-    }
-
-    // Category icon
-    const getNotificationIcon = (notif: Notification) => {
-        if (isFriendRequest(notif)) return <Users size={16} className={styles.iconFriend} aria-hidden="true" />;
-        if (notif.message.includes('accepted your friend request')) return <UserCheck size={16} className={styles.iconAccepted} aria-hidden="true" />;
-        if (notif.message.includes('message') || notif.link?.startsWith('/chat/')) return <MessageSquare size={16} className={styles.iconMessage} aria-hidden="true" />;
-        if (notif.message.includes('challenge') || notif.message.includes('game')) return <Swords size={16} className={styles.iconChallenge} aria-hidden="true" />;
-        return <Bell size={16} className={styles.iconDefault} aria-hidden="true" />;
+    const handleDeleteNotification = (notificationId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        deleteNotification(notificationId);
     };
 
     const displayedNotifications =
@@ -456,7 +125,6 @@ const NotificationBell = ({ userId, friendSocket }: Props) => {
 
             {isOpen && (
                 <div className={styles.notificationDropdown}>
-                    {/* Header */}
                     <div className={styles.notificationHeader}>
                         <div className={styles.headerTitleGroup}>
                             <h3>{t('notifications')}</h3>
@@ -489,7 +157,6 @@ const NotificationBell = ({ userId, friendSocket }: Props) => {
                         </div>
                     </div>
 
-                    {/* Filter Tabs */}
                     {notifications.length > 0 && (
                         <div className={styles.filterTabs}>
                             <button
@@ -507,7 +174,6 @@ const NotificationBell = ({ userId, friendSocket }: Props) => {
                         </div>
                     )}
 
-                    {/* List */}
                     <div className={styles.notificationList}>
                         {loading && notifications.length === 0 ? (
                             <div className={styles.loadingContainer}>
@@ -519,86 +185,16 @@ const NotificationBell = ({ userId, friendSocket }: Props) => {
                                 <p>{t('no_notifications')}</p>
                             </div>
                         ) : (
-                            displayedNotifications.map((notif) => {
-                                const isFriendReq = isFriendRequest(notif);
-                                const feedback = actionFeedback[notif.id];
-                                const isActionBusy = actionLoading[notif.id];
-
-                                return (
-                                    <div
-                                        key={notif.id}
-                                        className={`${styles.notificationItem} ${!notif.is_read ? styles.unread : ''}`}
-                                        onClick={() => handleNotificationClick(notif)}
-                                    >
-                                        <div className={styles.notifIconWrapper}>
-                                            <span className={styles.categoryIcon}>
-                                                {getNotificationIcon(notif)}
-                                            </span>
-                                            {!notif.is_read && (
-                                                <span className={styles.unreadDot} />
-                                            )}
-                                        </div>
-
-                                        <div className={styles.notificationContent}>
-                                            <div className={styles.notificationMessage}>
-                                                {renderNotificationMessage(notif.message)}
-                                            </div>
-
-                                            {/* Friend Request Quick Actions */}
-                                            {isFriendReq && (
-                                                <div
-                                                    className={styles.friendActionRow}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                >
-                                                    {feedback === 'accepted' ? (
-                                                        <span className={styles.actionFeedbackAccepted}>
-                                                            <Check size={14} aria-hidden="true" /> {t('accepted')}
-                                                        </span>
-                                                    ) : feedback === 'declined' ? (
-                                                        <span className={styles.actionFeedbackDeclined}>
-                                                            <X size={14} aria-hidden="true" /> {t('declined')}
-                                                        </span>
-                                                    ) : (
-                                                        <>
-                                                            <button
-                                                                className={styles.acceptBtn}
-                                                                onClick={(e) =>
-                                                                    handleAcceptFriend(notif, e)
-                                                                }
-                                                                disabled={isActionBusy}
-                                                            >
-                                                                {t('accept')}
-                                                            </button>
-                                                            <button
-                                                                className={styles.declineBtn}
-                                                                onClick={(e) =>
-                                                                    handleRejectFriend(notif, e)
-                                                                }
-                                                                disabled={isActionBusy}
-                                                            >
-                                                                {t('reject')}
-                                                            </button>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            )}
-
-                                            <div className={styles.notificationTime}>
-                                                {formatTime(notif.created_at)}
-                                            </div>
-                                        </div>
-
-                                        <button
-                                            className={styles.deleteNotification}
-                                            onClick={(e) => deleteNotification(notif.id, e)}
-                                            title={t('delete')}
-                                            aria-label={t('delete_notification')}
-                                        >
-                                            <X size={14} aria-hidden="true" />
-                                        </button>
-                                    </div>
-                                );
-                            })
+                            displayedNotifications.map((notif) => (
+                                <NotificationItem
+                                    key={notif.id}
+                                    notification={notif}
+                                    friendSocket={friendSocket}
+                                    onClick={handleNotificationClick}
+                                    onDelete={handleDeleteNotification}
+                                    onActionCompleted={removeNotificationLocally}
+                                />
+                            ))
                         )}
                     </div>
                 </div>

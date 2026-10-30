@@ -8,22 +8,22 @@ export function useFriends(currentUser: User | null) {
     const [friends, setFriends] = useState<User[]>([]);
     const socketRef = useRef<Socket | null>(null);
 
-	const loadFriends = useCallback(async () => {
-		if (!currentUser) return
-		try {
-			const token = localStorage.getItem('token')
-			if (!token) return
+    const loadFriends = useCallback(async () => {
+        if (!currentUser) return
+        try {
+            const token = localStorage.getItem('token')
+            if (!token) return
 
-			const res = await fetch(`/api/friends/list/${currentUser.username}`, {
-				headers: { Authorization: `Bearer ${token}` },
-			})
-			if (!res.ok) return
-			const data = await res.json()
-			setFriends(data)
-		} catch (err) {
-			console.error(err)
-		}
-	}, [currentUser]);
+            const res = await fetch(`/api/friends/list/${currentUser.username}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            if (!res.ok) return
+            const data = await res.json()
+            setFriends(data)
+        } catch (err) {
+            console.error(err)
+        }
+    }, [currentUser]);
 
     // Listen to real-time friend status updates
     useEffect(() => {
@@ -66,7 +66,7 @@ export function useFriends(currentUser: User | null) {
 
         socketRef.current = socket;
 
-        socket.on('connect', () => {});
+        socket.on('connect', () => { });
 
         socket.on('friend_request_sent', () => {
             loadFriends();
@@ -102,6 +102,13 @@ export function useFriends(currentUser: User | null) {
 
         socket.on('profile_friends_updated', (data: { username: string }) => {
             window.dispatchEvent(new CustomEvent('profile_friends_updated', { detail: data }));
+        });
+
+        socket.on('new_notification', (data) => {
+            window.dispatchEvent(new CustomEvent('new_notification', { detail: data }));
+        });
+        socket.on('notification_deleted', (data) => {
+            window.dispatchEvent(new CustomEvent('notification_deleted', { detail: data }));
         });
 
         return () => {

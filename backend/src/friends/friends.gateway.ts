@@ -188,7 +188,7 @@ export class FriendsGateway implements OnGatewayConnection, OnGatewayDisconnect 
         this.server.to(`profile_${receiver.username.toLowerCase()}`).emit('profile_friends_updated', { username: receiver.username });
 
         this.server.to(`user_${userId}`).emit('notification_deleted', { link: `/profile/${sender.username}` });
-        this.server.to(`user_${receiver.id}`).emit('new_notification', acceptedNotification);
+        this.server.to(`user_${sender.id}`).emit('new_notification', acceptedNotification);
     }
 
     @SubscribeMessage('reject_friend_request')
@@ -319,6 +319,6 @@ export class FriendsGateway implements OnGatewayConnection, OnGatewayDisconnect 
         this.server.to(`profile_${sender.username.toLowerCase()}`).emit('profile_friends_updated', { username: sender.username });
         this.server.to(`profile_${receiver.username.toLowerCase()}`).emit('profile_friends_updated', { username: receiver.username });
 
-        this.server.to(`user_${userId}`).emit('notification_deleted', { link: `/profile/${sender.username}` });
+        this.server.to(`user_${receiver.id}`).emit('notification_deleted', { link: `/profile/${sender.username}` });
     }
 }
