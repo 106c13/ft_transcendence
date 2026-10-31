@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not } from 'typeorm';
 import { User } from '../users/user.entity';
@@ -756,9 +756,9 @@ export class GameService {
 				game.disconnectDeadline = null;
 
 				if (game.board.history().length < 2) {
-				console.log(`Game ${game.gameId}: Abandoning game on disconnect (< 2 moves made)`);
-				this.abandonGame(game);
-				return;
+					console.log(`Game ${game.gameId}: Abandoning game on disconnect (< 2 moves made)`);
+					this.abandonGame(game);
+					return;
 				}
 
 				const disconnectedWhite = game.disconnectedPlayerIds.has(game.white.userId);
@@ -768,35 +768,35 @@ export class GameService {
 				let reason = 'DISCONNECTION';
 
 				if (disconnectedWhite && disconnectedBlack) {
-				winnerColor = null;
-				reason = 'DRAW';
+					winnerColor = null;
+					reason = 'DRAW';
 				} else if (disconnectedWhite) {
-				winnerColor = 'b';
+					winnerColor = 'b';
 				} else if (disconnectedBlack) {
-				winnerColor = 'w';
+					winnerColor = 'w';
 				} else {
-				return;
+					return;
 				}
 
 				this.saveMatch(game, reason, winnerColor).then((result) => {
-				this.activeGames.delete(game.gameId);
-				this.gameEventsCallback('game_over', game, {
-					winner: winnerColor,
-					reason,
-					fen: game.board.fen(),
-					matchId: result?.savedMatch?.id,
+					this.activeGames.delete(game.gameId);
+					this.gameEventsCallback('game_over', game, {
+						winner: winnerColor,
+						reason,
+						fen: game.board.fen(),
+						matchId: result?.savedMatch?.id,
 
-					whiteRatingAfter: result?.ratingResult?.whiteRating,
-					blackRatingAfter: result?.ratingResult?.blackRating,
-					whiteRatingDelta: result?.ratingResult?.whiteDelta,
-					blackRatingDelta: result?.ratingResult?.blackDelta,
-					whiteLeaderboardRating: result?.leaderboardResult?.white?.leaderboardRating,
-					whiteLeaderboardRank: result?.leaderboardResult?.white?.rank,
-					whiteLeaderboardRankDelta: result?.leaderboardResult?.white?.rankDelta,
-					blackLeaderboardRating: result?.leaderboardResult?.black?.leaderboardRating,
-					blackLeaderboardRank: result?.leaderboardResult?.black?.rank,
-					blackLeaderboardRankDelta: result?.leaderboardResult?.black?.rankDelta,
-				});
+						whiteRatingAfter: result?.ratingResult?.whiteRating,
+						blackRatingAfter: result?.ratingResult?.blackRating,
+						whiteRatingDelta: result?.ratingResult?.whiteDelta,
+						blackRatingDelta: result?.ratingResult?.blackDelta,
+						whiteLeaderboardRating: result?.leaderboardResult?.white?.leaderboardRating,
+						whiteLeaderboardRank: result?.leaderboardResult?.white?.rank,
+						whiteLeaderboardRankDelta: result?.leaderboardResult?.white?.rankDelta,
+						blackLeaderboardRating: result?.leaderboardResult?.black?.leaderboardRating,
+						blackLeaderboardRank: result?.leaderboardResult?.black?.rank,
+						blackLeaderboardRankDelta: result?.leaderboardResult?.black?.rankDelta,
+					});
 				});
 			}, graceMs);
 		}
@@ -1229,17 +1229,21 @@ export class GameService {
 		}
 
 		const engineUrl = process.env.ENGINE_URL || 'http://engine:5000/analyze';
-		const response = await fetch(engineUrl, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ pgn: match.pgn, depth: 15 }),
-		});
 
-
+		let response: Response;
+		try {
+			response = await fetch(engineUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ pgn: match.pgn, depth: 15 }),
+			});
+		} catch (err) {
+			console.error('Failed to connect to engine service:', err);
+			throw new ServiceUnavailableException('Engine service is unavailable');
+		}
 
 		if (!response.ok) {
-			const errText = await response.text();
-			throw new Error(`Engine analysis failed: ${errText}`);
+			throw new ServiceUnavailableException(`Engine returned ${response.status}`);
 		}
 
 		const analysisData = await response.json();
