@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Info, Globe, Brain, Menu, X } from 'lucide-react';
+import { Trophy, Info, Globe, Brain } from 'lucide-react';
 import MessagesIcon from '../MessagesIcon/MessagesIcon';
+import MobileMenuButton from '../MobileMenuButton/MobileMenuButton';
 import NotificationBell from '../NotificationBell/NotificationBell';
 import PlayerSearch from '../PlayerSearch/PlayerSearch';
 import ProfileMenu from '../ProfileMenu/ProfileMenu';
@@ -24,6 +25,8 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 
 	const [showLanguageMenu, setShowLanguageMenu] = useState(false);
 	const [mobileOpen, setMobileOpen] = useState(false);
+	const [unreadNotifications, setUnreadNotifications] = useState(0);
+	const [unreadMessages, setUnreadMessages] = useState(0);
 	const languageMenuRef = useRef<HTMLDivElement>(null);
 	const headerRef = useRef<HTMLElement>(null);
 
@@ -97,16 +100,12 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 			</div>
 
 			{/* Hamburger (mobile only, right side) */}
-			<button
-				type="button"
-				className={styles.menuToggle}
-				onClick={() => setMobileOpen((open) => !open)}
-				aria-label={mobileOpen ? t('closeMenu', 'Close menu') : t('openMenu', 'Open menu')}
-				aria-expanded={mobileOpen}
-				aria-controls="navbar-actions"
-			>
-				{mobileOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
-			</button>
+			<MobileMenuButton
+				isOpen={mobileOpen}
+				onToggle={() => setMobileOpen((open) => !open)}
+				unreadNotifications={currentUser ? unreadNotifications : 0}
+				unreadMessages={currentUser ? unreadMessages : 0}
+			/>
 
 			{/* Dimmed backdrop behind the drawer (mobile only) */}
 			<div
@@ -123,7 +122,13 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 				{currentUser && <PlayerSearch />}
 
 				{/* 2. Notifications */}
-				{currentUser && friendSocket && <NotificationBell userId={currentUser.id} friendSocket={friendSocket} />}
+				{currentUser && friendSocket && (
+					<NotificationBell
+						userId={currentUser.id}
+						friendSocket={friendSocket}
+						onUnreadChange={setUnreadNotifications}
+					/>
+				)}
 
 				{/* 3. Language Switcher */}
 				<NavTooltip content={t('language')} position="bottom" disabled={showLanguageMenu} offset="navbar">
@@ -189,7 +194,12 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 				</NavTooltip>
 
 				{/* 5. Messages / Chat */}
-				{currentUser && <MessagesIcon userId={currentUser.id} />}
+				{currentUser && (
+					<MessagesIcon
+						userId={currentUser.id}
+						onUnreadChange={setUnreadMessages}
+					/>
+				)}
 
 				{/* Analysis */}
 				{currentUser && (

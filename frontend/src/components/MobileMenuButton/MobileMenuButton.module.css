@@ -1,0 +1,70 @@
+.menuToggle {
+	display: none;
+	position: relative;
+	align-items: center;
+	justify-content: center;
+	width: 42px;
+	height: 42px;
+	padding: 0;
+	background: transparent;
+	border: none;
+	border-radius: var(--radius-2xl);
+	color: var(--color-slate-400);
+	cursor: pointer;
+	transition: color var(--transition-normal);
+}
+
+.menuToggle:hover {
+	color: var(--color-slate-100);
+}
+
+.menuToggle:focus-visible {
+	outline: 2px solid var(--color-blue-400);
+	outline-offset: 2px;
+}
+
+.statusDot {
+	position: absolute;
+	top: 7px;
+	right: 7px;
+	width: 10px;
+	height: 10px;
+	border-radius: var(--radius-full);
+	border: 1.5px solid #0F172A;
+	box-sizing: border-box;
+	pointer-events: none;
+	animation: dotPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dotNotification {
+	background: linear-gradient(135deg, #EF4444, #DC2626);
+	box-shadow: 0 2px 6px rgba(239, 68, 68, 0.55);
+}
+
+.dotMessage {
+	background: linear-gradient(135deg, #3B82F6, #2563EB);
+	box-shadow: 0 2px 6px rgba(59, 130, 246, 0.55);
+}
+
+.dotBoth {
+	background: linear-gradient(135deg, #C084FC, #9333EA);
+	box-shadow: 0 2px 6px rgba(168, 85, 247, 0.55);
+}
+
+@keyframes dotPop {
+	0% {
+		transform: scale(0.4);
+		opacity: 0;
+	}
+	100% {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+@media (max-width: 1024px) {
+	.menuToggle {
+		display: flex;
+	}
+}
+

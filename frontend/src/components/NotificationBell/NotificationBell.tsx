@@ -12,9 +12,10 @@ import styles from './NotificationBell.module.css';
 type Props = {
     userId: number;
     friendSocket: FriendSocketType;
+    onUnreadChange?: (count: number) => void;
 };
 
-const NotificationBell = ({ userId, friendSocket }: Props) => {
+const NotificationBell = ({ userId, friendSocket, onUnreadChange }: Props) => {
     const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const [filter, setFilter] = useState<'all' | 'unread'>('all');
@@ -49,6 +50,10 @@ const NotificationBell = ({ userId, friendSocket }: Props) => {
     useEffect(() => {
         setIsOpen(false);
     }, [location.pathname]);
+
+    useEffect(() => {
+        onUnreadChange?.(unreadCount);
+    }, [unreadCount, onUnreadChange]);
 
     // Click outside and Escape key to close dropdown
     useEffect(() => {

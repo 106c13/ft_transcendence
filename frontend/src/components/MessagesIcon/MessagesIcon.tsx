@@ -7,9 +7,10 @@ import styles from './MessagesIcon.module.css';
 
 type Props = {
 	userId?: number;
+	onUnreadChange?: (count: number) => void;
 };
 
-const MessagesIcon = ({ userId }: Props) => {
+const MessagesIcon = ({ userId, onUnreadChange }: Props) => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -57,6 +58,10 @@ const MessagesIcon = ({ userId }: Props) => {
 			document.removeEventListener('visibilitychange', handleMessagesRead);
 		};
 	}, [userId, fetchUnreadCount]);
+
+	useEffect(() => {
+		onUnreadChange?.(unreadCount);
+	}, [unreadCount, onUnreadChange]);
 
 	return (
 		<NavTooltip content={t('chat')} position="bottom" offset="navbar">

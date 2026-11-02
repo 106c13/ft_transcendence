@@ -116,30 +116,6 @@
 	display: none;
 }
 
-.menuToggle {
-	display: none;
-	align-items: center;
-	justify-content: center;
-	width: 42px;
-	height: 42px;
-	padding: 0;
-	background: transparent;
-	border: none;
-	border-radius: var(--radius-2xl);
-	color: var(--color-slate-400);
-	cursor: pointer;
-	transition: color var(--transition-normal);
-}
-
-.menuToggle:hover {
-	color: var(--color-slate-100);
-}
-
-.menuToggle:focus-visible {
-	outline: 2px solid var(--color-blue-400);
-	outline-offset: 2px;
-}
-
 .backdrop {
 	display: none;
 }
@@ -243,10 +219,6 @@
 		padding: 0 14px 0 24px;
 		justify-content: space-between;
 		gap: 8px;
-	}
-
-	.menuToggle {
-		display: flex;
 	}
 
 	.backdrop {
