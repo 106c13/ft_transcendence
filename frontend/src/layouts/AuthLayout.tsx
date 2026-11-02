@@ -10,9 +10,13 @@ export default function AuthLayout() {
 
 	useEffect(() => {
 		if (token) {
-			navigate('/home', { replace: true })
+			navigate('/home', { replace: true });
 		}
-	}, [token, navigate])
+	}, [token, navigate]);
+
+	if (token) {
+		return null;
+	}
 
 	return (
 		<div className="auth-layout">

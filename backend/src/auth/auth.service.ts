@@ -46,24 +46,24 @@ export class AuthService {
 	}
 
 	async register({ email, username, password, repassword }) {
-		if (email && !isValidEmail(email)) {
-			throw new BadRequestException('invalid_email_format');
+		if (!email || !isValidEmail(email)) {
+			return { message: 'invalid_email_format', token: null };
 		}
 
-		if (username.length > 15) {
-			throw new BadRequestException('username_too_long');
+		if (!username || username.length > 15) {
+			return { message: 'username_too_long', token: null };
 		}
 
 		if (/[^a-zA-Z0-9_]/.test(username)) {
-			throw new BadRequestException('username_invalid_chars');
+			return { message: 'username_invalid_chars', token: null };
 		}
 
-		if (password.length < 8) {
-			throw new BadRequestException('password_too_short');
+		if (!password || password.length < 8) {
+			return { message: 'password_too_short', token: null };
 		}
 
 		if (password !== repassword) {
-			throw new BadRequestException('passwords_do_not_match');
+			return { message: 'passwords_do_not_match', token: null };
 		}
 
 		const hasLetter = /[a-zA-Z]/.test(password);
@@ -71,7 +71,7 @@ export class AuthService {
 		const hasSpecial = /[^a-zA-Z0-9]/.test(password);
 
 		if (!hasLetter || !hasNumber || !hasSpecial) {
-			throw new BadRequestException('password_complexity_error');
+			return { message: 'password_complexity_error', token: null };
 		}
 
 		const hashedPassword = await bcrypt.hash(password, 10);
@@ -83,7 +83,7 @@ export class AuthService {
 		const isDublicateUsername = await this.usersService.findByUsername(username);
 
 		if (isDublicateEmail || isDublicateUsername) {
-			throw new BadRequestException('user_already_exists');
+			return { message: 'user_already_exists', token: null };
 		}
 
 		const user: User = await this.usersService.create({
@@ -97,20 +97,24 @@ export class AuthService {
 		return {
 			message: 'account_created',
 			token,
-		}
+		};
 	}
 
 	async login({ email, password }) {
+		if (!email || !password) {
+			return { message: 'invalid_credentials', token: null };
+		}
+
 		const user: User | null = await this.usersService.findByEmail(email);
 
 		if (!user) {
-			throw new BadRequestException('invalid_credentials');
+			return { message: 'invalid_credentials', token: null };
 		}
 
 		const isMatch = await bcrypt.compare(password, user.password);
 
 		if (!isMatch) {
-			throw new BadRequestException('invalid_credentials');
+			return { message: 'invalid_credentials', token: null };
 		}
 
 		const token: string = this.generateToken(user);
