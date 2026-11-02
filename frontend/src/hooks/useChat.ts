@@ -157,16 +157,18 @@ export function useChat(currentUserId: number | null) {
 				const res = await fetch(`/api/chat/get/${userid}`, {
 					headers: { Authorization: `Bearer ${token}` },
 				});
-				const chat = res.ok ? await res.json() : null;
 
 				if (!isMounted) return;
 
-				if (!chat?.chat_id) {
+				if (!res.ok) {
 					setSelectedChat(null);
 					setMessages([]);
 					navigate('/chat', { replace: true });
 					return;
 				}
+
+				const chat = await res.json();
+				if (!isMounted) return;
 
 				setSelectedChat(chat);
 				markChatAsRead(chat.chat_id);

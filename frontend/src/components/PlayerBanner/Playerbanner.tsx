@@ -141,6 +141,7 @@ const PlayerBanner = ({
 			.then(res => {
 				if (!isSubscribed) return null
 				if (res.ok) {
+					setUserExists(true)
 					return res.json()
 				} else {
 					setUserExists(false)
@@ -149,13 +150,7 @@ const PlayerBanner = ({
 				}
 			})
 			.then(data => {
-				if (!isSubscribed) return
-				if (!data?.id) {
-					setUserExists(false)
-					setIsOpen(false)
-					return
-				}
-				setUserExists(true)
+				if (!isSubscribed || !data) return
 				if (data.ratings) setRatings(data.ratings)
 				if (data.avatar) setUserAvatar(data.avatar)
 			})

@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../context/ToastContext';
-import type { TabType, User, FriendStatus } from '../utils/profileUtils';
+import { isValidUsername, type TabType, type User, type FriendStatus } from '../utils/profileUtils';
 import type { FriendSocketType } from '../utils/layoutContextUtils';
 
 export function useProfile(
@@ -78,6 +78,13 @@ export function useProfile(
 				return;
 			}
 
+			if (!isValidUsername(username)) {
+				setUser(null);
+				toast.error(t('user_not_found'), { id: 'user_not_found' });
+				navigate('/home', { replace: true });
+				return;
+			}
+
 			try {
 				const token = localStorage.getItem('token');
 				const headers: HeadersInit = {};
@@ -87,16 +94,18 @@ export function useProfile(
 				}
 
 				const res = await fetch(`/api/users/${encodeURIComponent(username)}`, { headers });
-				const data = res.ok ? await res.json() : null;
 
 				if (!isMounted) return;
 
-				if (!data?.id) {
+				if (!res.ok) {
 					setUser(null);
 					toast.error(t('user_not_found'), { id: 'user_not_found' });
 					navigate('/home', { replace: true });
 					return;
 				}
+
+				const data = await res.json();
+				if (!isMounted) return;
 
 				setUser({
 					...data,

@@ -33,10 +33,10 @@ export function useRegister() {
 				body: JSON.stringify(data),
 			})
 
-			const result = res.ok ? await res.json() : null;
+			const result = await res.json();
 
-			if (!result?.token) {
-				toast.error(result?.message || 'something_went_wrong');
+			if (!res.ok) {
+				toast.error(result.message || 'something_went_wrong');
 				return;
 			}
 

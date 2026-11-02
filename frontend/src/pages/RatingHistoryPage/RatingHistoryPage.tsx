@@ -6,7 +6,7 @@ import { useGameHistory } from '../../hooks/useGameHistory';
 import { useRatingHistory, type RatingCategory } from '../../hooks/useRatingHistory';
 import { usePageTitle } from '../../hooks/usePageTitle';
 import { useToast } from '../../context/ToastContext';
-import type { User } from '../../utils/profileUtils';
+import { isValidUsername, type User } from '../../utils/profileUtils';
 import type { LayoutContextType } from '../../utils/layoutContextUtils';
 import BigRatingChart from '../../components/BigRatingChart/BigRatingChart';
 import styles from './RatingHistoryPage.module.css';
@@ -69,6 +69,14 @@ const RatingHistoryPage = () => {
 		let isMounted = true;
 
 		const fetchUser = async () => {
+			if (!isValidUsername(paramUsername)) {
+				setUser(null);
+				setLoadingUser(false);
+				toast.error(t('user_not_found'), { id: 'user_not_found' });
+				navigate('/home', { replace: true });
+				return;
+			}
+
 			setLoadingUser(true);
 			try {
 				const token = localStorage.getItem('token');
@@ -78,18 +86,17 @@ const RatingHistoryPage = () => {
 
 				if (!isMounted) return;
 
-				if (res.ok) {
-					const data = await res.json();
-					if (!isMounted) return;
-					if (data?.id) {
-						setUser(data);
-						return;
-					}
+				if (!res.ok) {
+					setUser(null);
+					toast.error(t('user_not_found'), { id: 'user_not_found' });
+					navigate('/home', { replace: true });
+					return;
 				}
 
-				setUser(null);
-				toast.error(t('user_not_found'), { id: 'user_not_found' });
-				navigate('/home', { replace: true });
+				const data = await res.json();
+				if (!isMounted) return;
+
+				setUser(data);
 			} catch {
 				if (!isMounted) return;
 				setUser(null);

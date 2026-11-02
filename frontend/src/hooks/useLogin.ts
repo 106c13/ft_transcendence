@@ -21,10 +21,10 @@ export function useLogin() {
 				body: JSON.stringify(data),
 			})
 
-			const result = res.ok ? await res.json() : null;
+			const result = await res.json();
 
-			if (!result?.token) {
-				toast.error(result?.message || 'invalid_credentials');
+			if (!res.ok) {
+				toast.error(result.message || 'invalid_credentials');
 				return;
 			}
 

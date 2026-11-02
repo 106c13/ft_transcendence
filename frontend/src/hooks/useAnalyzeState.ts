@@ -305,14 +305,16 @@ export function useAnalyzeState({
                 const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
 
                 const matchRes = await fetch(`/api/game/${gameId}`, { headers });
-                const matchData: MatchRecord | null = matchRes.ok ? await matchRes.json() : null;
                 if (isCancelled) return;
 
-                if (!matchData?.id) {
+                if (!matchRes.ok) {
                     handleReset();
                     navigate('/analysis', { replace: true });
                     return;
                 }
+
+                const matchData: MatchRecord = await matchRes.json();
+                if (isCancelled) return;
 
                 if (matchData.white?.username) setWhitePlayerName(matchData.white.username);
                 if (matchData.black?.username) setBlackPlayerName(matchData.black.username);

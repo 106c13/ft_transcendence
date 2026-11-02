@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+	Injectable,
+	UnauthorizedException,
+	BadRequestException,
+	ConflictException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
@@ -35,7 +40,7 @@ export class AuthService {
 		const existingUser = await this.usersService.findByEmail(email);
 
 		if (existingUser) {
-			throw new BadRequestException('user_already_exists');
+			throw new ConflictException('user_already_exists');
 		}
 		const hashedPassword = await bcrypt.hash(password, 10);
 		return this.usersService.create({
@@ -47,23 +52,23 @@ export class AuthService {
 
 	async register({ email, username, password, repassword }) {
 		if (!email || !isValidEmail(email)) {
-			return { message: 'invalid_email_format', token: null };
+			throw new BadRequestException('invalid_email_format');
 		}
 
 		if (!username || username.length > 15) {
-			return { message: 'username_too_long', token: null };
+			throw new BadRequestException('username_too_long');
 		}
 
 		if (/[^a-zA-Z0-9_]/.test(username)) {
-			return { message: 'username_invalid_chars', token: null };
+			throw new BadRequestException('username_invalid_chars');
 		}
 
 		if (!password || password.length < 8) {
-			return { message: 'password_too_short', token: null };
+			throw new BadRequestException('password_too_short');
 		}
 
 		if (password !== repassword) {
-			return { message: 'passwords_do_not_match', token: null };
+			throw new BadRequestException('passwords_do_not_match');
 		}
 
 		const hasLetter = /[a-zA-Z]/.test(password);
@@ -71,7 +76,7 @@ export class AuthService {
 		const hasSpecial = /[^a-zA-Z0-9]/.test(password);
 
 		if (!hasLetter || !hasNumber || !hasSpecial) {
-			return { message: 'password_complexity_error', token: null };
+			throw new BadRequestException('password_complexity_error');
 		}
 
 		const hashedPassword = await bcrypt.hash(password, 10);
@@ -83,7 +88,7 @@ export class AuthService {
 		const isDublicateUsername = await this.usersService.findByUsername(username);
 
 		if (isDublicateEmail || isDublicateUsername) {
-			return { message: 'user_already_exists', token: null };
+			throw new ConflictException('user_already_exists');
 		}
 
 		const user: User = await this.usersService.create({
@@ -102,19 +107,19 @@ export class AuthService {
 
 	async login({ email, password }) {
 		if (!email || !password) {
-			return { message: 'invalid_credentials', token: null };
+			throw new BadRequestException('invalid_credentials');
 		}
 
 		const user: User | null = await this.usersService.findByEmail(email);
 
 		if (!user) {
-			return { message: 'invalid_credentials', token: null };
+			throw new UnauthorizedException('invalid_credentials');
 		}
 
 		const isMatch = await bcrypt.compare(password, user.password);
 
 		if (!isMatch) {
-			return { message: 'invalid_credentials', token: null };
+			throw new UnauthorizedException('invalid_credentials');
 		}
 
 		const token: string = this.generateToken(user);

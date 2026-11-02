@@ -33,3 +33,7 @@ export type FriendStatus =
 	| 'ACCEPTED'
 	| 'RECEIVED'
 	| 'SENT';
+
+export const isValidUsername = (username: string): boolean => {
+	return /^[a-zA-Z0-9_]{1,15}$/.test(username);
+};

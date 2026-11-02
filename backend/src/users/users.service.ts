@@ -1,4 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+	Injectable,
+	BadRequestException,
+	NotFoundException,
+	ConflictException,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -77,7 +83,7 @@ export class UsersService {
 	async getProfileByUsername(username: string, authHeader?: string) {
 		const user = await this.findByUsername(username);
 		if (!user) {
-			return { id: null };
+			throw new NotFoundException('user_not_found');
 		}
 
 		const requesterId = this.extractUserIdFromHeader(authHeader);
@@ -138,7 +144,7 @@ export class UsersService {
 		const user = await this.usersRepo.findOne({ where: { id } });
 
 		if (!user) {
-			throw new BadRequestException('user_not_found');
+			throw new NotFoundException('user_not_found');
 		}
 
 		if (data.username && data.username !== user.username) {
@@ -147,7 +153,7 @@ export class UsersService {
 			});
 
 			if (exists) {
-				throw new BadRequestException('username_already_exists');
+				throw new ConflictException('username_already_exists');
 			}
 		}
 
@@ -157,7 +163,7 @@ export class UsersService {
 			});
 
 			if (exists) {
-				throw new BadRequestException('email_already_exists');
+				throw new ConflictException('email_already_exists');
 			}
 		}
 
@@ -178,13 +184,13 @@ export class UsersService {
 		const user = await this.usersRepo.findOne({ where: { id: userId } });
 
 		if (!user) {
-			throw new BadRequestException('user_not_found');
+			throw new NotFoundException('user_not_found');
 		}
 
 		const isMatch = await bcrypt.compare(data.oldPassword, user.password);
 
 		if (!isMatch) {
-			throw new BadRequestException('old_password_incorrect');
+			throw new UnauthorizedException('old_password_incorrect');
 		}
 
 		if (data.newPassword.length < 8) {

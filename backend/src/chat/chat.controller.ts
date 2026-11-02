@@ -51,35 +51,39 @@ export class ChatController {
 		@Req() req,
 		@Param('user_id') userIdParam: string
 	) {
-		const currentUserId = req.user.userId
-		const otherUserId = parseInt(userIdParam, 10)
+		const currentUserId = req.user.userId;
+		const otherUserId = parseInt(userIdParam, 10);
 
-		if (isNaN(otherUserId) || currentUserId === otherUserId) {
-			return { chat_id: null }
+		if (isNaN(otherUserId)) {
+			throw new BadRequestException('invalid_user_id');
 		}
 
-		const id1 = Math.min(currentUserId, otherUserId)
-		const id2 = Math.max(currentUserId, otherUserId)
-		const chatId = `${id1}_${id2}`
+		if (currentUserId === otherUserId) {
+			throw new BadRequestException('cannot_chat_with_yourself');
+		}
 
-		let chat = await this.chatService.getChat(chatId)
+		const id1 = Math.min(currentUserId, otherUserId);
+		const id2 = Math.max(currentUserId, otherUserId);
+		const chatId = `${id1}_${id2}`;
+
+		const chat = await this.chatService.getChat(chatId);
 
 		if (chat) {
-			return this.formatChat(chat)
+			return this.formatChat(chat);
 		}
 
-		const otherUser = await this.usersService.findById(otherUserId)
+		const otherUser = await this.usersService.findById(otherUserId);
 		if (!otherUser) {
-			return { chat_id: null }
+			throw new NotFoundException('user_not_found');
 		}
 
-		let newChat = await this.chatService.createChat(currentUserId, otherUserId)
+		const newChat = await this.chatService.createChat(currentUserId, otherUserId);
 
 		if (!newChat) {
-			return { chat_id: null }
+			throw new NotFoundException('cannot_create_chat');
 		}
 
-		return this.formatChat(newChat)
+		return this.formatChat(newChat);
 	}
 
 	@Get('my-chats')

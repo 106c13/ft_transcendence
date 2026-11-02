@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import {
+	Controller,
+	Get,
+	Post,
+	Body,
+	Param,
+	Query,
+	UseGuards,
+	BadRequestException,
+	NotFoundException,
+} from '@nestjs/common';
 import { GameService } from './game.service';
 import { RatingService } from './rating.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -20,7 +30,7 @@ export class GameController {
 	async analyzeMatch(@Param('id') id: string, @Query('force') force?: string) {
 		const matchId = parseInt(id, 10);
 		if (isNaN(matchId)) {
-			return { id: null };
+			throw new BadRequestException('invalid_match_id');
 		}
 		return this.gameService.analyzeMatch(matchId, force === 'true');
 	}
@@ -50,10 +60,13 @@ export class GameController {
 	async getMatch(@Param('id') id: string) {
 		const matchId = parseInt(id, 10);
 		if (isNaN(matchId)) {
-			return { id: null };
+			throw new BadRequestException('invalid_match_id');
 		}
 		const match = await this.gameService.getMatchById(matchId);
-		return match ?? { id: null };
+		if (!match) {
+			throw new NotFoundException('match_not_found');
+		}
+		return match;
 	}
 }
 
