@@ -9,135 +9,32 @@ import {
 	UploadedFile,
 	Param,
 	Query,
-} from '@nestjs/common'
-import { FileInterceptor } from '@nestjs/platform-express'
-import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { diskStorage } from 'multer'
-import { extname } from 'path'
-import type { Express } from 'express'
-import { JwtAuthGuard } from '../auth/jwt-auth.guard'
-import { JwtService } from '@nestjs/jwt'
-import { UsersService } from './users.service'
-import { RatingService } from '@/game/rating.service';
-import { LeaderboardService } from '@/game/leaderboard.service';
-import { PresenceService } from '@/presence/presence.service';
-
-function isValidEmail(email: string) {
-	return (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 256)
-}
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import type { Express } from 'express';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-	constructor(
-		private readonly usersService: UsersService,
-		private readonly jwtService: JwtService,
-		private readonly ratingService: RatingService,
-		private readonly leaderboardService: LeaderboardService,
-		private readonly presenceService: PresenceService,
-	) { }
+	constructor(private readonly usersService: UsersService) {}
 
 	@Get('me')
 	async getMe(@Req() req) {
-		const authHeader = req.headers.authorization
-		if (!authHeader) {
-			return { id: null }
-		}
-
-		let userId: number
-		try {
-			const token = authHeader.split(' ')[1]
-			const decoded = this.jwtService.verify(token)
-			userId = decoded.sub
-		} catch {
-			return { id: null }
-		}
-
-		const user = await this.usersService.findById(userId)
-
-		if (!user) {
-			return { id: null }
-		}
-
-		const ratings = await this.ratingService.getAllRatings(user.id);
-		const userStatus = this.presenceService.getUserStatus(user.id);
-		const status = userStatus === 'OFFLINE' ? 'ONLINE' : userStatus;
-		const lbInfo = await this.leaderboardService.getUserLeaderboardInfo(user.id);
-
-		return {
-			id: user.id,
-			username: user.username,
-			email: user.email,
-			bio: user.bio,
-			avatar: user.avatar,
-			status,
-			is_active: true,
-			last_seen: user.last_seen,
-			created_at: user.created_at,
-			isOwnProfile: true,
-			ratings,
-			leaderboardRating: lbInfo.leaderboardRating,
-			leaderboardRank: lbInfo.rank,
-		}
+		return this.usersService.getMe(req.headers.authorization);
 	}
 
 	@Get('search')
 	@UseGuards(JwtAuthGuard)
-	async searchUser(
-		@Req() req,
-		@Query('q') query: string
-	) {
-		const users = await this.usersService.searchUser(query);
-		return users.map(u => ({
-			id: u.id,
-			username: u.username,
-			avatar: u.avatar,
-			bio: u.bio,
-			is_active: this.presenceService.isUserOnline(u.id),
-			status: this.presenceService.getUserStatus(u.id),
-		}));
+	async searchUser(@Query('q') query: string) {
+		return this.usersService.searchUser(query);
 	}
 
 	@Get(':username')
 	async getByUsername(@Req() req, @Param('username') username: string) {
-		const user = await this.usersService.findByUsername(username)
-
-		if (!user) {
-			throw new NotFoundException('user_not_found')
-		}
-
-		// Manually check token
-		let isOwnProfile = false
-		const authHeader = req.headers.authorization
-		if (authHeader) {
-			try {
-				const token = authHeader.split(' ')[1]
-				const decoded = this.jwtService.verify(token)
-				isOwnProfile = decoded.sub === user.id
-			} catch {
-				isOwnProfile = false
-			}
-		}
-
-		const ratings = await this.ratingService.getAllRatings(user.id);
-		const userStatus = this.presenceService.getUserStatus(user.id);
-		const status = (isOwnProfile && userStatus === 'OFFLINE') ? 'ONLINE' : userStatus;
-		const lbInfo = await this.leaderboardService.getUserLeaderboardInfo(user.id);
-
-		return {
-			id: user.id,
-			username: user.username,
-			email: user.email,
-			avatar: user.avatar,
-			status: status,
-			is_active: status !== 'OFFLINE',
-			last_seen: user.last_seen,
-			bio: user.bio,
-			created_at: user.created_at,
-			isOwnProfile,
-			ratings,
-			leaderboardRating: lbInfo.leaderboardRating,
-			leaderboardRank: lbInfo.rank,
-		}
+		return this.usersService.getProfileByUsername(username, req.headers.authorization);
 	}
 
 	@Patch('me')
@@ -148,9 +45,9 @@ export class UsersController {
 				destination: './uploads',
 				filename: (req, file, cb) => {
 					const uniqueName =
-						Date.now() + '-' + Math.round(Math.random() * 1e9)
+						Date.now() + '-' + Math.round(Math.random() * 1e9);
 
-					cb(null, uniqueName + extname(file.originalname))
+					cb(null, uniqueName + extname(file.originalname));
 				},
 			}),
 		}),
@@ -160,38 +57,7 @@ export class UsersController {
 		@UploadedFile() file: Express.Multer.File,
 		@Body() body: any,
 	) {
-		const userId = req.user.userId
-
-		if (/[^a-zA-Z0-9_]/.test(body.username)) {
-			throw new BadRequestException('username_invalid_chars');
-		}
-
-		if (body.username.length > 15) {
-			throw new BadRequestException('username_too_long');
-		}
-
-		if (body.bio.length > 100) {
-			throw new BadRequestException('bio_too_long');
-		}
-
-		if (body.email && !isValidEmail(body.email)) {
-			throw new BadRequestException('invalid_email_format');
-		}
-
-
-		const updateData: any = {
-			username: body.username,
-			email: body.email,
-			bio: body.bio,
-		}
-
-		if (file) {
-			updateData.avatar = file.filename
-		}
-
-		await this.usersService.updateUser(userId, updateData)
-
-		return { success: true }
+		return this.usersService.updateUser(req.user.userId, body, file?.filename);
 	}
 
 	@Patch('password')
@@ -200,9 +66,8 @@ export class UsersController {
 		@Req() req,
 		@Body() body: { oldPassword: string; newPassword: string }
 	) {
-		await this.usersService.changePassword(req.user.userId, body)
+		await this.usersService.changePassword(req.user.userId, body);
 
-		return { succes: true }
+		return { succes: true };
 	}
-
 }

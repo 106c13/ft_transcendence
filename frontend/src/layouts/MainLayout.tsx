@@ -12,92 +12,95 @@ import { useFriends } from '../hooks/useFriends'
 export type { User, LayoutContextType };
 
 export default function MainLayout() {
-  const [currentUser, setCurrentUser] = useState<User | null>(null)
-  const navigate = useNavigate()
-  const location = useLocation()
-  const token = localStorage.getItem('token')
-  const isPublicRoute = location.pathname === '/about' || location.pathname.startsWith('/analyze')
+	const [currentUser, setCurrentUser] = useState<User | null>(null)
+	const navigate = useNavigate()
+	const location = useLocation()
+	const token = localStorage.getItem('token')
+	const isPublicRoute = location.pathname === '/about'
 
-  useEffect(() => {
-    if (!token) {
-      if (!isPublicRoute) {
-        navigate('/login', { replace: true })
-      }
-      return
-    }
+	useEffect(() => {
+		if (!token) {
+			if (!isPublicRoute) {
+				navigate('/login', { replace: true })
+			}
+			return
+		}
 
-    let isMounted = true
+		let isMounted = true;
 
-    fetch('/api/users/me', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('Unauthorized')
-        return res.json()
-      })
-      .then((data) => {
-        if (!data?.id) throw new Error('Unauthorized')
-        if (isMounted) {
-          setCurrentUser(data)
-        }
-      })
-      .catch(() => {
-        localStorage.removeItem('token')
-        if (isMounted && !isPublicRoute) {
-          navigate('/login', { replace: true })
-        }
-      })
+		const verifyUser = async () => {
+			try {
+				const res = await fetch('/api/users/me', {
+					headers: { Authorization: `Bearer ${token}` },
+				});
+				if (!res.ok) throw new Error('Unauthorized');
 
-    return () => {
-      isMounted = false
-    }
-  }, [navigate, token, isPublicRoute])
+				const data = await res.json();
+				if (!data?.id) throw new Error('Unauthorized');
 
-  const challengeSocket = useChallengeSocket(currentUser?.id)
-  const { incomingChallenge, acceptChallenge, declineChallenge } = challengeSocket
-  const { setTopSlot } = useToast()
+				if (isMounted) {
+					setCurrentUser(data);
+				}
+			} catch {
+				localStorage.removeItem('token');
+				if (isMounted && !isPublicRoute) {
+					navigate('/login', { replace: true });
+				}
+			}
+		};
 
-  const friendSocket = useFriends(currentUser)
+		verifyUser();
 
-  useEffect(() => {
-    if (incomingChallenge) {
-      setTopSlot(
-        <ChallengeNotification
-          key={incomingChallenge.challengeId}
-          challenge={incomingChallenge}
-          onAccept={acceptChallenge}
-          onDecline={declineChallenge}
-        />
-      )
-    } else {
-      setTopSlot(null)
-    }
-  }, [incomingChallenge, acceptChallenge, declineChallenge, setTopSlot])
+		return () => {
+			isMounted = false;
+		};
+	}, [navigate, token, isPublicRoute])
 
-  // Clear topSlot on unmount of MainLayout
-  useEffect(() => {
-    return () => {
-      setTopSlot(null)
-    }
-  }, [setTopSlot])
+	const challengeSocket = useChallengeSocket(currentUser?.id)
+	const { incomingChallenge, acceptChallenge, declineChallenge } = challengeSocket
+	const { setTopSlot } = useToast()
 
-  if (!currentUser && !isPublicRoute) {
-    return null
-  }
+	const friendSocket = useFriends(currentUser)
 
-  const isChatRoute = location.pathname.startsWith('/chat')
-  const isGameRoute = location.pathname.startsWith('/game') && !location.pathname.startsWith('/game/analysis')
-  const isAnalyzeRoute = location.pathname.startsWith('/analyze') || location.pathname.startsWith('/game/analysis')
-  const showFooter = !isChatRoute && !isGameRoute && !isAnalyzeRoute
+	useEffect(() => {
+		if (incomingChallenge) {
+			setTopSlot(
+				<ChallengeNotification
+					key={incomingChallenge.challengeId}
+					challenge={incomingChallenge}
+					onAccept={acceptChallenge}
+					onDecline={declineChallenge}
+				/>
+			)
+		} else {
+			setTopSlot(null)
+		}
+	}, [incomingChallenge, acceptChallenge, declineChallenge, setTopSlot])
 
-  return (
-    <div className="app-layout">
-      <Navbar currentUser={currentUser} friendSocket={friendSocket} />
-      <main className="layout-body">
-        {/* Child routes render here */}
-        <Outlet context={{ currentUser, setCurrentUser, challengeSocket, friendSocket } satisfies LayoutContextType} />
-      </main>
-      {showFooter && <Footer currentUser={currentUser} />}
-    </div>
-  )
+	// Clear topSlot on unmount of MainLayout
+	useEffect(() => {
+		return () => {
+			setTopSlot(null)
+		}
+	}, [setTopSlot])
+
+	if (!currentUser && !isPublicRoute) {
+		return null
+	}
+
+	const isChatRoute = location.pathname.startsWith('/chat')
+	const isGameRoute = location.pathname.startsWith('/game') && !location.pathname.startsWith('/game/analysis')
+	const isAnalyzeRoute = location.pathname.startsWith('/analyze') || location.pathname.startsWith('/game/analysis')
+	const showFooter = !isChatRoute && !isGameRoute && !isAnalyzeRoute
+
+	return (
+		<div className="app-layout">
+			<Navbar currentUser={currentUser} friendSocket={friendSocket} />
+			<main className="layout-body">
+				{/* Child routes render here */}
+				<Outlet context={{ currentUser, setCurrentUser, challengeSocket, friendSocket } satisfies LayoutContextType} />
+			</main>
+			{showFooter && <Footer currentUser={currentUser} />}
+		</div>
+	)
 }
