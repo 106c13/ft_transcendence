@@ -91,7 +91,7 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 
 	const isAboutActive = location.pathname === '/about';
 	const isLeaderboardActive = location.pathname === '/leaderboard';
-	const isAnalyzeActive = location.pathname.startsWith('/analyze');
+	const isAnalyzeActive = location.pathname.startsWith('/analysis');
 
 	return (
 		<header className={styles.navbar} ref={headerRef}>
@@ -206,14 +206,14 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 					<NavTooltip content={t('analysis', 'Analysis')} position="bottom" offset="navbar">
 						<div
 							className={`${styles.navActionItem} ${isAnalyzeActive ? styles.activeNavAction : ''}`}
-							onClick={() => go('/analyze')}
+							onClick={() => go('/analysis')}
 							role="button"
 							tabIndex={0}
 							aria-label={t('analysis', 'Analysis')}
 							onKeyDown={(e) => {
 								if (e.key === 'Enter' || e.key === ' ') {
 									e.preventDefault();
-									go('/analyze');
+									go('/analysis');
 								}
 							}}
 						>

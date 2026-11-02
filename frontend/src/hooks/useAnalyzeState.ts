@@ -270,65 +270,88 @@ export function useAnalyzeState({
         }
     }, [t, showToast, fetchFullPgnAnalysis])
 
-    // Load game by route param :id
+    // Reset board
+    const handleReset = useCallback(() => {
+        skipSoundRef.current = true;
+        setMoveHistory([STARTING_FEN]);
+        setMoveSAN([]);
+        setMoveDetails([]);
+        setViewIndex(0);
+        setWhitePlayerName('White');
+        setBlackPlayerName('Black');
+        setWhiteRating(undefined);
+        setBlackRating(undefined);
+        setAnalysisData(null);
+        onResetEngine?.();
+    }, [onResetEngine]);
+
+    // Load game by route param :gameid
     useEffect(() => {
-        if (!gameId) return
-        let isCancelled = false
+        if (!gameId) return;
+
+        let isCancelled = false;
 
         const fetchGameById = async () => {
+            if (!/^\d+$/.test(gameId)) {
+                handleReset();
+                setIsLoadingGame(false);
+                navigate('/analysis', { replace: true });
+                return;
+            }
+
             try {
-                setIsLoadingGame(true)
-                const token = localStorage.getItem('token')
-                const [matchRes, analysisRes] = await Promise.all([
-                    fetch(`/api/game/${gameId}`, {
-                        headers: token ? { Authorization: `Bearer ${token}` } : {},
-                    }),
-                    fetch(`/api/game/analyze/${gameId}`, {
-                        headers: token ? { Authorization: `Bearer ${token}` } : {},
-                    }),
-                ])
+                setIsLoadingGame(true);
+                const token = localStorage.getItem('token');
+                const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
 
-                if (isCancelled) return
+                const matchRes = await fetch(`/api/game/${gameId}`, { headers });
+                const matchData: MatchRecord | null = matchRes.ok ? await matchRes.json() : null;
+                if (isCancelled) return;
 
-                if (matchRes.ok) {
-                    const matchData: MatchRecord = await matchRes.json()
-                    if (isCancelled) return
-                    if (matchData.white?.username) setWhitePlayerName(matchData.white.username)
-                    if (matchData.black?.username) setBlackPlayerName(matchData.black.username)
-                    if (matchData.white?.rating !== undefined && matchData.white?.rating !== null) {
-                        setWhiteRating(matchData.white.rating)
-                    }
-                    if (matchData.black?.rating !== undefined && matchData.black?.rating !== null) {
-                        setBlackRating(matchData.black.rating)
-                    }
-
-                    if (matchData.pgn) {
-                        loadPgnString(matchData.pgn, false, false)
-                    }
+                if (!matchData?.id) {
+                    handleReset();
+                    navigate('/analysis', { replace: true });
+                    return;
                 }
+
+                if (matchData.white?.username) setWhitePlayerName(matchData.white.username);
+                if (matchData.black?.username) setBlackPlayerName(matchData.black.username);
+                if (matchData.white?.rating !== undefined && matchData.white?.rating !== null) {
+                    setWhiteRating(matchData.white.rating);
+                }
+                if (matchData.black?.rating !== undefined && matchData.black?.rating !== null) {
+                    setBlackRating(matchData.black.rating);
+                }
+
+                if (matchData.pgn) {
+                    loadPgnString(matchData.pgn, false, false);
+                }
+
+                const analysisRes = await fetch(`/api/game/analyze/${gameId}`, { headers });
+                if (isCancelled) return;
 
                 if (analysisRes.ok) {
-                    const data: GameAnalysisResult = await analysisRes.json()
-                    if (isCancelled) return
-                    setAnalysisData(data)
+                    const data: GameAnalysisResult = await analysisRes.json();
+                    if (isCancelled) return;
+                    setAnalysisData(data);
                 }
-            } catch (err) {
-                if (isCancelled) return
-                console.error('Failed to load game analysis for id:', gameId, err)
-                showToast('error', t('game_not_found'))
+            } catch {
+                if (isCancelled) return;
+                handleReset();
+                navigate('/analysis', { replace: true });
             } finally {
                 if (!isCancelled) {
-                    setIsLoadingGame(false)
+                    setIsLoadingGame(false);
                 }
             }
-        }
+        };
 
-        fetchGameById()
+        fetchGameById();
 
         return () => {
-            isCancelled = true
-        }
-    }, [gameId, t, showToast, loadPgnString])
+            isCancelled = true;
+        };
+    }, [gameId, navigate, loadPgnString, handleReset]);
 
     // Execute Move locally on the active position branch
     const executeMove = useCallback((from: string, to: string, promotion?: string): boolean => {
@@ -383,24 +406,9 @@ export function useAnalyzeState({
         if (game.pgn) {
             loadPgnString(game.pgn, true)
         } else if (game.id) {
-            navigate(`/analyze/${game.id}`)
+            navigate(`/analysis/${game.id}`)
         }
     }, [navigate, loadPgnString])
-
-    // Reset board
-    const handleReset = useCallback(() => {
-        skipSoundRef.current = true
-        setMoveHistory([STARTING_FEN])
-        setMoveSAN([])
-        setMoveDetails([])
-        setViewIndex(0)
-        setWhitePlayerName('White')
-        setBlackPlayerName('Black')
-        setWhiteRating(undefined)
-        setBlackRating(undefined)
-        setAnalysisData(null)
-        onResetEngine?.()
-    }, [onResetEngine])
 
     const handleFlipBoard = useCallback(() => {
         setOrientation((prev) => (prev === 'w' ? 'b' : 'w'))

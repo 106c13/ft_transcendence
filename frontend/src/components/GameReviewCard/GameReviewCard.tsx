@@ -68,7 +68,7 @@ const GameReviewCard = ({ games, currentUsername, loading }: Props) => {
 
 	const handleReviewClick = () => {
 		if (!selectedGame) return
-		navigate(`/game/analysis/${selectedGame.id}`, {
+		navigate(`/analysis/${selectedGame.id}`, {
 			state: { match: selectedGame, fromUsername: currentUsername },
 		})
 	}

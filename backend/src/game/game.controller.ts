@@ -18,7 +18,11 @@ export class GameController {
 
 	@Get('analyze/:id')
 	async analyzeMatch(@Param('id') id: string, @Query('force') force?: string) {
-		return this.gameService.analyzeMatch(parseInt(id, 10), force === 'true');
+		const matchId = parseInt(id, 10);
+		if (isNaN(matchId)) {
+			return { id: null };
+		}
+		return this.gameService.analyzeMatch(matchId, force === 'true');
 	}
 
 	@Post('analyze-pgn')
@@ -44,7 +48,12 @@ export class GameController {
 
 	@Get(':id')
 	async getMatch(@Param('id') id: string) {
-		return this.gameService.getMatchById(parseInt(id, 10));
+		const matchId = parseInt(id, 10);
+		if (isNaN(matchId)) {
+			return { id: null };
+		}
+		const match = await this.gameService.getMatchById(matchId);
+		return match ?? { id: null };
 	}
 }
 

@@ -17,13 +17,13 @@ import styles from './AnalyzePage.module.css'
 
 export default function AnalyzePage() {
     usePageTitle('page_title_interactive_analysis')
-    const { id } = useParams<{ id?: string }>()
+    const { gameid } = useParams<{ gameid?: string }>()
 
     const [showPgnModal, setShowPgnModal] = useState<boolean>(false)
     const [showGamesModal, setShowGamesModal] = useState<boolean>(false)
 
     // 1. Core analysis state (history, PGN, navigation, orientation)
-    const state = useAnalyzeState({ gameId: id })
+    const state = useAnalyzeState({ gameId: gameid })
 
     // 2. Engine evaluation & telemetry
     const engine = useAnalyzeEngine({

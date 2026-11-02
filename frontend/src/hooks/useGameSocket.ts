@@ -897,7 +897,7 @@ export function useGameSocket() {
 
     const analyzeGame = () => {
         if (savedMatchId) {
-            navigate(`/game/analysis/${savedMatchId}`)
+            navigate(`/analysis/${savedMatchId}`)
         } else if (currentUser?.username) {
             navigate(`/profile/${currentUser.username}?tab=games`)
         } else {

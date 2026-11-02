@@ -5,7 +5,7 @@ import type { ChatObject, Message } from '../utils/chatUtils';
 
 export function useChat(currentUserId: number | null) {
 	const navigate = useNavigate()
-	const { user_id } = useParams<{ user_id?: string }>()
+	const { userid } = useParams<{ userid?: string }>()
 	const [chats, setChats] = useState<ChatObject[]>([])
 	const [selectedChat, setSelectedChat] = useState<ChatObject | null>(null)
 	const [messages, setMessages] = useState<Message[]>([])
@@ -122,82 +122,90 @@ export function useChat(currentUserId: number | null) {
 		}
 	}, [currentUserId, refreshChats, markChatAsRead])
 
-	// Sync active chat and messages with URL param (/chat/:user_id)
+	// Sync active chat and messages with URL param (/chat/:userid)
 	useEffect(() => {
-		if (!currentUserId) return
+		if (!currentUserId) return;
 
-		// When on /chat without user_id, clear selected chat
-		if (!user_id) {
-			setSelectedChat(null)
-			setMessages([])
-			return
+		// When on /chat without userid, clear selected chat
+		if (!userid) {
+			setSelectedChat(null);
+			setMessages([]);
+			return;
 		}
 
-		const targetUserId = parseInt(user_id, 10)
-		if (isNaN(targetUserId) || targetUserId === currentUserId) {
-			navigate('/chat', { replace: true })
-			return
+		const targetUserId = parseInt(userid, 10);
+		if (!/^\d+$/.test(userid) || isNaN(targetUserId) || targetUserId <= 0 || targetUserId === currentUserId) {
+			setSelectedChat(null);
+			setMessages([]);
+			navigate('/chat', { replace: true });
+			return;
 		}
 
-		let isMounted = true
+		let isMounted = true;
 
 		// Optimistically select chat if it exists in current chats list
 		const existingChat = chats.find(
 			c => c.user1_id === targetUserId || c.user2_id === targetUserId
-		)
+		);
 		if (existingChat) {
-			setSelectedChat(existingChat)
-			markChatAsRead(existingChat.chat_id)
+			setSelectedChat(existingChat);
+			markChatAsRead(existingChat.chat_id);
 		}
 
-		// Fetch full chat object from backend
-		fetch(`/api/chat/get/${user_id}`, {
-			headers: { Authorization: `Bearer ${token}` }
-		})
-			.then(res => {
-				if (!res.ok) throw new Error('Chat not found')
-				return res.json()
-			})
-			.then(chat => {
-				if (!isMounted || !chat?.chat_id) return
+		const openChat = async () => {
+			try {
+				const res = await fetch(`/api/chat/get/${userid}`, {
+					headers: { Authorization: `Bearer ${token}` },
+				});
+				const chat = res.ok ? await res.json() : null;
 
-				setSelectedChat(chat)
-				markChatAsRead(chat.chat_id)
+				if (!isMounted) return;
+
+				if (!chat?.chat_id) {
+					setSelectedChat(null);
+					setMessages([]);
+					navigate('/chat', { replace: true });
+					return;
+				}
+
+				setSelectedChat(chat);
+				markChatAsRead(chat.chat_id);
 
 				setChats(prev => {
 					if (prev.some(c => c.chat_id === chat.chat_id)) {
-						return prev.map(c => (c.chat_id === chat.chat_id ? { ...chat, unreadCount: 0 } : c))
+						return prev.map(c => (c.chat_id === chat.chat_id ? { ...chat, unreadCount: 0 } : c));
 					}
-					return [{ ...chat, unreadCount: 0 }, ...prev]
-				})
+					return [{ ...chat, unreadCount: 0 }, ...prev];
+				});
 
-				return fetch(`/api/messages/${chat.chat_id}?limit=100`, {
-					headers: { Authorization: `Bearer ${token}` }
-				})
-			})
-			.then(res => {
-				if (!res) return
-				if (!res.ok) throw new Error('Failed to fetch messages')
-				return res.json()
-			})
-			.then(data => {
-				if (!isMounted || !data) return
-				setMessages(data.messages || [])
+				const msgRes = await fetch(`/api/messages/${chat.chat_id}?limit=100`, {
+					headers: { Authorization: `Bearer ${token}` },
+				});
+
+				if (!isMounted || !msgRes.ok) return;
+
+				const data = await msgRes.json();
+				if (!isMounted || !data) return;
+
+				setMessages(data.messages || []);
 				if (selectedChatRef.current?.chat_id) {
-					markChatAsRead(selectedChatRef.current.chat_id)
+					markChatAsRead(selectedChatRef.current.chat_id);
 				}
-			})
-			.catch(err => {
-				console.error('Error opening chat:', err)
+			} catch {
 				if (isMounted) {
-					navigate('/chat', { replace: true })
+					setSelectedChat(null);
+					setMessages([]);
+					navigate('/chat', { replace: true });
 				}
-			})
+			}
+		};
+
+		openChat();
 
 		return () => {
-			isMounted = false
-		}
-	}, [user_id, currentUserId, token, navigate, markChatAsRead])
+			isMounted = false;
+		};
+	}, [userid, currentUserId, token, navigate, markChatAsRead]);
 
 	const sendMessage = async () => {
 		if (!newMessage.trim() || !selectedChat || !token) return
@@ -244,6 +252,6 @@ export function useChat(currentUserId: number | null) {
 		setNewMessage,
 		sendMessage,
 		handleSelectChat,
-		userIdParam: user_id ? parseInt(user_id, 10) : null,
+		userIdParam: userid ? parseInt(userid, 10) : null,
 	}
 }

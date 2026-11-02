@@ -52,14 +52,10 @@ export class ChatController {
 		@Param('user_id') userIdParam: string
 	) {
 		const currentUserId = req.user.userId
-		const otherUserId = parseInt(userIdParam)
+		const otherUserId = parseInt(userIdParam, 10)
 
-		if (isNaN(otherUserId)) {
-			throw new BadRequestException('invalid_user_id')
-		}
-
-		if (currentUserId === otherUserId) {
-			throw new BadRequestException('cannot_chat_with_yourself')
+		if (isNaN(otherUserId) || currentUserId === otherUserId) {
+			return { chat_id: null }
 		}
 
 		const id1 = Math.min(currentUserId, otherUserId)
@@ -74,13 +70,13 @@ export class ChatController {
 
 		const otherUser = await this.usersService.findById(otherUserId)
 		if (!otherUser) {
-			throw new NotFoundException('user_not_found')
+			return { chat_id: null }
 		}
 
 		let newChat = await this.chatService.createChat(currentUserId, otherUserId)
 
 		if (!newChat) {
-			throw new NotFoundException('cannot_create_chat')
+			return { chat_id: null }
 		}
 
 		return this.formatChat(newChat)

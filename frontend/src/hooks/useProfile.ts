@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useToast } from '../context/ToastContext';
 import type { TabType, User, FriendStatus } from '../utils/profileUtils';
 import type { FriendSocketType } from '../utils/layoutContextUtils';
 
@@ -9,6 +11,8 @@ export function useProfile(
 	username?: string,
 	defaultTab: TabType = 'overview'
 ) {
+	const { t } = useTranslation();
+	const { toast } = useToast();
 	const location = useLocation();
 	const initialTab: TabType = (location.state as any)?.defaultTab || defaultTab;
 	const [user, setUser] = useState<User | null>(null);
@@ -60,61 +64,61 @@ export function useProfile(
 		}
 	}, [user?.username]);
 
-	const loadProfile = async () => {
-		if (!username) {
-			if (currentUser) {
-				setUser({
-					...currentUser,
-					isOwnProfile: true,
-				});
-			}
-			return;
-		}
-
-		try {
-			const token = localStorage.getItem('token');
-			const headers: HeadersInit = {};
-
-			if (token) {
-				headers.Authorization = `Bearer ${token}`;
-			}
-
-			const res = await fetch(`/api/users/${username}`, { headers });
-
-			if (res.status === 404) {
-				setUser(null);
-				return;
-			}
-
-			if (!res.ok) {
-				localStorage.removeItem('token');
-				navigate('/login');
-				return;
-			}
-
-			const data = await res.json();
-			if (!data?.id) {
-				setUser(null);
-				return;
-			}
-
-			setUser({
-				...data,
-				isOwnProfile: data.isOwnProfile ?? false,
-			});
-
-			if (token && username && data.isOwnProfile === false) {
-				loadFriendStatus(token, username);
-			}
-		} catch {
-			localStorage.removeItem('token');
-			navigate('/login');
-		}
-	};
-
 	useEffect(() => {
+		let isMounted = true;
+
+		const loadProfile = async () => {
+			if (!username) {
+				if (currentUser && isMounted) {
+					setUser({
+						...currentUser,
+						isOwnProfile: true,
+					});
+				}
+				return;
+			}
+
+			try {
+				const token = localStorage.getItem('token');
+				const headers: HeadersInit = {};
+
+				if (token) {
+					headers.Authorization = `Bearer ${token}`;
+				}
+
+				const res = await fetch(`/api/users/${encodeURIComponent(username)}`, { headers });
+				const data = res.ok ? await res.json() : null;
+
+				if (!isMounted) return;
+
+				if (!data?.id) {
+					setUser(null);
+					toast.error(t('user_not_found'), { id: 'user_not_found' });
+					navigate('/home', { replace: true });
+					return;
+				}
+
+				setUser({
+					...data,
+					isOwnProfile: data.isOwnProfile ?? false,
+				});
+
+				if (token && username && data.isOwnProfile === false) {
+					loadFriendStatus(token, username);
+				}
+			} catch {
+				if (!isMounted) return;
+				toast.error(t('user_not_found'), { id: 'user_not_found' });
+				navigate('/home', { replace: true });
+			}
+		};
+
 		loadProfile();
-	}, [username, currentUser]);
+
+		return () => {
+			isMounted = false;
+		};
+	}, [username, currentUser, loadFriendStatus, navigate, t, toast]);
 
 	useEffect(() => {
 		if (user?.username) {

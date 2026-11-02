@@ -89,8 +89,8 @@ export default function MainLayout() {
 	}
 
 	const isChatRoute = location.pathname.startsWith('/chat')
-	const isGameRoute = location.pathname.startsWith('/game') && !location.pathname.startsWith('/game/analysis')
-	const isAnalyzeRoute = location.pathname.startsWith('/analyze') || location.pathname.startsWith('/game/analysis')
+	const isGameRoute = location.pathname.startsWith('/game')
+	const isAnalyzeRoute = location.pathname.startsWith('/analysis')
 	const showFooter = !isChatRoute && !isGameRoute && !isAnalyzeRoute
 
 	return (

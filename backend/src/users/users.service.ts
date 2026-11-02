@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -77,7 +77,7 @@ export class UsersService {
 	async getProfileByUsername(username: string, authHeader?: string) {
 		const user = await this.findByUsername(username);
 		if (!user) {
-			throw new NotFoundException('user_not_found');
+			return { id: null };
 		}
 
 		const requesterId = this.extractUserIdFromHeader(authHeader);

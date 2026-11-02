@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useProfile } from '../../hooks/useProfile';
 import { usePageTitle } from '../../hooks/usePageTitle';
 import { useGameHistory } from '../../hooks/useGameHistory';
@@ -17,7 +16,6 @@ type Props = {
 };
 
 const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
-    const { t } = useTranslation();
     const { username } = useParams();
     const { currentUser, friendSocket } = useOutletContext<LayoutContextType>();
 
@@ -167,11 +165,7 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
     }
 
     if (!user) {
-        return (
-            <div className={pageStyles.authPage}>
-                <p className={pageStyles.msg}>{t('user_not_found')}</p>
-            </div>
-        );
+        return null;
     }
 
     return (

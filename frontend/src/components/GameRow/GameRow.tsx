@@ -191,7 +191,7 @@ const GameRow = ({ match, username }: Props) => {
 					className={styles.reviewBtn}
 					onClick={(e) => {
 						e.stopPropagation()
-						navigate(`/game/analysis/${match.id}`)
+						navigate(`/analysis/${match.id}`)
 					}}
 				>
 					<span>{accuracy ? accuracy : t('review')}</span>

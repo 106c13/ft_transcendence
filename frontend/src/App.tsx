@@ -37,19 +37,16 @@ export default function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/profile/rating" element={<RatingHistoryPage />} />
+
           <Route path="/profile/settings" element={<SettingsPage />} />
           <Route path="/profile/:username" element={<ProfilePage />} />
           <Route path="/profile/:username/rating" element={<RatingHistoryPage />} />
-          <Route path="/profile/:username/games" element={<ProfilePage defaultTab="games" />} />
-          <Route path="/profile/:username/analysis/:id" element={<AnalyzePage />} />
-          <Route path="/profile/:username/games/:id" element={<AnalyzePage />} />
-          <Route path="/game/analysis/:id" element={<AnalyzePage />} />
-          <Route path="/analyze" element={<AnalyzePage />} />
-          <Route path="/analyze/:id" element={<AnalyzePage />} />
+
+          <Route path="/analysis/:gameid" element={<AnalyzePage />} />
+          <Route path="/analysis" element={<AnalyzePage />} />
+          
           <Route path="/chat" element={<ChatPage />} />
-          <Route path="/chat/:user_id" element={<ChatPage />} />
+          <Route path="/chat/:userid" element={<ChatPage />} />
           
           {/* Game Socket Scoped Routes */}
           <Route element={<GameLayout />}>

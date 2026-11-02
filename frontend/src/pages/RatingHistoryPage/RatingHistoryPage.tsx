@@ -5,6 +5,7 @@ import { TrendingUp } from 'lucide-react';
 import { useGameHistory } from '../../hooks/useGameHistory';
 import { useRatingHistory, type RatingCategory } from '../../hooks/useRatingHistory';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { useToast } from '../../context/ToastContext';
 import type { User } from '../../utils/profileUtils';
 import type { LayoutContextType } from '../../utils/layoutContextUtils';
 import BigRatingChart from '../../components/BigRatingChart/BigRatingChart';
@@ -42,6 +43,7 @@ function parseModesFromSearch(search: string): RatingCategory[] {
 
 const RatingHistoryPage = () => {
 	const { t } = useTranslation();
+	const { toast } = useToast();
 	usePageTitle('page_title_rating_history');
 	const { username: paramUsername } = useParams();
 	const { currentUser } = useOutletContext<LayoutContextType>();
@@ -64,31 +66,50 @@ const RatingHistoryPage = () => {
 			return;
 		}
 
+		let isMounted = true;
+
 		const fetchUser = async () => {
 			setLoadingUser(true);
 			try {
 				const token = localStorage.getItem('token');
-				const res = await fetch(`/api/users/${paramUsername}`, {
+				const res = await fetch(`/api/users/${encodeURIComponent(paramUsername)}`, {
 					headers: token ? { Authorization: `Bearer ${token}` } : {},
 				});
 
+				if (!isMounted) return;
+
 				if (res.ok) {
 					const data = await res.json();
+					if (!isMounted) return;
 					if (data?.id) {
 						setUser(data);
+						return;
 					}
 				}
-			} catch (err) {
-				console.error('Failed to load user for rating history:', err);
+
+				setUser(null);
+				toast.error(t('user_not_found'), { id: 'user_not_found' });
+				navigate('/home', { replace: true });
+			} catch {
+				if (!isMounted) return;
+				setUser(null);
+				toast.error(t('user_not_found'), { id: 'user_not_found' });
+				navigate('/home', { replace: true });
 			} finally {
-				setLoadingUser(false);
+				if (isMounted) {
+					setLoadingUser(false);
+				}
 			}
 		};
 
 		fetchUser();
-	}, [paramUsername, currentUser]);
 
-	const actualUsername = user?.username || paramUsername || '';
+		return () => {
+			isMounted = false;
+		};
+	}, [paramUsername, currentUser, navigate, t, toast]);
+
+	const actualUsername = user?.username || '';
 	const gameHistory = useGameHistory(actualUsername);
 	const ratingData = useRatingHistory(gameHistory.matches, actualUsername, user?.ratings);
 
@@ -163,6 +184,10 @@ const RatingHistoryPage = () => {
 				</div>
 			</div>
 		);
+	}
+
+	if (!user) {
+		return null;
 	}
 
 	const primaryMode = activeModes[0] || playableModes[0] || 'blitz';
