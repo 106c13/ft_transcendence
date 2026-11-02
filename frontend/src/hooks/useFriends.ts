@@ -7,14 +7,16 @@ export function useFriends(currentUser: User | null) {
     const { toast } = useToast();
     const [friends, setFriends] = useState<User[]>([]);
     const socketRef = useRef<Socket | null>(null);
+    const userId = currentUser?.id;
+    const username = currentUser?.username;
 
     const loadFriends = useCallback(async () => {
-        if (!currentUser) return
+        if (!username) return
         try {
             const token = localStorage.getItem('token')
             if (!token) return
 
-            const res = await fetch(`/api/friends/list/${currentUser.username}`, {
+            const res = await fetch(`/api/friends/list/${username}`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             if (!res.ok) return
@@ -23,7 +25,7 @@ export function useFriends(currentUser: User | null) {
         } catch (err) {
             console.error(err)
         }
-    }, [currentUser]);
+    }, [username]);
 
     // Listen to real-time friend status updates
     useEffect(() => {
@@ -54,13 +56,13 @@ export function useFriends(currentUser: User | null) {
 
     useEffect(() => {
         loadFriends();
-    }, [currentUser]);
+    }, [loadFriends]);
 
     useEffect(() => {
-        if (!currentUser) return;
+        if (!userId) return;
 
         const socket = io('/friends', {
-            query: { userId: currentUser.id.toString() },
+            query: { userId: userId.toString() },
             transports: ['websocket', 'polling'],
         });
 
@@ -114,7 +116,7 @@ export function useFriends(currentUser: User | null) {
         return () => {
             socket.disconnect();
         };
-    }, [currentUser]);
+    }, [userId, loadFriends, toast]);
 
     const sendFriendRequest = useCallback((friendUsername: string) => {
         if (socketRef.current) {
