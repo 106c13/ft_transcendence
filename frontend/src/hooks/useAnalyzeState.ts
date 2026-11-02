@@ -399,18 +399,21 @@ export function useAnalyzeState({
 
     // Past game selection
     const handleSelectPastGame = useCallback((game: MatchRecord) => {
-        skipSoundRef.current = true
-        if (game.white?.username) setWhitePlayerName(game.white.username)
-        if (game.black?.username) setBlackPlayerName(game.black.username)
-        setWhiteRating(game.white?.rating ?? undefined)
-        setBlackRating(game.black?.rating ?? undefined)
+        if (game.id) {
+            navigate(`/analysis/${game.id}`);
+            return;
+        }
+
+        skipSoundRef.current = true;
+        if (game.white?.username) setWhitePlayerName(game.white.username);
+        if (game.black?.username) setBlackPlayerName(game.black.username);
+        setWhiteRating(game.white?.rating ?? undefined);
+        setBlackRating(game.black?.rating ?? undefined);
 
         if (game.pgn) {
-            loadPgnString(game.pgn, true)
-        } else if (game.id) {
-            navigate(`/analysis/${game.id}`)
+            loadPgnString(game.pgn, true);
         }
-    }, [navigate, loadPgnString])
+    }, [navigate, loadPgnString]);
 
     const handleFlipBoard = useCallback(() => {
         setOrientation((prev) => (prev === 'w' ? 'b' : 'w'))
