@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { TrendingUp } from 'lucide-react';
 import { useGameHistory } from '../../hooks/useGameHistory';
 import { useRatingHistory, type RatingCategory } from '../../hooks/useRatingHistory';
 import { usePageTitle } from '../../hooks/usePageTitle';
 import type { User } from '../../utils/profileUtils';
+import type { LayoutContextType } from '../../utils/layoutContextUtils';
 import BigRatingChart from '../../components/BigRatingChart/BigRatingChart';
 import styles from './RatingHistoryPage.module.css';
 
@@ -43,6 +44,7 @@ const RatingHistoryPage = () => {
 	const { t } = useTranslation();
 	usePageTitle('page_title_rating_history');
 	const { username: paramUsername } = useParams();
+	const { currentUser } = useOutletContext<LayoutContextType>();
 	const location = useLocation();
 	const navigate = useNavigate();
 
@@ -54,20 +56,27 @@ const RatingHistoryPage = () => {
 	const [user, setUser] = useState<User | null>(null);
 	const [loadingUser, setLoadingUser] = useState(true);
 
-	// Fetch user details
+	// Fetch user details (or use currentUser from MainLayout when viewing own rating history)
 	useEffect(() => {
+		if (!paramUsername || (currentUser && paramUsername.toLowerCase() === currentUser.username.toLowerCase())) {
+			setUser(currentUser);
+			setLoadingUser(false);
+			return;
+		}
+
 		const fetchUser = async () => {
 			setLoadingUser(true);
 			try {
 				const token = localStorage.getItem('token');
-				const endpoint = paramUsername ? `/api/users/${paramUsername}` : '/api/users/me';
-				const res = await fetch(endpoint, {
+				const res = await fetch(`/api/users/${paramUsername}`, {
 					headers: token ? { Authorization: `Bearer ${token}` } : {},
 				});
 
 				if (res.ok) {
 					const data = await res.json();
-					setUser(data);
+					if (data?.id) {
+						setUser(data);
+					}
 				}
 			} catch (err) {
 				console.error('Failed to load user for rating history:', err);
@@ -77,7 +86,7 @@ const RatingHistoryPage = () => {
 		};
 
 		fetchUser();
-	}, [paramUsername]);
+	}, [paramUsername, currentUser]);
 
 	const actualUsername = user?.username || paramUsername || '';
 	const gameHistory = useGameHistory(actualUsername);

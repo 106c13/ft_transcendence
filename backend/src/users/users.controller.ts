@@ -37,12 +37,25 @@ export class UsersController {
 	) { }
 
 	@Get('me')
-	@UseGuards(JwtAuthGuard)
 	async getMe(@Req() req) {
-		const user = await this.usersService.findById(req.user.userId)
+		const authHeader = req.headers.authorization
+		if (!authHeader) {
+			return { id: null }
+		}
+
+		let userId: number
+		try {
+			const token = authHeader.split(' ')[1]
+			const decoded = this.jwtService.verify(token)
+			userId = decoded.sub
+		} catch {
+			return { id: null }
+		}
+
+		const user = await this.usersService.findById(userId)
 
 		if (!user) {
-			throw new NotFoundException('user_not_found');
+			return { id: null }
 		}
 
 		const ratings = await this.ratingService.getAllRatings(user.id);

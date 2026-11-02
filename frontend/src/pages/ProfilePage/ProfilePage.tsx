@@ -39,7 +39,7 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
         logout,
         goToSettings,
         goToUserProfile,
-    } = useProfile(friendSocket, username, defaultTab);
+    } = useProfile(friendSocket, currentUser, username, defaultTab);
 
     // Load game history to know total games count and pass down to tabs
     const history = useGameHistory(user?.username || '');

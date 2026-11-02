@@ -3,7 +3,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import type { TabType, User, FriendStatus } from '../utils/profileUtils';
 import type { FriendSocketType } from '../utils/layoutContextUtils';
 
-export function useProfile(friendSocket: FriendSocketType, username?: string, defaultTab: TabType = 'overview') {
+export function useProfile(
+	friendSocket: FriendSocketType,
+	currentUser: User | null,
+	username?: string,
+	defaultTab: TabType = 'overview'
+) {
 	const location = useLocation();
 	const initialTab: TabType = (location.state as any)?.defaultTab || defaultTab;
 	const [user, setUser] = useState<User | null>(null);
@@ -56,16 +61,25 @@ export function useProfile(friendSocket: FriendSocketType, username?: string, de
 	}, [user?.username]);
 
 	const loadProfile = async () => {
+		if (!username) {
+			if (currentUser) {
+				setUser({
+					...currentUser,
+					isOwnProfile: true,
+				});
+			}
+			return;
+		}
+
 		try {
 			const token = localStorage.getItem('token');
-			const endpoint = username ? `/api/users/${username}` : '/api/users/me';
 			const headers: HeadersInit = {};
 
 			if (token) {
 				headers.Authorization = `Bearer ${token}`;
 			}
 
-			const res = await fetch(endpoint, { headers });
+			const res = await fetch(`/api/users/${username}`, { headers });
 
 			if (res.status === 404) {
 				setUser(null);
@@ -79,6 +93,11 @@ export function useProfile(friendSocket: FriendSocketType, username?: string, de
 			}
 
 			const data = await res.json();
+			if (!data?.id) {
+				setUser(null);
+				return;
+			}
+
 			setUser({
 				...data,
 				isOwnProfile: data.isOwnProfile ?? false,
@@ -95,7 +114,7 @@ export function useProfile(friendSocket: FriendSocketType, username?: string, de
 
 	useEffect(() => {
 		loadProfile();
-	}, [username]);
+	}, [username, currentUser]);
 
 	useEffect(() => {
 		if (user?.username) {

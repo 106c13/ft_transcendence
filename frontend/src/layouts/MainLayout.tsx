@@ -21,10 +21,12 @@ export default function MainLayout() {
   useEffect(() => {
     if (!token) {
       if (!isPublicRoute) {
-        navigate('/login')
+        navigate('/login', { replace: true })
       }
       return
     }
+
+    let isMounted = true
 
     fetch('/api/users/me', {
       headers: { Authorization: `Bearer ${token}` },
@@ -33,13 +35,22 @@ export default function MainLayout() {
         if (!res.ok) throw new Error('Unauthorized')
         return res.json()
       })
-      .then((data) => setCurrentUser(data))
-      .catch(() => {
-        localStorage.removeItem('token')
-        if (!isPublicRoute) {
-          navigate('/login')
+      .then((data) => {
+        if (!data?.id) throw new Error('Unauthorized')
+        if (isMounted) {
+          setCurrentUser(data)
         }
       })
+      .catch(() => {
+        localStorage.removeItem('token')
+        if (isMounted && !isPublicRoute) {
+          navigate('/login', { replace: true })
+        }
+      })
+
+    return () => {
+      isMounted = false
+    }
   }, [navigate, token, isPublicRoute])
 
   const challengeSocket = useChallengeSocket(currentUser?.id)

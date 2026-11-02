@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
+import { useOutletContext } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Swords, X } from 'lucide-react'
 import type { MatchRecord } from '../../utils/gameUtils'
+import type { LayoutContextType } from '../../utils/layoutContextUtils'
 import SimpleGameRow from '../SimpleGameRow/SimpleGameRow'
 import styles from './AnalyzeGamesModal.module.css'
 
@@ -19,10 +21,11 @@ export default function AnalyzeGamesModal({
     onSelectGame,
 }: AnalyzeGamesModalProps) {
     const { t } = useTranslation()
+    const { currentUser } = useOutletContext<LayoutContextType>()
     const [userGames, setUserGames] = useState<MatchRecord[]>([])
     const [isLoadingGames, setIsLoadingGames] = useState<boolean>(false)
     const [gamesPage, setGamesPage] = useState<number>(1)
-    const [currentUsername, setCurrentUsername] = useState<string>('')
+    const currentUsername = currentUser?.username || ''
 
     useEffect(() => {
         if (!isOpen) return
@@ -34,20 +37,12 @@ export default function AnalyzeGamesModal({
         const fetchUserGames = async () => {
             try {
                 const token = localStorage.getItem('token')
-                if (!token) {
+                if (!token || !currentUsername) {
                     setIsLoadingGames(false)
                     return
                 }
 
-                const meRes = await fetch('/api/users/me', {
-                    headers: { Authorization: `Bearer ${token}` },
-                })
-                if (!meRes.ok || isCancelled) return
-                const me = await meRes.json()
-                if (isCancelled) return
-                setCurrentUsername(me.username)
-
-                const gamesRes = await fetch(`/api/game/history/${me.username}`, {
+                const gamesRes = await fetch(`/api/game/history/${currentUsername}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 })
                 if (gamesRes.ok && !isCancelled) {
@@ -70,7 +65,7 @@ export default function AnalyzeGamesModal({
         return () => {
             isCancelled = true
         }
-    }, [isOpen])
+    }, [isOpen, currentUsername])
 
     if (!isOpen) return null
 
