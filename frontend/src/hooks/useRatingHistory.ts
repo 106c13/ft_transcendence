@@ -22,7 +22,7 @@ export function useRatingHistory(
 ) {
 	return useMemo(() => {
 		const categories: RatingCategory[] = ['bullet', 'blitz', 'rapid']
-		const result: Record<RatingCategory, ModeRatingHistory> = {} as any
+		const result = {} as Record<RatingCategory, ModeRatingHistory>
 
 		for (const cat of categories) {
 			const catRatingInfo: RatingInfo | null = ratings ? ratings[cat] : null
@@ -63,9 +63,16 @@ export function useRatingHistory(
 						allTime.push({
 							id: m.id,
 							date: m.played_at,
+							timestamp: dateObj.getTime(),
 							displayDate: dateObj.toLocaleDateString(undefined, {
 								month: 'short',
 								day: 'numeric',
+							}),
+							fullDateTime: dateObj.toLocaleString(undefined, {
+								month: 'short',
+								day: 'numeric',
+								hour: '2-digit',
+								minute: '2-digit',
 							}),
 							rating: ratingAfter,
 							delta: delta ?? null,
@@ -82,10 +89,13 @@ export function useRatingHistory(
 
 			// If no match ratings recorded yet, show a starting point
 			if (allTime.length === 0) {
+				const initDate = new Date()
 				allTime.push({
 					id: 'init',
-					date: new Date().toISOString(),
+					date: initDate.toISOString(),
+					timestamp: initDate.getTime(),
 					displayDate: 'Initial',
+					fullDateTime: 'Initial',
 					rating: currentRating,
 					delta: 0,
 					mode: cat,
@@ -116,7 +126,12 @@ export function useRatingHistory(
 
 				last7Days.push({
 					date: targetDate.toISOString(),
-					label: targetDate.toLocaleDateString(undefined, { weekday: 'narrow' }),
+					fullDate: targetDate.toLocaleDateString(undefined, {
+						weekday: 'short',
+						month: 'short',
+						day: 'numeric',
+					}),
+					label: targetDate.toLocaleDateString(undefined, { weekday: 'short' }),
 					rating: ratingOnDay,
 				})
 			}

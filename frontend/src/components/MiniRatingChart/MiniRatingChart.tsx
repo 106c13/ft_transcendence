@@ -1,4 +1,13 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+	ResponsiveContainer,
+	AreaChart,
+	Area,
+	YAxis,
+	Tooltip,
+	ReferenceLine,
+} from 'recharts';
 import GameModeIcon from '../GameModeIcon/GameModeIcon';
 import type { ModeRatingHistory, RatingCategory } from '../../hooks/useRatingHistory';
 import styles from './MiniRatingChart.module.css';
@@ -31,60 +40,240 @@ const MODE_CONFIG: Record<
 	},
 };
 
+const CALIBRATION_STEPS = [0, 1, 2, 3, 4];
+
 const MiniRatingChart = ({ mode, history, onClick, compact = false }: Props) => {
 	const { t } = useTranslation();
 	const config = MODE_CONFIG[mode];
 
-	const isNotPlayed = !history || history.gamesPlayed === 0
-	const isProvisional = history?.isProvisional ?? true
-	const current = history?.current ?? 800
-	const delta = history?.delta7Days ?? 0
+	const isNotPlayed = !history || history.gamesPlayed === 0;
+	const isProvisional = history?.isProvisional ?? true;
+	const gamesPlayed = history?.gamesPlayed ?? 0;
+	const current = history?.current ?? 800;
 
-	const wins = history?.wins ?? 0
-	const draws = history?.draws ?? 0
-	const losses = history?.losses ?? 0
+	const wins = history?.wins ?? 0;
+	const draws = history?.draws ?? 0;
+	const losses = history?.losses ?? 0;
 
-	// SVG Sparkline calculation
-	const points = history?.last7Days ?? []
-	const width = 240
-	const height = compact ? 50 : 68
-	const padX = 6
-	const padY = compact ? 6 : 8
+	const points = useMemo(() => history?.last7Days ?? [], [history?.last7Days]);
 
-	const ratings = points.map(p => p.rating)
-	const rawMin = ratings.length > 0 ? Math.min(...ratings) : 800
-	const rawMax = ratings.length > 0 ? Math.max(...ratings) : 800
-	const diff = rawMax - rawMin
-	const padRating = diff === 0 ? 30 : Math.max(15, diff * 0.15)
-	const minVal = rawMin - padRating
-	const maxVal = rawMax + padRating
+	const { minVal, maxVal } = useMemo(() => {
+		const ratings = points.map((p) => p.rating);
+		const rawMin = ratings.length > 0 ? Math.min(...ratings) : 800;
+		const rawMax = ratings.length > 0 ? Math.max(...ratings) : 800;
+		const diff = rawMax - rawMin;
+		const padRating = diff === 0 ? 30 : Math.max(15, diff * 0.2);
+		return {
+			minVal: Math.floor(rawMin - padRating),
+			maxVal: Math.ceil(rawMax + padRating),
+		};
+	}, [points]);
 
-	const chartPoints = points.map((p, idx) => {
-		const x = padX + (idx / Math.max(1, points.length - 1)) * (width - padX * 2)
-		const ratio = (p.rating - minVal) / (maxVal - minVal || 1)
-		const y = height - padY - ratio * (height - padY * 2)
-		return { x, y, rating: p.rating, label: p.label }
-	})
+	const strokeColor = config.color;
+	const gradientId = `mini-grad-${mode}-${compact ? 'c' : 'f'}`;
 
-	const pathD = chartPoints.length > 0
-		? chartPoints.reduce((acc, pt, i) => `${acc} ${i === 0 ? 'M' : 'L'} ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`, '')
-		: ''
+	const renderSparkline = () => {
+		if (isNotPlayed || isProvisional || points.length === 0) {
+			if (compact) {
+				return (
+					<ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={10}>
+						<AreaChart
+							data={[
+								{ label: '1', rating: 800 },
+								{ label: '7', rating: 800 },
+							]}
+							margin={{ top: 4, right: 4, left: 4, bottom: 4 }}
+						>
+							<YAxis domain={[750, 850]} hide />
+							<ReferenceLine
+								y={800}
+								stroke="rgba(148, 163, 184, 0.25)"
+								strokeWidth={1.5}
+								strokeDasharray="4 4"
+							/>
+						</AreaChart>
+					</ResponsiveContainer>
+				);
+			}
 
-	const areaD = chartPoints.length > 0
-		? `${pathD} L ${chartPoints[chartPoints.length - 1].x.toFixed(1)} ${height} L ${chartPoints[0].x.toFixed(1)} ${height} Z`
-		: ''
+			const clampedGames = Math.min(5, Math.max(0, gamesPlayed));
+			const remaining = Math.max(1, 5 - clampedGames);
 
-	const lastPt = chartPoints[chartPoints.length - 1]
-	const strokeColor = delta > 0 ? '#34D399' : delta < 0 ? '#F87171' : config.color
-	const gradientId = `mini-grad-${mode}`
+			return (
+				<div
+					className={styles.calibrationEmptyState}
+					style={{ '--mode-color': strokeColor } as React.CSSProperties}
+				>
+					<div className={styles.calibrationTopRow}>
+						<span className={styles.calibrationHint}>
+							{clampedGames === 0
+								? t('play_5_to_calibrate')
+								: t('play_more_to_calibrate', { count: remaining })}
+						</span>
+						<span className={styles.calibrationCount}>{clampedGames} / 5</span>
+					</div>
+
+					<div className={styles.calibrationTrack} aria-hidden="true">
+						{CALIBRATION_STEPS.map((step) => (
+							<span
+								key={step}
+								className={`${styles.calibrationSegment} ${
+									step < clampedGames ? styles.calibrationSegmentFilled : ''
+								}`}
+							/>
+						))}
+					</div>
+				</div>
+			);
+		}
+
+		return (
+			<ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={10}>
+				<AreaChart
+					data={points}
+					margin={
+						compact
+							? { top: 4, right: 6, left: 6, bottom: 4 }
+							: { top: 8, right: 8, left: 8, bottom: 8 }
+					}
+				>
+					<defs>
+						<linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+							<stop offset="0%" stopColor={strokeColor} stopOpacity={0.35} />
+							<stop offset="100%" stopColor={strokeColor} stopOpacity={0.0} />
+						</linearGradient>
+					</defs>
+
+					<YAxis domain={[minVal, maxVal]} hide />
+
+					{!compact && (
+						<Tooltip
+							isAnimationActive={false}
+							cursor={{
+								stroke: 'rgba(148, 163, 184, 0.35)',
+								strokeWidth: 1,
+								strokeDasharray: '3 3',
+							}}
+							content={({ active, payload }) => {
+								if (!active || !payload || !payload.length) return null;
+								const pt = payload[0].payload as {
+									label?: string;
+									fullDate?: string;
+									rating: number;
+								};
+								return (
+									<div className={styles.miniTooltip}>
+										<span className={styles.miniTooltipDate}>
+											{pt.fullDate || pt.label}
+										</span>
+										<span
+											className={styles.miniTooltipRating}
+											style={{ color: strokeColor }}
+										>
+											{pt.rating}
+										</span>
+									</div>
+								);
+							}}
+						/>
+					)}
+
+					<Area
+						type="monotone"
+						dataKey="rating"
+						stroke={strokeColor}
+						strokeWidth={2.4}
+						fill={`url(#${gradientId})`}
+						isAnimationActive={true}
+						animationDuration={650}
+						animationEasing="ease-out"
+						dot={(dotProps: { cx?: number; cy?: number; index?: number }) => {
+							const { cx, cy, index = 0 } = dotProps;
+							if (cx == null || cy == null) return <g key={`empty-${index}`} />;
+							const isLast = index === points.length - 1;
+							if (compact) {
+								if (!isLast) return <g key={`c-dot-${index}`} />;
+								return (
+									<circle
+										key={`c-dot-${index}`}
+										cx={cx}
+										cy={cy}
+										r={3}
+										fill={strokeColor}
+										stroke="#1E293B"
+										strokeWidth={1.5}
+									/>
+								);
+							}
+							if (isLast) {
+								return (
+									<g key={`dot-${index}`}>
+										<circle
+											cx={cx}
+											cy={cy}
+											r={6}
+											fill={strokeColor}
+											fillOpacity={0.25}
+										/>
+										<circle
+											cx={cx}
+											cy={cy}
+											r={3.5}
+											fill={strokeColor}
+											stroke="#1E293B"
+											strokeWidth={1.5}
+										/>
+									</g>
+								);
+							}
+							return (
+								<circle
+									key={`dot-${index}`}
+									cx={cx}
+									cy={cy}
+									r={2.2}
+									fill={strokeColor}
+									stroke="#1E293B"
+									strokeWidth={1.2}
+								/>
+							);
+						}}
+						activeDot={
+							compact
+								? false
+								: {
+										r: 4.5,
+										fill: strokeColor,
+										stroke: '#0F172A',
+										strokeWidth: 2,
+								  }
+						}
+					/>
+				</AreaChart>
+			</ResponsiveContainer>
+		);
+	};
+
+	const handleCardClick = () => {
+		if (isNotPlayed) return;
+		onClick();
+	};
 
 	if (compact) {
 		return (
 			<div
-				className={`${styles.miniChartCard} ${styles.compactCard}`}
-				onClick={onClick}
-				role="button"
-				tabIndex={0}
+				className={`${styles.miniChartCard} ${styles.compactCard} ${
+					isNotPlayed ? styles.unplayedCard : ''
+				}`}
+				onClick={handleCardClick}
+				role={isNotPlayed ? undefined : 'button'}
+				tabIndex={isNotPlayed ? -1 : 0}
+				onKeyDown={(e) => {
+					if (!isNotPlayed && (e.key === 'Enter' || e.key === ' ')) {
+						e.preventDefault();
+						onClick();
+					}
+				}}
 			>
 				<div className={styles.compactRow}>
 					<div className={styles.modeInfo}>
@@ -93,89 +282,55 @@ const MiniRatingChart = ({ mode, history, onClick, compact = false }: Props) => 
 						</span>
 						<div className={styles.modeText}>
 							<span className={styles.modeTitle}>{t(config.nameKey)}</span>
-							<span className={styles.modeTime}>
-								{t(mode === 'bullet' ? 'time_1_min' : mode === 'blitz' ? 'time_3_min' : 'time_10_min')}
-							</span>
 						</div>
 					</div>
 
 					<div className={styles.compactRecord}>
-						<span className={styles.compactWins}>{wins}{t('wins_short')}</span>
+						<span className={styles.compactWins}>
+							{wins}
+							{t('wins_short')}
+						</span>
 						<span className={styles.compactSep}>/</span>
-						<span className={styles.compactDraws}>{draws}{t('draws_short')}</span>
+						<span className={styles.compactDraws}>
+							{draws}
+							{t('draws_short')}
+						</span>
 						<span className={styles.compactSep}>/</span>
-						<span className={styles.compactLosses}>{losses}{t('losses_short')}</span>
+						<span className={styles.compactLosses}>
+							{losses}
+							{t('losses_short')}
+						</span>
 					</div>
 
-					<div className={styles.compactChartContainer}>
-						<svg
-							viewBox={`0 0 ${width} ${height}`}
-							className={styles.sparklineSvg}
-							preserveAspectRatio="none"
-						>
-							<defs>
-								<linearGradient id={`${gradientId}-c`} x1="0" y1="0" x2="0" y2="1">
-									<stop offset="0%" stopColor={strokeColor} stopOpacity="0.3" />
-									<stop offset="100%" stopColor={strokeColor} stopOpacity="0.0" />
-								</linearGradient>
-							</defs>
-
-							{chartPoints.length > 0 ? (
-								<>
-									<path d={areaD} fill={`url(#${gradientId}-c)`} />
-									<path
-										d={pathD}
-										fill="none"
-										stroke={strokeColor}
-										strokeWidth="2.2"
-										strokeLinecap="round"
-										strokeLinejoin="round"
-									/>
-								</>
-							) : (
-								<line
-									x1={padX}
-									y1={height / 2}
-									x2={width - padX}
-									y2={height / 2}
-									stroke="rgba(148, 163, 184, 0.22)"
-									strokeWidth="1.5"
-									strokeDasharray="4 4"
-								/>
-							)}
-						</svg>
-					</div>
+					<div className={styles.compactChartContainer}>{renderSparkline()}</div>
 
 					<div className={styles.compactValueGroup}>
 						<div
 							className={`${styles.ratingNumber} ${
-								isNotPlayed
-									? styles.ratingNumberUnrated
-									: isProvisional
-									? styles.ratingNumberProvisional
-									: ''
+								isNotPlayed ? styles.ratingNumberUnrated : ''
 							}`}
 						>
 							{isNotPlayed ? '—' : isProvisional ? `~${current}` : current}
 						</div>
-
-						{!isNotPlayed && (
-							<div
-								className={`${styles.deltaBadge} ${
-									delta > 0 ? styles.deltaPos : delta < 0 ? styles.deltaNeg : styles.deltaZero
-								}`}
-							>
-								<span>{delta > 0 ? `+${delta}` : delta}</span>
-							</div>
-						)}
 					</div>
 				</div>
 			</div>
-		)
+		);
 	}
 
 	return (
-		<div className={styles.miniChartCard} onClick={onClick} role="button" tabIndex={0}>
+		<div
+			className={`${styles.miniChartCard} ${isNotPlayed ? styles.unplayedCard : ''}`}
+			onClick={handleCardClick}
+			role={isNotPlayed ? undefined : 'button'}
+			tabIndex={isNotPlayed ? -1 : 0}
+			onKeyDown={(e) => {
+				if (!isNotPlayed && (e.key === 'Enter' || e.key === ' ')) {
+					e.preventDefault();
+					onClick();
+				}
+			}}
+		>
 			<div className={styles.header}>
 				<div className={styles.modeInfo}>
 					<span className={styles.modeIcon}>
@@ -183,126 +338,22 @@ const MiniRatingChart = ({ mode, history, onClick, compact = false }: Props) => 
 					</span>
 					<div className={styles.modeText}>
 						<span className={styles.modeTitle}>{t(config.nameKey)}</span>
-						<span className={styles.modeTime}>
-							{t(mode === 'bullet' ? 'time_1_min' : mode === 'blitz' ? 'time_3_min' : 'time_10_min')}
-						</span>
 					</div>
 				</div>
 
-				{isNotPlayed ? (
-					<span className={`${styles.badge} ${styles.badgeNotPlayed}`}>
-						{t('not_played')}
-					</span>
-				) : isProvisional ? (
-					<span className={`${styles.badge} ${styles.badgeCalibrating}`}>
-						{t('calibrating')} ({history?.gamesPlayed}/5)
-					</span>
-				) : (
-					<span className={`${styles.badge} ${styles.badgeActive}`}>
-						{history?.winRate}% {t('win_rate')}
-					</span>
-				)}
-			</div>
-
-			<div className={styles.valueRow}>
 				<div
 					className={`${styles.ratingNumber} ${
-						isNotPlayed
-							? styles.ratingNumberUnrated
-							: isProvisional
-							? styles.ratingNumberProvisional
-							: ''
+						isNotPlayed ? styles.ratingNumberUnrated : ''
 					}`}
 				>
 					{isNotPlayed ? '—' : isProvisional ? `~${current}` : current}
 				</div>
-
-				{!isNotPlayed && (
-					<div
-						className={`${styles.deltaBadge} ${
-							delta > 0 ? styles.deltaPos : delta < 0 ? styles.deltaNeg : styles.deltaZero
-						}`}
-					>
-						<span>{delta > 0 ? `+${delta}` : delta}</span>
-						<span className={styles.deltaLabel}>{t('7d')}</span>
-					</div>
-				)}
 			</div>
 
-			{/* 7-day sparkline SVG */}
-			<div className={styles.chartContainer}>
-				<svg
-					viewBox={`0 0 ${width} ${height}`}
-					className={styles.sparklineSvg}
-					preserveAspectRatio="none"
-				>
-					<defs>
-						<linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-							<stop offset="0%" stopColor={strokeColor} stopOpacity="0.3" />
-							<stop offset="100%" stopColor={strokeColor} stopOpacity="0.0" />
-						</linearGradient>
-					</defs>
-
-					{chartPoints.length > 0 ? (
-						<>
-							{/* Fill area */}
-							<path d={areaD} fill={`url(#${gradientId})`} />
-
-							{/* Line */}
-							<path
-								d={pathD}
-								fill="none"
-								stroke={strokeColor}
-								strokeWidth="2.2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-
-							{/* Data point dots */}
-							{!isNotPlayed &&
-								chartPoints.map((pt, idx) => (
-									<circle
-										key={idx}
-										cx={pt.x}
-										cy={pt.y}
-										r={idx === chartPoints.length - 1 ? 3.5 : 2.5}
-										fill={strokeColor}
-										stroke="#1E293B"
-										strokeWidth="1.5"
-									>
-										{pt.label && <title>{`${pt.label}: ${pt.rating}`}</title>}
-									</circle>
-								))}
-						</>
-					) : (
-						<line
-							x1={padX}
-							y1={height / 2}
-							x2={width - padX}
-							y2={height / 2}
-							stroke="rgba(148, 163, 184, 0.22)"
-							strokeWidth="1.5"
-							strokeDasharray="4 4"
-						/>
-					)}
-				</svg>
-
-				{/* Active end point - rendered as a pure CSS circle to prevent any oval distortion */}
-				{!isNotPlayed && lastPt && (
-					<div
-						className={styles.activeDot}
-						style={{
-							left: `${(lastPt.x / width) * 100}%`,
-							top: `${(lastPt.y / height) * 100}%`,
-							backgroundColor: strokeColor,
-							boxShadow: `0 0 0 2px #1E293B, 0 0 0 4px ${strokeColor}40`,
-						}}
-					/>
-				)}
-			</div>
+			{/* 7-day Recharts sparkline or 0/5 Calibration Progress Bar */}
+			<div className={styles.chartContainer}>{renderSparkline()}</div>
 		</div>
 	);
 };
 
 export default MiniRatingChart;
-

@@ -38,6 +38,20 @@
 	transform: translateY(-1px);
 }
 
+.unplayedCard {
+	cursor: default;
+}
+
+.unplayedCard:hover {
+	transform: none;
+	border-color: rgba(148, 163, 184, 0.2);
+	box-shadow: none;
+}
+
+.unplayedCard:active {
+	transform: none;
+}
+
 .header {
 	display: flex;
 	align-items: center;
@@ -125,13 +139,12 @@
 }
 
 .ratingNumber {
-	font-size: 32px;
-	font-size: 24px;
+	font-size: 16px;
 	font-weight: 800;
 	color: #F8FAFC;
 	font-family: var(--mono, monospace);
 	line-height: 1;
-	letter-spacing: -0.5px;
+	letter-spacing: -0.3px;
 }
 
 .ratingNumberProvisional {
@@ -183,25 +196,98 @@
 
 .chartContainer {
 	width: 100%;
-	height: 68px;
+	height: 72px;
 	position: relative;
 	margin: 4px 0 2px 0;
 }
 
-.sparklineSvg {
+.calibrationEmptyState {
 	width: 100%;
 	height: 100%;
-	overflow: visible;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 9px;
+	padding: 6px 10px;
+	box-sizing: border-box;
+	background: rgba(15, 23, 42, 0.42);
+	border: 1px dashed rgba(148, 163, 184, 0.16);
+	border-radius: 9px;
 }
 
-/* Active point is an exact HTML/CSS circle to avoid SVG aspect-ratio distortion */
-.activeDot {
-	position: absolute;
-	width: 7px;
-	height: 7px;
-	border-radius: 50%;
-	transform: translate(-50%, -50%);
+.calibrationTopRow {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.calibrationHint {
+	font-size: 11px;
+	font-weight: 600;
+	color: #94A3B8;
+	line-height: 1.2;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.calibrationCount {
+	font-size: 10.5px;
+	font-weight: 700;
+	font-family: var(--mono, monospace);
+	color: var(--mode-color, #94A3B8);
+	background: color-mix(in srgb, var(--mode-color, #94A3B8) 14%, transparent);
+	border: 1px solid color-mix(in srgb, var(--mode-color, #94A3B8) 30%, transparent);
+	padding: 1.5px 6px;
+	border-radius: 5px;
+	flex-shrink: 0;
+}
+
+.calibrationTrack {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 6px;
+	width: 100%;
+}
+
+.calibrationSegment {
+	height: 6px;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--mode-color, #94A3B8) 12%, rgba(148, 163, 184, 0.12));
+	border: 1px solid color-mix(in srgb, var(--mode-color, #94A3B8) 26%, transparent);
+	transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.calibrationSegmentFilled {
+	background: var(--mode-color, #38BDF8);
+	border-color: var(--mode-color, #38BDF8);
+	box-shadow: 0 0 8px color-mix(in srgb, var(--mode-color, #38BDF8) 45%, transparent);
+}
+
+.miniTooltip {
+	background: rgba(15, 23, 42, 0.94);
+	backdrop-filter: blur(8px);
+	border: 1px solid rgba(148, 163, 184, 0.22);
+	border-radius: 6px;
+	padding: 4px 8px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 	pointer-events: none;
+}
+
+.miniTooltipDate {
+	font-size: 10px;
+	color: #94A3B8;
+	font-weight: 600;
+}
+
+.miniTooltipRating {
+	font-size: 11.5px;
+	font-weight: 800;
+	font-family: var(--mono, monospace);
 }
 
 /* Compact Mode Styles for Live Overview */
@@ -318,7 +404,7 @@
 }
 
 .compactValueGroup .ratingNumber {
-	font-size: 16.5px;
+	font-size: 14.5px;
 	font-weight: 800;
 	color: #F8FAFC;
 	font-family: var(--mono, monospace);

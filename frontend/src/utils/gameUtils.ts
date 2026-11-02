@@ -297,6 +297,7 @@ export type RatingCategory = 'bullet' | 'blitz' | 'rapid';
 
 export type SparklinePoint = {
 	date: string;
+	fullDate?: string;
 	label: string;
 	rating: number;
 };
@@ -304,7 +305,9 @@ export type SparklinePoint = {
 export type AllTimeRatingPoint = {
 	id: string | number;
 	date: string;
+	timestamp?: number;
 	displayDate: string;
+	fullDateTime?: string;
 	rating: number;
 	delta: number | null;
 	result?: 'win' | 'loss' | 'draw';

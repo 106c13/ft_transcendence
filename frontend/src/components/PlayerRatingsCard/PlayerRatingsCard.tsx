@@ -32,9 +32,9 @@ const PlayerRatingsCard = ({
 
 	const handleClickMode = (modeKey: string) => {
 		if (username) {
-			navigate(`/profile/${username}/rating?mode=${modeKey}`)
+			navigate(`/profile/${username}/rating?modes=${modeKey}`)
 		} else {
-			navigate(`/profile/rating?mode=${modeKey}`)
+			navigate(`/profile/rating?modes=${modeKey}`)
 		}
 	}
 

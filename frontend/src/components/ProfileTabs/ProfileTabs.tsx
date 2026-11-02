@@ -43,7 +43,7 @@ const ProfileTabs = ({
 
 	const handleChartClick = (mode: RatingCategory) => {
 		if (username) {
-			navigate(`/profile/${username}/rating?mode=${mode}`);
+			navigate(`/profile/${username}/rating?modes=${mode}`);
 		}
 	};
 
