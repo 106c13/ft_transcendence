@@ -32,50 +32,50 @@ const ChallengeSection = ({
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-				setIsOpen(false)
-				setSearchQuery('')
-				setOpenUpwards(false)
+				setIsOpen(false);
+				setSearchQuery('');
+				setOpenUpwards(false);
 			}
-		}
+		};
 
 		if (isOpen) {
-			document.addEventListener('mousedown', handleClickOutside)
+			document.addEventListener('mousedown', handleClickOutside);
 		}
 		return () => {
-			document.removeEventListener('mousedown', handleClickOutside)
-		}
-	}, [isOpen])
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [isOpen]);
 
 	const handleToggleDropdown = () => {
-		if (!active) return
+		if (!active) return;
 
 		if (!isOpen && dropdownRef.current) {
-			const rect = dropdownRef.current.getBoundingClientRect()
-			const spaceBellow = window.innerHeight - rect.bottom
-			const dropdownEstHeight = 290
+			const rect = dropdownRef.current.getBoundingClientRect();
+			const spaceBellow = window.innerHeight - rect.bottom;
+			const dropdownEstHeight = 290;
 
-			setOpenUpwards(spaceBellow < dropdownEstHeight && rect.top > dropdownEstHeight)
-			setIsOpen(true)
+			setOpenUpwards(spaceBellow < dropdownEstHeight && rect.top > dropdownEstHeight);
+			setIsOpen(true);
 		} else {
-			setIsOpen(false)
-			setSearchQuery('')
-			setOpenUpwards(false)
+			setIsOpen(false);
+			setSearchQuery('');
+			setOpenUpwards(false);
 		}
-	}
+	};
 
 	const handleToggle = () => {
-		setIsOpen(false)
-		setSearchQuery('')
-		setOpenUpwards(false)
-		onToggle()
-	}
+		setIsOpen(false);
+		setSearchQuery('');
+		setOpenUpwards(false);
+		onToggle();
+	};
 
 	const handleSelect = (username: string) => {
-		onSelectFriend(username)
-		setIsOpen(false)
-		setSearchQuery('')
-		setOpenUpwards(false)
-	}
+		onSelectFriend(username);
+		setIsOpen(false);
+		setSearchQuery('');
+		setOpenUpwards(false);
+	};
 
 	const selectedFriendObj = friends.find(f => f.username === selectedFriend)
 

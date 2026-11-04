@@ -169,7 +169,7 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
     }
 
     return (
-        <div className={pageStyles.profilePage}>
+        <div className={`${pageStyles.profilePage} min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center pt-20 px-4 pb-10 w-full box-border`}>
             {/* Header and Live Game placed side-by-side with fluid grid width transitions */}
             <div
                 className={`${pageStyles.headerWrapper} ${

@@ -95,9 +95,9 @@ const MatchmakingPage = () => {
         : `~800 (${t('provisional')})`
 
     return (
-        <div className={styles.pageContainer}>
-            <main className={styles.mainContent}>
-                <div className={styles.searchingCard}>
+        <div className={`${styles.pageContainer} min-h-[calc(100vh-64px)] w-full flex items-center justify-center p-4 bg-slate-900 text-slate-100 box-border`}>
+            <main className={`${styles.mainContent} flex items-center justify-center w-full`}>
+                <div className={`${styles.searchingCard} flex flex-col items-center max-w-sm w-full p-8 rounded-2xl bg-slate-800/90 border border-slate-700/60 shadow-2xl text-center`}>
                     <div className={styles.visualContainer} aria-hidden="true">
                         <div className={styles.loaderRing} />
                         <div className={styles.pedestal}>
@@ -111,17 +111,17 @@ const MatchmakingPage = () => {
                             </div>
                         </div>
                     </div>
-                    <h3>{t('searching_match')}</h3>
-                    <p className={styles.searchingDesc}>
+                    <h3 className="text-xl font-bold text-slate-100 mt-4 mb-2">{t('searching_match')}</h3>
+                    <p className={`${styles.searchingDesc} text-sm text-slate-400 mb-2`}>
                         {t('searching_desc')}{' '}
-                        <span className={styles.modeBadge}>{modeParam}</span>
+                        <span className={`${styles.modeBadge} inline-block px-2 py-0.5 rounded text-xs font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/30`}>{modeParam}</span>
                     </p>
-                    <p className={styles.searchingRating}>
-                        {t('your_rating')}: <strong>{searchingRatingText}</strong>
+                    <p className={`${styles.searchingRating} text-xs text-slate-400 mb-6`}>
+                        {t('your_rating')}: <strong className="text-slate-200">{searchingRatingText}</strong>
                     </p>
                     <button
                         type="button"
-                        className={styles.cancelMatchBtn}
+                        className={`${styles.cancelMatchBtn} flex items-center justify-center gap-2 py-2.5 px-6 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 transition duration-150 font-medium cursor-pointer`}
                         onClick={handleCancel}
                     >
                         <X size={15} aria-hidden="true" />

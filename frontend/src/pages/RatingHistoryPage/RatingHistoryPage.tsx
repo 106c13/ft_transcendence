@@ -200,11 +200,11 @@ const RatingHistoryPage = () => {
 	const primaryMode = activeModes[0] || playableModes[0] || 'blitz';
 
 	return (
-		<div className={styles.ratingHistoryPage}>
-			<div className={styles.contentWrapper}>
+		<div className={`${styles.ratingHistoryPage} min-h-[calc(100vh-64px)] w-full flex flex-col items-center pt-20 px-4 pb-8 bg-slate-900 text-slate-100 box-border`}>
+			<div className={`${styles.contentWrapper} w-full max-w-[1040px] flex flex-col gap-6`}>
 				{/* User header */}
 				{user && (
-					<div className={styles.userHeader}>
+					<div className={`${styles.userHeader} flex items-center gap-4 p-4 rounded-xl bg-slate-800/80 border border-slate-700/60 shadow-lg`}>
 						<img
 							src={
 								user.avatar && user.avatar !== 'default.jpg'
@@ -212,7 +212,7 @@ const RatingHistoryPage = () => {
 									: '/assets/default.jpg'
 							}
 							alt={user.username}
-							className={styles.avatar}
+							className={`${styles.avatar} w-14 h-14 rounded-full object-cover border-2 border-slate-600`}
 							onError={(e) => {
 								const target = e.currentTarget;
 								if (!target.src.endsWith('/assets/default.jpg')) {
@@ -220,9 +220,9 @@ const RatingHistoryPage = () => {
 								}
 							}}
 						/>
-						<div className={styles.userInfo}>
-							<span className={styles.userName}>{user.username}</span>
-							<span className={styles.userSubtitle}>{t('rating_overview')}</span>
+						<div className={`${styles.userInfo} flex flex-col`}>
+							<span className={`${styles.userName} text-lg font-bold text-slate-100`}>{user.username}</span>
+							<span className={`${styles.userSubtitle} text-xs text-slate-400`}>{t('rating_overview')}</span>
 						</div>
 					</div>
 				)}

@@ -15,7 +15,7 @@ import AnalyzeGamesModal from '../../components/AnalyzeGamesModal/AnalyzeGamesMo
 
 import styles from './AnalyzePage.module.css'
 
-export default function AnalyzePage() {
+const AnalyzePage = () => {
     usePageTitle('page_title_interactive_analysis')
     const { gameid } = useParams<{ gameid?: string }>()
 
@@ -61,8 +61,8 @@ export default function AnalyzePage() {
     }
 
     return (
-        <div className={styles.container}>
-            <main className={styles.main}>
+        <div className={`${styles.container} min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center pt-16 box-border w-full`}>
+            <main className={`${styles.main} flex-1 max-w-[1280px] w-full mx-auto p-4 flex flex-col lg:flex-row gap-6 items-start justify-center`}>
                 <div className={styles.playArea}>
                     {/* Left Board & Eval Bar Area */}
                     <div className={styles.boardAreaWithEval}>
@@ -172,5 +172,7 @@ export default function AnalyzePage() {
                 />
             </main>
         </div>
-    )
-}
+    );
+};
+
+export default AnalyzePage;

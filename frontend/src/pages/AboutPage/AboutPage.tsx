@@ -110,13 +110,13 @@ const AboutPage = () => {
 	}, [selectedDev, currentPly]);
 
 	return (
-		<div className={styles.aboutContainer}>
-			<div className={styles.content}>
+		<div className="flex flex-col min-h-screen bg-slate-900 text-slate-200 pt-16 box-border w-full">
+			<div className="flex-1 max-w-[1200px] w-full mx-auto px-4 pb-12 box-border flex flex-col gap-8">
 				{/* Top Hero Section */}
 				<AboutHero />
 
 				{/* Interactive Section: Equal 14px margins, matching widths, always open */}
-				<section className={styles.interactiveSection}>
+				<section className={`${styles.interactiveSection} w-full`}>
 					{/* Left: Description Showcase (Always open) */}
 					<div className={styles.showcaseWrapper}>
 						<AboutShowcase

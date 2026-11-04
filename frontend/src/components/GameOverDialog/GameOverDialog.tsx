@@ -44,7 +44,7 @@ type Props = {
 	isAnalysisLoading?: boolean
 }
 
-function GameOverDialog({
+const GameOverDialog = ({
 	gameId,
 	currentUser,
 	winnerColor,
@@ -66,7 +66,7 @@ function GameOverDialog({
 	onConfettiComplete,
 	analysis,
 	isAnalysisLoading = false,
-}: Props) {
+}: Props) => {
 	const { t } = useTranslation()
 	const navigate = useNavigate()
 	const isWaiting = rematchState === 'sent'
@@ -262,7 +262,7 @@ function GameOverDialog({
 				</div>
 			</div>
 		</div>
-	)
-}
+	);
+};
 
-export default GameOverDialog
+export default GameOverDialog;

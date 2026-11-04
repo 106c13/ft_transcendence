@@ -1,29 +1,29 @@
-import { useEffect, useState } from 'react'
-import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import Navbar from '../components/Navbar/Navbar'
-import Footer from '../components/Footer/Footer'
-import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification'
-import { useChallengeSocket } from '../hooks/useChallengeSocket'
-import { useToast } from '../context/ToastContext'
+import { useEffect, useState } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import Navbar from '../components/Navbar/Navbar';
+import Footer from '../components/Footer/Footer';
+import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification';
+import { useChallengeSocket } from '../hooks/useChallengeSocket';
+import { useToast } from '../context/ToastContext';
 
-import type { User } from '../utils/profileUtils'
-import type { LayoutContextType } from '../utils/layoutContextUtils'
-import { useFriends } from '../hooks/useFriends'
+import type { User } from '../utils/profileUtils';
+import type { LayoutContextType } from '../utils/layoutContextUtils';
+import { useFriends } from '../hooks/useFriends';
 export type { User, LayoutContextType };
 
-export default function MainLayout() {
-	const [currentUser, setCurrentUser] = useState<User | null>(null)
-	const navigate = useNavigate()
-	const location = useLocation()
-	const token = localStorage.getItem('token')
-	const isPublicRoute = location.pathname === '/about'
+const MainLayout = () => {
+	const [currentUser, setCurrentUser] = useState<User | null>(null);
+	const navigate = useNavigate();
+	const location = useLocation();
+	const token = localStorage.getItem('token');
+	const isPublicRoute = location.pathname === '/about';
 
 	useEffect(() => {
 		if (!token) {
 			if (!isPublicRoute) {
-				navigate('/login', { replace: true })
+				navigate('/login', { replace: true });
 			}
-			return
+			return;
 		}
 
 		let isMounted = true;
@@ -54,13 +54,13 @@ export default function MainLayout() {
 		return () => {
 			isMounted = false;
 		};
-	}, [navigate, token, isPublicRoute])
+	}, [navigate, token, isPublicRoute]);
 
-	const challengeSocket = useChallengeSocket(currentUser?.id)
-	const { incomingChallenge, acceptChallenge, declineChallenge } = challengeSocket
-	const { setTopSlot } = useToast()
+	const challengeSocket = useChallengeSocket(currentUser?.id);
+	const { incomingChallenge, acceptChallenge, declineChallenge } = challengeSocket;
+	const { setTopSlot } = useToast();
 
-	const friendSocket = useFriends(currentUser)
+	const friendSocket = useFriends(currentUser);
 
 	useEffect(() => {
 		if (incomingChallenge) {
@@ -71,36 +71,38 @@ export default function MainLayout() {
 					onAccept={acceptChallenge}
 					onDecline={declineChallenge}
 				/>
-			)
+			);
 		} else {
-			setTopSlot(null)
+			setTopSlot(null);
 		}
-	}, [incomingChallenge, acceptChallenge, declineChallenge, setTopSlot])
+	}, [incomingChallenge, acceptChallenge, declineChallenge, setTopSlot]);
 
 	// Clear topSlot on unmount of MainLayout
 	useEffect(() => {
 		return () => {
-			setTopSlot(null)
-		}
-	}, [setTopSlot])
+			setTopSlot(null);
+		};
+	}, [setTopSlot]);
 
 	if (!currentUser && !isPublicRoute) {
-		return null
+		return null;
 	}
 
-	const isChatRoute = location.pathname.startsWith('/chat')
-	const isGameRoute = location.pathname.startsWith('/game')
-	const isAnalyzeRoute = location.pathname.startsWith('/analysis')
-	const showFooter = !isChatRoute && !isGameRoute && !isAnalyzeRoute
+	const isChatRoute = location.pathname.startsWith('/chat');
+	const isGameRoute = location.pathname.startsWith('/game');
+	const isAnalyzeRoute = location.pathname.startsWith('/analysis');
+	const showFooter = !isChatRoute && !isGameRoute && !isAnalyzeRoute;
 
 	return (
-		<div className="app-layout">
+		<div className="app-layout min-h-screen flex flex-col bg-slate-900 text-slate-100">
 			<Navbar currentUser={currentUser} friendSocket={friendSocket} />
-			<main className="layout-body">
+			<main className="layout-body flex-1 flex flex-col w-full">
 				{/* Child routes render here */}
 				<Outlet context={{ currentUser, setCurrentUser, challengeSocket, friendSocket } satisfies LayoutContextType} />
 			</main>
 			{showFooter && <Footer currentUser={currentUser} />}
 		</div>
-	)
-}
+	);
+};
+
+export default MainLayout;

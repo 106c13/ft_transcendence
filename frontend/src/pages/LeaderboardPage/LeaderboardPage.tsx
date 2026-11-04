@@ -203,8 +203,8 @@ const LeaderboardPage = () => {
 	}, [topThree, players]);
 
 	return (
-		<div className={styles.leaderboardPage}>
-			<div className={styles.leaderboardContainer}>
+		<div className={`${styles.leaderboardPage} min-h-[calc(100vh-64px)] w-full flex flex-col items-center pt-20 px-6 pb-6 box-border`}>
+			<div className={`${styles.leaderboardContainer} w-full max-w-[960px] flex flex-col gap-4`}>
 				{/* Header Section */}
 				<LeaderboardHeader
 					total={total}

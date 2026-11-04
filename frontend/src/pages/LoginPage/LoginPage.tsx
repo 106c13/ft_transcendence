@@ -1,20 +1,20 @@
-import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { useLogin } from '../../hooks/useLogin'
-import { usePageTitle } from '../../hooks/usePageTitle'
-import PasswordInput from '../../components/PasswordInput/PasswordInput'
-import styles from '../Common.module.css'
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useLogin } from '../../hooks/useLogin';
+import { usePageTitle } from '../../hooks/usePageTitle';
+import PasswordInput from '../../components/PasswordInput/PasswordInput';
+import styles from '../Common.module.css';
 
-function LoginPage() {
-	const { t } = useTranslation()
-	usePageTitle('page_title_login')
+const LoginPage = () => {
+	const { t } = useTranslation();
+	usePageTitle('page_title_login');
 	const {
 		email,
 		password,
 		setEmail,
 		setPassword,
 		handleSubmit,
-	} = useLogin()
+	} = useLogin();
 
 	return (
 		<>
@@ -45,7 +45,7 @@ function LoginPage() {
 				{t('create_account')}
 			</Link>
 		</>
-	)
-}
+	);
+};
 
-export default LoginPage
+export default LoginPage;

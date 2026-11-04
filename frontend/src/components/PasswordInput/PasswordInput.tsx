@@ -1,19 +1,19 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { Eye, EyeOff } from 'lucide-react'
-import styles from './PasswordInput.module.css'
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Eye, EyeOff } from 'lucide-react';
+import styles from './PasswordInput.module.css';
 
 type Props = {
-	value: string
-	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-	placeholder: string
-	name?: string
-	required?: boolean
-}
+	value: string;
+	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	placeholder: string;
+	name?: string;
+	required?: boolean;
+};
 
-function PasswordInput({ value, onChange, placeholder, name = 'password', required = true }: Props) {
-	const { t } = useTranslation()
-	const [showPassword, setShowPassword] = useState(false)
+const PasswordInput = ({ value, onChange, placeholder, name = 'password', required = true }: Props) => {
+	const { t } = useTranslation();
+	const [showPassword, setShowPassword] = useState(false);
 
 	return (
 		<div className={styles.passwordWrapper}>
@@ -39,7 +39,7 @@ function PasswordInput({ value, onChange, placeholder, name = 'password', requir
 				)}
 			</button>
 		</div>
-	)
-}
+	);
+};
 
-export default PasswordInput
+export default PasswordInput;

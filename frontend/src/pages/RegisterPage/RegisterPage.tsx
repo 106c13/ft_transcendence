@@ -1,13 +1,13 @@
-import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import PasswordInput from '../../components/PasswordInput/PasswordInput'
-import { useRegister } from '../../hooks/useRegister'
-import { usePageTitle } from '../../hooks/usePageTitle'
-import styles from '../Common.module.css'
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import PasswordInput from '../../components/PasswordInput/PasswordInput';
+import { useRegister } from '../../hooks/useRegister';
+import { usePageTitle } from '../../hooks/usePageTitle';
+import styles from '../Common.module.css';
 
-function RegisterPage() {
-	const { t } = useTranslation()
-	usePageTitle('page_title_register')
+const RegisterPage = () => {
+	const { t } = useTranslation();
+	usePageTitle('page_title_register');
 	const {
 		email,
 		username,
@@ -17,7 +17,7 @@ function RegisterPage() {
 		setUsername,
 		setPassword,
 		setRepassword,
-		handleSubmit
+		handleSubmit,
 	} = useRegister();
 
 	return (
@@ -63,7 +63,7 @@ function RegisterPage() {
 				{t('sign_in')}
 			</Link>
 		</>
-	)
-}
+	);
+};
 
-export default RegisterPage
+export default RegisterPage;

@@ -10,7 +10,7 @@ import NewChatModal from '../../components/NewChatModal/NewChatModal';
 import type { Friend } from '../../utils/chatUtils';
 import styles from './ChatPage.module.css'
 
-function ChatPage() {
+const ChatPage = () => {
 	const { t } = useTranslation()
 	usePageTitle('page_title_chat')
 	const navigate = useNavigate()
@@ -151,11 +151,11 @@ function ChatPage() {
 		)
 	}
 
-	const isMobileChatOpen = Boolean(selectedChat || userIdParam)
+	const isMobileChatOpen = Boolean(selectedChat || userIdParam);
 
 	return (
-		<div className={styles.chatContainer}>
-			<div className={styles.chatContent}>
+		<div className={`${styles.chatContainer} h-[calc(100vh-64px)] w-full flex bg-slate-900 text-slate-100 overflow-hidden box-border`}>
+			<div className={`${styles.chatContent} flex-1 flex w-full h-full overflow-hidden`}>
 				<ChatSidebar
 					chats={chats}
 					selectedChat={selectedChat}
@@ -191,7 +191,7 @@ function ChatPage() {
 				loading={loadingFriends}
 			/>
 		</div>
-	)
-}
+	);
+};
 
-export default ChatPage
+export default ChatPage;
