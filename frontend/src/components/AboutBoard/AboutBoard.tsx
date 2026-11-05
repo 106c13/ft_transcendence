@@ -4,138 +4,135 @@ import { DEVS, getTranslatedDev } from '../../utils/aboutUtils';
 import type { DevKey } from '../../utils/aboutUtils';
 import styles from './AboutBoard.module.css';
 
-const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-const RANKS = ['8', '7', '6', '5', '4', '3', '2', '1']
+const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+const RANKS = ['8', '7', '6', '5', '4', '3', '2', '1'];
 
 interface Props {
-	fen: string
-	isCheckmate: boolean
-	selectedDev: DevKey | null
-	onSelectDev: (dev: DevKey) => void
-	onClickEmpty: () => void
+	fen: string;
+	isCheckmate: boolean;
+	isSmooth?: boolean;
+	onTogglePlay?: () => void;
 }
 
-interface PieceOnSquare {
-	type: string
-	color: 'w' | 'b'
-	dev?: DevKey
+interface PieceData {
+	id: 'wK' | 'wR' | 'wB' | 'wN' | 'bK';
+	type: string;
+	color: 'w' | 'b';
+	dev?: DevKey;
+	fileIdx: number;
+	rankIdx: number;
+	sq: string;
 }
 
-function parseFenToBoard(fen: string): Record<string, PieceOnSquare> {
-	const board: Record<string, PieceOnSquare> = {}
-	const [position] = fen.split(' ')
-	const rows = position.split('/')
+const PIECE_ORDER: PieceData['id'][] = ['wK', 'wR', 'wB', 'wN', 'bK'];
+
+function parseFenToPieces(fen: string): PieceData[] {
+	const [position] = fen.split(' ');
+	const rows = position.split('/');
+	const pieces: PieceData[] = [];
 
 	rows.forEach((row, rIdx) => {
-		const rank = (8 - rIdx).toString()
-		let fileIdx = 0
-
+		let fileIdx = 0;
 		for (const ch of row) {
 			if (ch >= '1' && ch <= '8') {
-				fileIdx += parseInt(ch, 10)
+				fileIdx += parseInt(ch, 10);
 			} else {
-				const file = FILES[fileIdx]
-				const sq = `${file}${rank}`
-				const isUpper = ch === ch.toUpperCase()
-				const color = isUpper ? 'w' : 'b'
-				const type = ch.toLowerCase()
+				const sq = `${FILES[fileIdx]}${8 - rIdx}`;
+				const isUpper = ch === ch.toUpperCase();
+				const color: 'w' | 'b' = isUpper ? 'w' : 'b';
+				const type = ch.toLowerCase();
 
-				let dev: DevKey | undefined
-				if (color === 'w') {
-					if (type === 'k') dev = 'arman'
-					else if (type === 'q') dev = 'narek'
-					else if (type === 'n') dev = 'hakob'
+				let id: PieceData['id'];
+				let dev: DevKey | undefined;
+
+				if (ch === 'K') id = 'wK';
+				else if (ch === 'R') {
+					id = 'wR';
+					dev = 'hakob';
+				} else if (ch === 'B') {
+					id = 'wB';
+					dev = 'narek';
+				} else if (ch === 'N') {
+					id = 'wN';
+					dev = 'arman';
+				} else {
+					id = 'bK';
 				}
 
-				board[sq] = { type, color, dev }
-				fileIdx++
+				pieces.push({ id, type, color, dev, fileIdx, rankIdx: rIdx, sq });
+				fileIdx++;
 			}
 		}
-	})
+	});
 
-	return board
+	// Stable sort prevents DOM reordering stutters during diagonal or rank-crossing moves like Bg4+
+	return pieces.sort((a, b) => PIECE_ORDER.indexOf(a.id) - PIECE_ORDER.indexOf(b.id));
 }
 
 export default function AboutBoard({
 	fen,
 	isCheckmate,
-	selectedDev,
-	onSelectDev,
-	onClickEmpty,
+	isSmooth = true,
+	onTogglePlay,
 }: Props) {
 	const { t } = useTranslation();
-	const boardState = useMemo(() => parseFenToBoard(fen), [fen])
-
-	const handleSquareClick = (sq: string) => {
-		const piece = boardState[sq]
-		if (piece && piece.dev) {
-			onSelectDev(piece.dev)
-		} else {
-			onClickEmpty()
-		}
-	}
+	const pieces = useMemo(() => parseFenToPieces(fen), [fen]);
 
 	return (
 		<div className={styles.boardWrapper}>
-			{RANKS.map((rank, rankIdx) =>
-				FILES.map((file, fileIdx) => {
-					const sq = `${file}${rank}`
-					const isLight = (fileIdx + rankIdx) % 2 === 0
-					const piece = boardState[sq]
+			{/* Static 64 Squares Grid */}
+			<div className={styles.squaresGrid}>
+				{RANKS.map((rank, rankIdx) =>
+					FILES.map((file, fileIdx) => {
+						const sq = `${file}${rank}`;
+						const isLight = (fileIdx + rankIdx) % 2 === 0;
 
-					const isSelected = Boolean(
-						piece && piece.dev && piece.dev === selectedDev
-					)
+						return (
+							<div
+								key={sq}
+								className={`${styles.square} ${isLight ? styles.light : styles.dark}`}
+								onClick={onTogglePlay}
+							>
+								{fileIdx === 0 && (
+									<span className={styles.coordRank}>{rank}</span>
+								)}
+								{rank === '1' && (
+									<span className={styles.coordFile}>{file}</span>
+								)}
+							</div>
+						);
+					})
+				)}
+			</div>
 
-					const isWinnerKing = isCheckmate && piece?.color === 'w' && piece?.type === 'k'
-					const isLoserKing = isCheckmate && piece?.color === 'b' && piece?.type === 'k'
-					const isKingInCheck = isCheckmate && piece?.color === 'b' && piece?.type === 'k'
-
-					let squareClass = `${styles.square} ${
-						isLight ? styles.light : styles.dark
-					}`
-					if (isSelected) squareClass += ` ${styles.selected}`
-
-					const pieceSvg = piece
-						? `/assets/pieces/${piece.color}${piece.type.toUpperCase()}.svg`
-						: ''
+			{/* Smooth Animated Pieces Layer */}
+			<div className={styles.piecesLayer}>
+				{pieces.map((p) => {
+					const isWinnerKing = isCheckmate && p.id === 'wK';
+					const isLoserKing = isCheckmate && p.id === 'bK';
 
 					return (
 						<div
-							key={sq}
-							className={squareClass}
-							onClick={() => handleSquareClick(sq)}
-							data-about-piece={piece?.dev || (piece ? 'piece' : undefined)}
+							key={p.id}
+							className={`${styles.pieceContainer} ${isSmooth ? styles.smoothPiece : ''}`}
+							style={{
+								transform: `translate(${p.fileIdx * 100}%, ${p.rankIdx * 100}%)`,
+							}}
 							title={
-								piece?.dev
-									? `${getTranslatedDev(DEVS[piece.dev], t).name} (${sq})`
-									: piece
-									? `${piece.color === 'w' ? t('piece_role_white_king') : t('piece_role_black_king')} (${sq})`
-									: sq
+								p.dev
+									? `${getTranslatedDev(DEVS[p.dev], t).name} (${p.sq})`
+									: p.id === 'wK'
+									? `${t('piece_role_white_king')} (${p.sq})`
+									: `${t('piece_role_black_king')} (${p.sq})`
 							}
+							onClick={onTogglePlay}
 						>
-							{/* Rank labels on column 'a' */}
-							{fileIdx === 0 && (
-								<span className={styles.coordRank}>{rank}</span>
-							)}
-							{/* File labels on rank '1' */}
-							{rank === '1' && (
-								<span className={styles.coordFile}>{file}</span>
-							)}
+							<img
+								src={`/assets/pieces/${p.color}${p.type.toUpperCase()}.svg`}
+								alt={p.type}
+								className={`${styles.pieceImg} ${isLoserKing ? styles.checkedKing : ''}`}
+							/>
 
-							{/* Piece image */}
-							{piece && (
-								<img
-									src={pieceSvg}
-									alt={piece.type}
-									data-about-piece={piece?.dev || 'piece'}
-									className={`${styles.pieceImg} ${
-										isSelected ? styles.pieceSelected : ''
-									} ${isKingInCheck ? styles.checkedKing : ''}`}
-								/>
-							)}
-
-							{/* King Win / Loss Indicators */}
 							{isWinnerKing && (
 								<div className={styles.kingBadgeWinner} aria-label={t('winner')}>
 									<svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
@@ -162,9 +159,9 @@ export default function AboutBoard({
 								</div>
 							)}
 						</div>
-					)
-				})
-			)}
+					);
+				})}
+			</div>
 		</div>
-	)
+	);
 }

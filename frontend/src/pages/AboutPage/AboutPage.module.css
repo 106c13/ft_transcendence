@@ -19,138 +19,286 @@
 	gap: 32px;
 }
 
-/* Interactive Board & Showcase Section (Always open, fills full container width) */
-.interactiveSection {
+/* Unified Team & Tactical Board Section */
+.unifiedSection {
 	background: #1E293B;
 	border: 1px solid rgba(148, 163, 184, 0.12);
 	border-radius: 16px;
-	padding: 14px;
-	gap: 14px;
+	padding: 20px;
 	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
-	display: flex;
+	display: grid;
+	grid-template-columns: 440px minmax(0, 1fr);
+	gap: 12px;
 	align-items: stretch;
-	justify-content: center;
-	margin: 0 auto;
 	box-sizing: border-box;
-	overflow: hidden;
-	width: 1100px;
-	max-width: 100%;
+	width: 100%;
+	max-width: 1100px;
+	margin: 0 auto;
 }
 
-/* Description Showcase Wrapper (Always open, matching RightColumn width) */
-.showcaseWrapper {
+/* Board Column (Left) - Perfectly matches height of 3 cards */
+.boardColumn {
+	width: 440px;
+	height: 440px;
+	aspect-ratio: 1 / 1;
+	border-radius: 10px;
+	overflow: hidden;
+	background: rgba(15, 23, 42, 0.6);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 	display: flex;
-	flex-direction: column;
-	height: 380px;
-	width: 332px;
-	max-width: 332px;
-	flex: 1 1 0;
-	min-width: 0;
 	box-sizing: border-box;
 	flex-shrink: 0;
 }
 
-/* Center Chessboard */
-.boardColumn {
+/* Contributors Column (Right: Stacked Cards) */
+.contributorsColumn {
 	display: flex;
 	flex-direction: column;
+	gap: 12px;
+	height: 440px;
+	min-width: 0;
+	box-sizing: border-box;
+}
+
+.contributorCard {
+	flex: 1 1 0;
+	min-height: 0;
+	background: rgba(15, 23, 42, 0.5);
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	border-radius: 12px;
+	padding: 12px 16px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 6px;
+	transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+	box-sizing: border-box;
+}
+
+.contributorCard:hover {
+	border-color: rgba(96, 165, 250, 0.35);
+	background: rgba(15, 23, 42, 0.7);
+	transform: translateY(-1px);
+}
+
+.cardHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.devMeta {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-width: 0;
+}
+
+.pieceAvatar {
+	width: 34px;
+	height: 34px;
+	border-radius: 8px;
+	background: rgba(96, 165, 250, 0.1);
+	border: 1px solid rgba(96, 165, 250, 0.2);
+	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 380px;
-	height: 380px;
-	box-sizing: border-box;
 	flex-shrink: 0;
 }
 
-/* Right Move Log (Matches description width exactly) */
-.rightColumn {
+.pieceAvatar img {
+	width: 24px;
+	height: 24px;
+	object-fit: contain;
+}
+
+.devTitles {
 	display: flex;
 	flex-direction: column;
-	height: 380px;
-	width: 332px;
-	max-width: 332px;
-	flex: 1 1 0;
 	min-width: 0;
-	box-sizing: border-box;
+}
+
+.nameRow {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.devName {
+	font-size: 14.5px;
+	font-weight: 700;
+	color: #F8FAFC;
+	margin: 0;
+}
+
+.shortRole {
+	font-size: 11.5px;
+	color: #94A3B8;
+	margin: 1px 0 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.intraButton {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 4px 9px;
+	border-radius: 6px;
+	background: #0F172A;
+	border: 1px solid rgba(148, 163, 184, 0.18);
+	color: #E2E8F0;
+	text-decoration: none;
+	font-size: 11px;
+	font-weight: 600;
+	transition: all 0.2s ease;
 	flex-shrink: 0;
 }
 
-/* Intermediate: board + log on top, showcase full width below */
-@media (max-width: 1040px) {
-	.interactiveSection {
-		display: grid;
-		grid-template-columns: 380px minmax(0, 1fr);
-		grid-template-areas:
-			"board    log"
-			"showcase showcase";
-		align-items: stretch;
-		width: 100%;
-		max-width: 860px;
-		padding: 14px;
-		gap: 14px;
+.intraButton:hover {
+	background: #3B82F6;
+	color: #FFFFFF;
+	border-color: #3B82F6;
+	box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+	transform: translateY(-1px);
+}
+
+.externalIcon {
+	opacity: 0.8;
+}
+
+.statementText {
+	font-size: 11.5px;
+	line-height: 1.45;
+	color: #CBD5E1;
+	margin: 0;
+}
+
+/* Intermediate Breakpoint (861px - 1024px, keeps side-by-side balanced on compact desktops) */
+@media (max-width: 1024px) {
+	.unifiedSection {
+		grid-template-columns: 390px minmax(0, 1fr);
+		padding: 16px;
+		gap: 12px;
 	}
 
 	.boardColumn {
-		grid-area: board;
-		width: 380px;
-		height: 380px;
+		width: 390px;
+		height: 390px;
 	}
 
-	.rightColumn {
-		grid-area: log;
-		width: 100%;
-		max-width: none;
-		height: 380px;
+	.contributorsColumn {
+		height: 390px;
+		gap: 10px;
 	}
 
-	.showcaseWrapper {
-		grid-area: showcase;
-		width: 100%;
-		max-width: none;
-		height: auto;
+	.contributorCard {
+		padding: 9px 13px;
+		gap: 4px;
+	}
+
+	.pieceAvatar {
+		width: 30px;
+		height: 30px;
+	}
+
+	.pieceAvatar img {
+		width: 20px;
+		height: 20px;
+	}
+
+	.devName {
+		font-size: 13.5px;
+	}
+
+	.shortRole {
+		font-size: 11px;
+	}
+
+	.intraButton {
+		padding: 3px 8px;
+		font-size: 10.5px;
+	}
+
+	.statementText {
+		font-size: 11px;
+		line-height: 1.35;
 	}
 }
 
-/* Narrow: single column */
-@media (max-width: 760px) {
-	.interactiveSection {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		max-width: 480px;
-	}
-
-	.showcaseWrapper {
-		width: 100%;
-		max-width: 380px;
-		height: auto;
+/* Move under board earlier (<= 860px, prevents narrow squishing at widths like 784px) */
+@media (max-width: 860px) {
+	.unifiedSection {
+		grid-template-columns: 1fr;
+		padding: 16px;
+		gap: 16px;
 	}
 
 	.boardColumn {
 		width: 100%;
-		max-width: 380px;
+		max-width: 440px;
 		height: auto;
+		aspect-ratio: 1 / 1;
+		margin: 0 auto;
 	}
 
-	.rightColumn {
+	.contributorsColumn {
 		width: 100%;
-		max-width: 380px;
-		height: 340px;
+		height: auto;
+		gap: 12px;
+	}
+
+	.contributorCard {
+		flex: none;
+		height: auto;
+		padding: 14px 16px;
+		gap: 6px;
+	}
+
+	.pieceAvatar {
+		width: 34px;
+		height: 34px;
+	}
+
+	.pieceAvatar img {
+		width: 24px;
+		height: 24px;
+	}
+
+	.devName {
+		font-size: 14.5px;
+	}
+
+	.shortRole {
+		font-size: 11.5px;
+	}
+
+	.intraButton {
+		padding: 4px 9px;
+		font-size: 11px;
+	}
+
+	.statementText {
+		font-size: 11.5px;
+		line-height: 1.45;
 	}
 }
 
 @media (max-width: 480px) {
-	.content {
-		padding: 16px 12px 36px;
-		gap: 20px;
-	}
-
-	.interactiveSection {
+	.unifiedSection {
 		padding: 12px;
 		gap: 12px;
 	}
 
-	.rightColumn {
-		height: 300px;
+	.cardHeader {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+
+	.intraButton {
+		align-self: flex-start;
 	}
 }

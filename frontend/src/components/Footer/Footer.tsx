@@ -223,10 +223,10 @@ const Footer = ({ currentUser }: FooterProps) => {
 									target="_blank"
 									rel="noopener noreferrer"
 									className={styles.contributorLink}
-									title={`${DEVS.arman.name} - ${DEVS.arman.shortRole}`}
+									title={`${t(DEVS.arman.nameKey)} - ${t(DEVS.arman.roleKey)}`}
 								>
 									<span className={styles.pieceCode}>{DEVS.arman.pieceSymbol}</span>
-									<span className={styles.devName}>{DEVS.arman.name}</span>
+									<span className={styles.devName}>{t(DEVS.arman.nameKey)}</span>
 									<ExternalLink size={12} className={styles.externalMark} aria-hidden="true" />
 								</a>
 							</li>
@@ -236,10 +236,10 @@ const Footer = ({ currentUser }: FooterProps) => {
 									target="_blank"
 									rel="noopener noreferrer"
 									className={styles.contributorLink}
-									title={`${DEVS.narek.name} - ${DEVS.narek.shortRole}`}
+									title={`${t(DEVS.narek.nameKey)} - ${t(DEVS.narek.roleKey)}`}
 								>
 									<span className={styles.pieceCode}>{DEVS.narek.pieceSymbol}</span>
-									<span className={styles.devName}>{DEVS.narek.name}</span>
+									<span className={styles.devName}>{t(DEVS.narek.nameKey)}</span>
 									<ExternalLink size={12} className={styles.externalMark} aria-hidden="true" />
 								</a>
 							</li>
@@ -249,10 +249,10 @@ const Footer = ({ currentUser }: FooterProps) => {
 									target="_blank"
 									rel="noopener noreferrer"
 									className={styles.contributorLink}
-									title={`${DEVS.hakob.name} - ${DEVS.hakob.shortRole}`}
+									title={`${t(DEVS.hakob.nameKey)} - ${t(DEVS.hakob.roleKey)}`}
 								>
 									<span className={styles.pieceCode}>{DEVS.hakob.pieceSymbol}</span>
-									<span className={styles.devName}>{DEVS.hakob.name}</span>
+									<span className={styles.devName}>{t(DEVS.hakob.nameKey)}</span>
 									<ExternalLink size={12} className={styles.externalMark} aria-hidden="true" />
 								</a>
 							</li>

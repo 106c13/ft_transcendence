@@ -1,4 +1,4 @@
-import { GraduationCap, Zap, Brain, ShieldCheck, Server } from 'lucide-react';
+import { GraduationCap, Layers, Brain, ShieldCheck, Server } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import styles from './AboutCurriculum.module.css';
 
@@ -24,7 +24,7 @@ const AboutCurriculum = () => {
 			<div className={styles.techStackGrid}>
 				<div className={styles.techItem}>
 					<div className={styles.techItemTitle}>
-						<Zap size={16} aria-hidden="true" />
+						<Layers size={16} aria-hidden="true" />
 						<span>{t('about_curriculum_gameplay_title')}</span>
 					</div>
 					<p className={styles.techItemDesc}>

@@ -15,7 +15,7 @@ const AboutHero = () => {
 					i18nKey="about_hero_lead"
 					components={{
 						armanLink: (
-							<Tooltip content={t(DEVS.arman.nameKey, DEVS.arman.name)} position="top" inline>
+							<Tooltip content={t(DEVS.arman.nameKey)} position="top" inline>
 								<a
 									href={DEVS.arman.intraUrl}
 									target="_blank"
@@ -27,7 +27,7 @@ const AboutHero = () => {
 							</Tooltip>
 						),
 						narekLink: (
-							<Tooltip content={t(DEVS.narek.nameKey, DEVS.narek.name)} position="top" inline>
+							<Tooltip content={t(DEVS.narek.nameKey)} position="top" inline>
 								<a
 									href={DEVS.narek.intraUrl}
 									target="_blank"
@@ -39,7 +39,7 @@ const AboutHero = () => {
 							</Tooltip>
 						),
 						hakobLink: (
-							<Tooltip content={t(DEVS.hakob.nameKey, DEVS.hakob.name)} position="top" inline>
+							<Tooltip content={t(DEVS.hakob.nameKey)} position="top" inline>
 								<a
 									href={DEVS.hakob.intraUrl}
 									target="_blank"

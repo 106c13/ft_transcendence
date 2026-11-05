@@ -4,37 +4,46 @@ export type DevKey = 'arman' | 'narek' | 'hakob';
 
 export interface DevProfile {
 	id: DevKey;
-	name: string;
 	handle: string;
 	intraUrl: string;
-	pieceCode: 'K' | 'Q' | 'N';
+	pieceCode: 'P' | 'R' | 'B' | 'N' | 'Q' | 'K';
 	pieceSymbol: string;
 	pieceSvg: string;
-	pieceRoleName: string;
-	shortRole: string;
-	statement: string;
-	tacticalMotto: string;
-	highlights: string[];
 	nameKey: string;
 	pieceRoleKey: string;
 	roleKey: string;
 	statementKey: string;
 	mottoKey: string;
+	tacticalRoleKey: string;
+	tagKeys: string[];
 	highlightKeys: string[];
+}
+
+export interface TranslatedDevProfile extends DevProfile {
+	name: string;
+	pieceRoleName: string;
+	shortRole: string;
+	statement: string;
+	tacticalMotto: string;
+	tacticalRole: string;
+	tags: string[];
+	highlights: string[];
 }
 
 export function getTranslatedDev(
 	dev: DevProfile,
 	t: TFunction
-): DevProfile {
+): TranslatedDevProfile {
 	return {
 		...dev,
-		name: t(dev.nameKey, dev.name),
-		pieceRoleName: t(dev.pieceRoleKey, dev.pieceRoleName),
-		shortRole: t(dev.roleKey, dev.shortRole),
-		statement: t(dev.statementKey, dev.statement),
-		tacticalMotto: t(dev.mottoKey, dev.tacticalMotto),
-		highlights: dev.highlightKeys.map((key, idx) => t(key, dev.highlights[idx])),
+		name: t(dev.nameKey),
+		pieceRoleName: t(dev.pieceRoleKey),
+		shortRole: t(dev.roleKey),
+		statement: t(dev.statementKey),
+		tacticalMotto: t(dev.mottoKey),
+		tacticalRole: t(dev.tacticalRoleKey),
+		tags: dev.tagKeys.map((key) => t(key)),
+		highlights: dev.highlightKeys.map((key) => t(key)),
 	};
 }
 
@@ -53,29 +62,18 @@ export interface MoveStep {
 export const DEVS: Record<DevKey, DevProfile> = {
 	arman: {
 		id: 'arman',
-		name: 'Arman Arakelyan',
 		handle: '@armarake',
 		intraUrl: 'https://profile-v3.intra.42.fr/users/armarake',
-		pieceCode: 'K',
-		pieceSymbol: '♚',
-		pieceSvg: '/assets/pieces/wK.svg',
-		pieceRoleName: 'White King',
-		shortRole: 'Project Structure & Gameplay',
-		statement:
-			'Arman defined the overall structure of the project and developed the gameplay. He built the Dockerized microservices architecture, core chess engine rules, turn state machines, clock loops, and low-latency WebSocket matchmaking with premoves and board mechanics.',
-		tacticalMotto:
-			'The King anchors the board: governing system architecture, clock synchronization, and real-time gameplay loops.',
-		highlights: [
-			'Defined overall full-stack architecture & containerized microservices',
-			'Developed core chess engine logic, turns, timers & game rules',
-			'Built real-time WebSocket matchmaking, rematch flow & game synchronization',
-			'Engineered interactive board with drag & drop, premoves & sound effects',
-		],
+		pieceCode: 'N',
+		pieceSymbol: '♞',
+		pieceSvg: '/assets/pieces/wN.svg',
 		nameKey: 'dev_name_arman',
-		pieceRoleKey: 'piece_role_white_king',
+		pieceRoleKey: 'piece_role_white_knight',
 		roleKey: 'role_architecture_gameplay',
 		statementKey: 'about_dev_arman_statement',
 		mottoKey: 'about_dev_arman_motto',
+		tacticalRoleKey: 'about_tactical_role_arman',
+		tagKeys: ['tag_frontend_arch', 'tag_chess_engine', 'tag_websockets'],
 		highlightKeys: [
 			'about_dev_arman_highlight_1',
 			'about_dev_arman_highlight_2',
@@ -85,29 +83,18 @@ export const DEVS: Record<DevKey, DevProfile> = {
 	},
 	narek: {
 		id: 'narek',
-		name: 'Narek Sargsyan',
 		handle: '@nasargsy',
 		intraUrl: 'https://profile-v3.intra.42.fr/users/nasargsy',
-		pieceCode: 'Q',
-		pieceSymbol: '♛',
-		pieceSvg: '/assets/pieces/wQ.svg',
-		pieceRoleName: 'White Queen',
-		shortRole: 'Game Analysis & Leaderboard',
-		statement:
-			'Narek created the game analysis and leaderboard. He integrated Stockfish for position evaluations, engineered move classification algorithms detecting blunders and brilliant tactics, and developed the global rating ladder with dynamic performance charts.',
-		tacticalMotto:
-			'The Queen commands the diagonals: evaluating positions with Stockfish depth and ranking global tournament ratings.',
-		highlights: [
-			'Integrated Stockfish chess analysis engine for deep game evaluation',
-			'Implemented move accuracy metrics (Brilliant, Best, Mistake, Blunder)',
-			'Built competitive global leaderboard with rating ladders & win rates',
-			'Engineered interactive rating history charts and performance analytics',
-		],
+		pieceCode: 'B',
+		pieceSymbol: '♝',
+		pieceSvg: '/assets/pieces/wB.svg',
 		nameKey: 'dev_name_narek',
-		pieceRoleKey: 'piece_role_white_queen',
+		pieceRoleKey: 'piece_role_white_bishop',
 		roleKey: 'role_analysis_leaderboard',
 		statementKey: 'about_dev_narek_statement',
 		mottoKey: 'about_dev_narek_motto',
+		tacticalRoleKey: 'about_tactical_role_narek',
+		tagKeys: ['tag_stockfish', 'tag_accuracy_analytics', 'tag_leaderboard'],
 		highlightKeys: [
 			'about_dev_narek_highlight_1',
 			'about_dev_narek_highlight_2',
@@ -117,29 +104,18 @@ export const DEVS: Record<DevKey, DevProfile> = {
 	},
 	hakob: {
 		id: 'hakob',
-		name: 'Hakob Aghajanyan',
 		handle: '@haaghaja',
 		intraUrl: 'https://profile-v3.intra.42.fr/users/haaghaja',
-		pieceCode: 'N',
-		pieceSymbol: '♞',
-		pieceSvg: '/assets/pieces/wN.svg',
-		pieceRoleName: 'White Knight',
-		shortRole: 'Authentication, Messages & Translations',
-		statement:
-			'Hakob created the authentication system, messages, and translations. He implemented JWT authentication with 2FA, built real-time WebSocket chat and messaging channels, and engineered the trilingual internationalization system across English, Russian, and Armenian.',
-		tacticalMotto:
-			'The Knight leaps over barriers: securing player accounts, bridging live chat channels, and translating across languages.',
-		highlights: [
-			'Built robust authentication with JWT tokens, password security & 2FA',
-			'Developed real-time direct chat & WebSocket messaging channels',
-			'Implemented trilingual localization for English, Russian, and Armenian',
-			'Crafted live notification bells, friend requests & user presence status',
-		],
+		pieceCode: 'R',
+		pieceSymbol: '♜',
+		pieceSvg: '/assets/pieces/wR.svg',
 		nameKey: 'dev_name_hakob',
-		pieceRoleKey: 'piece_role_white_knight',
+		pieceRoleKey: 'piece_role_white_rook',
 		roleKey: 'role_auth_messages_translations',
 		statementKey: 'about_dev_hakob_statement',
 		mottoKey: 'about_dev_hakob_motto',
+		tacticalRoleKey: 'about_tactical_role_hakob',
+		tagKeys: ['tag_project_foundation', 'tag_jwt_2fa', 'tag_chat_i18n'],
 		highlightKeys: [
 			'about_dev_hakob_highlight_1',
 			'about_dev_hakob_highlight_2',
@@ -149,7 +125,7 @@ export const DEVS: Record<DevKey, DevProfile> = {
 	},
 };
 
-export const INITIAL_FEN = '8/8/8/3N4/8/8/2Q5/2K2k2 w - - 0 1';
+export const INITIAL_FEN = '8/8/8/4R3/2B5/4N3/7k/4K3 w - - 9 5';
 
 export const MOVE_STEPS: MoveStep[] = [
 	{
@@ -160,62 +136,106 @@ export const MOVE_STEPS: MoveStep[] = [
 		from: '',
 		to: '',
 		piece: '',
-		fen: '8/8/8/3N4/8/8/2Q5/2K2k2 w - - 0 1',
+		fen: '8/8/8/4R3/2B5/4N3/7k/4K3 w - - 9 5',
 		isCheckmate: false,
 	},
 	{
 		ply: 1,
-		moveNumber: 1,
+		moveNumber: 5,
 		color: 'w',
-		san: 'Kd1',
-		from: 'c1',
-		to: 'd1',
-		piece: 'k',
-		fen: '8/8/8/3N4/8/8/2Q5/3K1k2 b - - 1 1',
+		san: 'Rg5',
+		from: 'e5',
+		to: 'g5',
+		piece: 'r',
+		fen: '8/8/8/6R1/2B5/4N3/7k/4K3 b - - 10 5',
 		isCheckmate: false,
 	},
 	{
 		ply: 2,
-		moveNumber: 1,
+		moveNumber: 5,
 		color: 'b',
-		san: 'Kg1',
-		from: 'f1',
-		to: 'g1',
+		san: 'Kh3',
+		from: 'h2',
+		to: 'h3',
 		piece: 'k',
-		fen: '8/8/8/3N4/8/8/2Q5/3K2k1 w - - 2 2',
+		fen: '8/8/8/6R1/2B5/4N2k/8/4K3 w - - 11 6',
 		isCheckmate: false,
 	},
 	{
 		ply: 3,
-		moveNumber: 2,
+		moveNumber: 6,
 		color: 'w',
-		san: 'Ne3',
-		from: 'd5',
-		to: 'e3',
-		piece: 'n',
-		fen: '8/8/8/8/8/4N3/2Q5/3K2k1 b - - 3 2',
+		san: 'Be6+',
+		from: 'c4',
+		to: 'e6',
+		piece: 'b',
+		fen: '8/8/4B3/6R1/8/4N2k/8/4K3 b - - 12 6',
 		isCheckmate: false,
 	},
 	{
 		ply: 4,
-		moveNumber: 2,
+		moveNumber: 6,
 		color: 'b',
-		san: 'Kh1',
-		from: 'g1',
-		to: 'h1',
+		san: 'Kh4',
+		from: 'h3',
+		to: 'h4',
 		piece: 'k',
-		fen: '8/8/8/8/8/4N3/2Q5/3K3k w - - 4 3',
+		fen: '8/8/4B3/6R1/7k/4N3/8/4K3 w - - 13 7',
 		isCheckmate: false,
 	},
 	{
 		ply: 5,
-		moveNumber: 3,
+		moveNumber: 7,
 		color: 'w',
-		san: 'Qg2#',
-		from: 'c2',
-		to: 'g2',
-		piece: 'q',
-		fen: '8/8/8/8/8/4N3/6Q1/3K3k b - - 5 3',
+		san: 'Rg7',
+		from: 'g5',
+		to: 'g7',
+		piece: 'r',
+		fen: '8/6R1/4B3/8/7k/4N3/8/4K3 b - - 14 7',
+		isCheckmate: false,
+	},
+	{
+		ply: 6,
+		moveNumber: 7,
+		color: 'b',
+		san: 'Kh5',
+		from: 'h4',
+		to: 'h5',
+		piece: 'k',
+		fen: '8/6R1/4B3/7k/8/4N3/8/4K3 w - - 15 8',
+		isCheckmate: false,
+	},
+	{
+		ply: 7,
+		moveNumber: 8,
+		color: 'w',
+		san: 'Bg4+',
+		from: 'e6',
+		to: 'g4',
+		piece: 'b',
+		fen: '8/6R1/8/7k/6B1/4N3/8/4K3 b - - 16 8',
+		isCheckmate: false,
+	},
+	{
+		ply: 8,
+		moveNumber: 8,
+		color: 'b',
+		san: 'Kh6',
+		from: 'h5',
+		to: 'h6',
+		piece: 'k',
+		fen: '8/6R1/7k/8/6B1/4N3/8/4K3 w - - 17 9',
+		isCheckmate: false,
+	},
+	{
+		ply: 9,
+		moveNumber: 9,
+		color: 'w',
+		san: 'Nf5#',
+		from: 'e3',
+		to: 'f5',
+		piece: 'n',
+		fen: '8/6R1/7k/5N2/6B1/8/8/4K3 b - - 18 9',
 		isCheckmate: true,
 	},
 ];
