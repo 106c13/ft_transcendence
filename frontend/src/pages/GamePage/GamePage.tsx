@@ -213,8 +213,8 @@ const GamePage = () => {
     )
 
     return (
-        <div className={`${styles.gameContainer} min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center pt-16 box-border w-full`}>
-            <main className={`${styles.gameMain} flex-1 max-w-[1280px] w-full mx-auto p-4 flex flex-col lg:flex-row gap-6 items-start justify-center`}>
+        <div className={styles.gameContainer}>
+            <main className={styles.gameMain}>
                 <div className={styles.gamePlayArea}>
                     <div
                         className={styles.boardContainer}
