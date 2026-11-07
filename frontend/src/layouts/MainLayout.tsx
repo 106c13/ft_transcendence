@@ -16,7 +16,8 @@ const MainLayout = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const token = localStorage.getItem('token');
-	const isPublicRoute = location.pathname === '/about';
+	const publicPaths = ['/about', '/privacy', '/terms', '/privacy-policy', '/terms-of-service'];
+	const isPublicRoute = publicPaths.includes(location.pathname);
 
 	useEffect(() => {
 		if (!token) {

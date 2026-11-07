@@ -15,6 +15,8 @@ import AnalyzePage from './pages/AnalyzePage/AnalyzePage'
 import RatingHistoryPage from './pages/RatingHistoryPage/RatingHistoryPage'
 import AboutPage from './pages/AboutPage/AboutPage'
 import LeaderboardPage from './pages/LeaderboardPage/LeaderboardPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage/PrivacyPolicyPage'
+import TermsOfServicePage from './pages/TermsOfServicePage/TermsOfServicePage'
 import { ToastProvider } from './context/ToastProvider'
 import ToastContainer from './components/Toast/ToastContainer'
 
@@ -36,6 +38,10 @@ export default function App() {
         <Route element={<MainLayout />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms" element={<TermsOfServicePage />} />
+          <Route path="/privacy-policy" element={<Navigate to="/privacy" replace />} />
+          <Route path="/terms-of-service" element={<Navigate to="/terms" replace />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
 
           <Route path="/profile/settings" element={<SettingsPage />} />

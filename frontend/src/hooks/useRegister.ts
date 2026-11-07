@@ -7,12 +7,18 @@ export function useRegister() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [repassword, setRepassword] = useState('')
+	const [acceptedTerms, setAcceptedTerms] = useState(false)
 
 	const navigate = useNavigate()
 	const { toast } = useToast()
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
+
+		if (!acceptedTerms) {
+			toast.error('must_accept_terms')
+			return
+		}
 
 		if (password !== repassword) {
 			toast.error('passwords_do_not_match')
@@ -57,10 +63,12 @@ export function useRegister() {
 		username,
 		password,
 		repassword,
+		acceptedTerms,
 		setEmail,
 		setUsername,
 		setPassword,
 		setRepassword,
+		setAcceptedTerms,
 		handleSubmit
 	}
 }

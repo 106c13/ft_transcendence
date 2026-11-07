@@ -13,10 +13,12 @@ const RegisterPage = () => {
 		username,
 		password,
 		repassword,
+		acceptedTerms,
 		setEmail,
 		setUsername,
 		setPassword,
 		setRepassword,
+		setAcceptedTerms,
 		handleSubmit,
 	} = useRegister();
 
@@ -55,6 +57,40 @@ const RegisterPage = () => {
 					placeholder={t('confirm_password')}
 					name="confirm_password"
 				/>
+
+				<div className={styles.termsGroup}>
+					<label className={styles.termsCheckboxLabel}>
+						<input
+							type="checkbox"
+							id="acceptedTerms"
+							name="acceptedTerms"
+							checked={acceptedTerms}
+							onChange={e => setAcceptedTerms(e.target.checked)}
+							required
+							className={styles.termsCheckbox}
+						/>
+						<span className={styles.termsText}>
+							{t('terms_agreement_prefix')}{' '}
+							<Link
+								to="/terms"
+								target="_blank"
+								rel="noopener noreferrer"
+								className={styles.termsLink}
+							>
+								{t('terms_of_service')}
+							</Link>{' '}
+							{t('terms_agreement_and')}{' '}
+							<Link
+								to="/privacy"
+								target="_blank"
+								rel="noopener noreferrer"
+								className={styles.termsLink}
+							>
+								{t('privacy_policy')}
+							</Link>
+						</span>
+					</label>
+				</div>
 
 				<button className={styles.button} type="submit">{t('register')}</button>
 			</form>

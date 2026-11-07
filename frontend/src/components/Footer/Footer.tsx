@@ -9,13 +9,12 @@ import {
 	Settings,
 	LogIn,
 	Sparkles,
-	GraduationCap,
-	ExternalLink,
 	ArrowUp,
 	Info,
+	FileText,
+	ShieldCheck,
 } from 'lucide-react';
 import GameModeIcon from '../GameModeIcon/GameModeIcon';
-import { DEVS } from '../../utils/aboutUtils';
 import type { User as UserType } from '../../utils/profileUtils';
 import styles from './Footer.module.css';
 
@@ -71,17 +70,6 @@ const Footer = ({ currentUser }: FooterProps) => {
 						<p className={styles.brandTagline}>
 							{t('footer_tagline')}
 						</p>
-
-						<div className={styles.badgeRow}>
-							<span className={styles.statusBadge}>
-								<span className={styles.statusDot} aria-hidden="true" />
-								{t('footer_status_operational')}
-							</span>
-							<span className={styles.capstoneBadge}>
-								<GraduationCap size={14} className={styles.badgeIcon} aria-hidden="true" />
-								{t('footer_capstone_badge')}
-							</span>
-						</div>
 					</div>
 
 					{/* Authenticated Mode: Play & Compete Column */}
@@ -205,10 +193,10 @@ const Footer = ({ currentUser }: FooterProps) => {
 						</div>
 					)}
 
-					{/* About & 42 School Column (available to both authenticated & guest) */}
+					{/* About Column (available to both authenticated & guest) */}
 					<div className={styles.navCol}>
 						<h4 className={styles.colTitle}>
-							{t('footer_about_title')}
+							{t('about')}
 						</h4>
 						<ul className={styles.linkList}>
 							<li>
@@ -218,57 +206,16 @@ const Footer = ({ currentUser }: FooterProps) => {
 								</Link>
 							</li>
 							<li>
-								<a
-									href={DEVS.arman.intraUrl}
-									target="_blank"
-									rel="noopener noreferrer"
-									className={styles.contributorLink}
-									title={`${t(DEVS.arman.nameKey)} - ${t(DEVS.arman.roleKey)}`}
-								>
-									<span className={styles.pieceCode}>{DEVS.arman.pieceSymbol}</span>
-									<span className={styles.devName}>{t(DEVS.arman.nameKey)}</span>
-									<ExternalLink size={12} className={styles.externalMark} aria-hidden="true" />
-								</a>
+								<Link to="/terms" className={styles.footerLink}>
+									<FileText size={14} className={styles.linkIcon} aria-hidden="true" />
+									{t('terms_of_service')}
+								</Link>
 							</li>
 							<li>
-								<a
-									href={DEVS.narek.intraUrl}
-									target="_blank"
-									rel="noopener noreferrer"
-									className={styles.contributorLink}
-									title={`${t(DEVS.narek.nameKey)} - ${t(DEVS.narek.roleKey)}`}
-								>
-									<span className={styles.pieceCode}>{DEVS.narek.pieceSymbol}</span>
-									<span className={styles.devName}>{t(DEVS.narek.nameKey)}</span>
-									<ExternalLink size={12} className={styles.externalMark} aria-hidden="true" />
-								</a>
-							</li>
-							<li>
-								<a
-									href={DEVS.hakob.intraUrl}
-									target="_blank"
-									rel="noopener noreferrer"
-									className={styles.contributorLink}
-									title={`${t(DEVS.hakob.nameKey)} - ${t(DEVS.hakob.roleKey)}`}
-								>
-									<span className={styles.pieceCode}>{DEVS.hakob.pieceSymbol}</span>
-									<span className={styles.devName}>{t(DEVS.hakob.nameKey)}</span>
-									<ExternalLink size={12} className={styles.externalMark} aria-hidden="true" />
-								</a>
-							</li>
-							<li>
-								<a
-									href="https://42.fr/"
-									target="_blank"
-									rel="noopener noreferrer"
-									className={styles.footerLink}
-								>
-									<span className={styles.linkIcon}>
-										<GraduationCap size={16} aria-hidden="true" />
-									</span>
-									{t('footer_school_network')}
-									<ExternalLink size={12} className={styles.externalMark} aria-hidden="true" />
-								</a>
+								<Link to="/privacy" className={styles.footerLink}>
+									<ShieldCheck size={14} className={styles.linkIcon} aria-hidden="true" />
+									{t('privacy_policy')}
+								</Link>
 							</li>
 						</ul>
 					</div>
@@ -280,6 +227,15 @@ const Footer = ({ currentUser }: FooterProps) => {
 						<span className={styles.copyrightText}>
 							© {new Date().getFullYear()} ft_transcendence. {t('footer_all_rights')}
 						</span>
+						<div className={styles.legalLinksRow}>
+							<Link to="/terms" className={styles.legalLink}>
+								{t('terms_of_service')}
+							</Link>
+							<span className={styles.legalSeparator} aria-hidden="true">•</span>
+							<Link to="/privacy" className={styles.legalLink}>
+								{t('privacy_policy')}
+							</Link>
+						</div>
 						<span className={styles.madeByText}>
 							{t('footer_made_by')}
 						</span>
