@@ -15,11 +15,6 @@
 	margin-top: var(--banner-gap, 8px);
 }
 
-/* Elevate slot above chess board and pieces when popup is open */
-.slotOpen {
-	z-index: 150;
-}
-
 .bannerBar {
 	position: relative;
 	display: flex;
@@ -115,11 +110,6 @@
 	border-color: transparent !important;
 }
 
-.userMainRowActive {
-	background: rgba(255, 255, 255, 0.12) !important;
-	border-color: rgba(96, 165, 250, 0.35) !important;
-}
-
 .profilePic {
 	width: 38px;
 	height: 38px;
@@ -205,175 +195,6 @@
 	color: #94A3B8;
 	background: transparent;
 	border: none;
-}
-
-/* Minimalistic Ratings Popup */
-.ratingPopup {
-	position: absolute;
-	left: 50%;
-	transform: translateX(-50%);
-	background: #1E293B;
-	border: 1px solid rgba(148, 163, 184, 0.25);
-	border-radius: 10px;
-	padding: 8px 10px 6px 10px;
-	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 16px rgba(59, 130, 246, 0.15);
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 6px;
-	width: max-content;
-	z-index: 160;
-	box-sizing: border-box;
-	cursor: default;
-}
-
-.popupAbove {
-	bottom: calc(100% + 11px);
-	animation: popupPopInAbove 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.popupBelow {
-	top: calc(100% + 11px);
-	animation: popupPopInBelow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes popupPopInAbove {
-	from {
-		opacity: 0;
-		transform: translate(-50%, 6px) scale(0.95);
-	}
-	to {
-		opacity: 1;
-		transform: translate(-50%, 0) scale(1);
-	}
-}
-
-@keyframes popupPopInBelow {
-	from {
-		opacity: 0;
-		transform: translate(-50%, -6px) scale(0.95);
-	}
-	to {
-		opacity: 1;
-		transform: translate(-50%, 0) scale(1);
-	}
-}
-
-/* Pointer pointing DOWN at the center of the user row (for bottom banner) */
-.pointerDown {
-	position: absolute;
-	bottom: -5px;
-	left: 50%;
-	transform: translateX(-50%) rotate(45deg);
-	width: 10px;
-	height: 10px;
-	background: #1E293B;
-	border-right: 1px solid rgba(148, 163, 184, 0.25);
-	border-bottom: 1px solid rgba(148, 163, 184, 0.25);
-	z-index: 1;
-	pointer-events: none;
-}
-
-/* Pointer pointing UP at the center of the user row (for top banner) */
-.pointerUp {
-	position: absolute;
-	top: -5px;
-	left: 50%;
-	transform: translateX(-50%) rotate(45deg);
-	width: 10px;
-	height: 10px;
-	background: #1E293B;
-	border-left: 1px solid rgba(148, 163, 184, 0.25);
-	border-top: 1px solid rgba(148, 163, 184, 0.25);
-	z-index: 1;
-	pointer-events: none;
-}
-
-.ratingPopupGrid {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-}
-
-.ratingPopupItem {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	padding: 5px 8px;
-	background: rgba(15, 23, 42, 0.6);
-	border-radius: 6px;
-	border: 1px solid rgba(148, 163, 184, 0.12);
-	min-width: 54px;
-	gap: 2px;
-	transition: all 0.15s ease;
-}
-
-.ratingPopupItem:hover {
-	background: rgba(15, 23, 42, 0.85);
-	border-color: rgba(148, 163, 184, 0.25);
-}
-
-.ratingItemActive {
-	background: rgba(59, 130, 246, 0.12);
-	border-color: rgba(96, 165, 250, 0.35);
-	box-shadow: 0 0 8px rgba(59, 130, 246, 0.15);
-}
-
-.ratingPopupHeader {
-	display: flex;
-	align-items: center;
-	gap: 3px;
-}
-
-.ratingPopupIcon {
-	font-size: 11px;
-	line-height: 1;
-}
-
-.ratingPopupMode {
-	font-size: 10px;
-	font-weight: 600;
-	color: #94A3B8;
-	text-transform: capitalize;
-	letter-spacing: 0.2px;
-}
-
-.ratingPopupValue {
-	font-size: 13px;
-	font-weight: 700;
-	font-family: var(--mono, monospace);
-	letter-spacing: 0.3px;
-	line-height: 1.2;
-}
-
-.ratingPopupFooter {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	padding-top: 4px;
-	border-top: 1px solid rgba(148, 163, 184, 0.12);
-}
-
-.seeProfileBtn {
-	background: none;
-	border: none;
-	color: #60A5FA;
-	font-size: 12px;
-	font-weight: 600;
-	cursor: pointer;
-	padding: 3px 6px;
-	border-radius: 6px;
-	transition: all 0.2s ease;
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-}
-
-.seeProfileBtn:hover {
-	background: rgba(96, 165, 250, 0.1);
-	color: #93C5FD;
 }
 
 /* Captured Pieces: directly beside User Info */

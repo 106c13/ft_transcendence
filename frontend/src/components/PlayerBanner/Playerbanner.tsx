@@ -1,9 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RatingInfo } from '../../utils/profileUtils';
 import { getAvatarUrl, getModeColor, getPieceImageSrc } from '../../utils/gameUtils';
-import GameModeIcon from '../GameModeIcon/GameModeIcon';
 import { WifiOff } from 'lucide-react';
 import styles from './PlayerBanner.module.css';
 
@@ -67,11 +65,7 @@ const PlayerBanner = ({
 	disconnectCountdown = null,
 }: Props) => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
-	const [isOpen, setIsOpen] = useState(false)
-	const [ratings, setRatings] = useState<Record<string, RatingInfo | null> | null>(initialRatings || null)
 	const [userAvatar, setUserAvatar] = useState<string | null>(avatar || null)
-	const wrapperRef = useRef<HTMLDivElement>(null)
 
 	const actualUsername = username || name
 	const modeColor = getModeColor(selectedMode)
@@ -94,22 +88,13 @@ const PlayerBanner = ({
 		!isAnonymousPlaceholder
 	)
 
-	const handleSeeProfile = (e: React.MouseEvent) => {
-		e.stopPropagation()
-		setIsOpen(false)
-		if (canViewProfile) {
-			if (actualUsername === 'You' || actualUsername === t('you')) {
-				navigate('/profile')
-			} else {
-				navigate(`/profile/${actualUsername}`)
-			}
-		}
+	const handleOpenProfile = () => {
+		if (!canViewProfile) return
+		window.open(`/profile/${encodeURIComponent(actualUsername)}`, '_blank', 'noopener,noreferrer')
 	}
 
-	// Update local state when props change
 	useEffect(() => {
 		if (initialRatings) {
-			setRatings(initialRatings)
 			setUserExists(true)
 		}
 	}, [initialRatings])
@@ -120,16 +105,14 @@ const PlayerBanner = ({
 		}
 	}, [avatar])
 
-	// Check if user exists in our DB and fetch ratings/avatar if not supplied
+	// Check if user exists in our DB and fetch avatar if not supplied
 	useEffect(() => {
 		if (initialRatings) {
 			setUserExists(true)
-			setRatings(initialRatings)
 			return
 		}
 		if (isAnonymousPlaceholder) {
 			setUserExists(false)
-			setIsOpen(false)
 			return
 		}
 
@@ -145,19 +128,16 @@ const PlayerBanner = ({
 					return res.json()
 				} else {
 					setUserExists(false)
-					setIsOpen(false)
 					return null
 				}
 			})
 			.then(data => {
 				if (!isSubscribed || !data) return
-				if (data.ratings) setRatings(data.ratings)
 				if (data.avatar) setUserAvatar(data.avatar)
 			})
 			.catch(() => {
 				if (isSubscribed) {
 					setUserExists(false)
-					setIsOpen(false)
 				}
 			})
 
@@ -166,43 +146,11 @@ const PlayerBanner = ({
 		}
 	}, [actualUsername, initialRatings, isAnonymousPlaceholder])
 
-	// Close on outside click or Escape
-	useEffect(() => {
-		if (!isOpen) return
-		const handleClickOutside = (e: MouseEvent) => {
-			if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-				setIsOpen(false)
-			}
-		}
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') {
-				setIsOpen(false)
-			}
-		}
-		document.addEventListener('mousedown', handleClickOutside)
-		document.addEventListener('keydown', handleKeyDown)
-		return () => {
-			document.removeEventListener('mousedown', handleClickOutside)
-			document.removeEventListener('keydown', handleKeyDown)
-		}
-	}, [isOpen])
-
 	const isLowTime = isActive && time <= 10000
-
-	const getDisplayRating = (mode: 'bullet' | 'blitz' | 'rapid') => {
-		const info = ratings?.[mode]
-		if (info) {
-			return info.isProvisional ? `~${info.rating}` : `${info.rating}`
-		}
-		if (mode === selectedMode && rating !== undefined && rating !== null) {
-			return isProvisional ? `~${rating}` : `${rating}`
-		}
-		return '—'
-	}
 
 	return (
 		<div
-			className={`${styles.bannerSlot} ${isBottom ? styles.slotBottom : styles.slotTop} ${isOpen ? styles.slotOpen : ''}`}
+			className={`${styles.bannerSlot} ${isBottom ? styles.slotBottom : styles.slotTop}`}
 		>
 			<div
 				className={`${styles.bannerBar} ${
@@ -211,24 +159,22 @@ const PlayerBanner = ({
 			>
 				{/* Left Group: User info + Captured pieces right beside it */}
 				<div className={styles.leftGroup}>
-					<div className={styles.userInfoAnchor} ref={wrapperRef}>
-						{/* User row: click avatar or name to toggle minimalistic ratings popup if user exists */}
+					<div className={styles.userInfoAnchor}>
+						{/* User row: click avatar or name to open player profile in a new tab if user exists */}
 						<div
 							className={`${styles.userMainRow} ${
-								userExists ? styles.userMainRowClickable : styles.userMainRowDisabled
-							} ${isOpen ? styles.userMainRowActive : ''}`}
-							onClick={() => {
-								if (userExists) setIsOpen(prev => !prev)
-							}}
-							role="button"
-							tabIndex={userExists ? 0 : -1}
+								canViewProfile ? styles.userMainRowClickable : styles.userMainRowDisabled
+							}`}
+							onClick={handleOpenProfile}
+							role={canViewProfile ? 'button' : undefined}
+							tabIndex={canViewProfile ? 0 : -1}
 							onKeyDown={e => {
-								if (userExists && (e.key === 'Enter' || e.key === ' ')) {
+								if (canViewProfile && (e.key === 'Enter' || e.key === ' ')) {
 									e.preventDefault()
-									setIsOpen(prev => !prev)
+									handleOpenProfile()
 								}
 							}}
-							title={userExists ? (isOpen ? t('click_to_collapse') : t('click_to_view_ratings')) : undefined}
+							title={canViewProfile ? t('see_profile') : undefined}
 						>
 							{isDisconnected ? (
 								<div className={styles.disconnectedProfilePic} aria-label={t('opponent_disconnected_title')}>
@@ -273,69 +219,6 @@ const PlayerBanner = ({
 									)}
 								</div>
 							</div>
-
-							{/* Minimalistic Ratings Popup */}
-							{isOpen && userExists && (
-								<div
-									className={`${styles.ratingPopup} ${isBottom ? styles.popupAbove : styles.popupBelow}`}
-									onClick={e => e.stopPropagation()}
-									role="dialog"
-									aria-label={t('player_ratings')}
-								>
-									<div className={styles.ratingPopupGrid}>
-										<div className={`${styles.ratingPopupItem} ${selectedMode === 'bullet' ? styles.ratingItemActive : ''}`}>
-											<div className={styles.ratingPopupHeader}>
-												<span className={styles.ratingPopupIcon}>
-													<GameModeIcon mode="bullet" size={16} />
-												</span>
-												<span className={styles.ratingPopupMode}>{t('bullet_rating')}</span>
-											</div>
-											<span className={styles.ratingPopupValue} style={{ color: getModeColor('bullet') }}>
-												{getDisplayRating('bullet')}
-											</span>
-										</div>
-
-										<div className={`${styles.ratingPopupItem} ${selectedMode === 'blitz' ? styles.ratingItemActive : ''}`}>
-											<div className={styles.ratingPopupHeader}>
-												<span className={styles.ratingPopupIcon}>
-													<GameModeIcon mode="blitz" size={16} />
-												</span>
-												<span className={styles.ratingPopupMode}>{t('blitz_rating')}</span>
-											</div>
-											<span className={styles.ratingPopupValue} style={{ color: getModeColor('blitz') }}>
-												{getDisplayRating('blitz')}
-											</span>
-										</div>
-
-										<div className={`${styles.ratingPopupItem} ${selectedMode === 'rapid' ? styles.ratingItemActive : ''}`}>
-											<div className={styles.ratingPopupHeader}>
-												<span className={styles.ratingPopupIcon}>
-													<GameModeIcon mode="rapid" size={16} />
-												</span>
-												<span className={styles.ratingPopupMode}>{t('rapid_rating')}</span>
-											</div>
-											<span className={styles.ratingPopupValue} style={{ color: getModeColor('rapid') }}>
-												{getDisplayRating('rapid')}
-											</span>
-										</div>
-									</div>
-
-									{canViewProfile && (
-										<div className={styles.ratingPopupFooter}>
-											<button
-												type="button"
-												className={styles.seeProfileBtn}
-												onClick={handleSeeProfile}
-											>
-												{t('see_profile')} →
-											</button>
-										</div>
-									)}
-
-									{/* Pointer pointing at the center of the user row */}
-									<div className={isBottom ? styles.pointerDown : styles.pointerUp} />
-								</div>
-							)}
 						</div>
 					</div>
 
