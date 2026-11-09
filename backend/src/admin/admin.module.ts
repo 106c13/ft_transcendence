@@ -209,13 +209,12 @@ async function createAdminModule(): Promise<DynamicModule> {
                     return { email: user.email, id: user.id.toString() };
                 },
                 cookieName: 'adminjs',
-                cookiePassword:
-                    process.env.ADMIN_COOKIE_PASSWORD || 'super-secret-cookie-key-change-in-prod',
+                cookiePassword: process.env.ADMIN_COOKIE_PASSWORD!,
             },
             sessionOptions: {
                 resave: false,
                 saveUninitialized: false,
-                secret: process.env.ADMIN_COOKIE_PASSWORD || 'super-secret-cookie-key-change-in-prod',
+                secret: process.env.ADMIN_COOKIE_PASSWORD!,
             },
         }),
     });
