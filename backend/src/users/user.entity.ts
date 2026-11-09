@@ -36,8 +36,5 @@ export class User extends BaseEntity {
 	created_at: Date;
 
 	@Column({ default: false })
-	email_verified: boolean;
-
-	@Column({ default: false })
 	is_admin: boolean;
 }
