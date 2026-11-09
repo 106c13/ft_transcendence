@@ -42,7 +42,6 @@ export function useAnalyzeState({
     const [analysisData, setAnalysisData] = useState<GameAnalysisResult | null>(null)
 
     // Refs
-    const moveListRef = useRef<HTMLDivElement>(null)
     const prevViewIndexRef = useRef<number | null>(null)
     const isExecutingMoveRef = useRef<boolean>(false)
     const skipSoundRef = useRef<boolean>(false)
@@ -99,30 +98,6 @@ export function useAnalyzeState({
         capturedPieces: orientation === 'w' ? capturedBlack : capturedWhite,
         materialDiff: orientation === 'w' ? whiteDiff : blackDiff,
     }), [orientation, whitePlayerName, blackPlayerName, whiteRating, blackRating, capturedBlack, capturedWhite, whiteDiff, blackDiff])
-
-    // Move List Auto-Scrolling
-    useEffect(() => {
-        const container = moveListRef.current
-        if (!container) return
-
-        const active = container.querySelector('[data-active-move="true"]') as HTMLElement | null
-        if (!active) return
-
-        const containerRect = container.getBoundingClientRect()
-        const activeRect = active.getBoundingClientRect()
-
-        const relativeTop = activeRect.top - containerRect.top + container.scrollTop
-        const relativeBottom = relativeTop + activeRect.height
-
-        const currentScroll = container.scrollTop
-        const viewHeight = container.clientHeight
-
-        if (relativeTop < currentScroll) {
-            container.scrollTo({ top: Math.max(0, relativeTop - 4), behavior: 'smooth' })
-        } else if (relativeBottom > currentScroll + viewHeight) {
-            container.scrollTo({ top: relativeBottom - viewHeight + 4, behavior: 'smooth' })
-        }
-    }, [viewIndex])
 
     // Move Sound Playback on Navigation
     useEffect(() => {
@@ -419,11 +394,6 @@ export function useAnalyzeState({
         setOrientation((prev) => (prev === 'w' ? 'b' : 'w'))
     }, [])
 
-    const goToStart = useCallback(() => setViewIndex(0), [])
-    const goToPrev = useCallback(() => setViewIndex((prev) => Math.max(0, prev - 1)), [])
-    const goToNext = useCallback(() => setViewIndex((prev) => Math.min(moveHistory.length - 1, prev + 1)), [moveHistory.length])
-    const goToEnd = useCallback(() => setViewIndex(moveHistory.length - 1), [moveHistory.length])
-
     return {
         moveHistory,
         moveSAN,
@@ -443,12 +413,7 @@ export function useAnalyzeState({
         topBanner,
         bottomBanner,
         analysisData,
-        moveListRef,
         setViewIndex,
-        goToStart,
-        goToPrev,
-        goToNext,
-        goToEnd,
         executeMove,
         loadPgnString,
         handleSelectPastGame,

@@ -4,7 +4,7 @@ import type { Chess } from 'chess.js'
 import type { GameAnalysisResult } from '../../utils/gameUtils'
 import type { EvalInfo, EvaluationLine } from '../../utils/analyzeUtils'
 import AnalyzeEnginePanel from '../AnalyzeEnginePanel/AnalyzeEnginePanel'
-import AnalyzeMoveList from '../AnalyzeMoveList/AnalyzeMoveList'
+import MoveHistory from '../MoveHistory/MoveHistory'
 import AnalyzeToolbar from '../AnalyzeToolbar/AnalyzeToolbar'
 import styles from './AnalyzeInfoPanel.module.css'
 
@@ -19,12 +19,7 @@ interface AnalyzeInfoPanelProps {
     moveHistory: string[]
     moveSAN: string[]
     viewIndex: number
-    moveListRef?: React.RefObject<HTMLDivElement | null>
     onSelectIndex: (idx: number) => void
-    onGoToStart: () => void
-    onGoToPrev: () => void
-    onGoToNext: () => void
-    onGoToEnd: () => void
     onOpenPgnModal: () => void
     onOpenGamesModal: () => void
     onFlipBoard: () => void
@@ -42,12 +37,7 @@ export default function AnalyzeInfoPanel({
     moveHistory,
     moveSAN,
     viewIndex,
-    moveListRef,
     onSelectIndex,
-    onGoToStart,
-    onGoToPrev,
-    onGoToNext,
-    onGoToEnd,
     onOpenPgnModal,
     onOpenGamesModal,
     onFlipBoard,
@@ -78,17 +68,11 @@ export default function AnalyzeInfoPanel({
                 onSelectEngineLine={onSelectEngineLine}
             />
 
-            <AnalyzeMoveList
+            <MoveHistory
                 moveHistory={moveHistory}
                 moveSAN={moveSAN}
                 viewIndex={viewIndex}
-                analysisData={analysisData}
-                moveListRef={moveListRef}
                 onSelectIndex={onSelectIndex}
-                onGoToStart={onGoToStart}
-                onGoToPrev={onGoToPrev}
-                onGoToNext={onGoToNext}
-                onGoToEnd={onGoToEnd}
             />
 
             <AnalyzeToolbar

@@ -144,12 +144,7 @@ const AnalyzePage = () => {
                         moveHistory={state.moveHistory}
                         moveSAN={state.moveSAN}
                         viewIndex={state.viewIndex}
-                        moveListRef={state.moveListRef}
                         onSelectIndex={state.setViewIndex}
-                        onGoToStart={state.goToStart}
-                        onGoToPrev={state.goToPrev}
-                        onGoToNext={state.goToNext}
-                        onGoToEnd={state.goToEnd}
                         onOpenPgnModal={() => setShowPgnModal(true)}
                         onOpenGamesModal={() => setShowGamesModal(true)}
                         onFlipBoard={state.handleFlipBoard}

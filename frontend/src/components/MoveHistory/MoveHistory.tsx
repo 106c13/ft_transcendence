@@ -9,7 +9,7 @@ type Props = {
 	moveSAN: string[]
 	moveTimes?: number[]
 	viewIndex: number
-	isReviewing: boolean
+	isReviewing?: boolean
 	onSelectIndex: (idx: number) => void
 }
 
@@ -59,6 +59,7 @@ function MoveHistory({
 		}
 	}, [viewIndex])
 
+	const showMoveTimes = moveTimes !== undefined
 	const halfMoves = moveHistory.length - 1
 	const rows = []
 	for (let i = 0; i < halfMoves; i += 2) {
@@ -98,7 +99,10 @@ function MoveHistory({
 						const blackActive = viewIndex === row.blackIdx + 1
 
 						return (
-							<div key={row.num} className={styles.moveRow}>
+							<div
+								key={row.num}
+								className={`${styles.moveRow} ${!showMoveTimes ? styles.moveRowNoTimes : ''}`}
+							>
 								<span className={styles.moveRowNum}>{row.num}.</span>
 
 								<button
@@ -121,20 +125,22 @@ function MoveHistory({
 									<span className={styles.emptyMoveBtn} />
 								)}
 
-								<div className={styles.moveTimesGroup}>
-									<div className={styles.timeItem} title={t('white_time_spent')}>
-										<span className={styles.timeDotWhite} />
-										<span className={styles.timeText}>{formatMoveTime(row.whiteTime)}</span>
-									</div>
-									{row.blackSan ? (
-										<div className={styles.timeItem} title={t('black_time_spent')}>
-											<span className={styles.timeDotBlack} />
-											<span className={styles.timeText}>{formatMoveTime(row.blackTime)}</span>
+								{showMoveTimes && (
+									<div className={styles.moveTimesGroup}>
+										<div className={styles.timeItem} title={t('white_time_spent')}>
+											<span className={styles.timeDotWhite} />
+											<span className={styles.timeText}>{formatMoveTime(row.whiteTime)}</span>
 										</div>
-									) : (
-										<div className={styles.timeItemPlaceholder} />
-									)}
-								</div>
+										{row.blackSan ? (
+											<div className={styles.timeItem} title={t('black_time_spent')}>
+												<span className={styles.timeDotBlack} />
+												<span className={styles.timeText}>{formatMoveTime(row.blackTime)}</span>
+											</div>
+										) : (
+											<div className={styles.timeItemPlaceholder} />
+										)}
+									</div>
+								)}
 							</div>
 						)
 					})
