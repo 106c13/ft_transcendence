@@ -92,17 +92,6 @@ export class UsersService {
 		return this.buildUserProfile(user, isOwnProfile);
 	}
 
-	async createTestUser() {
-		const user = this.usersRepo.create({
-			email: 'test@test.com',
-			username: 'admin',
-			password: '123',
-			avatar: 'default.jpg',
-		});
-
-		return this.usersRepo.save(user);
-	}
-
 	async create(data: { email: string; username: string; password: string }) {
 		const user = this.usersRepo.create(data);
 		return this.usersRepo.save(user);

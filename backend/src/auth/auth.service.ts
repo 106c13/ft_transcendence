@@ -32,24 +32,6 @@ export class AuthService {
 		});
 	}
 
-	async test() {
-		const email = "admin@admin.com";
-		const username = "admin";
-		const password = "123";
-
-		const existingUser = await this.usersService.findByEmail(email);
-
-		if (existingUser) {
-			throw new ConflictException('user_already_exists');
-		}
-		const hashedPassword = await bcrypt.hash(password, 10);
-		return this.usersService.create({
-			email,
-			username,
-			password: hashedPassword,
-		});
-	}
-
 	async register({ email, username, password, repassword }) {
 		if (!email || !isValidEmail(email)) {
 			throw new BadRequestException('invalid_email_format');
