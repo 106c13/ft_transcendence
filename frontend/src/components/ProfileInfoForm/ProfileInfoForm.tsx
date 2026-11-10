@@ -47,10 +47,26 @@ const ProfileInfoForm = ({ initialUser, onUserUpdated }: Props) => {
 		}
 	}, [previewUrl])
 
+	const MAX_AVATAR_SIZE = 2 * 1024 * 1024 // 2MB
+	const ALLOWED_AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (e.target.files?.[0]) {
-			setAvatarFile(e.target.files[0])
+		const file = e.target.files?.[0]
+		if (!file) return
+
+		if (!ALLOWED_AVATAR_TYPES.includes(file.type)) {
+			toast.error('invalid_image_format')
+			e.target.value = ''
+			return
 		}
+
+		if (file.size > MAX_AVATAR_SIZE) {
+			toast.error('image_too_big')
+			e.target.value = ''
+			return
+		}
+
+		setAvatarFile(file)
 	}
 
 	const handleCancelAvatar = () => {
@@ -98,12 +114,12 @@ const ProfileInfoForm = ({ initialUser, onUserUpdated }: Props) => {
 				body: formData,
 			})
 
-			const result = await res.json()
-
 			if (res.status === 413) {
 				toast.error('image_too_big')
 				return
 			}
+
+			const result = await res.json()
 
 			if (!res.ok) {
 				toast.error(result.message || 'update_failed')
@@ -190,7 +206,7 @@ const ProfileInfoForm = ({ initialUser, onUserUpdated }: Props) => {
 					<input
 						ref={fileInputRef}
 						type="file"
-						accept="image/*"
+						accept="image/jpeg,image/png,image/webp"
 						onChange={handleFileChange}
 						className={styles.hiddenFileInput}
 					/>
