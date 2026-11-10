@@ -2,7 +2,7 @@
 	background: #1E293B;
 	border: 1px solid rgba(148, 163, 184, 0.14);
 	border-radius: 16px;
-	padding: 26px 28px;
+	padding: 20px;
 	display: flex;
 	flex-direction: column;
 	gap: 20px;
@@ -64,4 +64,18 @@
 	color: #94A3B8;
 	line-height: 1.4;
 	margin: 0;
+}
+
+@media (max-width: 1024px) {
+	.curriculumCard {
+		padding: 16px;
+		gap: 16px;
+	}
+}
+
+@media (max-width: 480px) {
+	.curriculumCard {
+		padding: 12px;
+		gap: 12px;
+	}
 }
