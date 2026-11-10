@@ -20,7 +20,7 @@ dev: check
 	@printf "$(GREEN)[DEV] Starting project in development mode...$(RESET)\n"
 	@$(COMPOSE_DEV) up --build -d
 	@printf "$(GREEN)[OK] Dev environment is running!$(RESET)\n"
-	@printf "$(GREEN)Frontend (with React DevTools & HMR): http://localhost:8080$(RESET)\n"
+	@printf "$(GREEN)Frontend (with React DevTools & HMR): https://localhost:8080$(RESET)\n"
 	@printf "$(YELLOW)Run 'make dev-logs' to view logs, 'make dev-down' to stop.$(RESET)\n"
 
 dev-up: check
