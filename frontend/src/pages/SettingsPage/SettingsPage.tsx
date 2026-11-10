@@ -6,7 +6,6 @@ import SettingsHeader from '../../components/SettingsHeader/SettingsHeader';
 import type { SettingsTab } from '../../utils/settingsUtils';
 import ProfileInfoForm from '../../components/ProfileInfoForm/ProfileInfoForm';
 import ChangePasswordForm from '../../components/ChangePasswordForm/ChangePasswordForm';
-import styles from './SettingsPage.module.css';
 
 const SettingsPage = () => {
 	usePageTitle('page_title_settings');
@@ -14,8 +13,8 @@ const SettingsPage = () => {
 	const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
 
 	return (
-		<div className={`${styles.settingsContainer} min-h-[calc(100vh-64px)] w-full flex flex-col items-center pt-20 px-4 pb-12 bg-slate-900 text-slate-100 box-border`}>
-			<div className={`${styles.content} w-full max-w-[800px] flex flex-col gap-6`}>
+		<div className="min-h-screen w-full flex flex-col items-center pt-[72px] md:pt-[84px] px-4 md:px-10 pb-10 md:pb-[60px] text-slate-200 box-border">
+			<div className="w-full max-w-[860px] mx-auto flex flex-col gap-5">
 				{/* Settings Header with title & Profile-matching tab options */}
 				<SettingsHeader
 					activeTab={activeTab}
@@ -23,7 +22,7 @@ const SettingsPage = () => {
 				/>
 
 				{/* Tab Content */}
-				<div className={`${styles.sectionWrapper} w-full bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 sm:p-8 shadow-xl`}>
+				<div className="w-full">
 					{activeTab === 'profile' && (
 						<ProfileInfoForm
 							initialUser={currentUser}

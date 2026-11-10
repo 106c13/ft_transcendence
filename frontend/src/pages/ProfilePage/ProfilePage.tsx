@@ -158,8 +158,8 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
 
     if (error) {
         return (
-            <div className={pageStyles.authPage}>
-                <p className={`${pageStyles.msg} ${pageStyles.error}`}>{error}</p>
+            <div className="flex justify-center items-center min-h-screen pb-16 box-border bg-[radial-gradient(circle_at_top,#0f172a,#020617)] text-slate-200">
+                <p className="text-[15px] text-red-400">{error}</p>
             </div>
         );
     }
@@ -169,7 +169,7 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
     }
 
     return (
-        <div className={`${pageStyles.profilePage} min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center pt-20 px-4 pb-10 w-full box-border`}>
+        <div className="min-h-screen bg-slate-900 text-slate-200 flex flex-col items-center pt-[72px] min-[769px]:pt-[84px] px-4 min-[769px]:px-10 pb-8 min-[769px]:pb-10 w-full box-border">
             {/* Header and Live Game placed side-by-side with fluid grid width transitions */}
             <div
                 className={`${pageStyles.headerWrapper} ${

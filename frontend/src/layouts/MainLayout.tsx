@@ -95,9 +95,9 @@ const MainLayout = () => {
 	const showFooter = !isChatRoute && !isGameRoute && !isAnalyzeRoute;
 
 	return (
-		<div className="app-layout min-h-screen flex flex-col bg-slate-900 text-slate-100">
+		<div className="min-h-screen flex flex-col bg-slate-900 text-slate-100">
 			<Navbar currentUser={currentUser} friendSocket={friendSocket} />
-			<main className="layout-body flex-1 flex flex-col w-full">
+			<main className="flex-1 flex flex-col w-full">
 				{/* Child routes render here */}
 				<Outlet context={{ currentUser, setCurrentUser, challengeSocket, friendSocket } satisfies LayoutContextType} />
 			</main>

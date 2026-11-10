@@ -8,7 +8,6 @@ import ChatSidebar from '../../components/ChatSidebar/ChatSidebar'
 import ChatMain from '../../components/ChatMain/ChatMain'
 import NewChatModal from '../../components/NewChatModal/NewChatModal';
 import type { Friend } from '../../utils/chatUtils';
-import styles from './ChatPage.module.css'
 
 const ChatPage = () => {
 	const { t } = useTranslation()
@@ -144,8 +143,8 @@ const ChatPage = () => {
 
 	if (!currentUserId) {
 		return (
-			<div className={styles.loadingContainer}>
-				<div className={styles.loadingSpinner} />
+			<div className="flex flex-col items-center justify-center h-screen pt-16 box-border gap-4 bg-gradient-to-br from-slate-900 to-slate-800 text-slate-400 text-[15px]">
+				<div className="w-11 h-11 rounded-full border-[3px] border-blue-500/20 border-t-blue-500 animate-spin" />
 				<span>{t('loading_chat')}</span>
 			</div>
 		)
@@ -154,8 +153,8 @@ const ChatPage = () => {
 	const isMobileChatOpen = Boolean(selectedChat || userIdParam);
 
 	return (
-		<div className={`${styles.chatContainer} h-[calc(100vh-64px)] w-full flex bg-slate-900 text-slate-100 overflow-hidden box-border`}>
-			<div className={`${styles.chatContent} flex-1 flex w-full h-full overflow-hidden`}>
+		<div className="flex flex-col h-screen w-full pt-16 box-border overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800 text-slate-200">
+			<div className="flex flex-1 w-full h-[calc(100vh-64px)] overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800 relative">
 				<ChatSidebar
 					chats={chats}
 					selectedChat={selectedChat}

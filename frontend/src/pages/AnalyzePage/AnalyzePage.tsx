@@ -48,11 +48,15 @@ const AnalyzePage = () => {
         board.resetSelection()
     }
 
+    const containerClass = `${styles.container} flex flex-col min-h-screen min-[951px]:h-dvh min-[951px]:max-h-dvh bg-[linear-gradient(135deg,#0F172A_0%,#1E293B_100%)] text-slate-200 pt-16 box-border overflow-y-auto min-[951px]:overflow-hidden`
+    const mainClass = "flex-1 px-3 pt-[var(--game-gap)] pb-[30px] min-[951px]:px-4 min-[951px]:py-[var(--game-gap)] flex flex-col items-center justify-center overflow-y-auto min-[951px]:overflow-hidden box-border w-full min-h-0"
+    const playAreaClass = "flex flex-col min-[951px]:flex-row gap-4 items-center min-[951px]:items-stretch justify-center w-full max-w-[1280px] h-auto min-[951px]:h-[var(--game-content-h)] min-[951px]:max-h-[var(--game-content-h)] mx-auto box-border"
+
     if (state.isLoadingGame) {
         return (
-            <div className={styles.container}>
-                <main className={styles.main}>
-                    <div className={styles.playArea}>
+            <div className={containerClass}>
+                <main className={mainClass}>
+                    <div className={playAreaClass}>
                         <ChessSkeleton mode="analyze" />
                     </div>
                 </main>
@@ -61,17 +65,17 @@ const AnalyzePage = () => {
     }
 
     return (
-        <div className={styles.container}>
-            <main className={styles.main}>
-                <div className={styles.playArea}>
+        <div className={containerClass}>
+            <main className={mainClass}>
+                <div className={playAreaClass}>
                     {/* Left Board & Eval Bar Area */}
-                    <div className={styles.boardAreaWithEval}>
+                    <div className="flex items-center justify-center min-[951px]:justify-start gap-[var(--eval-gap)] w-full min-[951px]:w-auto h-auto min-[951px]:h-[var(--game-content-h)] min-[951px]:max-h-[var(--game-content-h)] box-border">
                         {/* Evaluation Bar */}
                         <AnalyzeEvalBar evalInfo={engine.evalInfo} />
 
                         {/* Chess Board Container with Top and Bottom Player Banners */}
                         <div
-                            className={styles.boardContainer}
+                            className="flex flex-col items-center justify-between relative w-[var(--board-size)] h-auto min-[951px]:h-[var(--game-content-h)] min-[951px]:max-h-[var(--game-content-h)] shrink-0 box-border"
                             onContextMenu={board.handleContextMenu}
                         >
                             {/* Top Banner (Black if normal orientation, White if flipped) */}

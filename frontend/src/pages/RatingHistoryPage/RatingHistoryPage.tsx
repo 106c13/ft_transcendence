@@ -9,7 +9,6 @@ import { useToast } from '../../context/ToastContext';
 import { isValidUsername, type User } from '../../utils/profileUtils';
 import type { LayoutContextType } from '../../utils/layoutContextUtils';
 import BigRatingChart from '../../components/BigRatingChart/BigRatingChart';
-import styles from './RatingHistoryPage.module.css';
 
 const VALID_MODES: RatingCategory[] = ['bullet', 'blitz', 'rapid'];
 
@@ -184,9 +183,9 @@ const RatingHistoryPage = () => {
 
 	if (loadingUser && !user) {
 		return (
-			<div className={styles.ratingHistoryPage}>
-				<div className={styles.loadingSpinner}>
-					<TrendingUp size={32} className={styles.spinnerIcon} aria-hidden="true" />
+			<div className="min-h-[calc(100vh-64px)] w-full flex flex-col items-center pt-[72px] min-[769px]:pt-[84px] px-4 min-[769px]:px-10 pb-8 min-[769px]:pb-10 bg-slate-900 text-slate-200 box-border">
+				<div className="flex flex-col items-center justify-center min-h-[400px] gap-3.5 text-slate-400 w-full">
+					<TrendingUp size={32} className="text-blue-400 animate-bounce" aria-hidden="true" />
 					<p>{t('loading')}</p>
 				</div>
 			</div>
@@ -200,11 +199,11 @@ const RatingHistoryPage = () => {
 	const primaryMode = activeModes[0] || playableModes[0] || 'blitz';
 
 	return (
-		<div className={`${styles.ratingHistoryPage} min-h-[calc(100vh-64px)] w-full flex flex-col items-center pt-20 px-4 pb-8 bg-slate-900 text-slate-100 box-border`}>
-			<div className={`${styles.contentWrapper} w-full max-w-[1040px] flex flex-col gap-6`}>
+		<div className="min-h-[calc(100vh-64px)] w-full flex flex-col items-center pt-[72px] min-[769px]:pt-[84px] px-4 min-[769px]:px-10 pb-8 min-[769px]:pb-10 bg-slate-900 text-slate-200 box-border">
+			<div className="w-full max-w-[860px] mx-auto flex flex-col gap-5">
 				{/* User header */}
 				{user && (
-					<div className={`${styles.userHeader} flex items-center gap-4 p-4 rounded-xl bg-slate-800/80 border border-slate-700/60 shadow-lg`}>
+					<div className="flex items-center gap-3.5 px-[18px] py-3.5 rounded-xl bg-slate-800 border border-slate-400/12 w-full box-border">
 						<img
 							src={
 								user.avatar && user.avatar !== 'default.jpg'
@@ -212,7 +211,7 @@ const RatingHistoryPage = () => {
 									: '/assets/default.jpg'
 							}
 							alt={user.username}
-							className={`${styles.avatar} w-14 h-14 rounded-full object-cover border-2 border-slate-600`}
+							className="w-[46px] h-[46px] aspect-square rounded-full object-cover block border-2 border-slate-400/20 bg-slate-700 shrink-0"
 							onError={(e) => {
 								const target = e.currentTarget;
 								if (!target.src.endsWith('/assets/default.jpg')) {
@@ -220,9 +219,9 @@ const RatingHistoryPage = () => {
 								}
 							}}
 						/>
-						<div className={`${styles.userInfo} flex flex-col`}>
-							<span className={`${styles.userName} text-lg font-bold text-slate-100`}>{user.username}</span>
-							<span className={`${styles.userSubtitle} text-xs text-slate-400`}>{t('rating_overview')}</span>
+						<div className="flex flex-col gap-0.5">
+							<span className="text-lg font-extrabold text-slate-50 tracking-[-0.3px]">{user.username}</span>
+							<span className="text-xs text-slate-400">{t('rating_overview')}</span>
 						</div>
 					</div>
 				)}

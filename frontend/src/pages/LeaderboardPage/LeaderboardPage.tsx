@@ -8,7 +8,6 @@ import LeaderboardPodium from '../../components/LeaderboardPodium/LeaderboardPod
 import LeaderboardToolbar from '../../components/LeaderboardToolbar/LeaderboardToolbar';
 import LeaderboardTable from '../../components/LeaderboardTable/LeaderboardTable';
 import LeaderboardPagination from '../../components/LeaderboardPagination/LeaderboardPagination';
-import styles from './LeaderboardPage.module.css';
 
 export type { LeaderboardPlayer };
 
@@ -203,8 +202,8 @@ const LeaderboardPage = () => {
 	}, [topThree, players]);
 
 	return (
-		<div className={`${styles.leaderboardPage} min-h-[calc(100vh-64px)] w-full flex flex-col items-center pt-20 px-6 pb-6 box-border`}>
-			<div className={`${styles.leaderboardContainer} w-full max-w-[960px] flex flex-col gap-4`}>
+		<div className="min-h-[calc(100vh-64px)] w-full flex flex-col items-center pt-20 px-3 min-[769px]:px-6 pb-6 box-border text-slate-200 bg-[radial-gradient(circle_at_50%_0%,#1e1b4b_0%,#0F172A_40%,#090D16_100%)] [overflow-anchor:none]">
+			<div className="w-full max-w-[960px] flex flex-col gap-4 [overflow-anchor:none]">
 				{/* Header Section */}
 				<LeaderboardHeader
 					total={total}

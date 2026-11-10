@@ -72,11 +72,15 @@ const GamePage = () => {
         [bottomColor]
     )
 
+    const containerClass = `${styles.gameContainer} flex flex-col min-h-screen min-[951px]:h-dvh min-[951px]:max-h-dvh bg-[linear-gradient(135deg,#0F172A_0%,#1E293B_100%)] text-slate-200 pt-16 box-border overflow-y-auto min-[951px]:overflow-hidden`
+    const mainClass = "flex-1 ml-0 px-3 pt-[var(--game-gap)] pb-[30px] min-[951px]:px-4 min-[951px]:py-[var(--game-gap)] flex flex-col items-center justify-center overflow-y-auto min-[951px]:overflow-hidden box-border w-full min-h-0"
+    const playAreaClass = "flex flex-col min-[951px]:flex-row gap-4 min-[951px]:gap-[var(--game-gap)] items-center min-[951px]:items-stretch justify-center w-full max-w-[1280px] h-auto min-[951px]:h-[var(--game-content-h)] min-[951px]:max-h-[var(--game-content-h)] mx-auto box-border"
+
     if (game.gameState === 'searching') {
         return (
-            <div className={styles.gameContainer}>
-                <main className={styles.gameMain}>
-                    <div className={styles.gamePlayArea}>
+            <div className={containerClass}>
+                <main className={mainClass}>
+                    <div className={playAreaClass}>
                         <ChessSkeleton mode="game" />
                     </div>
                 </main>
@@ -213,11 +217,11 @@ const GamePage = () => {
     )
 
     return (
-        <div className={styles.gameContainer}>
-            <main className={styles.gameMain}>
-                <div className={styles.gamePlayArea}>
+        <div className={containerClass}>
+            <main className={mainClass}>
+                <div className={playAreaClass}>
                     <div
-                        className={styles.boardContainer}
+                        className="flex flex-col items-center justify-between relative w-[var(--board-size)] h-auto min-[951px]:h-[var(--game-content-h)] min-[951px]:max-h-[var(--game-content-h)] shrink-0 box-border"
                         onContextMenu={(e) => {
                             e.preventDefault()
                             if (board.showPromotion) {

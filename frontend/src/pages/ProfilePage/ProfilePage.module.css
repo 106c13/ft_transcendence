@@ -1,39 +1,6 @@
-.profilePage {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	padding: 84px 40px 40px;
-	color: var(--color-slate-200);
-	min-height: 100vh;
-	width: 100%;
-	box-sizing: border-box;
-}
-
-.authPage {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	min-height: 100vh;
-	padding-bottom: 64px;
-	box-sizing: border-box;
-	background: radial-gradient(circle at top, var(--color-slate-900), var(--color-bg-deep));
-	color: var(--color-slate-200);
-}
-
-.msg {
-	font-size: var(--font-size-md);
-	color: var(--color-slate-400);
-}
-
-.error {
-	color: var(--color-red-400);
-}
-
 /* Header & Live Game Side-by-Side Wrapper using CSS Grid for 100% fluid track interpolation */
 .headerWrapper {
 	container-type: inline-size; 
-	display: grid;
-	grid-template-columns: 1fr 0px;
 	display: grid;
 	grid-template-columns: 1fr 0px;
 	column-gap: 0px;
@@ -118,10 +85,6 @@
 }
 
 @media (max-width: 768px) {
-	.profilePage {
-		padding: 72px var(--padding-lg) var(--padding-3xl);
-	}
-
 	.headerWrapper {
 		display: flex;
 		flex-direction: column;

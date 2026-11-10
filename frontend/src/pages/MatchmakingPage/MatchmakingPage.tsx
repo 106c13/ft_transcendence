@@ -95,9 +95,9 @@ const MatchmakingPage = () => {
         : `~800 (${t('provisional')})`
 
     return (
-        <div className={`${styles.pageContainer} min-h-[calc(100vh-64px)] w-full flex items-center justify-center p-4 bg-slate-900 text-slate-100 box-border`}>
-            <main className={`${styles.mainContent} flex items-center justify-center w-full`}>
-                <div className={`${styles.searchingCard} flex flex-col items-center max-w-sm w-full p-8 rounded-2xl bg-slate-800/90 border border-slate-700/60 shadow-2xl text-center`}>
+        <div className="flex flex-col min-h-screen w-full pt-16 bg-[linear-gradient(135deg,#0f172a_0%,#1e293b_100%)] text-slate-200 box-border">
+            <main className="flex-1 flex flex-col items-center justify-center w-full px-4 pt-5 pb-9 box-border">
+                <div className="flex flex-col items-center max-w-[460px] w-full px-4 min-[641px]:px-7 py-7 min-[641px]:py-9 rounded-[20px] bg-slate-800/70 backdrop-blur-md border border-slate-400/15 shadow-[0_20px_50px_rgba(0,0,0,0.5)] text-center">
                     <div className={styles.visualContainer} aria-hidden="true">
                         <div className={styles.loaderRing} />
                         <div className={styles.pedestal}>
@@ -111,17 +111,17 @@ const MatchmakingPage = () => {
                             </div>
                         </div>
                     </div>
-                    <h3 className="text-xl font-bold text-slate-100 mt-4 mb-2">{t('searching_match')}</h3>
-                    <p className={`${styles.searchingDesc} text-sm text-slate-400 mb-2`}>
+                    <h3 className="text-[22px] font-bold text-slate-50 mt-0 mb-2.5">{t('searching_match')}</h3>
+                    <p className="text-sm text-slate-400 mt-0 mb-1">
                         {t('searching_desc')}{' '}
-                        <span className={`${styles.modeBadge} inline-block px-2 py-0.5 rounded text-xs font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/30`}>{modeParam}</span>
+                        <span className="inline-block px-3 py-1 rounded-[10px] text-sm font-semibold bg-blue-500/15 text-blue-400 capitalize">{modeParam}</span>
                     </p>
-                    <p className={`${styles.searchingRating} text-xs text-slate-400 mb-6`}>
-                        {t('your_rating')}: <strong className="text-slate-200">{searchingRatingText}</strong>
+                    <p className="text-sm text-slate-400 mt-0 mb-7">
+                        {t('your_rating')}: <strong className="text-blue-400">{searchingRatingText}</strong>
                     </p>
                     <button
                         type="button"
-                        className={`${styles.cancelMatchBtn} flex items-center justify-center gap-2 py-2.5 px-6 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 transition duration-150 font-medium cursor-pointer`}
+                        className="inline-flex items-center justify-center gap-2 py-3 px-7 rounded-xl bg-red-500/12 hover:bg-red-500/25 text-red-400 border border-red-500/40 hover:border-red-500/70 hover:-translate-y-px transition-all duration-200 text-sm font-semibold cursor-pointer"
                         onClick={handleCancel}
                     >
                         <X size={15} aria-hidden="true" />

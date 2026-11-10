@@ -85,23 +85,23 @@ const HomePage = () => {
 	];
 
 	return (
-		<div className={styles.homeContainer}>
-			<main className={styles.mainContent}>
+		<div className="flex flex-col min-h-screen bg-gradient-to-br from-[#0F172A] to-[#1E293B] text-slate-200 pt-16 box-border">
+			<main className="flex-1 max-w-[1140px] w-full mx-auto px-4 min-[961px]:px-5 pb-7 min-[961px]:pb-9 box-border flex flex-col gap-5 min-[961px]:gap-[22px]">
 				<div className={styles.contentHeader}>
 					<h1>{t('welcome', { username: currentUser?.username || t('player') })}</h1>
 				</div>
 
 				{/* Section 1: Play Online */}
-				<section className={styles.section}>
+				<section className="flex flex-col gap-3 w-full">
 					<div className={styles.sectionHeader}>
 						<h2 className={styles.sectionTitle}>
 							<Swords size={20} aria-hidden="true" /> {t('play_online')}
 						</h2>
 					</div>
 
-					<div className={styles.playOnlineLayout}>
+					<div className="grid grid-cols-1 min-[961px]:grid-cols-[minmax(0,7fr)_minmax(0,3fr)] gap-[18px] items-stretch w-full">
 						{/* Left subsection (70-80%): Challenge section & minimal game modes (without names) */}
-						<div className={styles.playOnlineLeft}>
+						<div className="flex flex-col gap-3 min-w-0 h-full">
 							<ChallengeSection
 								active={challengeActive}
 								onToggle={handleToggleChallenge}
@@ -113,7 +113,7 @@ const HomePage = () => {
 						</div>
 
 						{/* Right subsection (20-30%): Random review recommendation board */}
-						<div className={styles.playOnlineRight}>
+						<div className="flex flex-col min-w-0 w-full h-full">
 							<GameReviewCard
 								games={history.matches}
 								currentUsername={currentUser?.username}
@@ -124,16 +124,16 @@ const HomePage = () => {
 				</section>
 
 				{/* Section 2: Stats and More */}
-				<section className={styles.section}>
+				<section className="flex flex-col gap-3 w-full">
 					<div className={styles.sectionHeader}>
 						<h2 className={styles.sectionTitle}>
 							<BarChart3 size={20} aria-hidden="true" /> {t('stats_and_more')}
 						</h2>
 					</div>
 
-					<div className={styles.statsLayout}>
+					<div className="grid grid-cols-1 min-[1121px]:grid-cols-[minmax(0,7fr)_minmax(0,3fr)] gap-[18px] items-stretch w-full">
 						{/* Left subsection (70%): Recent games list like in profile */}
-						<div className={styles.statsLeft}>
+						<div className="flex flex-col min-w-0 h-full">
 							<RecentGames
 								matches={history.matches}
 								username={currentUser?.username || ''}
@@ -143,7 +143,7 @@ const HomePage = () => {
 						</div>
 
 						{/* Right subsection (30%): Stacked ratings on top and friends on bottom */}
-						<div className={styles.statsRight}>
+						<div className="flex flex-col gap-4 min-w-0 h-full">
 							<PlayerRatingsCard
 								ratings={effectiveRatings}
 								username={currentUser?.username}
