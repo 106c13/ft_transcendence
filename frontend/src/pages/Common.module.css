@@ -50,7 +50,7 @@ form {
 }
 
 /* INPUT + TEXTAREA */
-input:not([type="checkbox"]),
+input:where(:not([type="checkbox"])),
 textarea {
 	width: 100%;
 	padding: 12px;
@@ -63,12 +63,12 @@ textarea {
 	resize: vertical;
 }
 
-input:not([type="checkbox"])::placeholder,
+input:where(:not([type="checkbox"]))::placeholder,
 textarea::placeholder {
 	color: #94A3B8;
 }
 
-input:not([type="checkbox"]):focus,
+input:where(:not([type="checkbox"])):focus,
 textarea:focus {
 	border-color: #3B82F6;
 	background: rgba(59, 130, 246, 0.08);
