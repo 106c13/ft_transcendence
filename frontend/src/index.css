@@ -1,16 +1,5 @@
 @import "tailwindcss";
 
-@theme {
-  --color-bg-darkest: var(--color-bg-darkest);
-  --color-bg-deep: var(--color-bg-deep);
-  --color-bg-card: var(--color-bg-card);
-  --color-bg-surface: var(--color-bg-surface);
-  --color-bg-hover: var(--color-bg-hover);
-  --color-border-subtle: var(--color-border-subtle);
-  --color-border-card: var(--color-border-card);
-  --shadow-glow-blue: var(--shadow-glow-blue);
-}
-
 :root {
   --text: #6b6375;
   --text-h: #08060d;
