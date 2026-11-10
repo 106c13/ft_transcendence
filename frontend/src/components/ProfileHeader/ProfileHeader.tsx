@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Settings, LogOut, UserPlus, Clock, Check, X, UserCheck, MessageSquare } from 'lucide-react';
+import { Settings, LogOut, UserPlus, Clock, Check, X, UserCheck, MessageSquare, Calendar } from 'lucide-react';
 import type { User, FriendStatus, TabType } from '../../utils/profileUtils';
 import TopRankBadge from '../TopRankBadge/TopRankBadge';
 import styles from './ProfileHeader.module.css';
@@ -48,71 +48,83 @@ const ProfileHeader = ({
         navigate(`/chat/${user.id}`)
     }
 
+    const statusClass =
+        isLiveGame || user.status === 'INGAME'
+            ? styles.ingame
+            : isOwnProfile || user.status === 'ONLINE'
+            ? styles.online
+            : styles.offline;
+
+    const statusLabel =
+        isLiveGame || user.status === 'INGAME'
+            ? t('in_game')
+            : isOwnProfile || user.status === 'ONLINE'
+            ? t('online')
+            : t('offline');
+
     return (
         <div className={styles.profileHeader}>
-            {/* Top Section: Avatar, Nickname & Status, Bio, Action Buttons */}
+            {/* Top Section: Avatar with Status Dot, Identity Info, Action Buttons */}
             <div className={styles.topSection}>
                 <div className={styles.identityGroup}>
-                    <img
-                        className={styles.profileAvatar}
-                        src={
-                            user.avatar && user.avatar !== 'default.jpg'
-                                ? `/uploads/${user.avatar}`
-                                : `/assets/default.jpg`
-                        }
-                        alt={user.username || t('avatar')}
-                        onError={(e) => {
-                            const target = e.currentTarget
-                            if (!target.src.endsWith('/assets/default.jpg')) {
-                                target.src = '/assets/default.jpg'
+                    <div className={styles.avatarWrapper} title={statusLabel}>
+                        <img
+                            className={styles.profileAvatar}
+                            src={
+                                user.avatar && user.avatar !== 'default.jpg'
+                                    ? `/uploads/${user.avatar}`
+                                    : `/assets/default.jpg`
                             }
-                        }}
-                    />
+                            alt={user.username || t('avatar')}
+                            onError={(e) => {
+                                const target = e.currentTarget
+                                if (!target.src.endsWith('/assets/default.jpg')) {
+                                    target.src = '/assets/default.jpg'
+                                }
+                            }}
+                        />
+                        <span
+                            className={`${styles.statusDot} ${statusClass}`}
+                            aria-label={statusLabel}
+                        />
+                    </div>
 
                     <div className={styles.profileInfo}>
-                        <h2 className={styles.username}>{user.username}</h2>
-                        <div className={styles.statusRow}>
-                            {isLiveGame || user.status === 'INGAME' ? (
-                                <span className={styles.ingameIndicator}>
-                                    <span className={styles.ingameDot}></span>
-                                    {t('in_game')}
-                                </span>
-                            ) : isOwnProfile || user.status === 'ONLINE' ? (
-                                <span className={styles.onlineIndicator}>
-                                    <span className={styles.onlineDot}></span>
-                                    {t('online')}
-                                </span>
-                            ) : (
-                                <span className={styles.offlineIndicator}>
-                                    <span className={styles.offlineDot}></span>
-                                    {t('offline')}
-                                </span>
-                            )}
-                        </div>
-
-                        <div
-                            className={styles.leaderboardRow}
-                            onClick={() => navigate('/leaderboard')}
-                            title={t('view_leaderboard')}
-                            role="button"
-                            tabIndex={0}
-                        >
-                            <span className={styles.leaderboardRatingValue}>
-                                {user.leaderboardRating ?? 800}
-                            </span>
-                            {user.leaderboardRank !== undefined && user.leaderboardRank !== null && user.leaderboardRank <= 3 && (
-                                <TopRankBadge rank={user.leaderboardRank} size="sm" />
-                            )}
+                        <div className={styles.nameRow}>
+                            <h2 className={styles.username}>{user.username}</h2>
                             {user.leaderboardRank ? (
-                                <span className={styles.leaderboardRankPill}>
-                                    #{user.leaderboardRank}
-                                </span>
+                                <div
+                                    className={styles.rankGroup}
+                                    onClick={() => navigate('/leaderboard')}
+                                    title={t('view_leaderboard')}
+                                    role="button"
+                                    tabIndex={0}
+                                >
+                                    {user.leaderboardRank <= 3 && (
+                                        <TopRankBadge rank={user.leaderboardRank} size="sm" />
+                                    )}
+                                    <span className={styles.leaderboardRankPill}>
+                                        #{user.leaderboardRank}
+                                    </span>
+                                </div>
                             ) : null}
                         </div>
+
+                        <div className={styles.joinedAt}>
+                            <Calendar size={13} className={styles.joinedIcon} aria-hidden="true" />
+                            <span>{t('joined')}:</span>
+                            <span className={styles.joinedDate}>
+                                {user.created_at
+                                    ? new Date(user.created_at).toLocaleDateString()
+                                    : t('unknown')}
+                            </span>
+                        </div>
+
+                        <p className={styles.bio}>{user.bio || t('no_bio_yet')}</p>
                     </div>
                 </div>
 
-                {/* Header Actions - Unified Style and Proportional Spacing */}
+                {/* Header Actions */}
                 <div className={styles.headerActions}>
                 {isOwnProfile ? (
                     <>
@@ -194,23 +206,6 @@ const ProfileHeader = ({
                         )}
                     </>
                 ) : null}
-                </div>
-            </div>
-
-            {/* Bio Section */}
-            <div className={styles.bioSection}>
-                <p className={styles.bio}>{user.bio || t('no_bio_yet')}</p>
-            </div>
-
-            {/* Meta Row: Joined Date */}
-            <div className={styles.metaRow}>
-                <div className={styles.joinedAt}>
-                    <span>{t('joined')}: </span>
-                    <span className={styles.joinedDate}>
-                        {user.created_at
-                            ? new Date(user.created_at).toLocaleDateString()
-                            : t('unknown')}
-                    </span>
                 </div>
             </div>
 
