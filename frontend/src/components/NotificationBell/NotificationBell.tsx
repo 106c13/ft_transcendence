@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Bell, BellOff } from 'lucide-react';
+import { Bell, BellOff, CheckCheck, Trash2 } from 'lucide-react';
 import NavTooltip from '../NavTooltip/NavTooltip';
 import type { FriendSocketType } from '../../utils/layoutContextUtils';
 import type { Notification } from '../../utils/notificationUtils';
@@ -46,10 +46,13 @@ const NotificationBell = ({ userId, friendSocket, onUnreadChange }: Props) => {
         });
     };
 
+    const [prevPath, setPrevPath] = useState(location.pathname);
+
     // Close dropdown on route change
-    useEffect(() => {
+    if (prevPath !== location.pathname) {
+        setPrevPath(location.pathname);
         setIsOpen(false);
-    }, [location.pathname]);
+    }
 
     useEffect(() => {
         onUnreadChange?.(unreadCount);
@@ -143,20 +146,22 @@ const NotificationBell = ({ userId, friendSocket, onUnreadChange }: Props) => {
                         <div className={styles.headerActions}>
                             {unreadCount > 0 && (
                                 <button
-                                    className={styles.actionTextBtn}
+                                    className={`${styles.headerIconBtn} ${styles.markReadBtn}`}
                                     onClick={markAllRead}
                                     title={t('mark_all_read')}
+                                    aria-label={t('mark_all_read')}
                                 >
-                                    {t('mark_all_read')}
+                                    <CheckCheck size={16} aria-hidden="true" />
                                 </button>
                             )}
                             {notifications.length > 0 && (
                                 <button
-                                    className={`${styles.actionTextBtn} ${styles.clearBtn}`}
+                                    className={`${styles.headerIconBtn} ${styles.clearBtn}`}
                                     onClick={clearAll}
                                     title={t('clear_all')}
+                                    aria-label={t('clear_all')}
                                 >
-                                    {t('clear_all')}
+                                    <Trash2 size={16} aria-hidden="true" />
                                 </button>
                             )}
                         </div>
