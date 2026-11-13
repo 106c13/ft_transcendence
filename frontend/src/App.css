@@ -11,4 +11,14 @@ body {
   font-family: var(--sans);
   background: var(--color-slate-900);
   color: var(--color-slate-100);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
 }

@@ -105,7 +105,7 @@
   border-radius: 8px;
   padding: 10px;
   color: #F1F5F9;
-  font-family: monospace;
+  font-family: var(--mono);
   font-size: 12px;
   resize: vertical;
   box-sizing: border-box;
