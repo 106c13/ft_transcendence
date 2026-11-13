@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollText, SkipBack, ChevronLeft, ChevronRight, SkipForward } from 'lucide-react';
+import { formatMoveTime } from '../../utils/gameUtils';
 import styles from './MoveHistory.module.css';
 
 
@@ -13,23 +14,11 @@ type Props = {
 	onSelectIndex: (idx: number) => void
 }
 
-function formatMoveTime(ms?: number): string {
-	if (ms === undefined || ms === null) return '—'
-	const totalSec = ms / 1000
-	if (totalSec < 60) {
-		return `${totalSec.toFixed(1)}s`
-	}
-	const mins = Math.floor(totalSec / 60)
-	const secs = Math.floor(totalSec % 60)
-	return `${mins}:${secs.toString().padStart(2, '0')}`
-}
-
 function MoveHistory({
 	moveHistory,
 	moveSAN,
 	moveTimes,
 	viewIndex,
-	isReviewing: _isReviewing,
 	onSelectIndex,
 }: Props) {
 	const { t } = useTranslation()

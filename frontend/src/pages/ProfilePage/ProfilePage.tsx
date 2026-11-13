@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
 import { useProfile } from '../../hooks/useProfile';
 import { usePageTitle } from '../../hooks/usePageTitle';
@@ -42,26 +42,31 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
     // Load game history to know total games count and pass down to tabs
     const history = useGameHistory(user?.username || '');
 
-    // Live Ongoing Game beside header
+    // Live Ongoing Game below header
     const [activeGame, setActiveGame] = useState<LiveGameData | null>(null);
     const [isLiveActive, setIsLiveActive] = useState(false);
-    const [headerHeight, setHeaderHeight] = useState<number | null>(null);
-    const headerRef = useRef<HTMLDivElement>(null);
+    const profileUsername = user?.username;
 
-    const fetchLiveGame = useCallback(async () => {
-        if (!user?.username) return;
+    const fetchLiveGame = useCallback(async (resetFirst = false) => {
+        if (!profileUsername) return;
+        if (resetFirst) {
+            setActiveGame(null);
+            setIsLiveActive(false);
+        }
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`/api/game/live/${user.username}`, {
+            const res = await fetch(`/api/game/live/${profileUsername}`, {
                 headers: token ? { Authorization: `Bearer ${token}` } : {},
             });
             if (res.ok) {
                 const data = await res.json();
                 if (data?.gameId) {
                     setActiveGame(data);
-                    // rAF ensures the element is mounted in DOM before triggering active class for smooth expansion
+                    // Double rAF ensures the 0fr collapsed state is painted before transitioning to 1fr
                     requestAnimationFrame(() => {
-                        setIsLiveActive(true);
+                        requestAnimationFrame(() => {
+                            setIsLiveActive(true);
+                        });
                     });
                     return;
                 }
@@ -85,13 +90,14 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
                 return prev;
             });
         }
-    }, [user?.username]);
+    }, [profileUsername]);
 
     useEffect(() => {
-        setActiveGame(null);
-        setIsLiveActive(false);
-        fetchLiveGame();
-    }, [user?.username, fetchLiveGame]);
+        const id = setTimeout(() => {
+            fetchLiveGame(true);
+        }, 0);
+        return () => clearTimeout(id);
+    }, [fetchLiveGame]);
 
     // Listen for live presence changes to automatically detect game start
     useEffect(() => {
@@ -103,9 +109,9 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
                 gameId?: string;
             }>;
             const data = customEvent.detail;
-            if (!data || !user?.username) return;
+            if (!data || !profileUsername) return;
 
-            if (data.username?.toLowerCase() === user.username.toLowerCase()) {
+            if (data.username?.toLowerCase() === profileUsername.toLowerCase()) {
                 if (data.status === 'INGAME') {
                     fetchLiveGame();
                 }
@@ -116,35 +122,7 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
         return () => {
             window.removeEventListener('user_status_changed', handleStatusChange);
         };
-    }, [user?.username, fetchLiveGame]);
-
-    // Measure header height to keep board 1:1 matching
-    useEffect(() => {
-        if (!headerRef.current) return;
-
-        const updateHeight = () => {
-            if (headerRef.current) {
-                const h = headerRef.current.offsetHeight;
-                if (h > 0) {
-                    setHeaderHeight((prev) => {
-                        if (prev !== null && Math.abs(prev - h) <= 2) {
-                            return prev;
-                        }
-                        return h;
-                    });
-                }
-            }
-        };
-
-        updateHeight();
-
-        const ro = new ResizeObserver(() => {
-            updateHeight();
-        });
-        ro.observe(headerRef.current);
-
-        return () => ro.disconnect();
-    }, [user, friends]);
+    }, [profileUsername, fetchLiveGame]);
 
     const handleStartExit = useCallback(() => {
         setIsLiveActive(false);
@@ -170,42 +148,34 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
 
     return (
         <div className="min-h-screen bg-slate-900 text-slate-200 flex flex-col items-center pt-[72px] min-[769px]:pt-[84px] px-4 min-[769px]:px-10 pb-8 min-[769px]:pb-10 w-full box-border">
-            {/* Header and Live Game placed side-by-side with fluid grid width transitions */}
-            <div
-                className={`${pageStyles.headerWrapper} ${
-                    isLiveActive ? pageStyles.hasLiveGame : ''
-                }`}
-                style={
-                    headerHeight
-                        ? ({
-                                '--header-height': `${headerHeight}px`,
-                          } as React.CSSProperties)
-                        : undefined
-                }
-            >
-                <div ref={headerRef} className={pageStyles.headerContainer}>
-                    <ProfileHeader
-                        user={user}
-                        isOwnProfile={user.isOwnProfile || false}
-                        isLoggedIn={isLoggedIn}
-                        menuOpen={menuOpen}
-                        setMenuOpen={setMenuOpen}
-                        friendStatus={friendStatus}
-                        isLiveGame={isLiveActive}
-                        activeTab={activeTab}
-                        onSelectTab={handleSelectTab}
-                        onSend={sendFriendRequest}
-                        onAccept={acceptFriendRequest}
-                        onReject={rejectFriendRequest}
-                        onCancel={cancelFriendRequest}
-                        onUnfriend={unFriendRequest}
-                        onLogout={logout}
-                        onSettings={goToSettings}
-                    />
-                </div>
+            <div className={pageStyles.headerWrapper}>
+                <ProfileHeader
+                    user={user}
+                    isOwnProfile={user.isOwnProfile || false}
+                    isLoggedIn={isLoggedIn}
+                    menuOpen={menuOpen}
+                    setMenuOpen={setMenuOpen}
+                    friendStatus={friendStatus}
+                    isLiveGame={isLiveActive}
+                    activeTab={activeTab}
+                    onSelectTab={handleSelectTab}
+                    onSend={sendFriendRequest}
+                    onAccept={acceptFriendRequest}
+                    onReject={rejectFriendRequest}
+                    onCancel={cancelFriendRequest}
+                    onUnfriend={unFriendRequest}
+                    onLogout={logout}
+                    onSettings={goToSettings}
+                />
+            </div>
 
-                {activeGame && (
-                    <div className={pageStyles.liveGameContainer}>
+            {activeGame && (
+                <div
+                    className={`${pageStyles.liveGameCollapse} ${
+                        isLiveActive ? pageStyles.liveGameOpen : ''
+                    }`}
+                >
+                    <div className={pageStyles.liveGameInner}>
                         <OngoingGameCard
                             gameData={activeGame}
                             profileUsername={user.username}
@@ -214,8 +184,8 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
                             onGameOverDone={handleDoneExit}
                         />
                     </div>
-                )}
-            </div>
+                </div>
+            )}
 
             <ProfileTabs
                 activeTab={activeTab}

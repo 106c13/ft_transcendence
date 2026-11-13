@@ -1,4 +1,4 @@
-import { Chess } from 'chess.js';
+import { Chess, type Square } from 'chess.js';
 
 const PIECE_ASSET_DIR = '/assets/pieces';
 
@@ -285,12 +285,101 @@ export interface LiveGameData {
 	blackTime: number;
 	lastMoveTime: number;
 	lastMove?: { from: string; to: string } | null;
+	history?: string[];
+	moveTimes?: number[];
 	isCheck?: boolean;
 	isPaused?: boolean;
+	clock?: GameClockSnapshot;
 	isGameOver?: boolean;
 	whitePlayer: LiveGamePlayer;
 	blackPlayer: LiveGamePlayer;
 }
+
+export type GameClockSnapshot = {
+	whiteTime: number;
+	blackTime: number;
+	turn: 'w' | 'b';
+	serverTime: number;
+	isPaused: boolean;
+};
+
+export type CapturedPieceItem = {
+	type: string;
+	color: 'w' | 'b';
+};
+
+export const formatMoveTime = (ms?: number): string => {
+	if (ms === undefined || ms === null) return '—';
+	const clamped = Math.max(0, ms);
+	const totalSec = clamped / 1000;
+	if (totalSec < 60) {
+		return `${totalSec.toFixed(1)}s`;
+	}
+	const mins = Math.floor(totalSec / 60);
+	const secs = Math.floor(totalSec % 60);
+	return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
+export const calculateBoardMaterial = (chess: Chess): {
+	captured: { w: CapturedPieceItem[]; b: CapturedPieceItem[] };
+	whiteScore: number;
+	blackScore: number;
+} => {
+	const initial = {
+		w: { p: 8, n: 2, b: 2, r: 2, q: 1 },
+		b: { p: 8, n: 2, b: 2, r: 2, q: 1 },
+	};
+
+	const current = {
+		w: { p: 0, n: 0, b: 0, r: 0, q: 0 },
+		b: { p: 0, n: 0, b: 0, r: 0, q: 0 },
+	};
+
+	for (const rank of ['1', '2', '3', '4', '5', '6', '7', '8']) {
+		for (const file of ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) {
+			const piece = chess.get(`${file}${rank}` as Square);
+			if (piece && piece.type !== 'k') {
+				current[piece.color][piece.type]++;
+			}
+		}
+	}
+
+	const captured = {
+		w: [] as CapturedPieceItem[],
+		b: [] as CapturedPieceItem[],
+	};
+
+	const pieceValues: Record<string, number> = {
+		p: 1,
+		n: 3,
+		b: 3,
+		r: 5,
+		q: 9,
+	};
+
+	let whiteScore = 0;
+	let blackScore = 0;
+
+	for (const type of ['p', 'n', 'b', 'r', 'q'] as const) {
+		const lostWhite = Math.max(0, initial.w[type] - current.w[type]);
+		for (let i = 0; i < lostWhite; i++) {
+			captured.w.push({ type, color: 'w' });
+			blackScore += pieceValues[type];
+		}
+
+		const lostBlack = Math.max(0, initial.b[type] - current.b[type]);
+		for (let i = 0; i < lostBlack; i++) {
+			captured.b.push({ type, color: 'b' });
+			whiteScore += pieceValues[type];
+		}
+	}
+
+	return {
+		captured,
+		whiteScore,
+		blackScore,
+	};
+};
 
 // Rating Types 
 export type RatingCategory = 'bullet' | 'blitz' | 'rapid';
