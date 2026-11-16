@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Home, Repeat2, RotateCcw, Search, X } from 'lucide-react';
+import { Home, Repeat2, RotateCcw, Brain, X } from 'lucide-react';
 import { useGameHistory } from '../../hooks/useGameHistory';
 import ModalConfetti from '../ModalConfetti/ModalConfetti';
 import TopRankBadge from '../TopRankBadge/TopRankBadge';
@@ -217,7 +217,7 @@ const GameOverDialog = ({
 						) : (
 							<button className={styles.analyzeBtn} onClick={onAnalyze}>
 								<span className={styles.analyzeBtnIcon}>
-									<Search size={20} aria-hidden="true" />
+									<Brain size={20} aria-hidden="true" />
 								</span>
 								{t('review_game')}
 							</button>
@@ -227,7 +227,7 @@ const GameOverDialog = ({
 							{gameOverReason !== 'ABANDONED' && onAnalyze && (
 								<button className={styles.analyzeBtn} onClick={onAnalyze}>
 									<span className={styles.analyzeBtnIcon}>
-										<Search size={20} aria-hidden="true" />
+										<Brain size={20} aria-hidden="true" />
 									</span>
 									<span>{t('analyze_game')}</span>
 								</button>

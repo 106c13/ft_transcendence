@@ -144,7 +144,8 @@
 }
 
 .reviewBtnIcon {
-	transform: translateY(2px);
+	display: inline-flex;
+	align-items: center;
 }
 
 .emptyCard,

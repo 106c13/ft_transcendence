@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, Search, Check, X, Clock, Ban, Flag, Download, FlipHorizontal2, RotateCcw } from 'lucide-react';
+import { Home, Brain, Check, X, Clock, Ban, Flag, Download, FlipHorizontal2, RotateCcw } from 'lucide-react';
 import type { DrawOfferState } from '../../hooks/useGameSocket';
 import Tooltip from '../Tooltip/Tooltip';
 import styles from './GameActions.module.css';
@@ -131,7 +131,7 @@ const GameActions = ({
 									onClick={onAnalyze}
 									aria-label={t('analyze_game')}
 								>
-									<Search size={15} aria-hidden="true" />
+									<Brain size={15} aria-hidden="true" />
 								</button>
 							</Tooltip>
 						)}
@@ -194,7 +194,7 @@ const GameActions = ({
 								onClick={onAnalyze}
 								aria-label={t('analyze_game')}
 							>
-								<Search size={15} aria-hidden="true" />
+								<Brain size={15} aria-hidden="true" />
 							</button>
 						</Tooltip>
 					)}

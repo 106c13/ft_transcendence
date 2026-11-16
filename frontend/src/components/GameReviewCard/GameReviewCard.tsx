@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { RotateCw, Swords, Search } from 'lucide-react';
+import { RotateCw, Swords, Brain } from 'lucide-react';
 import { Chess, type Square } from 'chess.js';
 import type { MatchRecord } from '../../utils/gameUtils';
 import { getPieceImageSrc, PIECE_NAME } from '../../utils/gameUtils';
@@ -242,7 +242,7 @@ const GameReviewCard = ({ games, currentUsername, loading }: Props) => {
 				})}
 			>
 				<span className={styles.reviewBtnIcon}>
-					<Search size={15} aria-hidden="true" />
+					<Brain size={15} aria-hidden="true" />
 				</span>
 				<span>
 					{t('review_against_opponent', {
