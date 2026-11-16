@@ -350,7 +350,6 @@ const MiniRatingChart = ({ mode, history, onClick, compact = false }: Props) => 
 				</div>
 			</div>
 
-			{/* 7-day Recharts sparkline or 0/5 Calibration Progress Bar */}
 			<div className={styles.chartContainer}>{renderSparkline()}</div>
 		</div>
 	);

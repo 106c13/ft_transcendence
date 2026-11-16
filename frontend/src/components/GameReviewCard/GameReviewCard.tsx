@@ -17,10 +17,8 @@ const GameReviewCard = ({ games, currentUsername, loading }: Props) => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 
-	// Initial random seed generated on mount
 	const [randomSeed] = useState(() => Math.random())
 
-	// Pick randomly from the previous 5 games
 	const pool = useMemo(() => games.slice(0, 5), [games])
 
 	const selectedGame = useMemo(() => {
@@ -38,7 +36,7 @@ const GameReviewCard = ({ games, currentUsername, loading }: Props) => {
 				chess.loadPgn(selectedGame.pgn)
 			}
 		} catch {
-			// fallback
+			// Ignore invalid PGN
 		}
 
 		const history = chess.history({ verbose: true })
@@ -102,7 +100,6 @@ const GameReviewCard = ({ games, currentUsername, loading }: Props) => {
 	const opponent = isWhite ? selectedGame.black : selectedGame.white
 	const opponentName = opponent?.username || t('opponent')
 
-	// Calculate arrow coordinates if lastMove exists
 	let arrowShaft: React.ReactNode = null
 	let arrowHead: React.ReactNode = null
 	if (boardData.lastMove) {
@@ -172,7 +169,6 @@ const GameReviewCard = ({ games, currentUsername, loading }: Props) => {
 
 	return (
 		<div className={styles.reviewContainer}>
-			{/* Perfect Square Board */}
 			<div
 				className={styles.boardCard}
 				onClick={handleReviewClick}
@@ -222,7 +218,6 @@ const GameReviewCard = ({ games, currentUsername, loading }: Props) => {
 						})
 					)}
 
-					{/* Vector Arrow Overlay */}
 					{(arrowShaft || arrowHead) && (
 						<svg
 							className={styles.arrowOverlay}
@@ -238,7 +233,6 @@ const GameReviewCard = ({ games, currentUsername, loading }: Props) => {
 				</div>
 			</div>
 
-			{/* Review Button Under the Board */}
 			<button
 				className={styles.reviewBtn}
 				onClick={handleReviewClick}

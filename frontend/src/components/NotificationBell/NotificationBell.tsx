@@ -48,7 +48,6 @@ const NotificationBell = ({ userId, friendSocket, onUnreadChange }: Props) => {
 
     const [prevPath, setPrevPath] = useState(location.pathname);
 
-    // Close dropdown on route change
     if (prevPath !== location.pathname) {
         setPrevPath(location.pathname);
         setIsOpen(false);
@@ -58,7 +57,6 @@ const NotificationBell = ({ userId, friendSocket, onUnreadChange }: Props) => {
         onUnreadChange?.(unreadCount);
     }, [unreadCount, onUnreadChange]);
 
-    // Click outside and Escape key to close dropdown
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {

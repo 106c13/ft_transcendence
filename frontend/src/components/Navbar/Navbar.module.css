@@ -9,7 +9,6 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	/* 24px visual edge on both sides (the avatar sits 3px inside its 42px box) */
 	padding: 0 21px 0 24px;
 	z-index: 1000;
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -111,7 +110,6 @@
 	border-color: #60A5FA;
 }
 
-/* ---------- Mobile-only elements (hidden on desktop) ---------- */
 .navLabel {
 	display: none;
 }
@@ -120,7 +118,6 @@
 	display: none;
 }
 
-/* Language Dropdown */
 .languageDropdown {
 	position: absolute;
 	top: 64px;
@@ -212,10 +209,8 @@
 	letter-spacing: 0.5px;
 }
 
-/* Mobile: left slide-in drawer */
 @media (max-width: 1024px) {
 	.navbar {
-		/* Same 24px edge as desktop: the 22px icon sits 10px inside its 42px box */
 		padding: 0 14px 0 24px;
 		justify-content: space-between;
 		gap: 8px;
@@ -269,7 +264,6 @@
 		transition: right 0.28s ease, visibility 0s;
 	}
 
-	/* Rows: [28px icon box] [14px gap] [label] */
 	.navActionItem {
 		width: 100%;
 		height: 48px;
@@ -315,7 +309,6 @@
 		color: var(--color-blue-400);
 	}
 
-	/* Language: centered modal over the page */
 	.languageDropdown {
 		position: fixed;
 		top: 50%;

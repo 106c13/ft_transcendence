@@ -25,7 +25,7 @@ export function useGameHistory(username: string) {
 					setMatches(data)
 				}
 			} catch {
-				// Leave match history empty on fetch failure
+				// Leave history empty on failure
 			} finally {
 				setLoading(false)
 			}

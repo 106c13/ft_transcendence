@@ -60,7 +60,6 @@
 	animation: none !important;
 }
 
-/* Left Group: user info + captured pieces right beside it */
 .leftGroup {
 	display: flex;
 	align-items: center;
@@ -68,7 +67,6 @@
 	min-width: 0;
 }
 
-/* User Info Anchor: wraps only the user info in-flow */
 .userInfoAnchor {
 	position: static;
 	height: 38px;
@@ -78,7 +76,6 @@
 	flex-shrink: 0;
 }
 
-/* Main user info row: avatar, nickname, rating (click to view ratings popup) */
 .userMainRow {
 	position: relative;
 	display: flex;
@@ -154,7 +151,6 @@
 	max-width: 130px;
 }
 
-/* Borderless rating with game mode color applied via inline style */
 .ratingRow {
 	display: flex;
 	align-items: center;
@@ -197,7 +193,6 @@
 	border: none;
 }
 
-/* Captured Pieces: directly beside User Info */
 .capturedArea {
 	display: flex;
 	flex-direction: column;
@@ -256,7 +251,6 @@
 	margin-left: 12px;
 }
 
-/* Game Clock: Pushed all the way to right edge */
 .clockWrapper {
 	flex: 0 0 auto;
 	max-width: 100px;

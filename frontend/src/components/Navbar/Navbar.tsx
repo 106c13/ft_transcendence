@@ -30,7 +30,6 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 	const languageMenuRef = useRef<HTMLDivElement>(null);
 	const headerRef = useRef<HTMLElement>(null);
 
-	// Close the language dropdown when clicking outside of it
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			const target = event.target as Node;
@@ -43,7 +42,6 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
 
-	// Close the drawer when clicking outside the navbar or pressing Escape
 	useEffect(() => {
 		if (!mobileOpen) return;
 
@@ -64,17 +62,14 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 		};
 	}, [mobileOpen]);
 
-	// Close the drawer on route change
 	useEffect(() => {
 		setMobileOpen(false);
 	}, [location.pathname]);
 
-	// Reset state when leaving the mobile layout
 	useEffect(() => {
 		if (!isMobile) setMobileOpen(false);
 	}, [isMobile]);
 
-	// Collapse the language modal together with the drawer
 	useEffect(() => {
 		if (!mobileOpen) setShowLanguageMenu(false);
 	}, [mobileOpen]);
@@ -99,7 +94,6 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 				<h2>ft_transcendence</h2>
 			</div>
 
-			{/* Hamburger (mobile only, right side) */}
 			<MobileMenuButton
 				isOpen={mobileOpen}
 				onToggle={() => setMobileOpen((open) => !open)}
@@ -107,7 +101,6 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 				unreadMessages={currentUser ? unreadMessages : 0}
 			/>
 
-			{/* Dimmed backdrop behind the drawer (mobile only) */}
 			<div
 				className={`${styles.backdrop} ${mobileOpen ? styles.backdropOpen : ''}`}
 				onClick={() => setMobileOpen(false)}
@@ -118,10 +111,8 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 				id="navbar-actions"
 				className={`${styles.navbarActions} ${mobileOpen ? styles.navbarActionsOpen : ''}`}
 			>
-				{/* 1. Player Search */}
 				{currentUser && <PlayerSearch />}
 
-				{/* 2. Notifications */}
 				{currentUser && friendSocket && (
 					<NotificationBell
 						userId={currentUser.id}
@@ -130,7 +121,6 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 					/>
 				)}
 
-				{/* 3. Language Switcher */}
 				<NavTooltip content={t('language')} position="bottom" disabled={showLanguageMenu} offset="navbar">
 					<div
 						ref={languageMenuRef}
@@ -171,7 +161,6 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 					</div>
 				</NavTooltip>
 
-				{/* 4. About Info */}
 				<NavTooltip content={t('about')} position="bottom" offset="navbar">
 					<div
 						className={`${styles.navActionItem} ${isAboutActive ? styles.activeNavAction : ''}`}
@@ -193,7 +182,6 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 					</div>
 				</NavTooltip>
 
-				{/* 5. Messages / Chat */}
 				{currentUser && (
 					<MessagesIcon
 						userId={currentUser.id}
@@ -201,7 +189,6 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 					/>
 				)}
 
-				{/* Analysis */}
 				{currentUser && (
 					<NavTooltip content={t('analysis', 'Analysis')} position="bottom" offset="navbar">
 						<div
@@ -225,7 +212,6 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 					</NavTooltip>
 				)}
 
-				{/* 6. Leaderboard */}
 				{currentUser && (
 					<NavTooltip content={t('leaderboard')} position="bottom" offset="navbar">
 						<div
@@ -249,7 +235,6 @@ const Navbar = ({ currentUser, friendSocket }: Props) => {
 					</NavTooltip>
 				)}
 
-				{/* Profile Dropdown */}
 				{currentUser && (
 					<ProfileMenu
 						currentUser={currentUser}

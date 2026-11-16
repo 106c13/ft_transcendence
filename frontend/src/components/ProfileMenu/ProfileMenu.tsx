@@ -19,13 +19,11 @@ const ProfileMenu = ({ currentUser, onOpen }: Props) => {
 
 	const [prevPath, setPrevPath] = useState(location.pathname);
 
-	// Dismiss on route change
 	if (prevPath !== location.pathname) {
 		setPrevPath(location.pathname);
 		setIsOpen(false);
 	}
 
-	// Click outside to collapse
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -37,7 +35,6 @@ const ProfileMenu = ({ currentUser, onOpen }: Props) => {
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
 
-	// Escape closes the menu from anywhere (needed for the mobile modal)
 	useEffect(() => {
 		if (!isOpen) return;
 		const handleEscape = (e: KeyboardEvent) => {

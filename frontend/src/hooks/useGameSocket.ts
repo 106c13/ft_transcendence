@@ -66,7 +66,7 @@ const getSimulatedChess = (baseFen: string, color: 'w' | 'b' | null, premoveList
     if (!color || premoveList.length === 0) return sim
 
     for (const pm of premoveList) {
-        // King must never be capturable when premoving and must be considered illegal
+        // Prevent illegal king captures during premove simulation
         const targetPiece = sim.get(pm.to as Square)
         if (targetPiece?.type === 'k') {
             break
@@ -98,14 +98,12 @@ export function useGameSocket() {
     const { currentUser } = useOutletContext<LayoutContextType>()
     const { socket } = useGameSocketContext()
 
-    // Spectator / Viewer Mode State
     const [isViewer, setIsViewer] = useState(false)
     const isViewerRef = useRef(false)
     isViewerRef.current = isViewer
     const [whitePlayer, setWhitePlayer] = useState<PlayerInfo | null>(null)
     const [blackPlayer, setBlackPlayer] = useState<PlayerInfo | null>(null)
 
-    // Matchmaking and Game States
     const [gameState, setGameState] = useState<'searching' | 'playing'>('searching')
     const [selectedMode, setSelectedMode] = useState<GameModeType>(
         (searchParams.get('mode') as GameModeType) || 'blitz'
@@ -116,21 +114,17 @@ export function useGameSocket() {
     const [turn, setTurn] = useState<'w' | 'b'>('w')
     const [isCheck, setIsCheck] = useState(false)
 
-    // Game Outcome States
     const [isGameOver, setIsGameOver] = useState(false)
     const [hideGameOverModal, setHideGameOverModal] = useState(false)
     const [winnerColor, setWinnerColor] = useState<'w' | 'b' | null>(null)
     const [gameOverReason, setGameOverReason] = useState('')
 
-    // Draw Offer States
     const [drawOfferState, setDrawOfferState] = useState<DrawOfferState>('idle')
 
-    // Finished Match Database ID
     const [savedMatchId, setSavedMatchId] = useState<number | null>(null)
     const [gameAnalysis, setGameAnalysis] = useState<GameAnalysisResult | null>(null)
     const [isAnalysisLoading, setIsAnalysisLoading] = useState(false)
 
-    // Rating States
     const [playerRating, setPlayerRating] = useState<number | null>(null)
     const [playerIsProvisional, setPlayerIsProvisional] = useState(false)
     const [opponentRating, setOpponentRating] = useState<number | null>(null)
@@ -147,7 +141,6 @@ export function useGameSocket() {
     const [playerLeaderboardRankDelta, setPlayerLeaderboardRankDelta] = useState<number | null>(null)
     const [showConfetti, setShowConfetti] = useState(false)
 
-    // Timing States
     const [whiteTime, setWhiteTime] = useState(180000)
     const [blackTime, setBlackTime] = useState(180000)
     const clockSnapshotRef = useRef<GameClockSnapshot | null>(null)
@@ -157,11 +150,9 @@ export function useGameSocket() {
     const [disconnectedUserIds, setDisconnectedUserIds] = useState<number[]>([])
     const [disconnectSecondsRemaining, setDisconnectSecondsRemaining] = useState<Record<number, number>>({})
 
-    // Chess Rules engine
     const [localChess] = useState(() => new Chess())
     const [boardFen, setBoardFen] = useState(localChess.fen())
 
-    // Premove States & Refs
     const [premoves, setPremoves] = useState<Premove[]>([])
 
     const premovesRef = useRef<Premove[]>([])
@@ -171,7 +162,6 @@ export function useGameSocket() {
     const gameIdRef = useRef<string>(gameId)
     gameIdRef.current = gameId
 
-    // Move History
     const [moveHistory, setMoveHistory] = useState<string[]>(['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'])
     const [viewIndex, setViewIndex] = useState<number>(0)
     const [displayChess] = useState(() => new Chess())
@@ -205,7 +195,6 @@ export function useGameSocket() {
         playSound('tenseconds')
     }
 
-    // Preload piece images
     useEffect(() => {
         const colors: Array<'w' | 'b'> = ['w', 'b']
         const types = ['p', 'n', 'b', 'r', 'q', 'k']
@@ -225,7 +214,6 @@ export function useGameSocket() {
         }
     }, [activeGameId, navigate, t, toast])
 
-    // Socket connection & game event handlers
     const currentUserId = currentUser?.id
 
     useEffect(() => {
@@ -574,7 +562,6 @@ export function useGameSocket() {
         }
         socket.on('game_over', handleGameOver)
 
-        // Draw offer events
         const handleDrawOffered = (data: { fromUserId?: number }) => {
             if (data.fromUserId !== undefined && data.fromUserId === currentUserId) return
             setDrawOfferState('received')
@@ -642,7 +629,7 @@ export function useGameSocket() {
 
                 setGameAnalysis(await response.json() as GameAnalysisResult)
             } catch {
-                // Non-fatal: match summary remains usable if analysis request fails
+                // Keep match summary usable if analysis fails
             } finally {
                 if (!controller.signal.aborted) {
                     setIsAnalysisLoading(false)
@@ -655,7 +642,6 @@ export function useGameSocket() {
     }, [gameOverReason, isGameOver, savedMatchId])
 
 
-    // Pause countdown timer
     useEffect(() => {
         if (!isPaused || pauseCountdown === null || pauseCountdown <= 0) return
         const timer = setTimeout(() => {
@@ -667,7 +653,6 @@ export function useGameSocket() {
         return () => clearTimeout(timer)
     }, [isPaused, pauseCountdown])
 
-    // Game clock
     useEffect(() => {
         if (gameState !== 'playing' || isGameOver || isPaused) return
 
@@ -697,7 +682,6 @@ export function useGameSocket() {
         return () => clearInterval(timerInterval)
     }, [gameState, isGameOver, isPaused, turn])
 
-    // Arrow key navigation for move history
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
             if (gameState !== 'playing') return
@@ -720,7 +704,6 @@ export function useGameSocket() {
         return () => window.removeEventListener('keydown', handleKey)
     }, [gameState, moveHistory.length])
 
-    // Play move sounds when scrolling through move history (both during and after match)
     useEffect(() => {
         if (prevViewIndexRef.current === null) {
             prevViewIndexRef.current = viewIndex
@@ -751,7 +734,6 @@ export function useGameSocket() {
         playSound(sound)
     }, [viewIndex, moveSAN])
 
-    // Captured pieces calculation
     const { captured, whiteScore, blackScore } = (() => {
         const initial = {
             w: { p: 8, n: 2, b: 2, r: 2, q: 1 },
@@ -868,7 +850,6 @@ export function useGameSocket() {
         }
     }
 
-    // Draw actions
     const offerDraw = () => {
         const activeSocket = socketRef.current || socket
         if (activeSocket && gameId && !isViewerRef.current) {

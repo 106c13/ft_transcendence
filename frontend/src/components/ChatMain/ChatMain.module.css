@@ -281,7 +281,6 @@
 	cursor: not-allowed;
 }
 
-/* Empty State / Welcome Screen */
 .emptyChatContainer {
 	flex: 1;
 	display: flex;

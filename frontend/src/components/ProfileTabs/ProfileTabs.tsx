@@ -36,7 +36,6 @@ const ProfileTabs = ({
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 
-	// Load match history for games and rating computations
 	const internalHistory = useGameHistory(username || '');
 	const history = historyData || internalHistory;
 	const ratingData = useRatingHistory(history.matches, username || '', ratings);
@@ -49,7 +48,6 @@ const ProfileTabs = ({
 
 	return (
 		<div className={profileStyles.tabsWrapper}>
-			{/* Overview Tab Content */}
 			{activeTab === 'overview' && (
 				<div className={profileStyles.overviewSection}>
 					<div className={profileStyles.ratingsSection}>
@@ -84,7 +82,6 @@ const ProfileTabs = ({
 						onSeeAll={() => onSelectTab('friends')}
 					/>
 
-					{/* Recent Games List */}
 					<RecentGames
 						matches={history.matches}
 						username={username || ''}
@@ -94,7 +91,6 @@ const ProfileTabs = ({
 				</div>
 			)}
 
-			{/* Games Tab Content */}
 			{activeTab === 'games' && username && (
 				<GamesList
 					matches={history.matches}
@@ -104,7 +100,6 @@ const ProfileTabs = ({
 				/>
 			)}
 
-			{/* Friends Tab Content */}
 			{activeTab === 'friends' && (
 				<FriendsList
 					friends={friends}

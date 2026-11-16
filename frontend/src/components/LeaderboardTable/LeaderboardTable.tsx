@@ -131,7 +131,6 @@ const LeaderboardTable = ({
 									className={styles.tableRow}
 									onClick={() => onPlayerClick(player.username)}
 								>
-									{/* Rank Cell with top 3 badge */}
 									<td className={styles.rankCell}>
 										{player.rank <= 3 ? (
 											<span className={styles.rankBadgePodium}>
@@ -142,7 +141,6 @@ const LeaderboardTable = ({
 										)}
 									</td>
 
-									{/* Player Avatar & Username - Compact */}
 									<td>
 										<div className={styles.playerCell}>
 											<div className={styles.avatarWrapper}>
@@ -181,7 +179,6 @@ const LeaderboardTable = ({
 										</div>
 									</td>
 
-									{/* Leaderboard Rating with unique top 3 icon right beside rating */}
 									<td className={styles.ratingCell}>
 										<div className={styles.ratingDisplayWrapper}>
 											<span className={styles.mainRatingValue}>
@@ -193,7 +190,6 @@ const LeaderboardTable = ({
 										</div>
 									</td>
 
-									{/* Peak Elo - exact format color used across the project, no postfix */}
 									<td className={styles.highestCell}>
 										<span
 											className={styles.highestValue}
@@ -204,7 +200,6 @@ const LeaderboardTable = ({
 										</span>
 									</td>
 
-									{/* Formats Breakdown */}
 									<td className={styles.formatsCell}>
 										<div className={styles.formatsPillsRow}>
 											<span
@@ -237,7 +232,6 @@ const LeaderboardTable = ({
 										</div>
 									</td>
 
-									{/* Record (W / D / L) - slashes and exact w/d/l order */}
 									<td className={styles.recordCell}>
 										<span className={styles.recordText}>
 											<span className={styles.winsCount}>{player.stats.wins}W</span>
@@ -248,7 +242,6 @@ const LeaderboardTable = ({
 										</span>
 									</td>
 
-									{/* Win Rate */}
 									<td>
 										<div className={styles.winRateWrapper}>
 											<span className={styles.winRateText}>{player.stats.winRate}%</span>

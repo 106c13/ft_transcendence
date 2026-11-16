@@ -33,7 +33,6 @@ const ChatPage = () => {
 	const [loadingFriends, setLoadingFriends] = useState(false)
 	const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false)
 
-	// Fetch friends list for current user
 	const loadFriends = useCallback(async () => {
 		if (!currentUsername) return
 
@@ -52,7 +51,7 @@ const ChatPage = () => {
 				}
 			}
 		} catch {
-			// Retain current friends list if reload fails
+			// Keep current friends list on error
 		} finally {
 			setLoadingFriends(false)
 		}
@@ -80,7 +79,6 @@ const ChatPage = () => {
 		}
 	}, [currentUsername])
 
-	// Listen to real-time friend status updates
 	useEffect(() => {
 		const handleStatusChange = (e: Event) => {
 			const customEvent = e as CustomEvent<{ userId: number; username: string; status: string }>
@@ -103,7 +101,6 @@ const ChatPage = () => {
 		}
 	}, [])
 
-	// Create a fast lookup map for friend presence statuses (ONLINE / INGAME / OFFLINE)
 	const friendStatusMap = useMemo(() => {
 		const map = new Map<number, string>()
 		friends.forEach((friend) => {
@@ -116,7 +113,7 @@ const ChatPage = () => {
 
 	const handleOpenNewChat = () => {
 		setIsNewChatModalOpen(true)
-		// Refresh friends list when opening the modal to get up-to-date presence
+		// Refresh friend presence when opening modal
 		loadFriends()
 	}
 

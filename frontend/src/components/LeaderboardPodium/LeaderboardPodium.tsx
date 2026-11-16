@@ -22,7 +22,6 @@ const LeaderboardPodium = ({
 
 	return (
 		<section className={styles.podiumContainer} aria-label="Top 3 Champions">
-			{/* 2nd Place */}
 			<div
 				className={`${styles.podiumCard} ${styles.podiumSecond}`}
 				onClick={() => onPlayerClick(podiumPlayers.second.username)}
@@ -63,7 +62,6 @@ const LeaderboardPodium = ({
 				</div>
 			</div>
 
-			{/* 1st Place */}
 			<div
 				className={`${styles.podiumCard} ${styles.podiumFirst}`}
 				onClick={() => onPlayerClick(podiumPlayers.first.username)}
@@ -107,7 +105,6 @@ const LeaderboardPodium = ({
 				</div>
 			</div>
 
-			{/* 3rd Place */}
 			<div
 				className={`${styles.podiumCard} ${styles.podiumThird}`}
 				onClick={() => onPlayerClick(podiumPlayers.third.username)}

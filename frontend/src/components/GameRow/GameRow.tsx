@@ -30,7 +30,6 @@ const GameRow = ({ match, username }: Props) => {
 	const whiteRating = match.white_rating_after
 	const blackRating = match.black_rating_after
 
-	// Determine result
 	let outcome: 'win' | 'loss' | 'draw' = 'draw'
 	if (match.winner_id) {
 		outcome =
@@ -40,7 +39,6 @@ const GameRow = ({ match, username }: Props) => {
 				: 'loss'
 	}
 
-	// Format date
 	let dateStr = match.played_at
 	let timeStr = ''
 	try {
@@ -55,21 +53,18 @@ const GameRow = ({ match, username }: Props) => {
 			minute: '2-digit',
 		})
 	} catch {
-		// fallback
+		// Fallback to raw date string
 	}
 
-	// Move count (from saved move times)
 	const moveCount = match.move_times && match.move_times.length > 0
 		? Math.ceil(match.move_times.length / 2)
 		: null
 
-	// Accuracy
 	const accuracy =
 		match.analysis && match.analysis.accuracy
 			? (isListOwnerWhite ? match.analysis.accuracy.white : match.analysis.accuracy.black)
 			: null;
 
-	// Mode badge details
 	const rawMode = match.mode.toLowerCase()
 	const isBullet = rawMode.startsWith('bullet')
 	const isBlitz = rawMode.startsWith('blitz')
@@ -90,7 +85,6 @@ const GameRow = ({ match, username }: Props) => {
 			role="button"
 			tabIndex={0}
 		>
-			{/* 1. Game Mode (First) - Icon on top, mode name under icon */}
 			<div className={styles.modeCol}>
 				<span className={styles.modeIcon}>
 					<GameModeIcon mode={match.mode} size={18} />
@@ -98,10 +92,8 @@ const GameRow = ({ match, username }: Props) => {
 				<span className={`${styles.modeName} ${modeClass}`}>{t(match.mode.toLowerCase())}</span>
 			</div>
 
-			{/* 2. Players Column (White on top, Black on bottom) */}
 			<div className={styles.playersCol}>
 				<div className={styles.playersWrapper}>
-					{/* White Player (Always on top) */}
 					<div className={styles.playerRow}>
 						<img
 							src={getAvatarUrl(whitePlayer?.avatar)}
@@ -127,7 +119,6 @@ const GameRow = ({ match, username }: Props) => {
 						)}
 					</div>
 
-					{/* Black Player (Always on bottom) */}
 					<div className={styles.playerRow}>
 						<img
 							src={getAvatarUrl(blackPlayer?.avatar)}
@@ -155,7 +146,6 @@ const GameRow = ({ match, username }: Props) => {
 				</div>
 			</div>
 
-			{/* 3. Moves Column (After Players column) */}
 			<div className={styles.movesCol}>
 				<span
 					className={styles.movesCount}
@@ -165,7 +155,6 @@ const GameRow = ({ match, username }: Props) => {
 				</span>
 			</div>
 
-			{/* 4. Result */}
 			<div className={styles.resultCol}>
 				<span
 					className={`${styles.resultText} ${
@@ -184,7 +173,6 @@ const GameRow = ({ match, username }: Props) => {
 				</span>
 			</div>
 
-			{/* 5. Review Column (To the left of Date column) */}
 			<div className={styles.reviewCol}>
 				<button
 					type="button"
@@ -199,7 +187,6 @@ const GameRow = ({ match, username }: Props) => {
 				</button>
 			</div>
 
-			{/* 6. Date Played (Moved to end of data columns) */}
 			<div className={styles.dateCol}>
 				<span className={styles.dateFull}>{dateStr}</span>
 				{timeStr && <span className={styles.dateSub}>{timeStr}</span>}

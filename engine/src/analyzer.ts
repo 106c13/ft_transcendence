@@ -2,24 +2,24 @@ import { Chess, Square } from 'chess.js';
 import { StockfishService } from './stockfish';
 
 export interface MoveAnalysis {
-	ply: number; // 0, 1, 2, ...
-	moveNumber: number; // 1, 1, 2, 2, ...
+	ply: number;
+	moveNumber: number;
 	color: 'w' | 'b';
 	san: string;
 	from: string;
 	to: string;
 	fenBefore: string;
 	fenAfter: string;
-	score: number; // centipawns from White's perspective (+ White, - Black)
+	score: number; // Centipawns from White's perspective
 	mate: number | null;
-	centipawnLoss: number; // CPL >= 0
-	winChance: number; // 0 to 100 (White's win chance)
+	centipawnLoss: number;
+	winChance: number;
 	bestMove: {
 		from: string;
 		to: string;
 		san: string;
 	} | null;
-	continuation: string[]; // SAN list of best engine moves
+	continuation: string[];
 	classification: 'brilliant' | 'great' | 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder';
 	explanation: string;
 	explanationKey?: string;
@@ -88,27 +88,18 @@ function convertPvToSan(fen: string, pvList: string[]): string[] {
 	return result;
 }
 
-/**
- * Accurately determines if a move involves a genuine tactical piece sacrifice.
- * Conditions:
- * 1. Piece moved into an attacked square where lower-value piece can capture it,
- *    or piece is hanging (undefended or attackers > defenders).
- * 2. Exchange sacrifice (Rook for minor piece, or minor piece for pawn).
- * 3. Leaving an already-attacked piece en prise elsewhere on the board.
- * 4. Filters out trivial recaptures and standard pawn pushes.
- */
+// Detect tactical sacrifices while ignoring standard trades and pawn pushes
 function checkSacrifice(
 	replayBefore: Chess,
 	replayAfter: Chess,
 	move: any,
 	prevMove: any | null
 ): boolean {
-	const pieceMoved = move.piece; // 'p', 'n', 'b', 'r', 'q', 'k'
+	const pieceMoved = move.piece;
 	const opponentColor = move.color === 'w' ? 'b' : 'w';
 	const playerColor = move.color;
 
-	// 1. If this is an immediate recapture on the same square where opponent just captured,
-	// it is a standard trade/recapture, NOT a sacrifice.
+	// Ignore immediate recaptures on the same square
 	if (prevMove && prevMove.captured && move.captured && move.to === prevMove.to) {
 		const prevCapturedVal = PIECE_VALUES[prevMove.captured] || 0;
 		const myCapturedVal = PIECE_VALUES[move.captured] || 0;
@@ -117,15 +108,14 @@ function checkSacrifice(
 		}
 	}
 
-	// 2. Direct Sacrifice / Exchange Sacrifice on the destination square
+	// Direct or exchange sacrifice on the destination square
 	const oppCaptures = replayAfter.moves({ verbose: true }).filter((m: any) => m.to === move.to);
 	if (oppCaptures.length > 0) {
 		const movedVal = PIECE_VALUES[pieceMoved] || 0;
 		const capturedVal = move.captured ? (PIECE_VALUES[move.captured] || 0) : 0;
 		const netDirectCost = movedVal - capturedVal;
 
-		// A: Piece of value >= 300 moved to a square where an opponent piece of LOWER value can take it
-		// (e.g. Pawn captures Queen/Rook/Minor, or Minor captures Queen/Rook)
+		// Piece can be captured by a lower-value piece
 		for (const oppCap of oppCaptures) {
 			const oppPieceVal = PIECE_VALUES[oppCap.piece] || 0;
 			if (movedVal >= 300 && oppPieceVal < movedVal) {
@@ -133,21 +123,19 @@ function checkSacrifice(
 			}
 		}
 
-		// B: Piece of value >= 300 moved to a square where it is completely undefended (hanging)
+		// Piece moved to an undefended square
 		const isDefended = replayAfter.isAttacked(move.to as Square, playerColor);
 		if (!isDefended && movedVal >= 300) {
 			return true;
 		}
 
-		// C: Exchange sacrifice (e.g. Rook takes minor piece, net loss >= 150)
+		// Exchange sacrifice
 		if (netDirectCost >= 150) {
 			return true;
 		}
 	}
 
-	// 3. Hanging Piece Left Behind (counter-attack / deflection)
-	// Check if player had another piece (Knight, Bishop, Rook, Queen) attacked before the move,
-	// and instead of saving it, ignored the attack and let opponent legally take it next move.
+	// Check if another attacked piece was left undefended
 	const boardBefore = replayBefore.board();
 	for (let r = 0; r < 8; r++) {
 		for (let c = 0; c < 8; c++) {
@@ -207,29 +195,24 @@ export class GameAnalyzer {
 			const move = history[i];
 			const prevMove = i > 0 ? history[i - 1] : null;
 			const fenBefore = replay.fen();
-			const playerColor = move.color; // 'w' | 'b'
+			const playerColor = move.color;
 			const moveNumber = Math.floor(i / 2) + 1;
 
-			// Clone state before move for tactical sacrifice analysis
 			const replayBefore = new Chess(fenBefore);
 
-			// 1. Evaluate position BEFORE the move
 			const evalBefore = await this.stockfish.evaluatePosition(fenBefore, depth);
 			const bestMoveSanObj = uciToSan(fenBefore, evalBefore.bestMove);
 			const bestContinuationSan = convertPvToSan(fenBefore, evalBefore.pv);
 
-			// Apply the player's move
 			replay.move(move);
 			const fenAfter = replay.fen();
 
-			// Check for terminal positions directly
 			const isCheckmate = replay.isCheckmate();
 			const isStalemate = replay.isStalemate();
 			const isDraw = replay.isDraw();
 
 			const isSacrifice = checkSacrifice(replayBefore, replay, move, prevMove);
 
-			// Checkmate handling:
 			if (isCheckmate) {
 				const scoreWhitePerspective = playerColor === 'w' ? 10000 : -10000;
 				const winChanceWhite = playerColor === 'w' ? 100 : 0;
@@ -273,7 +256,6 @@ export class GameAnalyzer {
 				continue;
 			}
 
-			// Terminal draw / stalemate handling:
 			if (isStalemate || isDraw) {
 				const scoreWhitePerspective = 0;
 				const winChanceWhite = 50;
@@ -315,7 +297,6 @@ export class GameAnalyzer {
 				continue;
 			}
 
-			// 2. Evaluate position AFTER the move
 			const evalAfter = await this.stockfish.evaluatePosition(fenAfter, depth);
 
 			// Normalize scores from moving player's perspective
@@ -329,10 +310,9 @@ export class GameAnalyzer {
 				(bestMoveSanObj.from === move.from && bestMoveSanObj.to === move.to)
 			));
 
-			// 3. Centipawn Loss (CPL) pinning & refinement
 			let centipawnLoss = 0;
 			if (isPlayedMoveBest || (moveNumber <= 2 && rawCpl <= 35)) {
-				// Pin CPL to 0 if player played the engine's best move or standard opening book
+				// Pin CPL to 0 for best moves and book moves
 				centipawnLoss = 0;
 			} else if (evalBefore.mate !== null && evalAfter.mate !== null) {
 				const myBeforeMate = playerColor === 'w' ? evalBefore.mate : -evalBefore.mate;
@@ -357,7 +337,6 @@ export class GameAnalyzer {
 			const scoreWhitePerspective = evalAfter.score;
 			const winChanceWhite = centipawnsToWinChance(scoreWhitePerspective);
 
-			// 4. Move accuracy %
 			const moveAccuracy = Math.max(0, Math.min(100, Math.round((100 * Math.exp(-0.0035 * centipawnLoss)) * 10) / 10));
 			if (playerColor === 'w') {
 				whiteAccuracySum += moveAccuracy;
@@ -367,14 +346,12 @@ export class GameAnalyzer {
 				blackMoveCount++;
 			}
 
-			// 5. Great Move determination
 			const isGreatMove = !isSacrifice && (isPlayedMoveBest || centipawnLoss <= 5) &&
 				moveNumber > 2 &&
 				bestEvalFromPlayer >= -100 && bestEvalFromPlayer <= 550 &&
 				(!move.captured || (prevMove && !prevMove.captured)) &&
 				(move.san.includes('+') || playedEvalFromPlayer >= bestEvalFromPlayer + 40 || (bestEvalFromPlayer < 100 && playedEvalFromPlayer >= 150));
 
-			// 6. Classification based on CPL, sacrifice, and sharpness
 			let classification: 'brilliant' | 'great' | 'best' | 'excellent' | 'good' | 'inaccuracy' | 'mistake' | 'blunder' = 'best';
 			let explanation = '';
 			let explanationKey = '';

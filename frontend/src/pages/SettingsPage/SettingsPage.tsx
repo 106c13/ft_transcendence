@@ -15,13 +15,11 @@ const SettingsPage = () => {
 	return (
 		<div className="min-h-screen w-full flex flex-col items-center pt-[72px] md:pt-[84px] px-4 md:px-10 pb-10 md:pb-[60px] text-slate-200 box-border">
 			<div className="w-full max-w-[860px] mx-auto flex flex-col gap-5">
-				{/* Settings Header with title & Profile-matching tab options */}
 				<SettingsHeader
 					activeTab={activeTab}
 					onSelectTab={setActiveTab}
 				/>
 
-				{/* Tab Content */}
 				<div className="w-full">
 					{activeTab === 'profile' && (
 						<ProfileInfoForm

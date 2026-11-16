@@ -108,7 +108,6 @@
 	flex-shrink: 0;
 }
 
-/* Captured Pieces & Material Advantage */
 .capturedArea {
 	display: flex;
 	align-items: center;
@@ -146,7 +145,6 @@
 	flex-shrink: 0;
 }
 
-/* Right-Side Move / Thinking Status (same background-less style as capturedArea) */
 .moveStatusArea {
 	display: inline-flex;
 	align-items: center;

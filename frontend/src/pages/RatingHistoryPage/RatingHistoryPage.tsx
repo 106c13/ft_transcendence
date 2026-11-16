@@ -16,7 +16,7 @@ function parseModesFromSearch(search: string): RatingCategory[] {
 	const raw = search.startsWith('?') ? search.slice(1) : search;
 	if (!raw) return ['blitz'];
 
-	// Extract tokens from ?modes=rapid&blitz or ?mode=bullet or ?modes=bullet,blitz
+	// Parse modes from query string
 	const parts = raw.split(/[&,]/);
 	const found: RatingCategory[] = [];
 
@@ -57,7 +57,6 @@ const RatingHistoryPage = () => {
 	const [user, setUser] = useState<User | null>(null);
 	const [loadingUser, setLoadingUser] = useState(true);
 
-	// Fetch user details (or use currentUser from MainLayout when viewing own rating history)
 	useEffect(() => {
 		if (!paramUsername || (currentUser && paramUsername.toLowerCase() === currentUser.username.toLowerCase())) {
 			setUser(currentUser);
@@ -119,7 +118,6 @@ const RatingHistoryPage = () => {
 	const gameHistory = useGameHistory(actualUsername);
 	const ratingData = useRatingHistory(gameHistory.matches, actualUsername, user?.ratings);
 
-	// Determine which modes actually have recorded games
 	const playableModes = useMemo(() => {
 		return VALID_MODES.filter((m) => {
 			const h = ratingData[m];
@@ -129,7 +127,7 @@ const RatingHistoryPage = () => {
 		});
 	}, [ratingData]);
 
-	// Filter activeModes so unplayed modes are never selected on the chart
+	// Exclude unplayed modes from selection
 	const activeModes = useMemo(() => {
 		if (playableModes.length === 0) return [];
 		const validRequested = urlRequestedModes.filter((m) => playableModes.includes(m));
@@ -137,7 +135,7 @@ const RatingHistoryPage = () => {
 		return [playableModes[0]];
 	}, [urlRequestedModes, playableModes]);
 
-	// Keep URL query string clean and synced if unplayed modes were in the URL (after data finishes loading)
+	// Remove unplayed modes from URL query string
 	useEffect(() => {
 		if (loadingUser || gameHistory.loading || playableModes.length === 0) return;
 
@@ -201,7 +199,6 @@ const RatingHistoryPage = () => {
 	return (
 		<div className="min-h-[calc(100vh-64px)] w-full flex flex-col items-center pt-[72px] min-[769px]:pt-[84px] px-4 min-[769px]:px-10 pb-8 min-[769px]:pb-10 bg-slate-900 text-slate-200 box-border">
 			<div className="w-full max-w-[860px] mx-auto flex flex-col gap-5">
-				{/* User header */}
 				{user && (
 					<div className="flex items-center gap-3.5 px-[18px] py-3.5 rounded-xl bg-slate-800 border border-slate-400/12 w-full box-border">
 						<img
@@ -226,7 +223,6 @@ const RatingHistoryPage = () => {
 					</div>
 				)}
 
-				{/* Main Big Rating Chart with toggleable mode legends */}
 				<BigRatingChart
 					mode={primaryMode}
 					activeModes={activeModes}

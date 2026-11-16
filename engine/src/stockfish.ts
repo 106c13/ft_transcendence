@@ -11,10 +11,10 @@ export interface EngineLine {
 }
 
 export interface EvalResult {
-	score: number; // centipawns from White's perspective (+ White, - Black)
-	mate: number | null; // mate in N from White's perspective (+ White mates, - Black mates)
-	bestMove: string; // e.g. "e2e4"
-	pv: string[]; // principal variation line e.g. ["e2e4", "e7e5", "g1f3"]
+	score: number; // Centipawns from White's perspective
+	mate: number | null; // Mate in N from White's perspective
+	bestMove: string;
+	pv: string[];
 	depth: number;
 	lines?: EngineLine[];
 }

@@ -102,7 +102,6 @@ function ChessBoard({
     const [dragState, setDragState] = useState<DragState | null>(null)
     const boardRef = useRef<HTMLDivElement>(null)
 
-    // Move classification badge state for smooth enter/exit transitions
     const [activeBadge, setActiveBadge] = useState<MoveClassificationInfo | null>(null)
     const [fadingBadge, setFadingBadge] = useState<MoveClassificationInfo | null>(null)
     const prevBadgeRef = useRef<MoveClassificationInfo | null>(null)
@@ -133,7 +132,6 @@ function ChessBoard({
     dragStateRef.current = dragState
     const justDraggedRef = useRef(false)
 
-    // Right-click annotation state (highlights & arrows)
     const [userHighlights, setUserHighlights] = useState<Set<string>>(new Set())
     const [userArrows, setUserArrows] = useState<BoardArrow[]>([])
     const [rightDrag, setRightDrag] = useState<RightDragState | null>(null)
@@ -142,7 +140,6 @@ function ChessBoard({
 
     const canInteract = !isViewer && !isReviewing && !isPaused && !isGameOver
 
-    // Clear user annotations whenever board position changes (new move played)
     useEffect(() => {
         setUserHighlights(new Set())
         setUserArrows([])
@@ -212,13 +209,12 @@ function ChessBoard({
 
     const handleBoardPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
         if (e.button === 0) {
-            // Left click anywhere on board clears all user highlights and arrows (Chess.com behavior)
+            // Left click clears user highlights and arrows
             if (userHighlights.size > 0 || userArrows.length > 0) {
                 setUserHighlights(new Set())
                 setUserArrows([])
             }
         } else if (e.button === 2) {
-            // Right click down starts annotation highlight or arrow drag
             e.preventDefault()
             if (showPromotion) {
                 onPromotionCancel?.()
@@ -238,7 +234,6 @@ function ChessBoard({
         }
     }
 
-    // Piece dragging listeners
     useEffect(() => {
         if (!dragState) return
 
@@ -301,7 +296,6 @@ function ChessBoard({
         }
     }, [dragState !== null, files, ranks, onPieceDrop, onSquareClick, onSquareSelect])
 
-    // Cursor handling during left-piece drag
     useEffect(() => {
         if (dragState?.isDragging) {
             const prevCursor = document.body.style.cursor
@@ -316,7 +310,6 @@ function ChessBoard({
         }
     }, [dragState?.isDragging])
 
-    // Right-click annotation listeners (drawing arrow / toggling highlight)
     useEffect(() => {
         if (!rightDrag) return
 
@@ -338,7 +331,6 @@ function ChessBoard({
                 if (current) {
                     const dist = Math.hypot(e.clientX - current.startX, e.clientY - current.startY)
                     if (dist < 8 || current.startSq === current.currentSq) {
-                        // Right-clicked a single square: toggle red highlight
                         setUserHighlights(prev => {
                             const next = new Set(prev)
                             if (next.has(current.startSq)) {
@@ -349,7 +341,6 @@ function ChessBoard({
                             return next
                         })
                     } else {
-                        // Right-dragged between two squares: toggle arrow
                         setUserArrows(prev => {
                             const exists = prev.findIndex(
                                 a => a.from === current.startSq && a.to === current.currentSq
@@ -623,7 +614,6 @@ function ChessBoard({
                                 />
                             )}
 
-                            {/* King Win / Loss Indicators */}
                             {isWinnerKing && (
                                 <div className={styles.kingBadgeWinner} title={t('winner')}>
                                     <svg viewBox="0 0 24 24" className={styles.kingBadgeIcon}>
@@ -650,7 +640,6 @@ function ChessBoard({
                                 </div>
                             )}
 
-                            {/* Move Classification Badge (Analysis) */}
                             {badgeToRender && !isWinnerKing && !isLoserKing && (
                                 <BoardClassificationBadge
                                     classification={badgeToRender.badge.classification}
@@ -666,12 +655,10 @@ function ChessBoard({
                 })
             )}
 
-            {/* SVG Vector Annotations Overlay (Arrows) */}
             <svg
                 className={styles.annotationsOverlay}
                 viewBox="0 0 800 800"
             >
-                {/* User Drawn Arrows */}
                 {userArrows.map((arrow, idx) =>
                     renderArrow(
                         arrow.from,
@@ -681,7 +668,6 @@ function ChessBoard({
                     )
                 )}
 
-                {/* External Custom Arrows (Analysis) - hidden only while actively dragging the piece */}
                 {customArrows
                     ?.filter(
                         (arrow) => !(dragState?.isDragging && arrow.from === dragState.fromSquare)
@@ -695,7 +681,6 @@ function ChessBoard({
                         )
                     )}
 
-                {/* Live Arrow Preview while Right-Dragging */}
                 {rightDrag && rightDrag.startSq !== rightDrag.currentSq &&
                     renderArrow(
                         rightDrag.startSq,

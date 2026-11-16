@@ -29,7 +29,6 @@ const SOUND_SRC: Record<SoundType, string> = {
 
 const audioCache = new Map<SoundType, HTMLAudioElement>()
 
-// Preload audio instances for immediate playback
 if (typeof window !== 'undefined') {
     ;(Object.keys(SOUND_SRC) as SoundType[]).forEach(type => {
         const audio = new Audio(SOUND_SRC[type])
@@ -45,10 +44,10 @@ export function playSound(type: SoundType) {
         if (audio) {
             audio.currentTime = 0
             audio.play().catch(() => {
-                // Silently handle browser autoplay policy before initial user interaction
+                // Ignore autoplay restrictions before user interaction
             })
         }
     } catch {
-        // Safe failover
+        // Ignore audio errors
     }
 }

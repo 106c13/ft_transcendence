@@ -19,7 +19,6 @@ const ProfileInfoForm = ({ initialUser, onUserUpdated }: Props) => {
 	const [bio, setBio] = useState(() => initialUser?.bio || '')
 	const [prevUser, setPrevUser] = useState(initialUser)
 
-	// Adjust local state if initialUser updates from parent
 	if (initialUser !== prevUser) {
 		setPrevUser(initialUser)
 		setUsername(initialUser?.username || '')
@@ -32,13 +31,11 @@ const ProfileInfoForm = ({ initialUser, onUserUpdated }: Props) => {
 	const [avatarFile, setAvatarFile] = useState<File | null>(null)
 	const [loading, setLoading] = useState(false)
 
-	// Compute preview URL whenever avatarFile changes
 	const previewUrl = useMemo(() => {
 		if (!avatarFile) return null
 		return URL.createObjectURL(avatarFile)
 	}, [avatarFile])
 
-	// Revoke object URL on cleanup
 	useEffect(() => {
 		return () => {
 			if (previewUrl) {
@@ -47,7 +44,7 @@ const ProfileInfoForm = ({ initialUser, onUserUpdated }: Props) => {
 		}
 	}, [previewUrl])
 
-	const MAX_AVATAR_SIZE = 2 * 1024 * 1024 // 2MB
+	const MAX_AVATAR_SIZE = 2 * 1024 * 1024
 	const ALLOWED_AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,7 +76,6 @@ const ProfileInfoForm = ({ initialUser, onUserUpdated }: Props) => {
 	const handleSave = async (e: React.FormEvent) => {
 		e.preventDefault()
 
-		// Client validation
 		if (/[^a-zA-Z0-9_]/.test(username)) {
 			toast.error('username_invalid_chars')
 			return
@@ -132,7 +128,6 @@ const ProfileInfoForm = ({ initialUser, onUserUpdated }: Props) => {
 				fileInputRef.current.value = ''
 			}
 
-			// Refresh currentUser context so Navbar & other components update immediately
 			if (onUserUpdated && token) {
 				const refreshRes = await fetch('/api/users/me', {
 					headers: { Authorization: `Bearer ${token}` },
@@ -149,7 +144,6 @@ const ProfileInfoForm = ({ initialUser, onUserUpdated }: Props) => {
 		}
 	}
 
-	// Current avatar display image
 	const displayAvatar =
 		previewUrl ||
 		(initialUser?.avatar ? `/uploads/${initialUser.avatar}` : '/assets/default.jpg')
@@ -166,7 +160,6 @@ const ProfileInfoForm = ({ initialUser, onUserUpdated }: Props) => {
 				</p>
 			</div>
 
-			{/* Avatar upload section */}
 			<div className={styles.avatarSection}>
 				<div className={styles.avatarWrapper}>
 					<img

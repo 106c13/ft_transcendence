@@ -28,13 +28,11 @@ export default function App() {
         <Routes>
         <Route path="/" element={<Navigate to="/home" replace />} />
 
-        {/* Guest Auth Layout */}
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
         </Route>
 
-        {/* Authenticated Layout */}
         <Route element={<MainLayout />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
@@ -54,7 +52,6 @@ export default function App() {
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/chat/:userid" element={<ChatPage />} />
           
-          {/* Game Socket Scoped Routes */}
           <Route element={<GameLayout />}>
             <Route path="/game" element={<MatchmakingPage />} />
             <Route path="/game/:gameId" element={<GamePage />} />

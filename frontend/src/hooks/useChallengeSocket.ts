@@ -13,7 +13,6 @@ export function useChallengeSocket(userId: number | undefined) {
     const [challengeStatus, setChallengeStatus] = useState<ChallengeStatus>('idle')
     const [challengeError, setChallengeError] = useState('')
 
-    // Incoming Challenge State & Timer (countdown strictly for incoming challenge)
     const [incomingChallenge, setIncomingChallenge] = useState<ChallengeReceived | null>(null)
     const [incomingCountdown, setIncomingCountdown] = useState<number>(30)
     const incomingCountdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -23,7 +22,6 @@ export function useChallengeSocket(userId: number | undefined) {
         incomingChallengeRef.current = incomingChallenge
     }, [incomingChallenge])
 
-    // Outgoing Challenge State & Timer (countdown strictly for outgoing challenge)
     const [outgoingChallenge, setOutgoingChallenge] = useState<ChallengeSent | null>(null)
     const [outgoingCountdown, setOutgoingCountdown] = useState<number>(30)
     const outgoingCountdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -98,7 +96,6 @@ export function useChallengeSocket(userId: number | undefined) {
 
     const acceptedGameIdRef = useRef<string | null>(null)
 
-    // Connect to the challenge namespace
     useEffect(() => {
         if (!userId) return
 
@@ -143,9 +140,7 @@ export function useChallengeSocket(userId: number | undefined) {
                 outgoingToastIdRef.current = null
             }
             toastRef.current.success(data.isRematch ? 'rematch_accepted' : 'challenge_accepted')
-            // Auto-reset status after 5 seconds so it doesn't linger
             setTimeout(() => setChallengeStatus('idle'), 5000)
-            // Navigate to the game page with the challenge gameId
             navigateRef.current(`/game/${data.gameId}`)
         })
 
@@ -158,7 +153,6 @@ export function useChallengeSocket(userId: number | undefined) {
                 outgoingToastIdRef.current = null
             }
             toastRef.current.warning(data?.isRematch ? 'rematch_rejected' : 'challenge_declined')
-            // Auto-reset after 3 seconds
             setTimeout(() => setChallengeStatus('idle'), 3000)
         })
 
@@ -197,14 +191,12 @@ export function useChallengeSocket(userId: number | undefined) {
                 outgoingToastIdRef.current = null
             }
             toastRef.current.error(data.message || 'challenge_error')
-            // Auto-reset after 3 seconds
             setTimeout(() => {
                 setChallengeStatus('idle')
                 setChallengeError('')
             }, 3000)
         })
 
-        // Listen for global user presence status changes
         socket.on('user_status_changed', (data: { userId: number; username: string; status: string; gameId?: string }) => {
             window.dispatchEvent(new CustomEvent('user_status_changed', { detail: data }))
         })

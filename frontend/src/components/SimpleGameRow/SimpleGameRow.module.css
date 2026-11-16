@@ -37,7 +37,6 @@
 	background: #253347;
 }
 
-/* 1. Mode column */
 .modeCol {
 	display: flex;
 	flex-direction: column;
@@ -76,7 +75,6 @@
 	color: #CBD5E1;
 }
 
-/* 2. Players column */
 .playersCol {
 	display: flex;
 	flex-direction: column;
@@ -147,7 +145,6 @@
 	flex-shrink: 0;
 }
 
-/* 3. Result column */
 .resultCol {
 	display: flex;
 	align-items: center;

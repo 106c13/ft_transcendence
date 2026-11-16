@@ -57,7 +57,6 @@ const OngoingGameCard = ({
 
 	const prevGameIdRef = useRef<string>(gameData.gameId);
 
-	// If gameData changes to another game (e.g. rematch or next match)
 	useEffect(() => {
 		if (prevGameIdRef.current === gameData.gameId) return;
 		prevGameIdRef.current = gameData.gameId;
@@ -113,7 +112,6 @@ const OngoingGameCard = ({
 		};
 	}, [gameData, gameOverResult]);
 
-	// Socket connection to /game for real-time moves, move times, and game_over events
 	useEffect(() => {
 		if (!gameData.gameId) return;
 
@@ -204,7 +202,6 @@ const OngoingGameCard = ({
 		};
 	}, [gameData.gameId, currentUserId]);
 
-	// Tick the countdown and exit once it hits zero
 	useEffect(() => {
 		if (!gameOverResult || countdown === null) return;
 		if (countdown <= 0) {
@@ -224,7 +221,7 @@ const OngoingGameCard = ({
 		return () => clearTimeout(id);
 	}, [gameOverResult, countdown, onGameOverStartExit, onGameOverDone]);
 
-	// Orientation: Profile user is hero at bottom, opponent is at top
+	// Place profile user at the bottom of the board
 	const isProfileBlack = profileUsername.toLowerCase() === blackPlayer.username.toLowerCase();
 	const bottomColor: 'w' | 'b' = isProfileBlack ? 'b' : 'w';
 	const topColor: 'w' | 'b' = isProfileBlack ? 'w' : 'b';
@@ -247,7 +244,6 @@ const OngoingGameCard = ({
 		[displayChess]
 	);
 
-	// Game over classification: distinguish ABANDONED from DRAW
 	const isAbandoned = gameOverResult?.reason === 'ABANDONED';
 	const isDraw =
 		gameOverResult !== null &&
@@ -318,7 +314,6 @@ const OngoingGameCard = ({
 			role="button"
 			tabIndex={0}
 		>
-			{/* Left: Live ChessBoard */}
 			<div className={styles.boardSection}>
 				{gameOverResult && (
 					<div
@@ -388,7 +383,6 @@ const OngoingGameCard = ({
 				</div>
 			</div>
 
-			{/* Right: Top Player Banner, Match Status Divider, Bottom Player Banner */}
 			<div className={styles.infoSection}>
 				<OngoingGamePlayerBanner
 					player={topPlayer}

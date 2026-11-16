@@ -23,7 +23,7 @@ export interface LeaderboardPlayer {
 		wins: number;
 		losses: number;
 		draws: number;
-		winRate: number; // percentage, e.g. 52.5
+		winRate: number;
 	};
 	ratings: Record<RatingCategory, RatingInfo | null>;
 }
@@ -55,7 +55,7 @@ export interface LeaderboardResponse {
 export class LeaderboardService {
 	private cacheTimestamp: number = 0;
 	private cachedStandings: LeaderboardPlayer[] = [];
-	private readonly CACHE_TTL_MS = 5000; // 5 seconds cache
+	private readonly CACHE_TTL_MS = 5000;
 
 	constructor(
 		@InjectRepository(User)
@@ -71,13 +71,7 @@ export class LeaderboardService {
 		this.cacheTimestamp = 0;
 	}
 
-	/**
-	 * Calculates the composite Leaderboard Rating across all formats:
-	 * 1. Considers ratings in bullet, blitz, rapid with confidence weighting.
-	 * 2. Unplayed formats are excluded if active formats exist (default 800 if 0 games overall).
-	 * 3. Confidence weighting: 5+ games = 1.0, 1-4 games = 0.5 + 0.1 * games.
-	 * 4. Versatility bonus: +15 for 2 calibrated formats (>= 5 games), +30 for 3 calibrated formats, +5 for multi-format provisional.
-	 */
+	// Weighted rating across active formats with a versatility bonus
 	calculateLeaderboardRating(ratings: Record<RatingCategory, RatingInfo | null>): number {
 		const categories: RatingCategory[] = ['bullet', 'blitz', 'rapid'];
 		let weightedSum = 0;
@@ -116,10 +110,6 @@ export class LeaderboardService {
 		return Math.round(composite + versatilityBonus);
 	}
 
-	/**
-	 * Computes and returns the overall standings of all players sorted by default:
-	 * Leaderboard Rating DESC, Win Rate DESC, Total Games DESC, Username ASC.
-	 */
 	async getAllStandings(): Promise<LeaderboardPlayer[]> {
 		const now = Date.now();
 		if (this.cachedStandings.length > 0 && now - this.cacheTimestamp < this.CACHE_TTL_MS) {
@@ -133,7 +123,6 @@ export class LeaderboardService {
 			this.ratingRepo.find(),
 		]);
 
-		// Group ratings by user_id
 		const ratingsByUser = new Map<number, Record<RatingCategory, RatingInfo | null>>();
 
 		for (const r of allRatings) {
@@ -190,7 +179,7 @@ export class LeaderboardService {
 			const isActive = this.presenceService.isUserOnline(u.id);
 
 			return {
-				rank: 0, // Assigned after sorting
+				rank: 0,
 				userId: u.id,
 				username: u.username,
 				avatar: u.avatar ?? null,
@@ -212,7 +201,6 @@ export class LeaderboardService {
 			};
 		});
 
-		// Sort by default: Leaderboard Rating DESC, Win Rate DESC, Total Games DESC, Username ASC
 		players.sort((a, b) => {
 			if (b.leaderboardRating !== a.leaderboardRating) {
 				return b.leaderboardRating - a.leaderboardRating;
@@ -226,7 +214,6 @@ export class LeaderboardService {
 			return a.username.localeCompare(b.username);
 		});
 
-		// Assign ranks 1..N based on default standings
 		players.forEach((p, idx) => {
 			p.rank = idx + 1;
 		});
@@ -237,9 +224,6 @@ export class LeaderboardService {
 		return players;
 	}
 
-	/**
-	 * Gets a specific user's leaderboard rating and rank
-	 */
 	async getUserLeaderboardInfo(userId: number): Promise<{ leaderboardRating: number; rank: number | null }> {
 		const standings = await this.getAllStandings();
 		const player = standings.find((p) => p.userId === userId);
@@ -252,20 +236,15 @@ export class LeaderboardService {
 		};
 	}
 
-	/**
-	 * Fetches paginated, filtered, and sorted leaderboard players.
-	 */
 	async getLeaderboard(query: LeaderboardQueryDto): Promise<LeaderboardResponse> {
 		const allPlayers = await this.getAllStandings();
 		let filtered = [...allPlayers];
 
-		// 1. Search by username
 		if (query.search && query.search.trim().length > 0) {
 			const searchLower = query.search.trim().toLowerCase();
 			filtered = filtered.filter((p) => p.username.toLowerCase().includes(searchLower));
 		}
 
-		// 2. Filter by mode focus
 		if (query.mode && query.mode !== 'all') {
 			filtered = filtered.filter((p) => {
 				const r = p.ratings[query.mode as RatingCategory];
@@ -273,17 +252,14 @@ export class LeaderboardService {
 			});
 		}
 
-		// 3. Min games filter
 		if (query.minGames !== undefined && query.minGames > 0) {
 			filtered = filtered.filter((p) => p.stats.totalGames >= query.minGames!);
 		}
 
-		// 4. Min win rate filter
 		if (query.minWinRate !== undefined && query.minWinRate > 0) {
 			filtered = filtered.filter((p) => p.stats.winRate >= query.minWinRate!);
 		}
 
-		// 5. Min / Max Rating filter
 		if (query.minRating !== undefined && query.minRating > 0) {
 			filtered = filtered.filter((p) => p.leaderboardRating >= query.minRating!);
 		}
@@ -291,7 +267,6 @@ export class LeaderboardService {
 			filtered = filtered.filter((p) => p.leaderboardRating <= query.maxRating!);
 		}
 
-		// 6. Tier filter
 		if (query.tier && query.tier !== 'all') {
 			filtered = filtered.filter((p) => {
 				const r = p.leaderboardRating;
@@ -314,7 +289,6 @@ export class LeaderboardService {
 			});
 		}
 
-		// 7. Status filter
 		if (query.status && query.status !== 'all') {
 			filtered = filtered.filter((p) => {
 				if (query.status === 'online') return p.status === 'ONLINE' || p.status === 'INGAME';
@@ -323,7 +297,6 @@ export class LeaderboardService {
 			});
 		}
 
-		// 8. Sorting
 		const sortBy = query.sortBy || 'leaderboardRating';
 		const order = query.order || 'desc';
 		const isAsc = order === 'asc';
@@ -379,7 +352,6 @@ export class LeaderboardService {
 			return isAsc ? (valA as number) - (valB as number) : (valB as number) - (valA as number);
 		});
 
-		// 9. Pagination (exactly 30 items per page by default)
 		const page = Math.max(1, query.page ? Number(query.page) : 1);
 		const limit = Math.max(1, query.limit ? Number(query.limit) : 30);
 		const total = filtered.length;

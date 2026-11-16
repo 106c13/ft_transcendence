@@ -46,11 +46,11 @@ export interface ChessGame {
 	black: ChessPlayer;
 	board: Chess;
 	mode: GameModeType;
-	increment: number; // ms to add per move
-	whiteTime: number; // Remaining time in ms
-	blackTime: number; // Remaining time in ms
-	lastMoveTime: number; // timestamp
-	moveTimes: number[]; // ms spent on each half-move
+	increment: number;
+	whiteTime: number;
+	blackTime: number;
+	lastMoveTime: number;
+	moveTimes: number[];
 	timer: NodeJS.Timeout | null;
 	disconnectTimer: NodeJS.Timeout | null;
 	disconnectDeadline: number | null;
@@ -60,10 +60,8 @@ export interface ChessGame {
 
 @Injectable()
 export class GameService {
-	// Active games mapped by gameId
 	private activeGames = new Map<string, ChessGame>();
 
-	// Matchmaking queues separated by mode
 	private queues: Record<GameModeType, ChessPlayer[]> = {
 		bullet: [],
 		blitz: [],
@@ -75,16 +73,12 @@ export class GameService {
 
 	private matchmakingRequests = new Map<number, Promise<ChessGame | null>>();
 
-	// Pending challenge requests keyed by challengeId
 	private pendingChallenges = new Map<string, PendingChallenge>();
 
-	// Callback to notify gateway when timers expire or game state changes
 	private gameEventsCallback: (event: string, game: ChessGame, payload: any) => void = () => { };
 
-	// Callback set by the gateway so we can emit match_found
 	private matchFoundCallback: (game: ChessGame) => void = () => { };
 
-	// Callback set by the gateway so presence can track every game creation
 	private gameCreatedCallback: (game: ChessGame) => void = () => { };
 
 	constructor(
@@ -324,15 +318,13 @@ export class GameService {
 		let bestIndex = -1;
 		let bestRatingDiff = Infinity;
 
-		// Candidate must not be the new player itself
 		for (let i = 0; i < queue.length; i++) {
 			const candidate = queue[i];
 			if (candidate.userId === newPlayer.userId) continue;
 
 			const ratingDiff = Math.abs(newPlayer.rating - candidate.rating);
 
-			// Calibrating players get a wider search window (+-400 vs +-200)
-			// so they can find games faster during their 5 calibration matches
+			// Use a wider rating window for provisional players
 			const baseWindow = (newPlayer.isProvisional || candidate.isProvisional) ? 400 : 200;
 
 			const waitSeconds = (now - candidate.queuedAt) / 1000;
@@ -348,7 +340,6 @@ export class GameService {
 		if (bestIndex === -1) return null;
 
 		const opponent = queue[bestIndex];
-		// Remove both players from queue safely
 		this.queues[mode] = this.queues[mode].filter(
 			p => p.userId !== newPlayer.userId && p.userId !== opponent.userId
 		);
@@ -360,14 +351,11 @@ export class GameService {
 		return this.createGameInstance(white, black, mode);
 	}
 
-	// Remove player from matchmaking queue
 	removeFromQueue(userId: number) {
 		for (const mode of ['bullet', 'blitz', 'rapid', 'bullet+2', 'blitz+2', 'rapid+2'] as const) {
 			this.queues[mode] = this.queues[mode].filter(p => p.userId !== userId);
 		}
 	}
-
-	// === DIRECT MATCH (for challenges and rematches) ===
 
 	async createDirectMatch(
 		whiteUserId: number, whiteSocketId: string, whiteUsername: string,
@@ -407,8 +395,6 @@ export class GameService {
 		return this.createGameInstance(whitePlayer, blackPlayer, mode);
 	}
 
-	// === CHALLENGE SYSTEM ===
-
 	addChallenge(challenge: PendingChallenge) {
 		this.pendingChallenges.set(challenge.challengeId, challenge);
 	}
@@ -425,7 +411,6 @@ export class GameService {
 		return challenge;
 	}
 
-	// Make a move on the board
 	makeMove(gameId: string, userId: number, from: string, to: string, promotion?: string, isPremove?: boolean): any {
 		const game = this.activeGames.get(gameId);
 		if (!game) {
@@ -436,14 +421,14 @@ export class GameService {
 			return { error: 'game_paused_opponent_disconnected' };
 		}
 
-		const turn = game.board.turn(); // 'w' or 'b'
+		const turn = game.board.turn();
 		const expectedPlayer = turn === 'w' ? game.white : game.black;
 
 		if (expectedPlayer.userId !== userId) {
 			return { error: 'not_your_turn' };
 		}
 
-		// Calculate elapsed time and deduct (premove takes exactly 100ms / 0.1s)
+		// Deduct elapsed time (premove uses a fixed 100ms)
 		const now = Date.now();
 		const elapsed = isPremove ? 100 : Math.max(0, now - game.lastMoveTime);
 		const timeBeforeMove = turn === 'w' ? game.whiteTime : game.blackTime;
@@ -452,7 +437,6 @@ export class GameService {
 			return { error: 'time_out' };
 		}
 
-		// Attempt to apply move
 		try {
 			const destPiece = game.board.get(to as any);
 			if (destPiece && destPiece.type === 'k') {
@@ -476,7 +460,6 @@ export class GameService {
 			}
 			game.lastMoveTime = now;
 
-			// Clear current turn timer
 			if (game.timer) {
 				clearTimeout(game.timer);
 				game.timer = null;
@@ -495,7 +478,6 @@ export class GameService {
 				}
 			};
 
-			// Check if game is over
 			if (game.board.isGameOver()) {
 				addIncrement();
 				this.handleGameOver(game);
@@ -511,10 +493,8 @@ export class GameService {
 				};
 			}
 
-			// Add increment for the player who just moved
 			addIncrement();
 
-			// Start timer for the next turn
 			this.startTurnTimer(game);
 
 			return {
@@ -570,7 +550,6 @@ export class GameService {
 		});
 	}
 
-	// Handle resignation / abandon
 	async resign(gameId: string, userId: number) {
 		const game = this.activeGames.get(gameId);
 		if (!game) return;
@@ -586,8 +565,7 @@ export class GameService {
 		const winnerColor = game.white.userId === userId ? 'b' : 'w';
 		const reason = 'RESIGNATION';
 
-		// Remove the game before awaiting persistence so a concurrent matchmaking
-		// request cannot reconnect the user to this game.
+		// Delete active game before awaiting DB write to prevent stale reconnects
 		this.activeGames.delete(gameId);
 		const result = await this.saveMatch(game, reason, winnerColor);
 		this.gameEventsCallback('game_over', game, {
@@ -609,7 +587,6 @@ export class GameService {
 		});
 	}
 
-	// Handle draw offer
 	offerDraw(gameId: string, userId: number): { success: boolean; opponentSocketId?: string; error?: string } {
 		const game = this.activeGames.get(gameId);
 		if (!game) return { success: false, error: 'game_not_found' };
@@ -618,7 +595,7 @@ export class GameService {
 			return { success: false, error: 'user_not_in_game' };
 		}
 
-		// If opponent already offered a draw, accept it
+		// Auto-accept if opponent already offered a draw
 		if (game.drawOfferUserId && game.drawOfferUserId !== userId) {
 			this.acceptDraw(gameId, userId);
 			return { success: true };
@@ -629,7 +606,6 @@ export class GameService {
 		return { success: true, opponentSocketId: opponent.socketId };
 	}
 
-	// Handle draw acceptance
 	acceptDraw(gameId: string, userId: number): { success: boolean; error?: string } {
 		const game = this.activeGames.get(gameId);
 		if (!game) return { success: false, error: 'game_not_found' };
@@ -671,7 +647,6 @@ export class GameService {
 		return { success: true };
 	}
 
-	// Handle draw decline
 	declineDraw(gameId: string, userId: number): { success: boolean; requesterSocketId?: string; error?: string } {
 		const game = this.activeGames.get(gameId);
 		if (!game) return { success: false, error: 'game_not_found' };
@@ -687,7 +662,6 @@ export class GameService {
 		return { success: true, requesterSocketId: requester.socketId };
 	}
 
-	// Handle user disconnection from websocket
 	handleUserDisconnect(userId: number, socketId?: string) {
 		this.removeFromQueue(userId);
 
@@ -696,7 +670,7 @@ export class GameService {
 			return;
 		}
 
-		// If a socketId was provided, only proceed if this was the player's active socket
+		// Ignore disconnect if it is not from the player's active socket
 		if (socketId) {
 			const activeSocketId = game.white.userId === userId ? game.white.socketId : game.black.socketId;
 			if (activeSocketId && activeSocketId !== socketId) {
@@ -709,14 +683,12 @@ export class GameService {
 		const wasAlreadyPaused = game.disconnectedPlayerIds.size > 0;
 		game.disconnectedPlayerIds.add(userId);
 
-		// Pause turn timer if turn timer is running
 		if (game.timer) {
 			clearTimeout(game.timer);
 			game.timer = null;
 		}
 
-		// Only the first disconnect transitions the game from running to paused.
-		// Subsequent disconnects must not deduct the same elapsed time again.
+		// Deduct elapsed time only on the first disconnect
 		if (!wasAlreadyPaused) {
 			const now = Date.now();
 			const elapsed = now - game.lastMoveTime;
@@ -728,16 +700,13 @@ export class GameService {
 			game.lastMoveTime = now;
 		}
 
-		// Start one shared grace period for the game. A later disconnect does not
-		// reset the deadline, and reconnecting one player does not cancel it while
-		// another player remains disconnected.
+		// Share one grace period deadline across both players
 		const graceMs = this.getGraceSeconds(game.mode) * 1000;
 		if (!game.disconnectTimer) {
 			game.disconnectDeadline = Date.now() + graceMs;
 		}
 		const disconnectState = this.getDisconnectState(game);
 
-		// Notify other player (if connected)
 		this.gameEventsCallback('opponent_disconnected', game, {
 			userId,
 			graceSeconds: this.getGraceSeconds(game.mode),
@@ -797,12 +766,10 @@ export class GameService {
 		}
 	}
 
-	// Handle player reconnecting to WebSocket
 	handleUserReconnect(userId: number, newSocketId: string): ChessGame | null {
 		const game = this.getGameByUserId(userId);
 		if (!game) return null;
 
-		// Always update socket ID to latest connection
 		if (game.white.userId === userId) {
 			game.white.socketId = newSocketId;
 		} else {
@@ -812,7 +779,7 @@ export class GameService {
 		if (game.disconnectedPlayerIds.has(userId)) {
 			game.disconnectedPlayerIds.delete(userId);
 
-			// Resume turn timer if all players reconnected
+			// Resume turn timer once all players reconnect
 			if (game.disconnectedPlayerIds.size === 0) {
 				if (game.disconnectTimer) {
 					clearTimeout(game.disconnectTimer);
@@ -823,7 +790,6 @@ export class GameService {
 				this.startTurnTimer(game);
 			}
 
-			// Notify opponent
 			this.gameEventsCallback('opponent_reconnected', game, {
 				userId,
 				socketId: newSocketId,
@@ -841,7 +807,6 @@ export class GameService {
 			const queue = this.queues[mode];
 			if (queue.length < 2) continue;
 
-			// Keep trying to make matches until no more pairs are found
 			let matched = true;
 			while (matched && queue.length >= 2) {
 				matched = false;
@@ -861,7 +826,6 @@ export class GameService {
 						const maxDiff = Math.min(baseW + Math.floor(maxWait / 10) * 50, 500);
 
 						if (diff <= maxDiff) {
-							// Remove both from queue and create match
 							queue.splice(j, 1);
 							queue.splice(i, 1);
 
@@ -870,7 +834,6 @@ export class GameService {
 							const black = isAWhite ? b : a;
 
 							const newGame = await this.createGameInstance(white, black, mode);
-							// Notify the gateway to emit match_found to both players
 							this.matchFoundCallback(newGame);
 							matched = true;
 						}
@@ -880,7 +843,6 @@ export class GameService {
 		}
 	}
 
-	// Start standard chess clock timer for active player
 	private startTurnTimer(game: ChessGame) {
 		if (game.timer) {
 			clearTimeout(game.timer);
@@ -895,7 +857,6 @@ export class GameService {
 		}, remainingTime);
 	}
 
-	// Time runs out
 	private handleTimeout(game: ChessGame, turn: 'w' | 'b') {
 		if (game.board.history().length < 2) {
 			this.abandonGame(game);
@@ -933,13 +894,12 @@ export class GameService {
 		});
 	}
 
-	// Normal game over detection (checkmate, stalemate, draw)
 	private handleGameOver(game: ChessGame) {
 		let winner: 'w' | 'b' | null = null;
 		let reason = 'DRAW';
 
 		if (game.board.isCheckmate()) {
-			winner = game.board.turn() === 'w' ? 'b' : 'w'; // winner is opposite of checked king
+			winner = game.board.turn() === 'w' ? 'b' : 'w';
 			reason = 'CHECKMATE';
 		} else if (game.board.isStalemate()) {
 			reason = 'STALEMATE';
@@ -973,7 +933,6 @@ export class GameService {
 		});
 	}
 
-	// Save to DB
 	private async saveMatch(game: ChessGame, result: string, winnerColor: 'w' | 'b' | null) {
 		if (game.board.history().length < 2) {
 			await this.abandonGame(game);
@@ -1134,7 +1093,6 @@ export class GameService {
 		return { disconnectedUserIds, disconnectSecondsRemaining };
 	}
 
-	// Resign a player's active game (used when accepting a challenge while in-game)
 	resignActiveGame(userId: number): void {
 		const game = this.getGameByUserId(userId);
 		if (game && !game.board.isGameOver()) {

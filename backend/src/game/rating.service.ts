@@ -125,7 +125,6 @@ export class RatingService {
             whiteScore = 0.0;
             blackScore = 1.0;
         } else {
-            // Draw
             whiteScore = 0.5;
             blackScore = 0.5;
         }
@@ -185,10 +184,9 @@ export class RatingService {
         return Math.round(kA * (scoreA - expectedA));
     }
 
-    // Returns the K-factor based on how many games the player has played.
     private getKFactor(gamesPlayed: number): number {
-        if (gamesPlayed < 5) return 80;   // Calibration: big swings to find the right level
-        if (gamesPlayed < 30) return 40;  // New: still adjusting
-        return 20;                         // Established: small, stable changes
+        if (gamesPlayed < 5) return 80; // Provisional
+        if (gamesPlayed < 30) return 40; // Establishing
+        return 20; // Established
     }
 }

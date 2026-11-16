@@ -51,11 +51,9 @@ export function useChessBoard({
     const [selectedSquare, setSelectedSquare] = useState<string | null>(null)
     const [validMoves, setValidMoves] = useState<string[]>([])
 
-    // Promotion Modal states
     const [pendingMove, setPendingMove] = useState<{ from: string; to: string } | null>(null)
     const [showPromotion, setShowPromotion] = useState(false)
 
-    // Premove promotion
     const [pendingPremove, setPendingPremove] = useState<Premove | null>(null)
 
     const executeMove = (sourceSquare: string, targetSquare: string) => {
@@ -116,7 +114,7 @@ export function useChessBoard({
         const simChess = getSimulatedChess(boardFen, playerColor, premoves)
         const targetPiece = simChess.get(targetSquare as Square)
 
-        // Dropping on another friendly piece selects that piece instead
+        // Dropping on a friendly piece selects it instead
         if (targetPiece && targetPiece.color === playerColor) {
             setSelectedSquare(targetSquare)
             const targets = getValidMovesForSquare(simChess, targetSquare, playerColor)

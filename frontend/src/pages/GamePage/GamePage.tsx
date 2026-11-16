@@ -57,7 +57,7 @@ const GamePage = () => {
 
     const [isFlipped, setIsFlipped] = useState(false)
 
-    // Players start with themselves at the bottom, viewers with white
+    // Players see their own color at the bottom; spectators see White
     const baseBottom: 'w' | 'b' = game.isViewer ? 'w' : game.playerColor
     const bottomColor: 'w' | 'b' = isFlipped ? (baseBottom === 'w' ? 'b' : 'w') : baseBottom
 
@@ -88,7 +88,6 @@ const GamePage = () => {
         )
     }
 
-    // Player mode calculations
     const opponentColor = game.playerColor === 'w' ? 'b' : 'w'
     const opponentCaptured = opponentColor === 'w' ? game.captured.b : game.captured.w
     const opponentDiff = opponentColor === 'w'
@@ -100,7 +99,6 @@ const GamePage = () => {
         ? (game.whiteScore > game.blackScore ? game.whiteScore - game.blackScore : 0)
         : (game.blackScore > game.whiteScore ? game.blackScore - game.whiteScore : 0)
 
-    // Viewer mode banner data
     const blackBanner: BannerData = {
         name: game.blackPlayer?.username || (game.playerColor === 'w' ? game.opponentName : game.currentUser?.username) || 'Black',
         username: game.blackPlayer?.username || (game.playerColor === 'w' ? game.opponentName : game.currentUser?.username),
@@ -132,7 +130,6 @@ const GamePage = () => {
     const viewerTop = bottomColor === 'w' ? blackBanner : whiteBanner
     const viewerBottom = bottomColor === 'w' ? whiteBanner : blackBanner
 
-    // Disconnected players for viewer
     const blackDisconnected = game.blackPlayer?.id !== undefined && game.disconnectedUserIds.includes(game.blackPlayer.id)
     const whiteDisconnected = game.whitePlayer?.id !== undefined && game.disconnectedUserIds.includes(game.whitePlayer.id)
 

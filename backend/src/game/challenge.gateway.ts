@@ -107,7 +107,6 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 			return;
 		}
 
-		// Check if receiver is connected to the challenge namespace
 		if (!this.presenceService.isUserOnline(receiver.id)) {
 			client.emit('challenge_error', { message: 'friend_not_online' });
 			return;
@@ -115,7 +114,6 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 
 		const challengeId = `challenge_${Date.now()}_${senderId}_${receiver.id}`;
 
-		// Create the 30-second auto-decline timer
 		const timer = setTimeout(() => {
 			const challenge = this.gameService.removeChallenge(challengeId);
 			if (challenge) {
@@ -191,13 +189,12 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 			return;
 		}
 
-		// Check if receiver is online
 		if (!this.presenceService.isUserOnline(receiver.id)) {
 			client.emit('challenge_error', { message: 'opponent_not_online' });
 			return;
 		}
 
-		// Pre-swap colors from previous game
+		// Swap colors from previous game
 		const whiteUserId = isWhite ? receiver.id : sender.id;
 		const blackUserId = isWhite ? sender.id : receiver.id;
 
@@ -260,7 +257,6 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 
 		this.gameService.removeChallenge(challengeId);
 
-		// If the accepting player is in an active game, resign it
 		this.gameService.resignActiveGame(userId);
 
 		let whiteId: number;
@@ -281,7 +277,7 @@ export class ChallengeGateway implements OnGatewayConnection, OnGatewayDisconnec
 			blackUsername = isP1White ? challenge.receiverUsername : challenge.senderUsername;
 		}
 
-		// Create the game with placeholder socket IDs; players will connect to /game with the challenge gameId
+		// Create match with placeholder sockets until players join /game
 		const newGame = await this.gameService.createDirectMatch(
 			whiteId, '', whiteUsername,
 			blackId, '', blackUsername,

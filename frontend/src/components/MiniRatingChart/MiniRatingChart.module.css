@@ -290,7 +290,6 @@
 	font-family: var(--mono, monospace);
 }
 
-/* Compact Mode Styles for Live Overview */
 .miniChartCard.compactCard {
 	padding: 8px 14px;
 	gap: 0;

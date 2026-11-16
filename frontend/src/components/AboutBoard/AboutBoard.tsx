@@ -65,7 +65,7 @@ function parseFenToPieces(fen: string): PieceData[] {
 		}
 	});
 
-	// Stable sort prevents DOM reordering stutters during diagonal or rank-crossing moves like Bg4+
+	// Stable sort prevents DOM reordering stutters during diagonal moves
 	return pieces.sort((a, b) => PIECE_ORDER.indexOf(a.id) - PIECE_ORDER.indexOf(b.id));
 }
 
@@ -80,7 +80,6 @@ export default function AboutBoard({
 
 	return (
 		<div className={styles.boardWrapper}>
-			{/* Static 64 Squares Grid */}
 			<div className={styles.squaresGrid}>
 				{RANKS.map((rank, rankIdx) =>
 					FILES.map((file, fileIdx) => {
@@ -105,7 +104,6 @@ export default function AboutBoard({
 				)}
 			</div>
 
-			{/* Smooth Animated Pieces Layer */}
 			<div className={styles.piecesLayer}>
 				{pieces.map((p) => {
 					const isWinnerKing = isCheckmate && p.id === 'wK';

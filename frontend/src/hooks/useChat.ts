@@ -25,7 +25,6 @@ export function useChat(currentUserId: number | null) {
 		return chat.user1_id === currentUserId ? chat.user2 : chat.user1
 	}, [currentUserId])
 
-	// Load chat list
 	const refreshChats = useCallback(() => {
 		if (!currentUserId || !token) return
 
@@ -63,7 +62,6 @@ export function useChat(currentUserId: number | null) {
 			.catch(() => {});
 	}, [token])
 
-	// Socket connection
 	useEffect(() => {
 		if (!currentUserId) return
 
@@ -121,11 +119,9 @@ export function useChat(currentUserId: number | null) {
 		}
 	}, [currentUserId, refreshChats, markChatAsRead])
 
-	// Sync active chat and messages with URL param (/chat/:userid)
 	useEffect(() => {
 		if (!currentUserId) return;
 
-		// When on /chat without userid, clear selected chat
 		if (!userid) {
 			setSelectedChat(null);
 			setMessages([]);
@@ -142,7 +138,6 @@ export function useChat(currentUserId: number | null) {
 
 		let isMounted = true;
 
-		// Optimistically select chat if it exists in current chats list
 		const existingChat = chats.find(
 			c => c.user1_id === targetUserId || c.user2_id === targetUserId
 		);

@@ -50,7 +50,7 @@ export default function AnalyzeGamesModal({
                     setUserGames(games)
                 }
             } catch {
-                // Leave past games list empty if fetch fails
+                // Leave games list empty on failure
             } finally {
                 if (!isCancelled) {
                     setIsLoadingGames(false)

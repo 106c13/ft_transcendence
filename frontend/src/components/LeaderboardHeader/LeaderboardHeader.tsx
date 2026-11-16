@@ -42,7 +42,6 @@ const LeaderboardHeader = ({
 				<span>{showFormulaInfo ? t('hide_formula') : t('how_it_works')}</span>
 			</button>
 
-			{/* Rating Formula Explainer Modal/Card with smooth accordion */}
 			<div className={`${styles.explainerWrapper} ${showFormulaInfo ? styles.explainerOpen : ''}`}>
 				<div className={styles.explainerInner}>
 					<div className={styles.explainerCard}>

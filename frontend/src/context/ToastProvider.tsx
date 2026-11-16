@@ -35,7 +35,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     []
   )
 
-  // Listen for global custom events from non-hook code
   useEffect(() => {
     const handleGlobalToast = (e: Event) => {
       const customEvent = e as CustomEvent<{

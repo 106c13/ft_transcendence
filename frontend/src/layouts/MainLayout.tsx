@@ -78,7 +78,6 @@ const MainLayout = () => {
 		}
 	}, [incomingChallenge, acceptChallenge, declineChallenge, setTopSlot]);
 
-	// Clear topSlot on unmount of MainLayout
 	useEffect(() => {
 		return () => {
 			setTopSlot(null);
@@ -98,7 +97,6 @@ const MainLayout = () => {
 		<div className="min-h-screen flex flex-col bg-slate-900 text-slate-100">
 			<Navbar currentUser={currentUser} friendSocket={friendSocket} />
 			<main className="flex-1 flex flex-col w-full">
-				{/* Child routes render here */}
 				<Outlet context={{ currentUser, setCurrentUser, challengeSocket, friendSocket } satisfies LayoutContextType} />
 			</main>
 			{showFooter && <Footer currentUser={currentUser} />}

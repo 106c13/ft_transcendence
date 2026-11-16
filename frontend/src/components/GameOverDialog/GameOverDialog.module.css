@@ -139,7 +139,6 @@
 	margin: 2px 0 0 0;
 }
 
-/* Side-by-side Dual Rating Section - Centralized vertically and horizontally */
 .ratingsComparisonSection {
 	width: 100%;
 	margin: 0;
@@ -224,7 +223,6 @@
 	flex-shrink: 0;
 }
 
-/* Position change delta - styled like Elo delta (small text beside big rank), but distinct cyan/rose colors */
 .positionDeltaInline {
 	font-size: 15px;
 	font-weight: 800;

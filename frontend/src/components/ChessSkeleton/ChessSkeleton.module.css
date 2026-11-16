@@ -32,7 +32,6 @@
   box-sizing: border-box;
 }
 
-/* Banner Skeleton */
 .bannerSkeleton {
   width: 100%;
   height: var(--banner-h, 56px);
@@ -81,7 +80,6 @@
   border-radius: var(--radius-md);
 }
 
-/* Board Skeleton */
 .boardSkeleton {
   width: var(--board-size);
   height: var(--board-size);
@@ -128,7 +126,6 @@
   pointer-events: none;
 }
 
-/* Info Panel Skeleton */
 .infoPanel {
   width: 390px;
   flex: 1;

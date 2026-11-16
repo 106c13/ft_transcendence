@@ -29,7 +29,6 @@ const GamesList = ({
 }: Props) => {
 	const { t } = useTranslation()
 
-	// Filter states
 	const [colorFilter, setColorFilter] = useState<'all' | 'white' | 'black'>('all')
 	const [resultFilter, setResultFilter] = useState<'all' | 'win' | 'loss' | 'draw'>('all')
 	const [modeFilter, setModeFilter] = useState<'all' | 'bullet' | 'blitz' | 'rapid'>('all')
@@ -50,17 +49,14 @@ const GamesList = ({
 		setCurrentPage(1)
 	}
 
-	// Filtered matches
 	const filteredMatches = useMemo(() => {
 		return matches.filter((match) => {
 			const isWhite = match.white?.username === username
 			const isBlack = match.black?.username === username
 
-			// Color filter
 			if (colorFilter === 'white' && !isWhite) return false
 			if (colorFilter === 'black' && !isBlack) return false
 
-			// Result filter
 			if (resultFilter !== 'all') {
 				let outcome: 'win' | 'loss' | 'draw' = 'draw'
 				if (match.winner_id) {
@@ -73,7 +69,6 @@ const GamesList = ({
 				if (outcome !== resultFilter) return false
 			}
 
-			// Mode filter
 			if (modeFilter !== 'all') {
 				const rawMode = match.mode.toLowerCase()
 				if (!rawMode.startsWith(modeFilter)) return false
@@ -83,7 +78,6 @@ const GamesList = ({
 		})
 	}, [matches, username, colorFilter, resultFilter, modeFilter])
 
-	// Pagination calculations
 	const totalGames = filteredMatches.length
 	const totalPages = Math.max(1, Math.ceil(totalGames / GAMES_PER_PAGE))
 	const safePage = Math.min(currentPage, totalPages)
@@ -146,7 +140,6 @@ const GamesList = ({
 
 	return (
 		<div className={styles.container}>
-			{/* Top header */}
 			<div className={styles.header}>
 				<div className={styles.titleGroup}>
 					<h3 className={styles.title}>{t('games')}</h3>
@@ -154,9 +147,7 @@ const GamesList = ({
 				</div>
 			</div>
 
-			{/* Filter Bar */}
 			<div className={styles.filterBar}>
-				{/* Color Filter */}
 				<div className={styles.filterGroup}>
 					<label className={styles.filterLabel}>{t('filter_color')}:</label>
 					<CustomSelect<'all' | 'white' | 'black'>
@@ -167,7 +158,6 @@ const GamesList = ({
 					/>
 				</div>
 
-				{/* Result Filter */}
 				<div className={styles.filterGroup}>
 					<label className={styles.filterLabel}>{t('filter_result')}:</label>
 					<CustomSelect<'all' | 'win' | 'loss' | 'draw'>
@@ -178,7 +168,6 @@ const GamesList = ({
 					/>
 				</div>
 
-				{/* Game Mode Filter */}
 				<div className={styles.filterGroup}>
 					<label className={styles.filterLabel}>{t('filter_mode')}:</label>
 					<CustomSelect<'all' | 'bullet' | 'blitz' | 'rapid'>
@@ -189,7 +178,6 @@ const GamesList = ({
 					/>
 				</div>
 
-				{/* Reset Button */}
 				{hasActiveFilters && (
 					<button className={styles.resetBtn} onClick={handleResetFilters} type="button">
 						<X size={14} aria-hidden="true" />
@@ -198,7 +186,6 @@ const GamesList = ({
 				)}
 			</div>
 
-			{/* Games List Content */}
 			{totalGames === 0 ? (
 				<div className={styles.emptyCard}>
 					<Search size={36} className={styles.emptyIcon} aria-hidden="true" />
@@ -213,7 +200,6 @@ const GamesList = ({
 				</div>
 			) : (
 				<div className={styles.listContainer}>
-					{/* Table Column Labels */}
 					<div className={styles.listHeader}>
 						<span>{t('mode')}</span>
 						<span>{t('players')}</span>
@@ -235,7 +221,6 @@ const GamesList = ({
 				</div>
 			)}
 
-			{/* Pagination Controls (20 games per page) */}
 			{totalGames > 0 && (
 				<div className={styles.paginationBar}>
 					<div className={styles.paginationInfo}>
@@ -258,7 +243,6 @@ const GamesList = ({
 
 							{Array.from({ length: totalPages }, (_, i) => i + 1)
 								.filter((page) => {
-									// Show first, last, and pages around current
 									return (
 										page === 1 ||
 										page === totalPages ||

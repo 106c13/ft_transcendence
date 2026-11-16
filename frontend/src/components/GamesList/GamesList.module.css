@@ -41,7 +41,6 @@
 	border-radius: 10px;
 }
 
-/* Filter Bar */
 .filterBar {
 	display: flex;
 	align-items: center;
@@ -119,7 +118,6 @@
 	border-color: rgba(148, 163, 184, 0.4);
 }
 
-/* Games Table/List */
 .listContainer {
 	display: flex;
 	flex-direction: column;
@@ -160,7 +158,6 @@
 	}
 }
 
-/* Pagination Bar */
 .paginationBar {
 	display: flex;
 	align-items: center;
@@ -222,7 +219,6 @@
 	font-weight: 700;
 }
 
-/* Loading & Empty */
 .loadingSpinner {
 	display: flex;
 	flex-direction: column;

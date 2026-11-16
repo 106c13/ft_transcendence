@@ -331,7 +331,6 @@ const GameActions = ({
 									)}
 								</button>
 							</div>
-							{/* Pointer pointing right at the center of the original button */}
 							<div className={`${styles.modalPointer} ${isAbandon ? styles.abandonModalPointer : ''}`} />
 						</div>
 					)}

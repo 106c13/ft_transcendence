@@ -105,7 +105,6 @@ const PlayerBanner = ({
 		}
 	}, [avatar])
 
-	// Check if user exists in our DB and fetch avatar if not supplied
 	useEffect(() => {
 		if (initialRatings) {
 			setUserExists(true)
@@ -157,10 +156,8 @@ const PlayerBanner = ({
 					isActive ? styles.activeTurn : ''
 				} ${isLowTime ? styles.lowTime : ''}`}
 			>
-				{/* Left Group: User info + Captured pieces right beside it */}
 				<div className={styles.leftGroup}>
 					<div className={styles.userInfoAnchor}>
-						{/* User row: click avatar or name to open player profile in a new tab if user exists */}
 						<div
 							className={`${styles.userMainRow} ${
 								canViewProfile ? styles.userMainRowClickable : styles.userMainRowDisabled
@@ -222,7 +219,6 @@ const PlayerBanner = ({
 						</div>
 					</div>
 
-					{/* Captured pieces and connection status */}
 					{isDisconnected ? (
 						<span className={styles.disconnectStatus}>
 							{t('opponent_reconnect_wait')} {disconnectCountdown ?? 0}s
@@ -248,7 +244,6 @@ const PlayerBanner = ({
 					)}
 				</div>
 
-				{/* Clock */}
 				<div
 					className={`${styles.clockWrapper} ${shouldHideClock ? styles.clockHidden : ''}`}
 					aria-hidden={shouldHideClock}

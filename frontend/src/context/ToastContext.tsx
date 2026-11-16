@@ -4,7 +4,7 @@ export type ToastType = 'success' | 'error' | 'warning' | 'info'
 
 export interface ToastOptions {
   title?: string
-  duration?: number // ms, default: 4000
+  duration?: number
   id?: string
 }
 
@@ -34,9 +34,7 @@ export interface ToastContextValue {
 
 export const ToastContext = createContext<ToastContextValue | null>(null)
 
-/**
- * Global helper to dispatch a toast from non-React modules (e.g. outside components/hooks)
- */
+// Dispatch toast events from outside React components
 export function showGlobalToast(type: ToastType, message: string, options?: ToastOptions) {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(

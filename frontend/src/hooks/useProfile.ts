@@ -60,7 +60,7 @@ export function useProfile(
 			const data = await res.json();
 			setFriends(data);
 		} catch {
-			// Retain existing profile friends list if background fetch fails
+			// Keep existing friends list on failure
 		}
 	}, [user?.username]);
 
@@ -135,7 +135,6 @@ export function useProfile(
 		}
 	}, [user?.username, loadFriends]);
 
-	// Join profile room for live friend list synchronization
 	useEffect(() => {
 		if (!user?.username) return;
 

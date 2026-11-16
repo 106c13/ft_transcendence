@@ -74,12 +74,10 @@
 	}
 }
 
-/* Text label is mobile-only */
 .navLabel {
 	display: none;
 }
 
-/* Mobile drawer row */
 @media (max-width: 1024px) {
 	.messagesActionItem {
 		width: 100%;
@@ -126,7 +124,6 @@
 		color: var(--color-blue-400);
 	}
 
-	/* Badge sits at the right end of the row */
 	.notificationBadge {
 		position: static;
 		margin-left: auto;

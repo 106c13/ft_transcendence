@@ -9,10 +9,8 @@
   --game-content-h: calc(var(--board-size) + var(--banners-total));
 }
 
-/* Responsive */
 @media (max-width: 950px) {
   .container {
-    /* screen width - side padding - eval bar - gap */
     --board-size: min(calc(100vw - 24px - var(--eval-w) - var(--eval-gap)), 440px);
     --game-content-h: auto;
   }

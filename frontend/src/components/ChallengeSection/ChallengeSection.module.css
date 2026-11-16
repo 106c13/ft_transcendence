@@ -175,7 +175,6 @@
 	scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
 }
 
-/* Auto-flip upward when near bottom screen edge */
 .dropdownMenuUp {
 	top: auto;
 	bottom: calc(100% + 8px);
@@ -242,7 +241,7 @@
 	color: #E2E8F0;
 	font-size: 14px;
 	font-weight: 500;
-	min-width: 0; /* Prevents long usernames from blowing out horizontal width */
+	min-width: 0; /* Prevent long usernames from overflowing */
 }
 
 .dropdownOption:hover {

@@ -64,7 +64,6 @@ const ProfileHeader = ({
 
     return (
         <div className={styles.profileHeader}>
-            {/* Top Section: Avatar with Status Dot, Identity Info, Action Buttons */}
             <div className={styles.topSection}>
                 <div className={styles.identityGroup}>
                     <div className={styles.avatarWrapper} title={statusLabel}>
@@ -124,7 +123,6 @@ const ProfileHeader = ({
                     </div>
                 </div>
 
-                {/* Header Actions */}
                 <div className={styles.headerActions}>
                 {isOwnProfile ? (
                     <>
@@ -209,7 +207,6 @@ const ProfileHeader = ({
                 </div>
             </div>
 
-            {/* Connected Tabs Header inside Profile Header Card */}
             <div className={styles.tabsHeader} role="tablist">
                 <button
                     className={`${styles.tab} ${activeTab === 'overview' ? styles.activeTab : ''}`}

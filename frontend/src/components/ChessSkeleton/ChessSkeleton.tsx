@@ -8,7 +8,6 @@ export default function ChessSkeleton({ mode = 'analyze' }: Props) {
     return (
         <>
             <div className={styles.boardContainer}>
-                {/* Top Banner Skeleton */}
                 <div className={styles.bannerSkeleton}>
                     <div className={styles.bannerLeft}>
                         <div className={`${styles.skeleton} ${styles.avatarSkeleton}`} />
@@ -20,7 +19,6 @@ export default function ChessSkeleton({ mode = 'analyze' }: Props) {
                     <div className={`${styles.skeleton} ${styles.clockSkeleton}`} />
                 </div>
 
-                {/* Board Skeleton Grid */}
                 <div className={styles.boardSkeleton}>
                     <div className={styles.boardGrid}>
                         {Array.from({ length: 64 }).map((_, i) => {
@@ -40,7 +38,6 @@ export default function ChessSkeleton({ mode = 'analyze' }: Props) {
                     <div className={styles.boardShimmerOverlay} />
                 </div>
 
-                {/* Bottom Banner Skeleton */}
                 <div className={styles.bannerSkeleton}>
                     <div className={styles.bannerLeft}>
                         <div className={`${styles.skeleton} ${styles.avatarSkeleton}`} />
@@ -53,7 +50,6 @@ export default function ChessSkeleton({ mode = 'analyze' }: Props) {
                 </div>
             </div>
 
-            {/* Right Side Info Panel Skeleton */}
             <div className={styles.infoPanel}>
                 <div className={styles.panelHeader}>
                     <div className={`${styles.skeleton} ${styles.headerTitleSkeleton}`} />

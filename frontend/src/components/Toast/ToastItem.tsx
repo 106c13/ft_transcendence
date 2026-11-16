@@ -29,7 +29,6 @@ const ToastItem = ({ toast, onDismiss }: Props) => {
 	const [isPaused, setIsPaused] = useState(false);
 	const lastTickRef = useRef<number | null>(null);
 
-	// Default type titles if no custom title is passed
 	const defaultTitles = {
 		success: t('toast_success'),
 		error: t('toast_error'),
@@ -37,7 +36,6 @@ const ToastItem = ({ toast, onDismiss }: Props) => {
 		info: t('toast_info'),
 	};
 
-	// Message localization check
 	const displayMessage = i18n.exists(toast.message)
 		? t(toast.message)
 		: toast.message;

@@ -29,7 +29,6 @@ const HomePage = () => {
 
 	const history = useGameHistory(currentUser?.username || '')
 
-	// Load ratings & friends list
 	useEffect(() => {
 		if (!currentUser) return
 		const token = localStorage.getItem('token')
@@ -58,7 +57,6 @@ const HomePage = () => {
 				toast.error('select_friend_error')
 				return
 			}
-			// Send challenge
 			challengeSocket.sendChallenge(selectedFriend, mode)
 		} else {
 			navigate(`/game?mode=${encodeURIComponent(mode)}`)
@@ -91,7 +89,6 @@ const HomePage = () => {
 					<h1>{t('welcome', { username: currentUser?.username || t('player') })}</h1>
 				</div>
 
-				{/* Section 1: Play Online */}
 				<section className="flex flex-col gap-3 w-full">
 					<div className={styles.sectionHeader}>
 						<h2 className={styles.sectionTitle}>
@@ -100,7 +97,6 @@ const HomePage = () => {
 					</div>
 
 					<div className="grid grid-cols-1 min-[961px]:grid-cols-[minmax(0,7fr)_minmax(0,3fr)] gap-[18px] items-stretch w-full">
-						{/* Left subsection (70-80%): Challenge section & minimal game modes (without names) */}
 						<div className="flex flex-col gap-3 min-w-0 h-full">
 							<ChallengeSection
 								active={challengeActive}
@@ -112,7 +108,6 @@ const HomePage = () => {
 							<GameModesGrid modes={modes} onSelectMode={handlePlayMode} />
 						</div>
 
-						{/* Right subsection (20-30%): Random review recommendation board */}
 						<div className="flex flex-col min-w-0 w-full h-full">
 							<GameReviewCard
 								games={history.matches}
@@ -123,7 +118,6 @@ const HomePage = () => {
 					</div>
 				</section>
 
-				{/* Section 2: Stats and More */}
 				<section className="flex flex-col gap-3 w-full">
 					<div className={styles.sectionHeader}>
 						<h2 className={styles.sectionTitle}>
@@ -132,7 +126,6 @@ const HomePage = () => {
 					</div>
 
 					<div className="grid grid-cols-1 min-[1121px]:grid-cols-[minmax(0,7fr)_minmax(0,3fr)] gap-[18px] items-stretch w-full">
-						{/* Left subsection (70%): Recent games list like in profile */}
 						<div className="flex flex-col min-w-0 h-full">
 							<RecentGames
 								matches={history.matches}
@@ -142,7 +135,6 @@ const HomePage = () => {
 							/>
 						</div>
 
-						{/* Right subsection (30%): Stacked ratings on top and friends on bottom */}
 						<div className="flex flex-col gap-4 min-w-0 h-full">
 							<PlayerRatingsCard
 								ratings={effectiveRatings}

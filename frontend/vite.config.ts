@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  base: '/',   // ← THIS LINE IS CRITICAL
+  base: '/',
   server: {
     host: '0.0.0.0',
     port: 5173,

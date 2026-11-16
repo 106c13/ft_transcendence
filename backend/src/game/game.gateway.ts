@@ -34,12 +34,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private presenceService: PresenceService,
 		private challengeGateway: ChallengeGateway,
 	) {
-		// Provide active games checker to presence service
 		this.presenceService.setInGameChecker((userId: number) => {
 			return !!this.gameService.getGameByUserId(userId);
 		});
 
-		// Track every game creation (matchmaking queue, direct challenge, rematch)
 		this.gameService.setGameCreatedCallback((newGame) => {
 			this.presenceService.setUserInGame(newGame.white.userId, true);
 			this.presenceService.setUserInGame(newGame.black.userId, true);
@@ -58,12 +56,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			});
 		});
 
-		// Register events callback from service to notify clients
 		this.gameService.setGameEventsCallback((event, game, payload) => {
 			if (event === 'opponent_reconnected') {
-				// Notify the other player and spectators, but not the socket that
-				// just reconnected; that socket must keep its paused state until
-				// the other player reconnects.
+				// Keep the reconnecting socket paused until the opponent also reconnects
 				this.server.to(game.gameId).except(payload?.socketId).emit(event, payload);
 				return;
 			}
@@ -320,7 +315,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (matchGame) {
 			const roomName = matchGame.gameId;
 
-			// Ensure calling client socket is updated and joins the room
 			if (matchGame.white.userId === userId) {
 				matchGame.white.socketId = client.id;
 			} else if (matchGame.black.userId === userId) {
@@ -328,7 +322,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 			client.join(roomName);
 
-			// Sockets join room
 			const whiteSocket = this.server.sockets.get(matchGame.white.socketId);
 			const blackSocket = this.server.sockets.get(matchGame.black.socketId);
 
@@ -343,7 +336,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const whiteUser = await this.usersService.findById(matchGame.white.userId);
 			const blackUser = await this.usersService.findById(matchGame.black.userId);
 
-			// Notify White
 			const whitePayload = {
 				gameId: matchGame.gameId,
 				color: 'w',
@@ -368,7 +360,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.server.to(matchGame.white.socketId).emit('match_found', whitePayload);
 			}
 
-			// Notify Black
 			const blackPayload = {
 				gameId: matchGame.gameId,
 				color: 'b',

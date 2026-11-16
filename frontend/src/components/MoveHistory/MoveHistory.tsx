@@ -31,7 +31,7 @@ function MoveHistory({
 		const active = container.querySelector(`.${styles.moveBtn}.${styles.activeMove}`) as HTMLElement | null
 		if (!active) return
 
-		// Scroll ONLY the moveListRef container, never the browser window or parent page
+		// Scroll only the move list container, not the page
 		const containerRect = container.getBoundingClientRect()
 		const activeRect = active.getBoundingClientRect()
 

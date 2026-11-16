@@ -23,11 +23,10 @@ export function useFriends(currentUser: User | null) {
             const data = await res.json()
             setFriends(data)
         } catch {
-            // Retain existing friends list if background fetch fails
+            // Keep existing friends list on failure
         }
     }, [username]);
 
-    // Listen to real-time friend status updates
     useEffect(() => {
         const handleStatusChange = (e: Event) => {
             const customEvent = e as CustomEvent<{

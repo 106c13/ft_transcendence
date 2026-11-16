@@ -34,12 +34,10 @@ export function useRatingHistory(
 			const draws = catRatingInfo?.draws ?? 0
 			const winRate = gamesPlayed > 0 ? Math.round((wins / gamesPlayed) * 100) : 0
 
-			// Filter matches belonging to this category (e.g. 'bullet' and 'bullet+2')
 			const catMatches = matches
 				.filter(m => m.mode.replace('+2', '') === cat)
 				.sort((a, b) => new Date(a.played_at).getTime() - new Date(b.played_at).getTime())
 
-			// Build all-time timeline
 			const allTime: AllTimeRatingPoint[] = []
 			let peak = currentRating
 			let lowest = currentRating
@@ -87,7 +85,6 @@ export function useRatingHistory(
 				}
 			}
 
-			// If no match ratings recorded yet, show a starting point
 			if (allTime.length === 0) {
 				const initDate = new Date()
 				allTime.push({
@@ -102,25 +99,21 @@ export function useRatingHistory(
 				})
 			}
 
-			// Generate 7-day sparkline points
 			const now = new Date()
 			const last7Days: SparklinePoint[] = []
 
-			// We need points for Day -6, Day -5, ..., Day 0 (today)
 			for (let i = 6; i >= 0; i--) {
 				const targetDate = new Date(now)
 				targetDate.setDate(targetDate.getDate() - i)
 				targetDate.setHours(23, 59, 59, 999)
 				const targetTimestamp = targetDate.getTime()
 
-				// Find the latest rating on or before this day's end
 				let ratingOnDay = currentRating
 				const matchesBeforeDay = allTime.filter(p => new Date(p.date).getTime() <= targetTimestamp)
 
 				if (matchesBeforeDay.length > 0) {
 					ratingOnDay = matchesBeforeDay[matchesBeforeDay.length - 1].rating
 				} else if (allTime.length > 0) {
-					// Fall back to the earliest recorded rating
 					ratingOnDay = allTime[0].rating
 				}
 

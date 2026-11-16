@@ -39,10 +39,8 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
         goToUserProfile,
     } = useProfile(friendSocket, currentUser, username, defaultTab);
 
-    // Load game history to know total games count and pass down to tabs
     const history = useGameHistory(user?.username || '');
 
-    // Live Ongoing Game below header
     const [activeGame, setActiveGame] = useState<LiveGameData | null>(null);
     const [isLiveActive, setIsLiveActive] = useState(false);
     const profileUsername = user?.username;
@@ -62,7 +60,7 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
                 const data = await res.json();
                 if (data?.gameId) {
                     setActiveGame(data);
-                    // Double rAF ensures the 0fr collapsed state is painted before transitioning to 1fr
+                    // Wait for 0fr state to paint before transitioning to 1fr
                     requestAnimationFrame(() => {
                         requestAnimationFrame(() => {
                             setIsLiveActive(true);
@@ -71,9 +69,7 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
                     return;
                 }
             }
-            // If response is not ok (no active game on server):
-            // Only clear state if we don't already have an active game mounted.
-            // If activeGame is already mounted, OngoingGameCard handles the 5-second countdown on game over.
+            // Keep mounted game so OngoingGameCard can finish its countdown
             setActiveGame((prev) => {
                 if (!prev) {
                     setIsLiveActive(false);
@@ -99,7 +95,6 @@ const ProfilePage = ({ defaultTab = 'overview' }: Props) => {
         return () => clearTimeout(id);
     }, [fetchLiveGame]);
 
-    // Listen for live presence changes to automatically detect game start
     useEffect(() => {
         const handleStatusChange = (e: Event) => {
             const customEvent = e as CustomEvent<{

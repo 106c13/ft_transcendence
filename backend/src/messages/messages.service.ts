@@ -103,7 +103,6 @@ export class MessagesService {
 			},
 		}
 
-		// Emit to chat participants via WebSocket
 		this.chatGateway.emitNewMessage(chat.user1_id, chat.user2_id, messageResponse);
 
 		return {

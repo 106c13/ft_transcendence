@@ -25,7 +25,7 @@ export const isFriendRequest = (notif: Notification): boolean => {
             const parsed = JSON.parse(notif.message);
             return parsed.key === 'notification_friend_request';
         } catch {
-            // Ignore parse errors for plain text
+            // Ignore parse errors
         }
     }
     return false;
@@ -41,7 +41,7 @@ export const extractUsername = (notif: Notification): string | null => {
             const parsed = JSON.parse(notif.message);
             if (parsed.username) return parsed.username;
         } catch {
-            // Ignore parse errors for plain text
+            // Ignore parse errors
         }
     }
     const match = notif.message.match(/^(.+?)\s+sent you a friend request/);
@@ -56,7 +56,7 @@ export const renderNotificationMessage = (msg: string, t: TFunction): string => 
                 return String(t(parsed.key, parsed));
             }
         } catch {
-            // Ignore parse errors for plain text
+            // Ignore parse errors
         }
     }
     return String(t(msg, msg));

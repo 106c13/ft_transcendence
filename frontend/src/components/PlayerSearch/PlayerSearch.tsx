@@ -24,20 +24,17 @@ const PlayerSearch = () => {
 	const [showResults, setShowResults] = useState(false);
 	const [isSearching, setIsSearching] = useState(false);
 
-	// On mobile the search is always expanded
 	const isExpanded = isExpandedState || isMobile;
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	// Focus input when the user expands it (not when it is expanded by default on mobile)
 	useEffect(() => {
 		if (isExpandedState) {
 			inputRef.current?.focus();
 		}
 	}, [isExpandedState]);
 
-	// Click outside to collapse
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -52,7 +49,6 @@ const PlayerSearch = () => {
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, [searchQuery]);
 
-	// Escape key to close
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.key === 'Escape') {
@@ -88,7 +84,7 @@ const PlayerSearch = () => {
 				setShowResults(true);
 			}
 		} catch {
-			// Ignore failed search query without breaking UI state
+			// Ignore failed search query
 		} finally {
 			setIsSearching(false);
 		}
@@ -140,7 +136,6 @@ const PlayerSearch = () => {
 		}
 	};
 
-	// On mobile the X is only useful while there is text to clear
 	const showCloseButton = isExpanded && (!isMobile || searchQuery.length > 0);
 
 	return (

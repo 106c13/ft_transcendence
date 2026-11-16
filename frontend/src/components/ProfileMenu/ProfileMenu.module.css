@@ -35,7 +35,6 @@
 	border-color: var(--color-blue-400);
 }
 
-/* Profile Dropdown */
 .profileDropdown {
 	position: absolute;
 	top: 64px;
@@ -49,7 +48,6 @@
 	animation: profileDropdownFadeIn 0.15s ease-out;
 }
 
-/* Pointy arrow joining seamlessly with card top border */
 .profileDropdown::after {
 	content: '';
 	position: absolute;
@@ -66,7 +64,6 @@
 	transition: background var(--transition-fast);
 }
 
-/* Match arrow color seamlessly when hovering "My Profile" */
 .profileDropdown:has(div:first-child:hover)::after {
 	background: color-mix(in srgb, var(--color-blue-400) 12%, var(--color-bg-card));
 }
@@ -143,12 +140,10 @@
 	background: rgba(248, 113, 113, 0.12);
 }
 
-/* Text label is mobile-only */
 .navLabel {
 	display: none;
 }
 
-/* Mobile drawer row + centered modal */
 @media (max-width: 1024px) {
 	.profileMenuContainer {
 		width: 100%;
@@ -171,7 +166,6 @@
 		background: rgba(96, 165, 250, 0.12);
 	}
 
-	/* Avatar occupies the same 28px icon box as every other row */
 	.navProfileAvatar {
 		width: 28px;
 		height: 28px;
@@ -202,7 +196,6 @@
 		color: var(--color-blue-400);
 	}
 
-	/* Dropdown becomes a centered modal */
 	.profileDropdown {
 		position: fixed;
 		top: 50%;

@@ -33,7 +33,6 @@
 	transform: scale(0.98);
 }
 
-/* Left: Larger Live Board Section */
 .boardSection {
 	position: relative;
 	width: 216px;
@@ -57,7 +56,6 @@
 	overflow: hidden;
 }
 
-/* Force inner ChessBoard to scale cleanly to 216x216 container */
 .boardWrapper > div {
 	width: 100% !important;
 	height: 100% !important;
@@ -75,7 +73,6 @@
 	object-fit: contain;
 }
 
-/* Smaller file and rank coordinates inside the mini-board */
 .boardWrapper span[class*="coordRank"] {
 	font-size: 7.5px !important;
 	top: 2px !important;
@@ -88,7 +85,6 @@
 	right: 2.5px !important;
 }
 
-/* Right: Top Player, Centered Match Divider, Bottom Player */
 .infoSection {
 	flex: 1;
 	min-width: 0;
@@ -99,7 +95,6 @@
 	padding: 0 var(--padding-sm);
 }
 
-/* Middle Divider Row with LIVE & Mode Pills */
 .dividerRow {
 	display: flex;
 	align-items: center;
@@ -190,7 +185,6 @@
 	color: var(--color-slate-300);
 }
 
-/* Result & New Match Overlays on Mini Board */
 .resultBadge {
 	position: absolute;
 	top: 50%;

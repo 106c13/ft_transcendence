@@ -138,7 +138,7 @@ export function useAnalyzeEngine({
                 setCustomArrows([])
             }
         } catch {
-            // ignore
+            // Ignore invalid move
         }
     }, [])
 
@@ -156,7 +156,6 @@ export function useAnalyzeEngine({
         }
     }, [engineLines])
 
-    // Live position evaluation effect with debounce & memory cache
     useEffect(() => {
         if (displayChess.isGameOver()) {
             if (displayChess.isCheckmate()) {
@@ -214,7 +213,7 @@ export function useAnalyzeEngine({
                     }
                 }
             } catch {
-                // Non-fatal: skip evaluation update for this position
+                // Skip evaluation update on failure
             } finally {
                 if (!isCancelled) {
                     setIsEvaluating(false)
@@ -228,7 +227,6 @@ export function useAnalyzeEngine({
         }
     }, [currentFen, displayChess, applyEvaluation])
 
-    // Dynamic Move Classification (best, great, blunder, etc.)
     const currentMoveClassification = useMemo(() => {
         if (viewIndex === 0) return null
         const playedMove = moveDetails[viewIndex - 1]
@@ -239,7 +237,6 @@ export function useAnalyzeEngine({
         const fenAfter = moveHistory[viewIndex]
         const analysis = analysisData?.positions[viewIndex - 1]
 
-        // 1. Recorded game classification at this ply
         if (
             analysis &&
             analysis.classification &&
@@ -253,7 +250,6 @@ export function useAnalyzeEngine({
             }
         }
 
-        // 2. Alternative move evaluation via cached engine telemetry
         const evalBefore = fenBefore ? evalCacheRef.current.get(fenBefore) : undefined
         const evalAfter = fenAfter ? evalCacheRef.current.get(fenAfter) : undefined
 

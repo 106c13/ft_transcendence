@@ -28,7 +28,6 @@ const ChallengeSection = ({
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
-	// Close dropdown when clicking outside
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -172,7 +171,6 @@ const ChallengeSection = ({
 
 					{isOpen && active && (
 						<div className={`${styles.dropdownMenu} ${openUpwards ? styles.dropdownMenuUp : ''}`}>
-							{/* 1. Pinned Search Bar (shown when friends list has items) */}
 							{friends.length > 0 && (
 								<div className={styles.searchWrapper}>
 									<svg
@@ -212,7 +210,6 @@ const ChallengeSection = ({
 									)}
 								</div>
 							)}
-							{/* 2. Pinned Deselect Option */}
 							{selectedFriend && (
 								<div
 									className={styles.dropdownClearOption}
@@ -224,7 +221,6 @@ const ChallengeSection = ({
 									<span>{t('deselect_friend')}</span>
 								</div>
 							)}
-							{/* 3. Dedicated Scrollable Friends Container */}
 							<div className={styles.friendsList}>
 								{friends.length === 0 ? (
 									<div className={styles.emptyOptions}>

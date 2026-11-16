@@ -78,7 +78,6 @@ function ChatMain({
 			? t('in_game')
 			: t('offline')
 
-	// Always scroll down when messages change or chat changes
 	useEffect(() => {
 		if (!selectedChat) return
 

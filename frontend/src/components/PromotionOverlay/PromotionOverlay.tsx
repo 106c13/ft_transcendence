@@ -22,14 +22,12 @@ const PromotionOverlay = ({
 }: Props) => {
 	const { t } = useTranslation()
 
-	// Calculate anchored positioning based on the promotion square
 	const colIdx = square && files ? files.indexOf(square[0]) : 3
 	const rowIdx = square && ranks ? ranks.indexOf(square[1]) : 0
 
 	const safeCol = colIdx >= 0 ? colIdx : 3
 	const safeRow = rowIdx >= 0 ? rowIdx : 0
 
-	// If promotion square is on top half, anchor from top; otherwise anchor from bottom
 	const isTopRank = safeRow <= 3
 
 	const positionStyle: React.CSSProperties = {
@@ -42,7 +40,6 @@ const PromotionOverlay = ({
 
 	return (
 		<>
-			{/* Transparent non-blur backdrop on board to capture clicks outside */}
 			<div
 				className={styles.transparentBackdrop}
 				onClick={onCancel}
@@ -53,7 +50,6 @@ const PromotionOverlay = ({
 				}}
 			/>
 
-			{/* Mini square-anchored promotion modal */}
 			<div
 				className={styles.miniPromotionBox}
 				style={positionStyle}

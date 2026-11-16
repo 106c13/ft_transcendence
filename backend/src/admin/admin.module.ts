@@ -11,7 +11,7 @@ import { FriendRequest } from '@/friends/friend-request.entity';
 import { Friendship } from '@/friends/friendship.entity';
 import { Notification } from '@/notification/notification.entity';
 
-// Prevents TypeScript from turning dynamic import() into require()
+// Prevent TypeScript from compiling dynamic import() into require()
 const dynamicImport = new Function('specifier', 'return import(specifier)') as (
     specifier: string,
 ) => Promise<any>;
@@ -25,7 +25,6 @@ async function createAdminModule(): Promise<DynamicModule> {
     const jsonFields = ['analysis', 'move_times'];
     const truncate = (s: string, max = 80) => (s.length > max ? s.slice(0, max) + '…' : s);
 
-    // Show page only: short, single-line previews
     const jsonPreview = async (response: any, request: any) => {
         if (request.method === 'get' && response.record) {
             const params = response.record.params;
@@ -45,12 +44,12 @@ async function createAdminModule(): Promise<DynamicModule> {
         return response;
     };
 
-    // Before showing/editing: JSON -> pretty-printed string
+    // Pretty-print JSON before showing or editing
     const jsonToText = async (response: any, request: any) => {
         if (request.method === 'get' && response.record) {
             const params = response.record.params;
             for (const field of jsonFields) {
-                // AdminJS flattens nested values ("analysis.0.x"), so rebuild first
+                // Rebuild nested properties flattened by AdminJS
                 const value = flat.get(params, field);
                 for (const key of Object.keys(params)) {
                     if (key === field || key.startsWith(`${field}.`)) delete params[key];
@@ -61,7 +60,7 @@ async function createAdminModule(): Promise<DynamicModule> {
         return response;
     };
 
-    // Before saving: string -> real JSON
+    // Parse edited string back into JSON before saving
     const textToJson = async (request: any) => {
         if (request.method === 'post' && request.payload) {
             const errors: Record<string, { message: string }> = {};
@@ -123,16 +122,13 @@ async function createAdminModule(): Promise<DynamicModule> {
                     {
                         resource: Match,
                         options: {
-                            // Newest matches first
                             sort: {
                                 sortBy: 'played_at',
                                 direction: 'desc',
                             },
 
-                            // Compact table: no heavy fields
                             listProperties: ['id', 'white_id', 'black_id', 'winner_id', 'mode', 'result', 'played_at'],
 
-                            // Show page: every field
                             showProperties: [
                                 'id', 'white_id', 'black_id', 'winner_id', 'mode', 'result',
                                 'pgn', 'analysis', 'move_times',
@@ -141,7 +137,6 @@ async function createAdminModule(): Promise<DynamicModule> {
                                 'played_at',
                             ],
 
-                            // Edit/new page: every field (id is auto-generated)
                             editProperties: [
                                 'white_id', 'black_id', 'winner_id', 'mode', 'result',
                                 'pgn', 'analysis', 'move_times',

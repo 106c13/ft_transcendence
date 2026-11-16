@@ -114,7 +114,6 @@
 	margin: 0;
 }
 
-/* Intermediate Breakpoint (861px - 1024px, keeps side-by-side balanced on compact desktops) */
 @media (max-width: 1024px) {
 	.contributorCard {
 		padding: 9px 13px;
@@ -150,7 +149,6 @@
 	}
 }
 
-/* Move under board earlier (<= 860px, prevents narrow squishing at widths like 784px) */
 @media (max-width: 860px) {
 	.contributorCard {
 		flex: none;

@@ -96,7 +96,6 @@
 	color: #FFFFFF !important;
 }
 
-/* Abandon Button Styling */
 .abandonBtn {
 	border-color: rgba(148, 163, 184, 0.25);
 	background: rgba(30, 41, 59, 0.75);
@@ -115,7 +114,6 @@
 	color: #FFFFFF !important;
 }
 
-/* Resignation Confirmation Popup */
 .resignModal {
 	position: absolute;
 	bottom: calc(100% + 11px);
@@ -137,7 +135,6 @@
 	box-sizing: border-box;
 }
 
-/* Pointer at the bottom pointing right at the center of the original button */
 .modalPointer {
 	position: absolute;
 	bottom: -5px;

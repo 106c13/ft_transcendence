@@ -22,10 +22,8 @@ const AnalyzePage = () => {
     const [showPgnModal, setShowPgnModal] = useState<boolean>(false)
     const [showGamesModal, setShowGamesModal] = useState<boolean>(false)
 
-    // 1. Core analysis state (history, PGN, navigation, orientation)
     const state = useAnalyzeState({ gameId: gameid })
 
-    // 2. Engine evaluation & telemetry
     const engine = useAnalyzeEngine({
         currentFen: state.currentFen,
         displayChess: state.displayChess,
@@ -35,7 +33,6 @@ const AnalyzePage = () => {
         analysisData: state.analysisData,
     })
 
-    // 3. Interactive board controls (click, drag-and-drop, promotion)
     const board = useAnalyzeBoard({
         displayChess: state.displayChess,
         currentTurn: state.currentTurn,
@@ -68,17 +65,13 @@ const AnalyzePage = () => {
         <div className={containerClass}>
             <main className={mainClass}>
                 <div className={playAreaClass}>
-                    {/* Left Board & Eval Bar Area */}
                     <div className="flex items-center justify-center min-[951px]:justify-start gap-[var(--eval-gap)] w-full min-[951px]:w-auto h-auto min-[951px]:h-[var(--game-content-h)] min-[951px]:max-h-[var(--game-content-h)] box-border">
-                        {/* Evaluation Bar */}
                         <AnalyzeEvalBar evalInfo={engine.evalInfo} />
 
-                        {/* Chess Board Container with Top and Bottom Player Banners */}
                         <div
                             className="flex flex-col items-center justify-between relative w-[var(--board-size)] h-auto min-[951px]:h-[var(--game-content-h)] min-[951px]:max-h-[var(--game-content-h)] shrink-0 box-border"
                             onContextMenu={board.handleContextMenu}
                         >
-                            {/* Top Banner (Black if normal orientation, White if flipped) */}
                             <PlayerBanner
                                 name={state.topBanner.name}
                                 username={state.topBanner.username}
@@ -91,7 +84,6 @@ const AnalyzePage = () => {
                                 materialDiff={state.topBanner.materialDiff}
                             />
 
-                            {/* Main Interactive ChessBoard */}
                             <ChessBoard
                                 displayChess={state.displayChess}
                                 displayFen={state.currentFen}
@@ -120,7 +112,6 @@ const AnalyzePage = () => {
                                 moveClassification={engine.currentMoveClassification}
                             />
 
-                            {/* Bottom Banner (White if normal orientation, Black if flipped) */}
                             <PlayerBanner
                                 name={state.bottomBanner.name}
                                 username={state.bottomBanner.username}
@@ -136,7 +127,6 @@ const AnalyzePage = () => {
                         </div>
                     </div>
 
-                    {/* Right Side Info Panel */}
                     <AnalyzeInfoPanel
                         analysisData={state.analysisData}
                         evalInfo={engine.evalInfo}
@@ -156,14 +146,12 @@ const AnalyzePage = () => {
                     />
                 </div>
 
-                {/* Modal: Load PGN / Upload */}
                 <AnalyzePgnModal
                     isOpen={showPgnModal}
                     onClose={() => setShowPgnModal(false)}
                     onLoadPgn={(pgn) => state.loadPgnString(pgn, true)}
                 />
 
-                {/* Modal: Analyze Existing Games */}
                 <AnalyzeGamesModal
                     isOpen={showGamesModal}
                     onClose={() => setShowGamesModal(false)}

@@ -60,7 +60,6 @@
 	line-height: 1.4;
 }
 
-/* Connected Tabs Header matching Profile Header card */
 .tabsHeader {
 	display: flex;
 	align-items: stretch;
@@ -109,7 +108,6 @@
 	line-height: 1;
 }
 
-/* Blue underline at the bottom of the container for selected tab (identical to Profile Header) */
 .tab.activeTab::after {
 	content: '';
 	position: absolute;

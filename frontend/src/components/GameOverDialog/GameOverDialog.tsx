@@ -9,7 +9,6 @@ import styles from './GameOverDialog.module.css';
 import type { User } from '../../utils/profileUtils';
 import type { GameAnalysisResult } from '../../utils/gameUtils';
 
-// Most "notable" first
 const CLASSIFICATION_PRIORITY = [
 	'brilliant', 'great', 'blunder', 'mistake',
 	'inaccuracy', 'best', 'excellent', 'good',
@@ -131,16 +130,13 @@ const GameOverDialog = ({
 
 				<div className={`${styles.modalBody} ${isViewer ? styles.modalBodyViewer : ''}`}>
 					<div className={styles.resultHeader}>
-						{/* <h2 className={styles.gameOverTitle}>{t('game_over')}</h2> */}
 						<div className={styles.gameOverResult}>{getResultText()}</div>
 						{getReasonText() && <div className={styles.gameOverReason}>{getReasonText()}</div>}
 					</div>
 
-					{/* Dual Rating Display: Format rating on Left, Leaderboard Place & Position Delta on Right */}
 					{!isViewer && !isAbandoned && (ratingDelta !== null || ratingAfter !== null || leaderboardRank !== null) && (
 						<>
 							<div className={styles.ratingsComparisonSection}>
-								{/* Left: Format Elo */}
 								<div className={styles.ratingCard}>
 									<div className={styles.ratingCategoryTitle}>
 										{modeLabel} {t('rating_label')}
@@ -162,7 +158,6 @@ const GameOverDialog = ({
 
 								<div className={styles.ratingsDivider} />
 
-								{/* Right: Leaderboard Place & Position Delta */}
 								<div className={styles.ratingCard}>
 									<div className={styles.ratingCategoryTitle}>
 										{t('leaderboard')}
@@ -210,7 +205,6 @@ const GameOverDialog = ({
 					)}
 				</div>
 
-				{/* Modal Footer */}
 				<div className={styles.modalFooter}>
 					{isViewer ? (
 						gameOverReason === 'ABANDONED' ? (

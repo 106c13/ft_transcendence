@@ -14,7 +14,6 @@ const AboutContributors = () => {
 
 	const maxPly = MOVE_STEPS.length - 1;
 
-	// Keyboard shortcut: Space for play/pause
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			const target = e.target as HTMLElement | null;
@@ -37,12 +36,10 @@ const AboutContributors = () => {
 		return () => window.removeEventListener('keydown', handleKeyDown);
 	}, []);
 
-	// Autoplay loop: loops through checkmate sequence
 	useEffect(() => {
 		if (!isPlaying) return;
 
 		const isLastPly = currentPly === maxPly;
-		// Fast checkmate sequence: 750ms between moves, 2500ms on checkmate, 1200ms on start position
 		const delay = isLastPly ? 2500 : currentPly === 0 ? 1200 : 750;
 
 		const timer = setTimeout(() => {
@@ -58,13 +55,11 @@ const AboutContributors = () => {
 
 	const currentStep = MOVE_STEPS[currentPly];
 
-	// Team members in chronological project order: Hakob -> Arman -> Narek
 	const devKeys: DevKey[] = ['hakob', 'arman', 'narek'];
 	const devList = devKeys.map((key) => getTranslatedDev(DEVS[key], t));
 
 	return (
 		<section className="w-full max-w-[1100px] mx-auto bg-slate-800 border border-slate-400/12 rounded-2xl p-3 min-[481px]:p-4 min-[1025px]:p-5 shadow-[0_10px_40px_rgba(0,0,0,0.35)] grid grid-cols-1 min-[861px]:grid-cols-[390px_minmax(0,1fr)] min-[1025px]:grid-cols-[440px_minmax(0,1fr)] gap-3 min-[481px]:gap-4 min-[861px]:gap-3 items-stretch box-border">
-			{/* Left: Animated Chessboard with Mate */}
 			<div className="w-full max-w-[440px] h-auto mx-auto min-[861px]:mx-0 min-[861px]:w-[390px] min-[861px]:h-[390px] min-[1025px]:w-[440px] min-[1025px]:h-[440px] aspect-square rounded-[10px] overflow-hidden bg-slate-900/60 shadow-[0_4px_16px_rgba(0,0,0,0.25)] flex box-border shrink-0">
 				<AboutBoard
 					fen={currentStep.fen}
@@ -74,7 +69,6 @@ const AboutContributors = () => {
 				/>
 			</div>
 
-			{/* Right: Stacked Contribution Block */}
 			<div className="flex flex-col gap-3 min-[861px]:gap-2.5 min-[1025px]:gap-3 w-full h-auto min-[861px]:h-[390px] min-[1025px]:h-[440px] min-w-0 box-border">
 				{devList.map((dev) => (
 					<div key={dev.id} className={styles.contributorCard}>

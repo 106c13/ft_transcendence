@@ -29,7 +29,6 @@ export default function SimpleGameRow({ match, currentUsername, onSelect }: Prop
 	const whiteRating = match.white_rating_after;
 	const blackRating = match.black_rating_after;
 
-	// Determine result
 	let outcome: 'win' | 'loss' | 'draw' = 'draw';
 	if (match.winner_id) {
 		if (isUserWhite) {
@@ -67,7 +66,6 @@ export default function SimpleGameRow({ match, currentUsername, onSelect }: Prop
 				}
 			}}
 		>
-			{/* 1. Game Mode */}
 			<div className={styles.modeCol}>
 				<span className={styles.modeIcon}>
 					<GameModeIcon mode={match.mode} size={16} />
@@ -77,9 +75,7 @@ export default function SimpleGameRow({ match, currentUsername, onSelect }: Prop
 				</span>
 			</div>
 
-			{/* 2. Players Column */}
 			<div className={styles.playersCol}>
-				{/* White Player */}
 				<div className={styles.playerRow}>
 					<img
 						src={getAvatarUrl(whitePlayer?.avatar)}
@@ -104,7 +100,6 @@ export default function SimpleGameRow({ match, currentUsername, onSelect }: Prop
 					)}
 				</div>
 
-				{/* Black Player */}
 				<div className={styles.playerRow}>
 					<img
 						src={getAvatarUrl(blackPlayer?.avatar)}
@@ -130,7 +125,6 @@ export default function SimpleGameRow({ match, currentUsername, onSelect }: Prop
 				</div>
 			</div>
 
-			{/* 3. Result Badge */}
 			<div className={styles.resultCol}>
 				<span
 					className={`${styles.resultText} ${

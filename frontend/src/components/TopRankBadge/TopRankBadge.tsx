@@ -33,7 +33,6 @@ const TopRankBadge = ({
 
 	let badgeIcon;
 
-	// Render unique icons for 1st, 2nd, and 3rd place
 	if (rank === 1) {
 		badgeIcon = (
 			<svg
@@ -57,27 +56,22 @@ const TopRankBadge = ({
 						<stop offset="100%" stopColor="#FFF59D" />
 					</linearGradient>
 				</defs>
-				{/* Trophy Base */}
 				<path
 					d="M11 31h14v2a1 1 0 0 1-1 1H12a1 1 0 0 1-1-1v-2Z"
 					fill="url(#goldBase)"
 				/>
 				<rect x="13" y="27" width="10" height="4" rx="1" fill="url(#goldBase)" />
-				{/* Trophy Stem */}
 				<path d="M16 22h4v5h-4z" fill="url(#goldCup)" />
-				{/* Trophy Cup */}
 				<path
 					d="M8 6h20v9a10 10 0 0 1-20 0V6Z"
 					fill="url(#goldCup)"
 				/>
-				{/* Handles */}
 				<path
 					d="M8 8H5a3 3 0 0 0-3 3v2a4 4 0 0 0 4 4h2M28 8h3a3 3 0 0 1 3 3v2a4 4 0 0 1-4 4h-2"
 					stroke="url(#goldCup)"
 					strokeWidth="2.5"
 					strokeLinecap="round"
 				/>
-				{/* Crown Jewel Star inside Cup */}
 				<path
 					d="M18 10l1.2 2.6 2.8.4-2 2 .5 2.8-2.5-1.4-2.5 1.4.5-2.8-2-2 2.8-.4L18 10Z"
 					fill="url(#goldGleam)"
@@ -107,13 +101,10 @@ const TopRankBadge = ({
 						<stop offset="100%" stopColor="#0284C7" />
 					</linearGradient>
 				</defs>
-				{/* Medal Ribbon */}
 				<path d="M12 2l4 12h-4L8 2h4Z" fill="url(#silverRibbon)" />
 				<path d="M24 2l-4 12h4l4-12h-4Z" fill="url(#silverRibbon)" opacity="0.85" />
-				{/* Medal Outer Rim */}
 				<circle cx="18" cy="22" r="11" fill="url(#silverCup)" />
 				<circle cx="18" cy="22" r="8.5" fill="url(#silverBase)" />
-				{/* Inner Star */}
 				<path
 					d="M18 16l1.4 3.2 3.4.5-2.5 2.4.6 3.4L18 23.8l-2.9 1.7.6-3.4-2.5-2.4 3.4-.5L18 16Z"
 					fill="#FFFFFF"
@@ -143,13 +134,10 @@ const TopRankBadge = ({
 						<stop offset="100%" stopColor="#BE123C" />
 					</linearGradient>
 				</defs>
-				{/* Ribbon */}
 				<path d="M13 2l3 11h-3.5L9 2h4Z" fill="url(#bronzeRibbon)" />
 				<path d="M23 2l-3 11h3.5L27 2h-4Z" fill="url(#bronzeRibbon)" opacity="0.85" />
-				{/* Medal Disc */}
 				<circle cx="18" cy="22" r="11" fill="url(#bronzeCup)" />
 				<circle cx="18" cy="22" r="8.5" fill="url(#bronzeBase)" />
-				{/* Inner Laurel / Star */}
 				<path
 					d="M18 17l1.3 2.8 3.1.4-2.2 2.2.5 3.1L18 24l-2.7 1.5.5-3.1-2.2-2.2 3.1-.4L18 17Z"
 					fill="#FED7AA"

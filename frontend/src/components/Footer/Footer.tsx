@@ -62,7 +62,6 @@ const Footer = ({ currentUser }: FooterProps) => {
 		<footer className={styles.footer} role="contentinfo">
 			<div className={styles.footerInner}>
 				<div className={`${styles.footerGrid} ${!currentUser ? styles.guestGrid : ''}`}>
-					{/* Brand Column */}
 					<div className={styles.brandCol}>
 						<Link to={currentUser ? '/home' : '/about'} className={styles.brandTitleLink}>
 							<h3 className={styles.brandTitle}>ft_transcendence</h3>
@@ -72,7 +71,6 @@ const Footer = ({ currentUser }: FooterProps) => {
 						</p>
 					</div>
 
-					{/* Authenticated Mode: Play & Compete Column */}
 					{currentUser && (
 						<div className={styles.navCol}>
 							<h4 className={styles.colTitle}>
@@ -123,7 +121,6 @@ const Footer = ({ currentUser }: FooterProps) => {
 						</div>
 					)}
 
-					{/* Authenticated Mode: Platform Column */}
 					{currentUser && (
 						<div className={styles.navCol}>
 							<h4 className={styles.colTitle}>
@@ -166,7 +163,6 @@ const Footer = ({ currentUser }: FooterProps) => {
 						</div>
 					)}
 
-					{/* Guest / Auth Layout Mode: Get Started Column (no login required) */}
 					{!currentUser && (
 						<div className={styles.navCol}>
 							<h4 className={styles.colTitle}>
@@ -193,7 +189,6 @@ const Footer = ({ currentUser }: FooterProps) => {
 						</div>
 					)}
 
-					{/* About Column (available to both authenticated & guest) */}
 					<div className={styles.navCol}>
 						<h4 className={styles.colTitle}>
 							{t('about')}
@@ -221,7 +216,6 @@ const Footer = ({ currentUser }: FooterProps) => {
 					</div>
 				</div>
 
-				{/* Bottom Bar */}
 				<div className={styles.footerBottom}>
 					<div className={styles.copyrightGroup}>
 						<span className={styles.copyrightText}>
@@ -242,7 +236,6 @@ const Footer = ({ currentUser }: FooterProps) => {
 					</div>
 
 					<div className={styles.controlsGroup}>
-						{/* Quick Language Switcher */}
 						<div className={styles.languagePills} aria-label="Language selector">
 							<button
 								type="button"
@@ -270,7 +263,6 @@ const Footer = ({ currentUser }: FooterProps) => {
 							</button>
 						</div>
 
-						{/* Back to top button */}
 						<button
 							type="button"
 							className={styles.backToTopBtn}

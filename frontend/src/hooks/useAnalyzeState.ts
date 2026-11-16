@@ -24,7 +24,6 @@ export function useAnalyzeState({
     const navigate = useNavigate()
     const { showToast } = useToast()
 
-    // Board & Moves History
     const [moveHistory, setMoveHistory] = useState<string[]>([STARTING_FEN])
     const [moveSAN, setMoveSAN] = useState<string[]>([])
     const [moveDetails, setMoveDetails] = useState<{ from: string; to: string }[]>([])
@@ -32,21 +31,17 @@ export function useAnalyzeState({
     const [orientation, setOrientation] = useState<'w' | 'b'>('w')
     const [isLoadingGame, setIsLoadingGame] = useState<boolean>(Boolean(gameId))
 
-    // Player Information
     const [whitePlayerName, setWhitePlayerName] = useState<string>('White')
     const [blackPlayerName, setBlackPlayerName] = useState<string>('Black')
     const [whiteRating, setWhiteRating] = useState<number | string | undefined>(undefined)
     const [blackRating, setBlackRating] = useState<number | string | undefined>(undefined)
 
-    // Full Game Analysis Data
     const [analysisData, setAnalysisData] = useState<GameAnalysisResult | null>(null)
 
-    // Refs
     const prevViewIndexRef = useRef<number | null>(null)
     const isExecutingMoveRef = useRef<boolean>(false)
     const skipSoundRef = useRef<boolean>(false)
 
-    // Current Chess Board derived from active ply
     const currentFen = moveHistory[viewIndex] || STARTING_FEN
     const displayChess = useMemo(() => {
         try {
@@ -80,7 +75,6 @@ export function useAnalyzeState({
         [currentFen]
     )
 
-    // Player Banner Data based on Orientation
     const topBanner = useMemo(() => ({
         name: orientation === 'w' ? blackPlayerName : whitePlayerName,
         username: orientation === 'w' ? blackPlayerName : whitePlayerName,
@@ -99,7 +93,6 @@ export function useAnalyzeState({
         materialDiff: orientation === 'w' ? whiteDiff : blackDiff,
     }), [orientation, whitePlayerName, blackPlayerName, whiteRating, blackRating, capturedBlack, capturedWhite, whiteDiff, blackDiff])
 
-    // Move Sound Playback on Navigation
     useEffect(() => {
         if (prevViewIndexRef.current === null) {
             prevViewIndexRef.current = viewIndex
@@ -133,7 +126,6 @@ export function useAnalyzeState({
         }
     }, [viewIndex, moveSAN])
 
-    // Keyboard Arrow Navigation
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
@@ -155,7 +147,6 @@ export function useAnalyzeState({
         return () => window.removeEventListener('keydown', handleKeyDown)
     }, [moveHistory.length])
 
-    // PGN Full Analysis Fetching
     const fetchFullPgnAnalysis = useCallback(async (pgn: string) => {
         try {
             const token = localStorage.getItem('token')
@@ -172,11 +163,10 @@ export function useAnalyzeState({
                 setAnalysisData(data)
             }
         } catch {
-            // Non-fatal: PGN remains loaded without full engine analysis
+            // Keep PGN loaded without full engine analysis
         }
     }, [])
 
-    // Load PGN String
     const loadPgnString = useCallback((
         pgnString: string,
         requestFullAnalysis = true,
@@ -244,7 +234,6 @@ export function useAnalyzeState({
         }
     }, [t, showToast, fetchFullPgnAnalysis])
 
-    // Reset board
     const handleReset = useCallback(() => {
         skipSoundRef.current = true;
         setMoveHistory([STARTING_FEN]);
@@ -259,7 +248,6 @@ export function useAnalyzeState({
         onResetEngine?.();
     }, [onResetEngine]);
 
-    // Load game by route param :gameid
     useEffect(() => {
         if (!gameId) return;
 
@@ -329,7 +317,6 @@ export function useAnalyzeState({
         };
     }, [gameId, navigate, loadPgnString, handleReset]);
 
-    // Execute Move locally on the active position branch
     const executeMove = useCallback((from: string, to: string, promotion?: string): boolean => {
         try {
             const currentPositionChess = new Chess(moveHistory[viewIndex])
@@ -371,7 +358,6 @@ export function useAnalyzeState({
         }
     }, [moveHistory, moveSAN, moveDetails, viewIndex])
 
-    // Past game selection
     const handleSelectPastGame = useCallback((game: MatchRecord) => {
         if (game.id) {
             navigate(`/analysis/${game.id}`);

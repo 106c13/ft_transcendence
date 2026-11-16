@@ -32,7 +32,6 @@ const SettingsHeader = ({
 				</div>
 			</div>
 
-			{/* Connected Tabs Header matching Profile Header */}
 			<div className={styles.tabsHeader} role="tablist">
 				<button
 					className={`${styles.tab} ${activeTab === 'profile' ? styles.activeTab : ''}`}

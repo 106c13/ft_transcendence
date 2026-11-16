@@ -16,7 +16,6 @@ const LeaderboardPage = () => {
 	usePageTitle(t('leaderboard'));
 	const navigate = useNavigate();
 
-	// Server-driven state
 	const [players, setPlayers] = useState<LeaderboardPlayer[]>([]);
 	const [total, setTotal] = useState(0);
 	const [totalPages, setTotalPages] = useState(1);
@@ -28,7 +27,6 @@ const LeaderboardPage = () => {
 		third: LeaderboardPlayer;
 	} | null>(null);
 
-	// Filter and Sort states
 	const [search, setSearch] = useState('');
 	const [debouncedSearch, setDebouncedSearch] = useState('');
 	const [mode, setMode] = useState<'all' | 'bullet' | 'blitz' | 'rapid'>('all');
@@ -37,11 +35,10 @@ const LeaderboardPage = () => {
 	const [sortBy, setSortBy] = useState<string>('leaderboardRating');
 	const [order, setOrder] = useState<'asc' | 'desc'>('desc');
 
-	// UI toggles
 	const [showFilters, setShowFilters] = useState(false);
 	const [showFormulaInfo, setShowFormulaInfo] = useState(false);
 
-	// Scroll position preservation across filter/sort changes, mounts and unmounts
+	// Preserve scroll position across filter and sort changes
 	const scrollPosRef = useRef<number>(0);
 	const isUpdatingRef = useRef<boolean>(false);
 
@@ -55,7 +52,6 @@ const LeaderboardPage = () => {
 		return () => window.removeEventListener('scroll', handleScroll);
 	}, []);
 
-	// Debounce search input
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setDebouncedSearch(search);
@@ -64,13 +60,12 @@ const LeaderboardPage = () => {
 		return () => clearTimeout(timer);
 	}, [search]);
 
-	// Fetch leaderboard data
 	const fetchLeaderboard = useCallback(async () => {
 		setLoading(true);
 		try {
 			const query = new URLSearchParams();
 			query.set('page', String(page));
-			query.set('limit', '30'); // exactly 30 players per page
+			query.set('limit', '30');
 
 			if (debouncedSearch.trim()) query.set('search', debouncedSearch.trim());
 			if (mode !== 'all') query.set('mode', mode);
@@ -102,7 +97,7 @@ const LeaderboardPage = () => {
 				}
 			}
 		} catch {
-			// Keep existing leaderboard state if request fails
+			// Keep existing state on failure
 		} finally {
 			setLoading(false);
 		}
@@ -112,7 +107,7 @@ const LeaderboardPage = () => {
 		fetchLeaderboard();
 	}, [fetchLeaderboard]);
 
-	// Prevent browser auto-scroll/jump on any filter, format, sort change, or component mount/unmount
+	// Preserve scroll position across filter and sort changes
 	useLayoutEffect(() => {
 		isUpdatingRef.current = true;
 		if (Math.abs(window.scrollY - scrollPosRef.current) > 0) {
@@ -127,7 +122,6 @@ const LeaderboardPage = () => {
 		return () => cancelAnimationFrame(timer);
 	}, [mode, sortBy, order, minWinRate, status, showFilters, showFormulaInfo, page, players]);
 
-	// Handle sort change
 	const handleSort = (field: string) => {
 		if (sortBy === field) {
 			setOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'));
@@ -138,7 +132,6 @@ const LeaderboardPage = () => {
 		setPage(1);
 	};
 
-	// Reset all filters
 	const handleResetFilters = () => {
 		setSearch('');
 		setDebouncedSearch('');
@@ -150,7 +143,6 @@ const LeaderboardPage = () => {
 		setPage(1);
 	};
 
-	// Count active filters
 	const activeFilterCount = useMemo(() => {
 		let count = 0;
 		if (debouncedSearch) count++;
@@ -161,9 +153,6 @@ const LeaderboardPage = () => {
 		return count;
 	}, [debouncedSearch, mode, minWinRate, status, sortBy, order]);
 
-	// Permanent top 3 global champions for podium view (always present)
-
-	// Fetch top 3 global champions once on mount
 	useEffect(() => {
 		const fetchTopChampions = async () => {
 			try {
@@ -182,13 +171,12 @@ const LeaderboardPage = () => {
 					}
 				}
 			} catch {
-				// Top champions podium falls back to current page slice
+				// Fall back to current page slice
 			}
 		};
 		fetchTopChampions();
 	}, []);
 
-	// Top 3 players for podium view (always present)
 	const podiumPlayers = useMemo(() => {
 		if (topThree) return topThree;
 		if (players.length >= 3) {
@@ -204,20 +192,17 @@ const LeaderboardPage = () => {
 	return (
 		<div className="min-h-[calc(100vh-64px)] w-full flex flex-col items-center pt-20 px-3 min-[769px]:px-6 pb-6 box-border text-slate-200 bg-[radial-gradient(circle_at_50%_0%,#1e1b4b_0%,#0F172A_40%,#090D16_100%)] [overflow-anchor:none]">
 			<div className="w-full max-w-[960px] flex flex-col gap-4 [overflow-anchor:none]">
-				{/* Header Section */}
 				<LeaderboardHeader
 					total={total}
 					showFormulaInfo={showFormulaInfo}
 					onToggleFormulaInfo={() => setShowFormulaInfo(!showFormulaInfo)}
 				/>
 
-				{/* Top 3 Podium (Page 1) */}
 				<LeaderboardPodium
 					podiumPlayers={podiumPlayers}
 					onPlayerClick={(username) => navigate(`/profile/${username}`)}
 				/>
 
-				{/* Search & Filter Toolbar */}
 				<LeaderboardToolbar
 					search={search}
 					onSearchChange={setSearch}
@@ -253,7 +238,6 @@ const LeaderboardPage = () => {
 					onResetFilters={handleResetFilters}
 				/>
 
-				{/* Table Card */}
 				<LeaderboardTable
 					players={players}
 					loading={loading}
@@ -264,7 +248,6 @@ const LeaderboardPage = () => {
 					onResetFilters={handleResetFilters}
 				/>
 
-				{/* Pagination Bar - Exactly 30 players per page */}
 				<LeaderboardPagination
 					page={page}
 					totalPages={totalPages}

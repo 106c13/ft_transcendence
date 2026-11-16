@@ -38,7 +38,6 @@
 	line-height: 1.4;
 }
 
-/* Avatar Section */
 .avatarSection {
 	display: flex;
 	align-items: center;
@@ -132,7 +131,6 @@
 	display: none;
 }
 
-/* Form Groups */
 .form {
 	display: flex;
 	flex-direction: column;
@@ -206,7 +204,6 @@
 	margin: 0;
 }
 
-/* Actions */
 .actionRow {
 	display: flex;
 	align-items: center;
@@ -245,7 +242,6 @@
 	cursor: not-allowed;
 }
 
-/* Alerts */
 .alert {
 	padding: 12px 16px;
 	border-radius: 9px;

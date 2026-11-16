@@ -84,7 +84,6 @@ const BigRatingChart = ({
 		[getModeHistory]
 	);
 
-	// Only allow playable modes to be active on the chart
 	const activeModes: RatingCategory[] = useMemo(() => {
 		const candidate =
 			propActiveModes && propActiveModes.length > 0 ? propActiveModes : [mode];
@@ -97,7 +96,6 @@ const BigRatingChart = ({
 	const isSingleMode = activeModes.length === 1;
 	const primaryMode = activeModes[0] || mode;
 
-	// Summary stats calculation (supports both single mode and multi-mode selection)
 	const summaryStats = useMemo(() => {
 		if (activeModes.length === 0) {
 			return {
@@ -132,7 +130,6 @@ const BigRatingChart = ({
 			};
 		}
 
-		// Multi-mode aggregate stats across active modes
 		const histories = activeModes
 			.map((m) => ({ mode: m, hist: getModeHistory(m) }))
 			.filter((item): item is { mode: RatingCategory; hist: ModeRatingHistory } => !!item.hist);
@@ -164,7 +161,6 @@ const BigRatingChart = ({
 		};
 	}, [isSingleMode, primaryMode, activeModes, getModeHistory, t]);
 
-	// Build unified timeline dataset across activeModes and filter by timeRange
 	const chartData = useMemo(() => {
 		if (activeModes.length === 0) return [];
 
@@ -192,7 +188,7 @@ const BigRatingChart = ({
 
 		if (isSingleMode) {
 			const h = getModeHistory(primaryMode);
-			// Exclude synthetic 'init' points so we only plot real played matches
+			// Exclude synthetic initial points
 			const rawPoints = (h?.allTime ?? []).filter((p) => p.id !== 'init');
 			if (rawPoints.length === 0) return [];
 
@@ -217,7 +213,7 @@ const BigRatingChart = ({
 				[`${primaryMode}Meta`]: pt,
 			}));
 
-			// If only 1 match exists, duplicate a start anchor so AreaChart draws a clean line
+			// Duplicate single point so AreaChart renders a line
 			if (data.length === 1) {
 				const single = data[0];
 				const singleMeta = single[`${primaryMode}Meta` as 'bulletMeta' | 'blitzMeta' | 'rapidMeta'];
@@ -245,7 +241,6 @@ const BigRatingChart = ({
 			return data;
 		}
 
-		// Multi-mode timeline merge (only real played matches, never 'init' points)
 		type RawEvent = {
 			mode: RatingCategory;
 			point: AllTimeRatingPoint;
@@ -309,7 +304,6 @@ const BigRatingChart = ({
 		return merged;
 	}, [isSingleMode, primaryMode, activeModes, timeRange, getModeHistory, t]);
 
-	// Compute Y-axis min and max bounds with padding
 	const { minRating, maxRating } = useMemo(() => {
 		const values: number[] = [];
 		for (const row of chartData) {
@@ -345,7 +339,6 @@ const BigRatingChart = ({
 
 	return (
 		<div className={styles.bigChartWrapper}>
-			{/* Top stats summary */}
 			<div className={styles.statsGrid}>
 				<div className={styles.statCard}>
 					<span className={styles.statLabel}>
@@ -393,9 +386,7 @@ const BigRatingChart = ({
 				</div>
 			</div>
 
-			{/* Big chart card */}
 			<div className={styles.chartCard}>
-				{/* Interactive Toggleable Mode Legends + Time Range Controls */}
 				<div className={styles.chartHeader}>
 					<div className={styles.legendPills} role="group" aria-label={t('active_modes')}>
 						{ALL_CATEGORIES.map((cat) => {
@@ -475,7 +466,6 @@ const BigRatingChart = ({
 					</div>
 				</div>
 
-				{/* Recharts Responsive AreaChart or Empty State */}
 				{chartData.length === 0 ? (
 					<div className={styles.emptyState}>
 						<TrendingUp size={36} className={styles.emptyIcon} aria-hidden="true" />

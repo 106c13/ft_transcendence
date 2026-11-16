@@ -32,11 +32,10 @@ export function useUnreadMessages(userId: number | undefined) {
 				setUnreadCount(data.count ?? 0);
 			}
 		} catch {
-			// Ignore transient background fetch errors
+			// Ignore background fetch error
 		}
 	}, [userId]);
 
-	// Initial load on mount or user change
 	useEffect(() => {
 		if (!userId) return;
 		const timer = setTimeout(() => {
@@ -45,7 +44,6 @@ export function useUnreadMessages(userId: number | undefined) {
 		return () => clearTimeout(timer);
 	}, [userId, fetchUnreadCount]);
 
-	// WebSocket real-time updates and local fallback sync
 	useEffect(() => {
 		if (!userId) return;
 

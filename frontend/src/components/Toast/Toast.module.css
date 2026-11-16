@@ -54,7 +54,6 @@
 		0 0 1px rgba(255, 255, 255, 0.2);
 }
 
-/* Toast Type Variations */
 .success {
 	border: 1px solid rgba(34, 197, 94, 0.35);
 	box-shadow:
@@ -83,7 +82,6 @@
 		0 0 18px rgba(59, 130, 246, 0.12);
 }
 
-/* Content Layout */
 .toastMain {
 	display: flex;
 	align-items: flex-start;
@@ -167,7 +165,6 @@
 	background: rgba(255, 255, 255, 0.08);
 }
 
-/* Progress bar */
 .progressBarTrack {
 	position: absolute;
 	bottom: 0;

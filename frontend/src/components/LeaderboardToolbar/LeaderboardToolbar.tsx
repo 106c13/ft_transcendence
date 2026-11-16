@@ -109,7 +109,6 @@ const LeaderboardToolbar = ({
 	return (
 		<div className={styles.toolbarCard}>
 			<div className={styles.primaryControlsRow}>
-				{/* Search Bar */}
 				<div className={styles.searchBox}>
 					<Search size={16} className={styles.searchIcon} aria-hidden="true" />
 					<input
@@ -131,7 +130,6 @@ const LeaderboardToolbar = ({
 					)}
 				</div>
 
-				{/* Game Mode Filters */}
 				<div className={styles.modeButtonGroup}>
 					<button
 						className={`${styles.modeBtn} ${mode === 'all' ? styles.modeBtnActive : ''}`}
@@ -184,7 +182,6 @@ const LeaderboardToolbar = ({
 					</button>
 				</div>
 
-				{/* Filter Toggle Button */}
 				<button
 					className={`${styles.filterToggleBtn} ${showFilters ? styles.filterToggleBtnActive : ''}`}
 					onClick={(e) => {
@@ -201,13 +198,11 @@ const LeaderboardToolbar = ({
 				</button>
 			</div>
 
-			{/* Expandable Advanced Filters Drawer with CustomSelect and Reset in same row */}
 			<div className={`${styles.drawerWrapper} ${showFilters ? styles.drawerOpen : ''}`}>
 				<div className={styles.drawerInner}>
 					<div className={styles.advancedDrawer}>
 						<div className={styles.drawerRow}>
 							<div className={styles.drawerFiltersGroup}>
-								{/* Min Win Rate */}
 								<div className={styles.filterField}>
 									<label className={styles.filterLabel}>{t('min_win_rate')}</label>
 									<CustomSelect<string>
@@ -217,7 +212,6 @@ const LeaderboardToolbar = ({
 									/>
 								</div>
 
-								{/* Activity / Online Status */}
 								<div className={styles.filterField}>
 									<label className={styles.filterLabel}>{t('status')}</label>
 									<CustomSelect<'all' | 'online' | 'ingame'>
@@ -227,7 +221,6 @@ const LeaderboardToolbar = ({
 									/>
 								</div>
 
-								{/* Sort Field */}
 								<div className={styles.filterField}>
 									<label className={styles.filterLabel}>{t('sort_by')}</label>
 									<CustomSelect<string>
@@ -237,7 +230,6 @@ const LeaderboardToolbar = ({
 									/>
 								</div>
 
-								{/* Order */}
 								<div className={styles.filterField}>
 									<label className={styles.filterLabel}>{t('sort_direction')}</label>
 									<CustomSelect<'asc' | 'desc'>
@@ -248,7 +240,6 @@ const LeaderboardToolbar = ({
 								</div>
 							</div>
 
-							{/* Reset Filters on the same row on the right side */}
 							<button
 								className={styles.resetBtn}
 								onClick={(e) => {
@@ -264,7 +255,6 @@ const LeaderboardToolbar = ({
 				</div>
 			</div>
 
-			{/* Active Filter Chips with smooth animation */}
 			<div className={`${styles.chipsWrapper} ${activeFilterCount > 0 ? styles.hasChips : ''}`}>
 				<div className={styles.chipsInner}>
 					<div className={styles.activeChipsRow}>

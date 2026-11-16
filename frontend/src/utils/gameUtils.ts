@@ -176,7 +176,7 @@ export const generatePgnString = (params: ExportPgnParams): string => {
 		try {
 			replay.move(san);
 		} catch {
-			// ignore illegal/malformed moves
+			// Ignore malformed moves
 		}
 	}
 	replay.header('Result', result);
@@ -209,7 +209,6 @@ export const exportPgnFile = (params: ExportPgnParams): void => {
 	URL.revokeObjectURL(url);
 };
 
-// Match and Game Analysis Types 
 export type MatchRecord = {
 	id: number;
 	white_id: number;
@@ -267,7 +266,6 @@ export interface GameAnalysisResult {
 	positions: MoveAnalysis[];
 }
 
-// Live Game Types 
 export interface LiveGamePlayer {
 	id: number;
 	username: string;
@@ -381,7 +379,6 @@ export const calculateBoardMaterial = (chess: Chess): {
 	};
 };
 
-// Rating Types 
 export type RatingCategory = 'bullet' | 'blitz' | 'rapid';
 
 export type SparklinePoint = {

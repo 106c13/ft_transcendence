@@ -25,13 +25,11 @@ const Tooltip = ({
 	const location = useLocation();
 	const [prevPath, setPrevPath] = useState(location.pathname);
 
-	// Reset open state during render when route changes
 	if (prevPath !== location.pathname) {
 		setPrevPath(location.pathname);
 		setIsOpen(false);
 	}
 
-	// Dismiss on page scroll
 	useEffect(() => {
 		const handleScroll = () => {
 			setIsOpen(false);
@@ -53,12 +51,11 @@ const Tooltip = ({
 		setIsOpen(false);
 	};
 
-	// Dismiss on click/pointer interactions
 	const handleClickCapture = () => {
 		setIsOpen(false);
 	};
 
-	// Only trigger on keyboard focus (:focus-visible), ignore mouse focus
+	// Trigger only on keyboard focus (:focus-visible)
 	const handleFocus = (e: React.FocusEvent) => {
 		if (disabled || !content) return;
 		try {

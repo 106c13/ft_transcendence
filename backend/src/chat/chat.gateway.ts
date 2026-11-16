@@ -1,4 +1,3 @@
-// backend/src/chat/chat.gateway.ts
 import {
 	WebSocketGateway,
 	WebSocketServer,

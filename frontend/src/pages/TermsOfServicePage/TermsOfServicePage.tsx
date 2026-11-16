@@ -9,7 +9,6 @@ const TermsOfServicePage = () => {
 	return (
 		<div className="flex flex-col min-h-screen bg-slate-900 text-slate-200 pt-24 sm:pt-28 pb-20 px-4 sm:px-6 lg:px-8 w-full box-border">
 			<article className="max-w-[885px] w-full mx-auto bg-slate-800/40 border border-slate-700/60 rounded-xl p-6 sm:p-10 md:p-12 shadow-sm flex flex-col">
-				{/* Document Header */}
 				<header className="border-b border-slate-700/60 pb-8 mb-8">
 					<h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-blue-400">
 						{t('terms_hero_title')}
@@ -28,9 +27,7 @@ const TermsOfServicePage = () => {
 					</div>
 				</header>
 
-				{/* Document Sections in a Single Solid Flow */}
 				<div className="flex flex-col gap-8 text-slate-300 text-sm sm:text-base leading-relaxed">
-					{/* Section 1 */}
 					<section className="flex flex-col gap-2">
 						<h2 className="text-lg sm:text-xl font-semibold text-blue-400">
 							1. {t('terms_sec1_title')}
@@ -39,7 +36,6 @@ const TermsOfServicePage = () => {
 						<p className="text-slate-400 text-xs sm:text-sm">{t('terms_sec1_p2')}</p>
 					</section>
 
-					{/* Section 2 */}
 					<section className="flex flex-col gap-3 border-t border-slate-700/40 pt-6">
 						<h2 className="text-lg sm:text-xl font-semibold text-blue-400">
 							2. {t('terms_sec2_title')}
@@ -65,7 +61,6 @@ const TermsOfServicePage = () => {
 						</div>
 					</section>
 
-					{/* Section 3 */}
 					<section className="flex flex-col gap-3 border-t border-slate-700/40 pt-6">
 						<h2 className="text-lg sm:text-xl font-semibold text-blue-400">
 							3. {t('terms_sec3_title')}
@@ -87,7 +82,6 @@ const TermsOfServicePage = () => {
 						</ul>
 					</section>
 
-					{/* Section 4 */}
 					<section className="flex flex-col gap-2 border-t border-slate-700/40 pt-6">
 						<h2 className="text-lg sm:text-xl font-semibold text-blue-400">
 							4. {t('terms_sec4_title')}
@@ -96,7 +90,6 @@ const TermsOfServicePage = () => {
 						<p className="text-slate-400 text-xs sm:text-sm">{t('terms_sec4_p2')}</p>
 					</section>
 
-					{/* Section 5 */}
 					<section className="flex flex-col gap-2 border-t border-slate-700/40 pt-6">
 						<h2 className="text-lg sm:text-xl font-semibold text-blue-400">
 							5. {t('terms_sec5_title')}
@@ -105,7 +98,6 @@ const TermsOfServicePage = () => {
 						<p className="text-slate-400 text-xs sm:text-sm">{t('terms_sec5_p2')}</p>
 					</section>
 
-					{/* Section 6 */}
 					<section className="flex flex-col gap-2 border-t border-slate-700/40 pt-6">
 						<h2 className="text-lg sm:text-xl font-semibold text-blue-400">
 							6. {t('terms_sec6_title')}
@@ -113,7 +105,6 @@ const TermsOfServicePage = () => {
 						<p>{t('terms_sec6_p1')}</p>
 					</section>
 
-					{/* Closing text with links */}
 					<footer className="border-t border-slate-700/60 pt-6 mt-4 text-xs sm:text-sm text-slate-400 leading-relaxed">
 						<p>
 							{t('terms_footer_note_prefix')}{' '}

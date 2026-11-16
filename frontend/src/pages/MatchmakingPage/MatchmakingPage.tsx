@@ -26,7 +26,6 @@ const MatchmakingPage = () => {
     const cancelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const matchmakingModeRef = useRef<GameModeType | null>(null)
 
-    // Matchmaking socket connection
     useEffect(() => {
         if (!currentUserId || !socket) return
 
@@ -66,8 +65,7 @@ const MatchmakingPage = () => {
             socket.off('connect', onConnect)
             socket.off('match_found', onMatchFound)
 
-            // Defer cancellation so StrictMode's setup/cleanup/setup cycle does
-            // not cancel the queue created by the next effect setup.
+            // Defer queue cancellation to avoid StrictMode double-mount races
             if (!matchFoundRef.current) {
                 cancelTimerRef.current = setTimeout(() => {
                     if (!matchFoundRef.current && socketRef.current === socket && socket.connected) {

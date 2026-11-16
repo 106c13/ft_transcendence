@@ -25,19 +25,17 @@ export function useNotifications(userId: number | undefined) {
                 setUnreadCount(nonChat.filter((n) => !n.is_read).length);
             }
         } catch {
-            // Retain existing notifications state if background fetch fails
+            // Keep existing notifications on failure
         } finally {
             if (showLoading) setLoading(false);
         }
     }, [userId]);
 
-    // Initial load on mount or user change
     useEffect(() => {
         if (!userId) return;
         fetchNotifications(true);
     }, [userId, fetchNotifications]);
 
-    // WebSocket real-time updates via window events
     useEffect(() => {
         const handleNewNotification = (e: Event) => {
             const customEvent = e as CustomEvent<Notification>;
@@ -103,7 +101,7 @@ export function useNotifications(userId: number | undefined) {
                 });
             }
         } catch {
-            // Ignore background read-state sync failure; server state remains unchanged
+            // Ignore background read-state sync error
         }
     }, [userId]);
 
