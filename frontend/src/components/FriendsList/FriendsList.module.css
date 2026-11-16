@@ -200,6 +200,10 @@
 }
 
 .resetBtn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--gap-xs);
 	margin-top: 6px;
 	background: none;
 	border: 1px solid rgba(148, 163, 184, 0.2);
