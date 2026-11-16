@@ -24,13 +24,7 @@ app.post('/analyze', async (req, res) => {
 	}
 
 	try {
-		console.log(`[Engine] Analyzing match (PGN length: ${pgn.length}, depth: ${depth})...`);
-		const startTime = Date.now();
 		const result = await analyzer.analyzeGame(pgn, Math.min(Math.max(depth, 8), 24));
-		const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
-		console.log(`[Engine] Analysis completed in ${elapsed}s for ${result.positions.length} moves.`);
-
-
 		res.json(result);
 	} catch (err: any) {
 		console.error('[Engine] Analysis failed:', err);
@@ -133,6 +127,4 @@ app.post('/evaluate', async (req, res) => {
 	}
 });
 
-app.listen(port, () => {
-	console.log(`Stockfish Analysis Microservice listening on port ${port}`);
-});
+app.listen(port);

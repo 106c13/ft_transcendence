@@ -270,9 +270,6 @@ export class GameAnalyzer {
 					blackMoveCount++;
 				}
 
-				console.log(
-					`[Stockfish] Move ${moveNumber}${playerColor === 'w' ? '.' : '...'} ${move.san.padEnd(5)} | CPL:    0 cp | Eval: Checkmate (${playerColor === 'w' ? '1-0' : '0-1'}) | Quality: ${classification.toUpperCase()}`
-				);
 				continue;
 			}
 
@@ -466,10 +463,6 @@ export class GameAnalyzer {
 				explanationKey,
 				explanationParams,
 			});
-
-			console.log(
-				`[Stockfish] Move ${moveNumber}${playerColor === 'w' ? '.' : '...'} ${move.san.padEnd(5)} | CPL: ${String(Math.round(centipawnLoss)).padStart(4)} cp | Eval: ${evalAfter.mate !== null ? ('M' + evalAfter.mate).padEnd(6) : ((scoreWhitePerspective / 100).toFixed(2)).padEnd(6)} | Best: ${(bestMoveSanObj?.san || '-').padEnd(6)} | Quality: ${classification.toUpperCase()}`
-			);
 		}
 
 		const whiteAccuracy = whiteMoveCount > 0 ? Math.round((whiteAccuracySum / whiteMoveCount) * 10) / 10 : 100;

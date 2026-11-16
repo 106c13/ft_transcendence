@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import io, { Socket } from 'socket.io-client'
+import { showGlobalToast } from '../context/ToastContext';
 import type { ChatObject, Message } from '../utils/chatUtils';
 
 export function useChat(currentUserId: number | null) {
@@ -40,7 +41,7 @@ export function useChat(currentUserId: number | null) {
 					setChats(data)
 				}
 			})
-			.catch(err => console.error('Error fetching chats:', err))
+			.catch(() => {});
 	}, [currentUserId, token])
 
 	useEffect(() => {
@@ -59,7 +60,7 @@ export function useChat(currentUserId: number | null) {
 				)
 				window.dispatchEvent(new CustomEvent('messages_read'))
 			})
-			.catch(err => console.error('Error marking chat read:', err))
+			.catch(() => {});
 	}, [token])
 
 	// Socket connection
@@ -227,12 +228,12 @@ export function useChat(currentUserId: number | null) {
 			})
 
 			if (!res.ok) {
-				console.error('Failed to send message')
-				setNewMessage(content)
+				showGlobalToast('error', 'network_error');
+				setNewMessage(content);
 			}
-		} catch (err) {
-			console.error('Error sending message:', err)
-			setNewMessage(content)
+		} catch {
+			showGlobalToast('error', 'network_error');
+			setNewMessage(content);
 		}
 	}
 

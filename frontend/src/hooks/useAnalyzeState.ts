@@ -171,8 +171,8 @@ export function useAnalyzeState({
                 const data: GameAnalysisResult = await res.json()
                 setAnalysisData(data)
             }
-        } catch (err) {
-            console.error('Failed to run full PGN analysis:', err)
+        } catch {
+            // Non-fatal: PGN remains loaded without full engine analysis
         }
     }, [])
 
@@ -238,10 +238,9 @@ export function useAnalyzeState({
             }
 
             return true
-        } catch (err) {
-            console.error('Failed to parse PGN:', err)
-            showToast('error', t('invalid_pgn'))
-            return false
+        } catch {
+            showToast('error', t('invalid_pgn'));
+            return false;
         }
     }, [t, showToast, fetchFullPgnAnalysis])
 

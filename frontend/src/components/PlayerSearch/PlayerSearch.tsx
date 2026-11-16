@@ -87,8 +87,8 @@ const PlayerSearch = () => {
 				setSearchResults(data);
 				setShowResults(true);
 			}
-		} catch (error) {
-			console.error('Search error:', error);
+		} catch {
+			// Ignore failed search query without breaking UI state
 		} finally {
 			setIsSearching(false);
 		}

@@ -139,7 +139,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!userIdStr) return;
 
 		const userId = parseInt(userIdStr as string);
-		console.log(`Game Gateway: User ${userId} connected (Socket: ${client.id})`);
 		await this.presenceService.handleUserConnect(userId, client.id);
 	}
 
@@ -148,7 +147,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!userIdStr) return;
 
 		const userId = parseInt(userIdStr as string, 10);
-		console.log(`Game Gateway: User ${userId} disconnected (Socket: ${client.id})`);
 
 		await this.presenceService.handleUserDisconnect(userId, client.id);
 		// Trigger grace period only if this was their active socket
@@ -317,11 +315,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 
 		const mode = payload?.mode || 'blitz';
-		console.log(`Game Gateway: User ${userId} (${user.username}) searching match in mode ${mode}`);
 		const matchGame = await this.gameService.addToQueue(userId, client.id, user.username, mode);
 
 		if (matchGame) {
-			console.log(`Game Gateway: Match found ${matchGame.gameId}: ${matchGame.white.username} vs ${matchGame.black.username}`);
 			const roomName = matchGame.gameId;
 
 			// Ensure calling client socket is updated and joins the room
@@ -442,7 +438,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!userIdStr) return;
 
 		const userId = parseInt(userIdStr as string, 10);
-		console.log(`Game Gateway: User ${userId} cancelled queue`);
 		this.gameService.removeFromQueue(userId);
 	}
 
@@ -453,7 +448,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		const userId = parseInt(userIdStr as string, 10);
 		if (payload && payload.gameId) {
-			console.log(`Game Gateway: User ${userId} resigned game ${payload.gameId}`);
 			await this.gameService.resign(payload.gameId, userId);
 		}
 	}
@@ -465,7 +459,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		const userId = parseInt(userIdStr as string, 10);
 		if (payload && payload.gameId) {
-			console.log(`Game Gateway: User ${userId} abandoned game ${payload.gameId}`);
 			await this.gameService.resign(payload.gameId, userId);
 		}
 	}

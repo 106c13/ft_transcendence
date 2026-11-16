@@ -641,10 +641,8 @@ export function useGameSocket() {
                 }
 
                 setGameAnalysis(await response.json() as GameAnalysisResult)
-            } catch (error) {
-                if (!controller.signal.aborted) {
-                    console.error('Failed to analyze finished game:', error)
-                }
+            } catch {
+                // Non-fatal: match summary remains usable if analysis request fails
             } finally {
                 if (!controller.signal.aborted) {
                     setIsAnalysisLoading(false)

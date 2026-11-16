@@ -24,7 +24,6 @@ export class PresenceService implements OnApplicationBootstrap {
                 .set({is_active: false})
                 .where('is_active = :active', { active: true })
                 .execute();
-            console.log('PresenceService: Reset stale active statuses on bootstrap');
         } catch (err) {
             console.error('PresenceService: Failed to reset active statuses on bootstrap:', err);
         }

@@ -49,10 +49,8 @@ export default function AnalyzeGamesModal({
                     const games: MatchRecord[] = await gamesRes.json()
                     setUserGames(games)
                 }
-            } catch (err) {
-                if (!isCancelled) {
-                    console.error('Failed to load past games:', err)
-                }
+            } catch {
+                // Leave past games list empty if fetch fails
             } finally {
                 if (!isCancelled) {
                     setIsLoadingGames(false)

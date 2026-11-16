@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, UserCheck, MessageSquare, Swords, Users, Check, X } from 'lucide-react';
+import { showGlobalToast } from '../../context/ToastContext';
 import type { Notification } from '../../utils/notificationUtils';
 import {
     isFriendRequest,
@@ -45,8 +46,8 @@ const NotificationItem = ({
             setTimeout(() => {
                 onActionCompleted(notification.id, !notification.is_read);
             }, 1000);
-        } catch (err) {
-            console.error('Error accepting friend request:', err);
+        } catch {
+            showGlobalToast('error', 'network_error');
         } finally {
             setActionLoading(false);
         }
@@ -65,8 +66,8 @@ const NotificationItem = ({
             setTimeout(() => {
                 onActionCompleted(notification.id, !notification.is_read);
             }, 800);
-        } catch (err) {
-            console.error('Error rejecting friend request:', err);
+        } catch {
+            showGlobalToast('error', 'network_error');
         } finally {
             setActionLoading(false);
         }

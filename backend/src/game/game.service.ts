@@ -251,7 +251,6 @@ export class GameService {
 			if (existingGame.board.isGameOver()) {
 				this.activeGames.delete(existingGame.gameId);
 			} else {
-				console.log(`Game Service: User ${userId} requested a new game; resigning ${existingGame.gameId}`);
 				await this.resign(existingGame.gameId, userId);
 			}
 		}
@@ -580,7 +579,6 @@ export class GameService {
 		this.removeFromQueue(game.black.userId);
 
 		if (game.board.history().length < 2) {
-			console.log(`Game ${gameId}: Abandoning game (< 2 moves made)`);
 			await this.abandonGame(game);
 			return;
 		}
@@ -643,7 +641,6 @@ export class GameService {
 		game.drawOfferUserId = null;
 
 		if (game.board.history().length < 2) {
-			console.log(`Game ${gameId}: Abandoning game on draw (< 2 moves made)`);
 			this.abandonGame(game);
 			return { success: true };
 		}
@@ -703,7 +700,6 @@ export class GameService {
 		if (socketId) {
 			const activeSocketId = game.white.userId === userId ? game.white.socketId : game.black.socketId;
 			if (activeSocketId && activeSocketId !== socketId) {
-				console.log(`Game Service: Ignoring disconnect from old socket ${socketId} for user ${userId} (active: ${activeSocketId})`);
 				return;
 			}
 		}
@@ -756,7 +752,6 @@ export class GameService {
 				game.disconnectDeadline = null;
 
 				if (game.board.history().length < 2) {
-					console.log(`Game ${game.gameId}: Abandoning game on disconnect (< 2 moves made)`);
 					this.abandonGame(game);
 					return;
 				}
@@ -903,7 +898,6 @@ export class GameService {
 	// Time runs out
 	private handleTimeout(game: ChessGame, turn: 'w' | 'b') {
 		if (game.board.history().length < 2) {
-			console.log(`Game ${game.gameId}: Abandoning game on timeout (< 2 moves made)`);
 			this.abandonGame(game);
 			return;
 		}

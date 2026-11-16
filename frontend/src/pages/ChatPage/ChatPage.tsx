@@ -51,8 +51,8 @@ const ChatPage = () => {
 					setFriends(data)
 				}
 			}
-		} catch (err) {
-			console.error('Failed to load friends for chat:', err)
+		} catch {
+			// Retain current friends list if reload fails
 		} finally {
 			setLoadingFriends(false)
 		}
@@ -73,7 +73,7 @@ const ChatPage = () => {
 					setFriends(data)
 				}
 			})
-			.catch((err) => console.error('Failed to load friends for chat:', err))
+			.catch(() => {});
 
 		return () => {
 			isMounted = false

@@ -22,8 +22,8 @@ export function useFriends(currentUser: User | null) {
             if (!res.ok) return
             const data = await res.json()
             setFriends(data)
-        } catch (err) {
-            console.error(err)
+        } catch {
+            // Retain existing friends list if background fetch fails
         }
     }, [username]);
 

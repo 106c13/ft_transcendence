@@ -59,8 +59,8 @@ export function useProfile(
 			if (!res.ok) return;
 			const data = await res.json();
 			setFriends(data);
-		} catch (err) {
-			console.error(err);
+		} catch {
+			// Retain existing profile friends list if background fetch fails
 		}
 	}, [user?.username]);
 

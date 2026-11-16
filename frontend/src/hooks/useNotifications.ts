@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { showGlobalToast } from '../context/ToastContext';
 import type { Notification } from '../utils/notificationUtils';
 import { isChatNotification } from '../utils/notificationUtils';
 
@@ -23,8 +24,8 @@ export function useNotifications(userId: number | undefined) {
                 setNotifications(nonChat);
                 setUnreadCount(nonChat.filter((n) => !n.is_read).length);
             }
-        } catch (error) {
-            console.error('Error fetching notifications:', error);
+        } catch {
+            // Retain existing notifications state if background fetch fails
         } finally {
             if (showLoading) setLoading(false);
         }
@@ -101,8 +102,8 @@ export function useNotifications(userId: number | undefined) {
                     return prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n));
                 });
             }
-        } catch (error) {
-            console.error('Error marking as read:', error);
+        } catch {
+            // Ignore background read-state sync failure; server state remains unchanged
         }
     }, [userId]);
 
@@ -119,8 +120,8 @@ export function useNotifications(userId: number | undefined) {
                 setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
                 setUnreadCount(0);
             }
-        } catch (error) {
-            console.error('Error marking all as read:', error);
+        } catch {
+            showGlobalToast('error', 'network_error');
         }
     }, [userId, unreadCount]);
 
@@ -137,8 +138,8 @@ export function useNotifications(userId: number | undefined) {
                 setNotifications([]);
                 setUnreadCount(0);
             }
-        } catch (error) {
-            console.error('Error clearing notifications:', error);
+        } catch {
+            showGlobalToast('error', 'network_error');
         }
     }, [userId, notifications.length]);
 
@@ -160,8 +161,8 @@ export function useNotifications(userId: number | undefined) {
                     return prev.filter((n) => n.id !== notificationId);
                 });
             }
-        } catch (error) {
-            console.error('Error deleting notification:', error);
+        } catch {
+            showGlobalToast('error', 'network_error');
         }
     }, [userId]);
 

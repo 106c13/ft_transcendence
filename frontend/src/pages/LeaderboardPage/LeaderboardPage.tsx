@@ -101,8 +101,8 @@ const LeaderboardPage = () => {
 					});
 				}
 			}
-		} catch (err) {
-			console.error('Failed to load leaderboard:', err);
+		} catch {
+			// Keep existing leaderboard state if request fails
 		} finally {
 			setLoading(false);
 		}
@@ -181,8 +181,8 @@ const LeaderboardPage = () => {
 						});
 					}
 				}
-			} catch (err) {
-				console.error('Failed to fetch top champions:', err);
+			} catch {
+				// Top champions podium falls back to current page slice
 			}
 		};
 		fetchTopChampions();

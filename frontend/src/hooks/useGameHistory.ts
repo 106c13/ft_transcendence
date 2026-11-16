@@ -24,8 +24,8 @@ export function useGameHistory(username: string) {
 					const data = await res.json()
 					setMatches(data)
 				}
-			} catch (err) {
-				console.error('Failed to fetch game history:', err)
+			} catch {
+				// Leave match history empty on fetch failure
 			} finally {
 				setLoading(false)
 			}

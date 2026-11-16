@@ -213,10 +213,8 @@ export function useAnalyzeEngine({
                         applyEvaluation(data, currentFen)
                     }
                 }
-            } catch (err) {
-                if (!isCancelled) {
-                    console.error('Failed to evaluate position:', err)
-                }
+            } catch {
+                // Non-fatal: skip evaluation update for this position
             } finally {
                 if (!isCancelled) {
                     setIsEvaluating(false)

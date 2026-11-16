@@ -41,7 +41,7 @@ const HomePage = () => {
 			.then(data => {
 				if (data) setRatings(data)
 			})
-			.catch(err => console.error('Failed to load ratings:', err))
+			.catch(() => {});
 	}, [currentUser])
 
 	const challengeFriends = useMemo(() => {
