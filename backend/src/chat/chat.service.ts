@@ -1,9 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Chat } from './chat.entity';
 import { User } from '../users/user.entity';
-import { Notification } from '../notification/notification.entity';
 import { Message } from '../messages/messages.entity';
 
 @Injectable()
@@ -13,11 +12,9 @@ export class ChatService {
 		private chatRepository: Repository<Chat>,
 		@InjectRepository(User)
 		private userRepository: Repository<User>,
-		@InjectRepository(Notification)
-		private notificationRepo: Repository<Notification>,
 		@InjectRepository(Message)
 		private messageRepository: Repository<Message>,
-	) { }
+	) {}
 
 	async getChat(chatId: string) {
 		const chat = await this.chatRepository

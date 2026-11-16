@@ -1,324 +1,212 @@
 import {
-    WebSocketGateway,
-    WebSocketServer,
-    SubscribeMessage,
-    OnGatewayConnection,
-    OnGatewayDisconnect,
+	WebSocketGateway,
+	WebSocketServer,
+	SubscribeMessage,
+	OnGatewayConnection,
+	OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Socket, Namespace } from 'socket.io';
 import { FriendsService } from './friends.service';
-import { UsersService } from '../users/users.service';
-import { FriendRequest, FriendRequestStatus } from './friend-request.entity';
-import { Friendship } from './friendship.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Notification } from '../notification/notification.entity';
 
 @WebSocketGateway({
-    namespace: '/friends',
-    cors: {
-        origin: true,
-        credentials: true,
-    },
+	namespace: '/friends',
+	cors: {
+		origin: true,
+		credentials: true,
+	},
 })
 export class FriendsGateway implements OnGatewayConnection, OnGatewayDisconnect {
-    @WebSocketServer()
-    server: Namespace;
+	@WebSocketServer()
+	server: Namespace;
 
-    constructor(
-        private friendsService: FriendsService,
-        private usersService: UsersService,
+	constructor(private readonly friendsService: FriendsService) {}
 
-        @InjectRepository(FriendRequest)
-        private friendRequestRepo: Repository<FriendRequest>,
+	private getUserIdFromClient(client: Socket): number | null {
+		const userIdStr = client.handshake.query.userId;
+		if (!userIdStr) return null;
 
-        @InjectRepository(Friendship)
-        private friendshipRepo: Repository<Friendship>,
+		const userId = parseInt(userIdStr as string, 10);
+		return isNaN(userId) ? null : userId;
+	}
 
-        @InjectRepository(Notification)
-        private notificationRepo: Repository<Notification>,
-    ) {}
+	private emitProfileFriendsUpdated(...usernames: (string | undefined)[]): void {
+		for (const username of usernames) {
+			if (username) {
+				this.server
+					.to(`profile_${username.toLowerCase()}`)
+					.emit('profile_friends_updated', { username });
+			}
+		}
+	}
 
-    async handleConnection(client: Socket): Promise<void> {
-        const userIdStr = client.handshake.query.userId;
-        if (!userIdStr) return;
+	async handleConnection(client: Socket): Promise<void> {
+		const userId = this.getUserIdFromClient(client);
+		if (userId === null) return;
 
-        const userId = parseInt(userIdStr as string);
-        client.join(`user_${userId}`);
-    }
+		client.join(`user_${userId}`);
+	}
 
-    async handleDisconnect(client: Socket) {
-        const userIdStr = client.handshake.query.userId;
-        if (!userIdStr) return;
+	async handleDisconnect(client: Socket): Promise<void> {
+		const userId = this.getUserIdFromClient(client);
+		if (userId === null) return;
 
-        const userId = parseInt(userIdStr as string);
-        client.leave(`user_${userId}`);
-    }
+		client.leave(`user_${userId}`);
+	}
 
-    @SubscribeMessage('view_profile')
-    handleViewProfile(client: Socket, payload: { username: string }) {
-        if (!payload?.username) return;
-        client.join(`profile_${payload.username.toLowerCase()}`);
-    }
+	@SubscribeMessage('view_profile')
+	handleViewProfile(client: Socket, payload: { username: string }) {
+		if (!payload?.username) return;
+		client.join(`profile_${payload.username.toLowerCase()}`);
+	}
 
-    @SubscribeMessage('leave_profile')
-    handleLeaveProfile(client: Socket, payload: { username: string }) {
-        if (!payload?.username) return;
-        client.leave(`profile_${payload.username.toLowerCase()}`);
-    }
+	@SubscribeMessage('leave_profile')
+	handleLeaveProfile(client: Socket, payload: { username: string }) {
+		if (!payload?.username) return;
+		client.leave(`profile_${payload.username.toLowerCase()}`);
+	}
 
-    @SubscribeMessage('send_friend_request')
-    async handleSendFriendRequest(client: Socket, payload: { friendUsername: string }) {
-        const userIdStr = client.handshake.query.userId;
-        if (!userIdStr) return;
+	@SubscribeMessage('send_friend_request')
+	async handleSendFriendRequest(client: Socket, payload: { friendUsername: string }) {
+		const userId = this.getUserIdFromClient(client);
+		if (userId === null) return;
 
-        const userId = parseInt(userIdStr as string);
-        const sender = await this.usersService.findById(userId);
-        if (!sender) {
-            client.emit('friend_request_error', { message: 'sender_not_found' });
-            return;
-        }
+		try {
+			const { sender, receiver, notification } = await this.friendsService.sendRequest(
+				userId,
+				payload.friendUsername,
+			);
 
-        const receiver = await this.usersService.findByUsername(payload.friendUsername);
-        if (!receiver) {
-            client.emit('friend_request_error', { message: 'user_not_found' });
-            return;
-        }
+			this.server.to(`user_${receiver.id}`).emit('friend_request_received', {
+				senderUsername: sender.username,
+			});
+			this.server.to(`user_${sender.id}`).emit('friend_request_sent', {
+				receiverUsername: receiver.username,
+			});
 
-        const existingRequest = await this.friendsService.getRequestStatus(userId, receiver.id);
-        if (existingRequest) {
-            client.emit('friend_request_error', { message: 'request_already_exists' });
-            return;
-        }
+			this.emitProfileFriendsUpdated(sender.username, receiver.username);
 
-        const request = await this.friendRequestRepo.create({
-            sender,
-            receiver,
-            status: FriendRequestStatus.PENDING,
-        });
-        await this.friendRequestRepo.save(request);
+			this.server.to(`user_${receiver.id}`).emit('new_notification', notification);
+		} catch (err) {
+			client.emit('friend_request_error', {
+				message: err instanceof Error ? err.message : 'unknown_error',
+			});
+		}
+	}
 
-        const notification = this.notificationRepo.create({
-			user_id: receiver.id,
-			message: JSON.stringify({ key: 'notification_friend_request', username: sender.username }),
-			link: `/profile/${sender.username}`,
-			is_read: false,
-		});
-		await this.notificationRepo.save(notification);
+	@SubscribeMessage('accept_friend_request')
+	async handleAcceptFriendRequest(client: Socket, payload: { friendUsername: string }) {
+		const userId = this.getUserIdFromClient(client);
+		if (userId === null) return;
 
-        this.server.to(`user_${receiver.id}`).emit('friend_request_received', { senderUsername: sender.username });
-        this.server.to(`user_${sender.id}`).emit('friend_request_sent', { receiverUsername: receiver.username });
+		try {
+			const { sender, receiver, acceptedNotification } = await this.friendsService.acceptRequest(
+				userId,
+				payload.friendUsername,
+			);
 
-        this.server.to(`profile_${sender.username.toLowerCase()}`).emit('profile_friends_updated', { username: sender.username });
-        this.server.to(`profile_${receiver.username.toLowerCase()}`).emit('profile_friends_updated', { username: receiver.username });
+			this.server.to(`user_${sender.id}`).emit('friend_request_accepted', {
+				receiverUsername: receiver.username,
+			});
+			this.server.to(`user_${receiver.id}`).emit('friend_request_accepted', {
+				senderUsername: sender.username,
+			});
 
-        this.server.to(`user_${receiver.id}`).emit('new_notification', notification);
-    }
+			this.emitProfileFriendsUpdated(sender.username, receiver.username);
 
-    @SubscribeMessage('accept_friend_request')
-    async handleAcceptFriendRequest(client: Socket, payload: { friendUsername: string }) {
-        const userIdStr = client.handshake.query.userId;
-        if (!userIdStr) return;
+			this.server.to(`user_${userId}`).emit('notification_deleted', {
+				link: `/profile/${sender.username}`,
+			});
+			this.server.to(`user_${sender.id}`).emit('new_notification', acceptedNotification);
+		} catch (err) {
+			client.emit('friend_request_error', {
+				message: err instanceof Error ? err.message : 'unknown_error',
+			});
+		}
+	}
 
-        const userId = parseInt(userIdStr as string);
-        const sender = await this.usersService.findByUsername(payload.friendUsername);
-        if (!sender) {
-            client.emit('friend_request_error', { message: 'sender_not_found' });
-            return;
-        }
+	@SubscribeMessage('reject_friend_request')
+	async handleRejectFriendRequest(client: Socket, payload: { friendUsername: string }) {
+		const userId = this.getUserIdFromClient(client);
+		if (userId === null) return;
 
-        const receiver = await this.usersService.findById(userId);
-        if (!receiver) {
-            client.emit('friend_request_error', { message: 'user_not_found' });
-            return;
-        }
+		try {
+			const { sender, receiver } = await this.friendsService.rejectRequest(
+				userId,
+				payload.friendUsername,
+			);
 
-        const request = await this.friendRequestRepo.findOne({
-            where: {
-                sender: { id: sender.id },
-                receiver: { id: receiver.id },
-                status: FriendRequestStatus.PENDING,
-            },
-            relations: ['sender', 'receiver'],
-        });
+			this.server.to(`user_${sender.id}`).emit('friend_request_rejected', {
+				receiverUsername: receiver.username,
+			});
+			this.server.to(`user_${receiver.id}`).emit('friend_request_rejected', {
+				senderUsername: sender.username,
+			});
 
-        if (!request) {
-            client.emit('friend_request_error', { message: 'request_not_found' });
-            return;
-        }
+			this.emitProfileFriendsUpdated(sender.username, receiver.username);
 
-        const id1 = Math.min(request.sender.id, request.receiver.id)
-		const id2 = Math.max(request.sender.id, request.receiver.id)
+			this.server.to(`user_${userId}`).emit('notification_deleted', {
+				link: `/profile/${sender.username}`,
+			});
+		} catch (err) {
+			client.emit('friend_request_error', {
+				message: err instanceof Error ? err.message : 'unknown_error',
+			});
+		}
+	}
 
-		const existing = await this.friendshipRepo.findOne({
-			where: {
-				user1: { id: id1 },
-				user2: { id: id2 },
-			},
-		})
+	@SubscribeMessage('unfriend')
+	async handleUnfriend(client: Socket, payload: { friendUsername: string }) {
+		const userId = this.getUserIdFromClient(client);
+		if (userId === null) return;
 
-        if (existing) {
-            client.emit('friend_request_error', { message: 'friendship_already_exists' });
-            return;
-        }
+		try {
+			const { currentUser, friend } = await this.friendsService.unfriend(
+				userId,
+				payload.friendUsername,
+			);
 
-        await this.notificationRepo.delete({
-			user_id: userId,
-			link: `/profile/${sender.username}`,
-		})
+			this.server.to(`user_${userId}`).emit('unfriended', {
+				friendUsername: friend.username,
+			});
+			this.server.to(`user_${friend.id}`).emit('unfriended', {
+				friendUsername: currentUser?.username,
+			});
 
-        const acceptedNotification = this.notificationRepo.create({
-			user_id: sender.id,
-			message: JSON.stringify({ key: 'notification_friend_accepted', username: request.receiver.username }),
-			link: `/profile/${request.receiver.username}`,
-			is_read: false,
-		})
+			this.emitProfileFriendsUpdated(currentUser?.username, friend.username);
+		} catch (err) {
+			client.emit('unfriend_error', {
+				message: err instanceof Error ? err.message : 'unknown_error',
+			});
+		}
+	}
 
-        await this.friendshipRepo.save({
-            user1: { id: id1 },
-            user2: { id: id2 },
-        })
-        await this.notificationRepo.save(acceptedNotification)
-		await this.friendRequestRepo.remove(request)
+	@SubscribeMessage('cancel_friend_request')
+	async handleCancelFriendRequest(client: Socket, payload: { friendUsername: string }) {
+		const userId = this.getUserIdFromClient(client);
+		if (userId === null) return;
 
-        this.server.to(`user_${sender.id}`).emit('friend_request_accepted', { receiverUsername: receiver.username });
-        this.server.to(`user_${receiver.id}`).emit('friend_request_accepted', { senderUsername: sender.username });
+		try {
+			const { sender, receiver } = await this.friendsService.cancelRequest(
+				userId,
+				payload.friendUsername,
+			);
 
-        this.server.to(`profile_${sender.username.toLowerCase()}`).emit('profile_friends_updated', { username: sender.username });
-        this.server.to(`profile_${receiver.username.toLowerCase()}`).emit('profile_friends_updated', { username: receiver.username });
+			this.server.to(`user_${sender.id}`).emit('friend_request_cancelled', {
+				receiverUsername: receiver.username,
+			});
+			this.server.to(`user_${receiver.id}`).emit('friend_request_cancelled', {
+				senderUsername: sender.username,
+			});
 
-        this.server.to(`user_${userId}`).emit('notification_deleted', { link: `/profile/${sender.username}` });
-        this.server.to(`user_${sender.id}`).emit('new_notification', acceptedNotification);
-    }
+			this.emitProfileFriendsUpdated(sender.username, receiver.username);
 
-    @SubscribeMessage('reject_friend_request')
-    async handleRejectFriendRequest(client: Socket, payload: { friendUsername: string }) {
-        const userIdStr = client.handshake.query.userId;
-        if (!userIdStr) return;
-
-        const userId = parseInt(userIdStr as string);
-        const sender = await this.usersService.findByUsername(payload.friendUsername);
-        if (!sender) {
-            client.emit('friend_request_error', { message: 'sender_not_found' });
-            return;
-        }
-
-        const receiver = await this.usersService.findById(userId);
-        if (!receiver) {
-            client.emit('friend_request_error', { message: 'user_not_found' });
-            return;
-        }
-
-        const request = await this.friendRequestRepo.findOne({
-            where: {
-                sender: { id: sender.id },
-                receiver: { id: receiver.id },
-                status: FriendRequestStatus.PENDING,
-            },
-            relations: ['sender', 'receiver'],
-        });
-
-        if (!request) {
-            client.emit('friend_request_error', { message: 'request_not_found' });
-            return;
-        }
-
-        await this.notificationRepo.delete({
-            user_id: userId,
-            link: `/profile/${sender.username}`,
-        })
-
-        await this.friendRequestRepo.remove(request)
-
-        this.server.to(`user_${sender.id}`).emit('friend_request_rejected', { receiverUsername: receiver.username });
-        this.server.to(`user_${receiver.id}`).emit('friend_request_rejected', { senderUsername: sender.username });
-
-        this.server.to(`profile_${sender.username.toLowerCase()}`).emit('profile_friends_updated', { username: sender.username });
-        this.server.to(`profile_${receiver.username.toLowerCase()}`).emit('profile_friends_updated', { username: receiver.username });
-
-        this.server.to(`user_${userId}`).emit('notification_deleted', { link: `/profile/${sender.username}` });
-    }
-
-    @SubscribeMessage('unfriend')
-    async handleUnfriend(client: Socket, payload: { friendUsername: string }) {
-        const userIdStr = client.handshake.query.userId;
-        if (!userIdStr) return;
-
-        const userId = parseInt(userIdStr as string);
-        const friend = await this.usersService.findByUsername(payload.friendUsername);
-        if (!friend) {
-            client.emit('unfriend_error', { message: 'friend_not_found' });
-            return;
-        }
-
-        const friendship = await this.friendshipRepo.findOne({
-            where: [
-                { user1: { id: userId }, user2: { id: friend.id } },
-                { user1: { id: friend.id }, user2: { id: userId } },
-            ],
-        });
-
-        if (!friendship) {
-            client.emit('unfriend_error', { message: 'friendship_not_found' });
-            return;
-        }
-
-        await this.friendshipRepo.remove(friendship);
-
-        this.server.to(`user_${userId}`).emit('unfriended', { friendUsername: friend.username });
-        this.server.to(`user_${friend.id}`).emit('unfriended', { friendUsername: (await this.usersService.findById(userId))?.username });
-
-        const currentUser = await this.usersService.findById(userId);
-        if (currentUser) {
-            this.server.to(`profile_${currentUser.username.toLowerCase()}`).emit('profile_friends_updated', { username: currentUser.username });
-        }
-        this.server.to(`profile_${friend.username.toLowerCase()}`).emit('profile_friends_updated', { username: friend.username });
-    }
-
-    @SubscribeMessage('cancel_friend_request')
-    async handleCancelFriendRequest(client: Socket, payload: { friendUsername: string }) {
-        const userIdStr = client.handshake.query.userId;
-        if (!userIdStr) return;
-
-        const userId = parseInt(userIdStr as string);
-        const sender = await this.usersService.findById(userId);
-        if (!sender) {
-            client.emit('friend_request_error', { message: 'sender_not_found' });
-            return;
-        }
-
-        const receiver = await this.usersService.findByUsername(payload.friendUsername);
-        if (!receiver) {
-            client.emit('friend_request_error', { message: 'user_not_found' });
-            return;
-        }
-
-        const request = await this.friendRequestRepo.findOne({
-            where: {
-                sender: { id: sender.id },
-                receiver: { id: receiver.id },
-                status: FriendRequestStatus.PENDING,
-            },
-        });
-
-        if (!request) {
-            client.emit('friend_request_error', { message: 'request_not_found' });
-            return;
-        }
-
-        await this.notificationRepo.delete({
-            user_id: receiver.id,
-            link: `/profile/${sender.username}`,
-        });
-
-        await this.friendRequestRepo.remove(request);
-
-        this.server.to(`user_${sender.id}`).emit('friend_request_cancelled', { receiverUsername: receiver.username });
-        this.server.to(`user_${receiver.id}`).emit('friend_request_cancelled', { senderUsername: sender.username });
-
-        this.server.to(`profile_${sender.username.toLowerCase()}`).emit('profile_friends_updated', { username: sender.username });
-        this.server.to(`profile_${receiver.username.toLowerCase()}`).emit('profile_friends_updated', { username: receiver.username });
-
-        this.server.to(`user_${receiver.id}`).emit('notification_deleted', { link: `/profile/${sender.username}` });
-    }
+			this.server.to(`user_${receiver.id}`).emit('notification_deleted', {
+				link: `/profile/${sender.username}`,
+			});
+		} catch (err) {
+			client.emit('friend_request_error', {
+				message: err instanceof Error ? err.message : 'unknown_error',
+			});
+		}
+	}
 }

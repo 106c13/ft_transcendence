@@ -1,11 +1,10 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { Message } from './messages.entity'
-import { Chat } from '../chat/chat.entity'
-import { User } from '../users/user.entity'
-import { Notification } from '../notification/notification.entity'
-import { ChatGateway } from '../chat/chat.gateway'
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Message } from './messages.entity';
+import { Chat } from '../chat/chat.entity';
+import { User } from '../users/user.entity';
+import { ChatGateway } from '../chat/chat.gateway';
 
 @Injectable()
 export class MessagesService {
@@ -16,10 +15,8 @@ export class MessagesService {
 		private chatRepository: Repository<Chat>,
 		@InjectRepository(User)
 		private userRepository: Repository<User>,
-		@InjectRepository(Notification)
-		private notificationRepo: Repository<Notification>,
 		private chatGateway: ChatGateway,
-	) { }
+	) {}
 
 	async getMessages(chatId: string, options: { limit: number; offset: number }) {
 		const [messages, total] = await this.messageRepository.findAndCount({
@@ -87,13 +84,7 @@ export class MessagesService {
 		}
 
 		// Emit to chat participants via WebSocket
-		this.chatGateway.server
-			.to(`user_${chat.user1_id}`)
-			.to(`user_${chat.user2_id}`)
-			.emit('new_message', {
-				type: 'new_message',
-				message: messageResponse,
-			});
+		this.chatGateway.emitNewMessage(chat.user1_id, chat.user2_id, messageResponse);
 
 		return {
 			id: message.id,
@@ -135,14 +126,7 @@ export class MessagesService {
 			.execute()
 
 		const unreadCount = await this.getUnreadCount(userId);
-
-		this.chatGateway.server
-			.to(`user_${userId}`)
-			.emit('messages_read', {
-				chat_id: chatId,
-				reader_id: userId,
-				unread_count: unreadCount,
-			});
+		this.chatGateway.emitMessagesRead(userId, chatId, unreadCount);
 
 		return { success: true }
 	}

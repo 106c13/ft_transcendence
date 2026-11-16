@@ -26,188 +26,203 @@ export class FriendsService {
 	) { }
 
 	async sendRequest(senderId: number, receiverUsername: string) {
-		const receiver = await this.userRepo.findOne({
-			where: { username: receiverUsername },
-		})
-
-		if (!receiver) throw new NotFoundException('user_not_found')
-
 		const sender = await this.userRepo.findOne({
 			where: { id: senderId },
-		})
+		});
+		if (!sender) {
+			throw new NotFoundException('sender_not_found');
+		}
 
-		if (!sender) throw new NotFoundException('sender_not_found')
+		const receiver = await this.userRepo.findOne({
+			where: { username: receiverUsername },
+		});
+		if (!receiver) {
+			throw new NotFoundException('user_not_found');
+		}
 
-		const existing = await this.friendRequestRepo.findOne({
-			where: [
-				{
-					sender: { id: senderId },
-					receiver: { id: receiver.id },
-				},
-				{
-					sender: { id: receiver.id },
-					receiver: { id: senderId },
-				},
-			],
-		})
-
-		if (existing) {
-			throw new BadRequestException('request_already_exists')
+		const existingRequest = await this.getRequestStatus(senderId, receiver.id);
+		if (existingRequest) {
+			throw new BadRequestException('request_already_exists');
 		}
 
 		const request = this.friendRequestRepo.create({
 			sender,
 			receiver,
 			status: FriendRequestStatus.PENDING,
-		})
+		});
+		await this.friendRequestRepo.save(request);
 
-		// Create notification for receiver
 		const notification = this.notificationRepo.create({
 			user_id: receiver.id,
 			message: JSON.stringify({ key: 'notification_friend_request', username: sender.username }),
 			link: `/profile/${sender.username}`,
 			is_read: false,
-		})
-		await this.notificationRepo.save(notification)
+		});
+		await this.notificationRepo.save(notification);
 
-		return this.friendRequestRepo.save(request)
+		return { sender, receiver, notification };
 	}
 
-	async acceptRequest(userId: number, username: string) {
+	async acceptRequest(userId: number, friendUsername: string) {
 		const sender = await this.userRepo.findOne({
-			where: { username },
-		})
-
+			where: { username: friendUsername },
+		});
 		if (!sender) {
-			throw new NotFoundException('user_not_found')
+			throw new NotFoundException('sender_not_found');
+		}
+
+		const receiver = await this.userRepo.findOne({
+			where: { id: userId },
+		});
+		if (!receiver) {
+			throw new NotFoundException('user_not_found');
 		}
 
 		const request = await this.friendRequestRepo.findOne({
 			where: {
 				sender: { id: sender.id },
-				receiver: { id: userId },
+				receiver: { id: receiver.id },
 				status: FriendRequestStatus.PENDING,
 			},
 			relations: ['sender', 'receiver'],
-		})
-
+		});
 		if (!request) {
-			throw new NotFoundException('request_not_found')
+			throw new NotFoundException('request_not_found');
 		}
 
-		const id1 = Math.min(request.sender.id, request.receiver.id)
-		const id2 = Math.max(request.sender.id, request.receiver.id)
+		const id1 = Math.min(request.sender.id, request.receiver.id);
+		const id2 = Math.max(request.sender.id, request.receiver.id);
 
 		const existing = await this.friendshipRepo.findOne({
 			where: {
 				user1: { id: id1 },
 				user2: { id: id2 },
 			},
-		})
-
-		if (!existing) {
-			const friendship = this.friendshipRepo.create({
-				user1: { id: id1 } as User,
-				user2: { id: id2 } as User,
-			})
-
-			await this.friendshipRepo.save(friendship)
+		});
+		if (existing) {
+			throw new BadRequestException('friendship_already_exists');
 		}
 
-		// Delete the friend request notification
 		await this.notificationRepo.delete({
 			user_id: userId,
 			link: `/profile/${sender.username}`,
-		})
+		});
 
-		// Create notification for sender that request was accepted
 		const acceptedNotification = this.notificationRepo.create({
 			user_id: sender.id,
 			message: JSON.stringify({ key: 'notification_friend_accepted', username: request.receiver.username }),
 			link: `/profile/${request.receiver.username}`,
 			is_read: false,
-		})
-		await this.notificationRepo.save(acceptedNotification)
+		});
 
-		await this.friendRequestRepo.remove(request)
+		await this.friendshipRepo.save({
+			user1: { id: id1 } as User,
+			user2: { id: id2 } as User,
+		});
+		await this.notificationRepo.save(acceptedNotification);
+		await this.friendRequestRepo.remove(request);
 
-		return { success: true }
+		return { sender, receiver, acceptedNotification };
 	}
 
-	async rejectRequest(userId: number, username: string) {
+	async rejectRequest(userId: number, friendUsername: string) {
 		const sender = await this.userRepo.findOne({
-			where: { username },
-		})
-
+			where: { username: friendUsername },
+		});
 		if (!sender) {
-			throw new NotFoundException('user_not_found')
+			throw new NotFoundException('sender_not_found');
+		}
+
+		const receiver = await this.userRepo.findOne({
+			where: { id: userId },
+		});
+		if (!receiver) {
+			throw new NotFoundException('user_not_found');
 		}
 
 		const request = await this.friendRequestRepo.findOne({
 			where: {
 				sender: { id: sender.id },
-				receiver: { id: userId },
+				receiver: { id: receiver.id },
+				status: FriendRequestStatus.PENDING,
 			},
 			relations: ['sender', 'receiver'],
-		})
-
+		});
 		if (!request) {
-			throw new NotFoundException('request_not_found')
+			throw new NotFoundException('request_not_found');
 		}
 
-		// Delete the friend request notification
 		await this.notificationRepo.delete({
 			user_id: userId,
 			link: `/profile/${sender.username}`,
-		})
+		});
 
-		await this.friendRequestRepo.remove(request)
+		await this.friendRequestRepo.remove(request);
 
-		return { success: true }
+		return { sender, receiver };
 	}
 
-	async cancelRequest(senderId: number, username: string) {
-		const user = await this.userRepo.findOne({ where: { username } })
-		if (!user) throw new NotFoundException('user_not_found')
+	async cancelRequest(userId: number, friendUsername: string) {
+		const sender = await this.userRepo.findOne({
+			where: { id: userId },
+		});
+		if (!sender) {
+			throw new NotFoundException('sender_not_found');
+		}
+
+		const receiver = await this.userRepo.findOne({
+			where: { username: friendUsername },
+		});
+		if (!receiver) {
+			throw new NotFoundException('user_not_found');
+		}
 
 		const request = await this.friendRequestRepo.findOne({
 			where: {
-				sender: { id: senderId },
-				receiver: { id: user.id },
+				sender: { id: sender.id },
+				receiver: { id: receiver.id },
 				status: FriendRequestStatus.PENDING,
 			},
-			relations: ['receiver'],
-		})
+		});
+		if (!request) {
+			throw new NotFoundException('request_not_found');
+		}
 
-		if (!request) throw new NotFoundException('request_not_found')
-
-		// Delete the friend request notification from receiver
 		await this.notificationRepo.delete({
-			user_id: user.id,
-			link: `/profile/${request.receiver.username}`,
-		})
+			user_id: receiver.id,
+			link: `/profile/${sender.username}`,
+		});
 
-		await this.friendRequestRepo.remove(request)
+		await this.friendRequestRepo.remove(request);
 
-		return { success: true }
+		return { sender, receiver };
 	}
 
-	async unfriend(userId: number, username: string) {
-		const user = await this.userRepo.findOne({ where: { username } })
-		if (!user) throw new NotFoundException('user_not_found')
+	async unfriend(userId: number, friendUsername: string) {
+		const friend = await this.userRepo.findOne({
+			where: { username: friendUsername },
+		});
+		if (!friend) {
+			throw new NotFoundException('friend_not_found');
+		}
 
 		const friendship = await this.friendshipRepo.findOne({
 			where: [
-				{ user1: { id: userId }, user2: { id: user.id } },
-				{ user1: { id: user.id }, user2: { id: userId } },
+				{ user1: { id: userId }, user2: { id: friend.id } },
+				{ user1: { id: friend.id }, user2: { id: userId } },
 			],
-		})
+		});
+		if (!friendship) {
+			throw new NotFoundException('friendship_not_found');
+		}
 
-		if (!friendship) throw new NotFoundException('not_friends')
+		await this.friendshipRepo.remove(friendship);
 
-		await this.friendshipRepo.remove(friendship)
+		const currentUser = await this.userRepo.findOne({
+			where: { id: userId },
+		});
 
-		return { success: true }
+		return { currentUser, friend };
 	}
 
 	async getFriends(userId: number) {

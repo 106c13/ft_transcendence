@@ -37,4 +37,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.leave(`user_${userId}`);
 		}
 	}
+
+	emitNewMessage(user1Id: number, user2Id: number, message: unknown) {
+		this.server
+			.to(`user_${user1Id}`)
+			.to(`user_${user2Id}`)
+			.emit('new_message', {
+				type: 'new_message',
+				message,
+			});
+	}
+
+	emitMessagesRead(userId: number, chatId: string, unreadCount: number) {
+		this.server
+			.to(`user_${userId}`)
+			.emit('messages_read', {
+				chat_id: chatId,
+				reader_id: userId,
+				unread_count: unreadCount,
+			});
+	}
 }
