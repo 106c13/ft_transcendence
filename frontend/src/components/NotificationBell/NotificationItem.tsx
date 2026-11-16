@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, UserCheck, MessageSquare, Swords, Users, Check, X } from 'lucide-react';
-import { showGlobalToast } from '../../context/ToastContext';
+import { useToast } from '../../context/ToastContext';
 import type { Notification } from '../../utils/notificationUtils';
 import {
     isFriendRequest,
@@ -28,6 +28,7 @@ const NotificationItem = ({
     onActionCompleted,
 }: Props) => {
     const { t } = useTranslation();
+    const { toast } = useToast();
     const [actionLoading, setActionLoading] = useState(false);
     const [actionFeedback, setActionFeedback] = useState<'accepted' | 'declined' | null>(null);
 
@@ -47,7 +48,7 @@ const NotificationItem = ({
                 onActionCompleted(notification.id, !notification.is_read);
             }, 1000);
         } catch {
-            showGlobalToast('error', 'network_error');
+            toast.error('network_error');
         } finally {
             setActionLoading(false);
         }
@@ -67,7 +68,7 @@ const NotificationItem = ({
                 onActionCompleted(notification.id, !notification.is_read);
             }, 800);
         } catch {
-            showGlobalToast('error', 'network_error');
+            toast.error('network_error');
         } finally {
             setActionLoading(false);
         }

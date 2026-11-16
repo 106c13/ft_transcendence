@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import io, { Socket } from 'socket.io-client'
-import { showGlobalToast } from '../context/ToastContext';
+import { useToast } from '../context/ToastContext';
 import type { ChatObject, Message } from '../utils/chatUtils';
 
 export function useChat(currentUserId: number | null) {
+	const { toast } = useToast();
 	const navigate = useNavigate()
 	const { userid } = useParams<{ userid?: string }>()
 	const [chats, setChats] = useState<ChatObject[]>([])
@@ -223,11 +224,11 @@ export function useChat(currentUserId: number | null) {
 			})
 
 			if (!res.ok) {
-				showGlobalToast('error', 'network_error');
+				toast.error('network_error');
 				setNewMessage(content);
 			}
 		} catch {
-			showGlobalToast('error', 'network_error');
+			toast.error('network_error');
 			setNewMessage(content);
 		}
 	}

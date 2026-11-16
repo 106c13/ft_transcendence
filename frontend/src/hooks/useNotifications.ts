@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { showGlobalToast } from '../context/ToastContext';
+import { useToast } from '../context/ToastContext';
 import type { Notification } from '../utils/notificationUtils';
 import { isChatNotification } from '../utils/notificationUtils';
 
 export function useNotifications(userId: number | undefined) {
+    const { toast } = useToast();
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -119,9 +120,9 @@ export function useNotifications(userId: number | undefined) {
                 setUnreadCount(0);
             }
         } catch {
-            showGlobalToast('error', 'network_error');
+            toast.error('network_error');
         }
-    }, [userId, unreadCount]);
+    }, [userId, unreadCount, toast]);
 
     const clearAll = useCallback(async () => {
         if (notifications.length === 0 || !userId) return;
@@ -137,9 +138,9 @@ export function useNotifications(userId: number | undefined) {
                 setUnreadCount(0);
             }
         } catch {
-            showGlobalToast('error', 'network_error');
+            toast.error('network_error');
         }
-    }, [userId, notifications.length]);
+    }, [userId, notifications.length, toast]);
 
     const deleteNotification = useCallback(async (notificationId: number) => {
         if (!userId) return;
@@ -160,9 +161,9 @@ export function useNotifications(userId: number | undefined) {
                 });
             }
         } catch {
-            showGlobalToast('error', 'network_error');
+            toast.error('network_error');
         }
-    }, [userId]);
+    }, [userId, toast]);
 
     const removeNotificationLocally = useCallback((notificationId: number, wasUnread: boolean) => {
         setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
