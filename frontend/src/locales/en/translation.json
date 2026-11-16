@@ -626,7 +626,7 @@
   "lowest_across_active": "Lowest across active",
   "avg_win_rate": "Avg. win rate",
   "click_point_to_analyze": "Click match point to analyze",
-  "play_5_to_calibrate": "Play 5 games to unlock rating",
+  "play_5_to_calibrate": "Play 5 games to calibrate",
   "play_more_to_calibrate": "Play {{count}} more to calibrate",
   "calibration_progress": "0 / 5 games",
   "page_title_privacy": "Privacy Policy",

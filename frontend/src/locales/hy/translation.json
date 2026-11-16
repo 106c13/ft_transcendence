@@ -626,7 +626,7 @@
   "lowest_across_active": "Նվազագույնն ընտրվածներից",
   "avg_win_rate": "Միջին հաղթանակի տոկոս",
   "click_point_to_analyze": "Սեղմեք խաղի կետին վերլուծության համար",
-  "play_5_to_calibrate": "Խաղացեք 5 խաղ վարկանիշը բացելու համար",
+  "play_5_to_calibrate": "Խաղացեք 5 խաղ տրամաչափման համար",
   "play_more_to_calibrate": "Եվս {{count}} խաղ տրամաչափման համար",
   "calibration_progress": "0 / 5 խաղ",
   "page_title_privacy": "Գաղտնիության քաղաքականություն",
