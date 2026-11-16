@@ -1,96 +1,31 @@
-// chat.controller.ts
 import {
 	Controller,
 	Get,
-	Body,
 	Param,
 	Req,
 	UseGuards,
-	Query,
-	NotFoundException,
-	BadRequestException,
-} from '@nestjs/common'
-import { JwtAuthGuard } from '../auth/jwt-auth.guard'
-import { ChatService } from './chat.service'
-import { UsersService } from '../users/users.service'
-import { MessagesService } from '../messages/messages.service'
+} from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ChatService } from './chat.service';
 
 @Controller('chat')
+@UseGuards(JwtAuthGuard)
 export class ChatController {
-	constructor(
-		private readonly usersService: UsersService,
-		private readonly chatService: ChatService,
-		private readonly messagesService: MessagesService,
-	) { }
-
-	private formatChat(chat: any) {
-		return {
-			id: chat.id,
-			chat_id: chat.chat_id,
-			user1_id: chat.user1_id,
-			user2_id: chat.user2_id,
-			created_at: chat.created_at,
-			user1: chat.user1 ? {
-				id: chat.user1.id,
-				username: chat.user1.username,
-				avatar: chat.user1.avatar,
-			} : null,
-			user2: chat.user2 ? {
-				id: chat.user2.id,
-				username: chat.user2.username,
-				avatar: chat.user2.avatar,
-			} : null,
-			unreadCount: chat.unreadCount ?? 0,
-			lastMessage: chat.lastMessage ?? null,
-		}
-	}
+	constructor(private readonly chatService: ChatService) {}
 
 	@Get('get/:user_id')
-	@UseGuards(JwtAuthGuard)
 	async getChat(
 		@Req() req,
-		@Param('user_id') userIdParam: string
+		@Param('user_id') userIdParam: string,
 	) {
-		const currentUserId = req.user.userId;
-		const otherUserId = parseInt(userIdParam, 10);
-
-		if (isNaN(otherUserId)) {
-			throw new BadRequestException('invalid_user_id');
-		}
-
-		if (currentUserId === otherUserId) {
-			throw new BadRequestException('cannot_chat_with_yourself');
-		}
-
-		const id1 = Math.min(currentUserId, otherUserId);
-		const id2 = Math.max(currentUserId, otherUserId);
-		const chatId = `${id1}_${id2}`;
-
-		const chat = await this.chatService.getChat(chatId);
-
-		if (chat) {
-			return this.formatChat(chat);
-		}
-
-		const otherUser = await this.usersService.findById(otherUserId);
-		if (!otherUser) {
-			throw new NotFoundException('user_not_found');
-		}
-
-		const newChat = await this.chatService.createChat(currentUserId, otherUserId);
-
-		if (!newChat) {
-			throw new NotFoundException('cannot_create_chat');
-		}
-
-		return this.formatChat(newChat);
+		return this.chatService.getOrCreateChat(
+			req.user.userId,
+			parseInt(userIdParam, 10),
+		);
 	}
 
 	@Get('my-chats')
-	@UseGuards(JwtAuthGuard)
 	async getUserChats(@Req() req) {
-		const userId = req.user.userId;
-		const chats = await this.chatService.getUserChats(userId);
-		return chats.map((chat) => this.formatChat(chat));
+		return this.chatService.getUserChats(req.user.userId);
 	}
 }

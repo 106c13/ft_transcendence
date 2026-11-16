@@ -18,7 +18,16 @@ export class MessagesService {
 		private chatGateway: ChatGateway,
 	) {}
 
-	async getMessages(chatId: string, options: { limit: number; offset: number }) {
+	private verifyChatParticipant(chatId: string, userId: number) {
+		const [id1, id2] = (chatId || '').split('_').map(Number);
+		if (userId !== id1 && userId !== id2) {
+			throw new BadRequestException('not_chat_participant');
+		}
+	}
+
+	async getMessages(chatId: string, userId: number, options: { limit: number; offset: number }) {
+		this.verifyChatParticipant(chatId, userId);
+
 		const [messages, total] = await this.messageRepository.findAndCount({
 			where: { chat_id: chatId },
 			relations: ['sender'],
@@ -47,26 +56,37 @@ export class MessagesService {
 	}
 
 	async sendMessage(chatId: string, senderId: number, content: string) {
-		const chat = await this.chatRepository.findOne({
-			where: { chat_id: chatId },
-		})
-
-		if (!chat) {
-			throw new NotFoundException('chat_not_found')
+		if (!content || content.trim().length === 0) {
+			throw new BadRequestException('message_empty');
 		}
 
-		const sender = await this.userRepository.findOne({ where: { id: senderId } })
+		if (content.length > 200) {
+			throw new BadRequestException('message_too_long');
+		}
+
+		this.verifyChatParticipant(chatId, senderId);
+		const trimmedContent = content.trim();
+
+		const chat = await this.chatRepository.findOne({
+			where: { chat_id: chatId },
+		});
+
+		if (!chat) {
+			throw new NotFoundException('chat_not_found');
+		}
+
+		const sender = await this.userRepository.findOne({ where: { id: senderId } });
 
 		if (!sender) {
-			throw new NotFoundException('sender_not_found')
+			throw new NotFoundException('sender_not_found');
 		}
 
 		const message = this.messageRepository.create({
 			chat_id: chatId,
 			sender_id: senderId,
-			content,
+			content: trimmedContent,
 			is_read: false,
-		})
+		});
 
 		await this.messageRepository.save(message)
 
@@ -115,6 +135,8 @@ export class MessagesService {
 	}
 
 	async markChatAsRead(chatId: string, userId: number) {
+		this.verifyChatParticipant(chatId, userId);
+
 		await this.messageRepository
 			.createQueryBuilder()
 			.update(Message)

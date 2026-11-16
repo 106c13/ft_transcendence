@@ -9,98 +9,62 @@ import {
 	Req,
 	UseGuards,
 	Query,
-	BadRequestException,
-	NotFoundException,
-} from '@nestjs/common'
-import { JwtAuthGuard } from '../auth/jwt-auth.guard'
-import { MessagesService } from './messages.service'
+} from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { MessagesService } from './messages.service';
 
 @Controller('messages')
+@UseGuards(JwtAuthGuard)
 export class MessagesController {
-	constructor(private readonly messagesService: MessagesService) { }
+	constructor(private readonly messagesService: MessagesService) {}
 
 	@Get('unread/total')
-	@UseGuards(JwtAuthGuard)
 	async getUnreadCount(@Req() req) {
-		const userId = req.user.userId
-		const count = await this.messagesService.getUnreadCount(userId)
-		return { count }
+		const count = await this.messagesService.getUnreadCount(req.user.userId);
+		return { count };
 	}
 
 	@Patch('read/:chat_id')
-	@UseGuards(JwtAuthGuard)
 	async markChatAsRead(
 		@Req() req,
-		@Param('chat_id') chatId: string
+		@Param('chat_id') chatId: string,
 	) {
-		const userId = req.user.userId
-		const [id1, id2] = chatId.split('_').map(Number)
-
-		if (userId !== id1 && userId !== id2) {
-			throw new BadRequestException('not_chat_participant')
-		}
-
-		return this.messagesService.markChatAsRead(chatId, userId)
+		return this.messagesService.markChatAsRead(chatId, req.user.userId);
 	}
 
 	@Get(':chat_id')
-	@UseGuards(JwtAuthGuard)
 	async getMessages(
 		@Req() req,
 		@Param('chat_id') chatId: string,
 		@Query('limit') limit?: string,
-		@Query('offset') offset?: string
+		@Query('offset') offset?: string,
 	) {
-		const userId = req.user.userId
-
-		const [id1, id2] = chatId.split('_').map(Number)
-
-		if (userId !== id1 && userId !== id2) {
-			throw new BadRequestException('not_chat_participant')
-		}
-
-		return this.messagesService.getMessages(chatId, {
-			limit: limit ? parseInt(limit) : 50,
-			offset: offset ? parseInt(offset) : 0,
-		})
+		return this.messagesService.getMessages(chatId, req.user.userId, {
+			limit: limit ? parseInt(limit, 10) : 50,
+			offset: offset ? parseInt(offset, 10) : 0,
+		});
 	}
 
 	@Post('send')
-	@UseGuards(JwtAuthGuard)
 	async sendMessage(
 		@Req() req,
-		@Body() body: { chat_id: string; content: string }
+		@Body() body: { chat_id: string; content: string },
 	) {
-		const userId = req.user.userId
-
-		if (!body.content || body.content.trim().length === 0) {
-			throw new BadRequestException('message_empty')
-		}
-
-		if (body.content.length > 200) {
-			throw new BadRequestException('message_too_long')
-		}
-
-		const [id1, id2] = body.chat_id.split('_').map(Number)
-
-		if (userId !== id1 && userId !== id2) {
-			throw new BadRequestException('not_chat_participant')
-		}
-
 		return this.messagesService.sendMessage(
 			body.chat_id,
-			userId,
-			body.content.trim()
-		)
+			req.user.userId,
+			body.content,
+		);
 	}
 
 	@Delete(':message_id')
-	@UseGuards(JwtAuthGuard)
 	async deleteMessage(
 		@Req() req,
-		@Param('message_id') messageId: string
+		@Param('message_id') messageId: string,
 	) {
-		const userId = req.user.userId
-		return this.messagesService.deleteMessage(parseInt(messageId), userId)
+		return this.messagesService.deleteMessage(
+			parseInt(messageId, 10),
+			req.user.userId,
+		);
 	}
 }

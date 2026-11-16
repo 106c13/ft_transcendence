@@ -6,8 +6,6 @@ import {
 	Param,
 	Query,
 	UseGuards,
-	BadRequestException,
-	NotFoundException,
 } from '@nestjs/common';
 import { GameService } from './game.service';
 import { RatingService } from './rating.service';
@@ -18,8 +16,8 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 export class GameController {
 	constructor(
 		private readonly gameService: GameService,
-		private readonly ratingService: RatingService
-	) { }
+		private readonly ratingService: RatingService,
+	) {}
 
 	@Get('history/:username')
 	async getHistory(@Param('username') username: string) {
@@ -28,11 +26,7 @@ export class GameController {
 
 	@Get('analyze/:id')
 	async analyzeMatch(@Param('id') id: string, @Query('force') force?: string) {
-		const matchId = parseInt(id, 10);
-		if (isNaN(matchId)) {
-			throw new BadRequestException('invalid_match_id');
-		}
-		return this.gameService.analyzeMatch(matchId, force === 'true');
+		return this.gameService.analyzeMatch(parseInt(id, 10), force === 'true');
 	}
 
 	@Post('analyze-pgn')
@@ -58,15 +52,6 @@ export class GameController {
 
 	@Get(':id')
 	async getMatch(@Param('id') id: string) {
-		const matchId = parseInt(id, 10);
-		if (isNaN(matchId)) {
-			throw new BadRequestException('invalid_match_id');
-		}
-		const match = await this.gameService.getMatchById(matchId);
-		if (!match) {
-			throw new NotFoundException('match_not_found');
-		}
-		return match;
+		return this.gameService.getMatchOrFail(parseInt(id, 10));
 	}
 }
-

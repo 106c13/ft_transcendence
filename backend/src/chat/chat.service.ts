@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Chat } from './chat.entity';
@@ -15,6 +15,67 @@ export class ChatService {
 		@InjectRepository(Message)
 		private messageRepository: Repository<Message>,
 	) {}
+
+	private formatChat(
+		chat: Chat,
+		unreadCount = 0,
+		lastMessage: Message | null = null,
+	) {
+		return {
+			id: chat.id,
+			chat_id: chat.chat_id,
+			user1_id: chat.user1_id,
+			user2_id: chat.user2_id,
+			created_at: chat.created_at,
+			user1: chat.user1
+				? {
+					id: chat.user1.id,
+					username: chat.user1.username,
+					avatar: chat.user1.avatar,
+				}
+				: null,
+			user2: chat.user2
+				? {
+					id: chat.user2.id,
+					username: chat.user2.username,
+					avatar: chat.user2.avatar,
+				}
+				: null,
+			unreadCount,
+			lastMessage,
+		};
+	}
+
+	async getOrCreateChat(currentUserId: number, otherUserId: number) {
+		if (isNaN(otherUserId)) {
+			throw new BadRequestException('invalid_user_id');
+		}
+
+		if (currentUserId === otherUserId) {
+			throw new BadRequestException('cannot_chat_with_yourself');
+		}
+
+		const id1 = Math.min(currentUserId, otherUserId);
+		const id2 = Math.max(currentUserId, otherUserId);
+		const chatId = `${id1}_${id2}`;
+
+		const existingChat = await this.getChat(chatId);
+		if (existingChat) {
+			return this.formatChat(existingChat);
+		}
+
+		const otherUser = await this.userRepository.findOne({ where: { id: otherUserId } });
+		if (!otherUser) {
+			throw new NotFoundException('user_not_found');
+		}
+
+		const newChat = await this.createChat(currentUserId, otherUserId);
+		if (!newChat) {
+			throw new NotFoundException('cannot_create_chat');
+		}
+
+		return this.formatChat(newChat);
+	}
 
 	async getChat(chatId: string) {
 		const chat = await this.chatRepository
@@ -80,29 +141,7 @@ export class ChatService {
 					order: { created_at: 'DESC' },
 				});
 
-				return {
-					id: chat.id,
-					chat_id: chat.chat_id,
-					user1_id: chat.user1_id,
-					user2_id: chat.user2_id,
-					created_at: chat.created_at,
-					user1: chat.user1
-						? {
-							id: chat.user1.id,
-							username: chat.user1.username,
-							avatar: chat.user1.avatar,
-						}
-						: null,
-					user2: chat.user2
-						? {
-							id: chat.user2.id,
-							username: chat.user2.username,
-							avatar: chat.user2.avatar,
-						}
-						: null,
-					unreadCount,
-					lastMessage,
-				};
+				return this.formatChat(chat, unreadCount, lastMessage);
 			}),
 		);
 	}

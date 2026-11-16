@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not } from 'typeorm';
 import { User } from '../users/user.entity';
@@ -1169,6 +1169,17 @@ export class GameService {
 		});
 	}
 
+	async getMatchOrFail(id: number): Promise<Match> {
+		if (isNaN(id)) {
+			throw new BadRequestException('invalid_match_id');
+		}
+		const match = await this.getMatchById(id);
+		if (!match) {
+			throw new NotFoundException('match_not_found');
+		}
+		return match;
+	}
+
 	async getGameSession(gameId: string, userId?: number): Promise<{
 		type: 'live' | 'finished' | 'not_found';
 		game?: ChessGame;
@@ -1211,6 +1222,10 @@ export class GameService {
 	}
 
 	async analyzeMatch(id: number, force = false): Promise<any> {
+		if (isNaN(id)) {
+			throw new BadRequestException('invalid_match_id');
+		}
+
 		const match = await this.matchRepo.findOne({
 			where: { id },
 			relations: ['white', 'black', 'winner'],
