@@ -2,11 +2,10 @@
 import {
 	WebSocketGateway,
 	WebSocketServer,
-	SubscribeMessage,
 	OnGatewayConnection,
 	OnGatewayDisconnect,
-} from '@nestjs/websockets'
-import { Server, Socket, Namespace } from 'socket.io'
+} from '@nestjs/websockets';
+import { Socket, Namespace } from 'socket.io';
 
 @WebSocketGateway({
 	namespace: '/chat',
@@ -15,28 +14,27 @@ import { Server, Socket, Namespace } from 'socket.io'
 		credentials: true,
 	},
 })
-
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
-	server: Namespace
-
-	private userSockets = new Map<number, string>()
+	server: Namespace;
 
 	handleConnection(client: Socket) {
-		const userId = client.handshake.query.userId
-		if (userId) {
-			this.userSockets.set(parseInt(userId as string), client.id)
-			console.log(`User ${userId} connected`)
+		const userIdStr = client.handshake.query.userId;
+		if (!userIdStr) return;
+
+		const userId = parseInt(userIdStr as string, 10);
+		if (!isNaN(userId)) {
+			client.join(`user_${userId}`);
 		}
 	}
 
 	handleDisconnect(client: Socket) {
-		for (const [userId, socketId] of this.userSockets.entries()) {
-			if (socketId === client.id) {
-				this.userSockets.delete(userId)
-				console.log(`User ${userId} disconnected`)
-				break
-			}
+		const userIdStr = client.handshake.query.userId;
+		if (!userIdStr) return;
+
+		const userId = parseInt(userIdStr as string, 10);
+		if (!isNaN(userId)) {
+			client.leave(`user_${userId}`);
 		}
 	}
 }

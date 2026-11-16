@@ -99,10 +99,9 @@ export function useChat(currentUserId: number | null) {
 					)
 				)
 			} else {
-				refreshChats()
-				window.dispatchEvent(new CustomEvent('messages_read'))
+				refreshChats();
 			}
-		})
+		});
 
 		socket.on('messages_read', (data: { chat_id: string; reader_id: number }) => {
 			if (data?.reader_id === currentUserId) {
@@ -110,10 +109,9 @@ export function useChat(currentUserId: number | null) {
 					prev.map(c =>
 						c.chat_id === data.chat_id ? { ...c, unreadCount: 0 } : c
 					)
-				)
-				window.dispatchEvent(new CustomEvent('messages_read'))
+				);
 			}
-		})
+		});
 
 		socket.on('disconnect', () => {})
 

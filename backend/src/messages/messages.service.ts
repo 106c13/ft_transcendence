@@ -86,11 +86,14 @@ export class MessagesService {
 			},
 		}
 
-		// Emit to receiver via WebSocket
-		this.chatGateway.server.emit('new_message', {
-			type: 'new_message',
-			message: messageResponse,
-		})
+		// Emit to chat participants via WebSocket
+		this.chatGateway.server
+			.to(`user_${chat.user1_id}`)
+			.to(`user_${chat.user2_id}`)
+			.emit('new_message', {
+				type: 'new_message',
+				message: messageResponse,
+			});
 
 		return {
 			id: message.id,
@@ -131,10 +134,15 @@ export class MessagesService {
 			})
 			.execute()
 
-		this.chatGateway.server.emit('messages_read', {
-			chat_id: chatId,
-			reader_id: userId,
-		})
+		const unreadCount = await this.getUnreadCount(userId);
+
+		this.chatGateway.server
+			.to(`user_${userId}`)
+			.emit('messages_read', {
+				chat_id: chatId,
+				reader_id: userId,
+				unread_count: unreadCount,
+			});
 
 		return { success: true }
 	}
