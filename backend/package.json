@@ -65,14 +65,15 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.3",
+    "typescript": "~6.0.2",
     "typescript-eslint": "^8.20.0"
   },
   "overrides": {
     "tinymce": "^8.0.0",
     "multer": "^2.5.0",
     "uuid": "^11.1.1",
-    "i18next-http-backend": "^4.0.10"
+    "i18next-http-backend": "^4.0.10",
+    "typescript": "~6.0.2"
   },
   "allowScripts": {
     "@parcel/watcher@2.6.0": true,
