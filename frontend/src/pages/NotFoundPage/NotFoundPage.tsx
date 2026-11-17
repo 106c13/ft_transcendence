@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '../../hooks/usePageTitle';
 import styles from './NotFoundPage.module.css';
@@ -14,9 +15,9 @@ const NotFoundPage = () => {
 				<p className={styles.notFoundMessage}>
 					{t('page_not_found_message')}
 				</p>
-				<a href="/home" className={styles.notFoundButton}>
+				<Link to="/home" className={styles.notFoundButton}>
 					{t('go_back_home')}
-				</a>
+				</Link>
 			</div>
 		</div>
 	);

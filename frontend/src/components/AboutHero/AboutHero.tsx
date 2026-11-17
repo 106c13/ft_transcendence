@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { DEVS } from '../../utils/aboutUtils';
 import Tooltip from '../Tooltip/Tooltip';
@@ -16,38 +17,38 @@ const AboutHero = () => {
 					components={{
 						armanLink: (
 							<Tooltip content={t(DEVS.arman.nameKey)} position="top" inline>
-								<a
-									href={DEVS.arman.intraUrl}
+								<Link
+									to={DEVS.arman.intraUrl}
 									target="_blank"
 									rel="noopener noreferrer"
 									className={styles.nicknameLink}
 								>
 									{DEVS.arman.handle}
-								</a>
+								</Link>
 							</Tooltip>
 						),
 						narekLink: (
 							<Tooltip content={t(DEVS.narek.nameKey)} position="top" inline>
-								<a
-									href={DEVS.narek.intraUrl}
+								<Link
+									to={DEVS.narek.intraUrl}
 									target="_blank"
 									rel="noopener noreferrer"
 									className={styles.nicknameLink}
 								>
 									{DEVS.narek.handle}
-								</a>
+								</Link>
 							</Tooltip>
 						),
 						hakobLink: (
 							<Tooltip content={t(DEVS.hakob.nameKey)} position="top" inline>
-								<a
-									href={DEVS.hakob.intraUrl}
+								<Link
+									to={DEVS.hakob.intraUrl}
 									target="_blank"
 									rel="noopener noreferrer"
 									className={styles.nicknameLink}
 								>
 									{DEVS.hakob.handle}
-								</a>
+								</Link>
 							</Tooltip>
 						),
 					}}

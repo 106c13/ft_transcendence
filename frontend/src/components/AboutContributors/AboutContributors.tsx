@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ExternalLink } from 'lucide-react';
 import { MOVE_STEPS, DEVS, getTranslatedDev } from '../../utils/aboutUtils';
@@ -85,8 +86,8 @@ const AboutContributors = () => {
 								</div>
 							</div>
 
-							<a
-								href={dev.intraUrl}
+							<Link
+								to={dev.intraUrl}
 								target="_blank"
 								rel="noopener noreferrer"
 								className={styles.intraButton}
@@ -94,7 +95,7 @@ const AboutContributors = () => {
 							>
 								<span>{dev.handle}</span>
 								<ExternalLink size={12} className={styles.externalIcon} aria-hidden="true" />
-							</a>
+							</Link>
 						</div>
 
 						<p className={styles.statementText}>{dev.statement}</p>
