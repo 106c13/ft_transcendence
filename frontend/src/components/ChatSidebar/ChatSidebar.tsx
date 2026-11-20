@@ -17,7 +17,7 @@ type Props = {
 	isMobileHidden?: boolean;
 };
 
-function formatChatTime(dateStr?: string): string {
+function formatChatTime(dateStr?: string, locale = 'en'): string {
 	if (!dateStr) return '';
 	try {
 		const date = new Date(dateStr);
@@ -29,9 +29,9 @@ function formatChatTime(dateStr?: string): string {
 			date.getFullYear() === now.getFullYear();
 
 		if (isToday) {
-			return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+			return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 		}
-		return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+		return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
 	} catch {
 		return '';
 	}
@@ -47,7 +47,8 @@ const ChatSidebar = ({
 	friendStatusMap,
 	isMobileHidden = false,
 }: Props) => {
-	const { t } = useTranslation()
+	const { t, i18n } = useTranslation();
+	const locale = i18n.resolvedLanguage || i18n.language || 'en';
 	const [searchQuery, setSearchQuery] = useState('')
 
 	const getOtherUser = useCallback(
@@ -129,7 +130,7 @@ const ChatSidebar = ({
 
 					const lastMsgTime =
 						typeof chat.lastMessage === 'object' && chat.lastMessage?.created_at
-							? formatChatTime(chat.lastMessage.created_at)
+							? formatChatTime(chat.lastMessage.created_at, locale)
 							: ''
 
 					return (

@@ -21,11 +21,11 @@ type Props = {
 	onSelectFriend?: (friend: Friend) => void
 }
 
-function formatMessageTime(dateStr: string): string {
+function formatMessageTime(dateStr: string, locale = 'en'): string {
 	try {
 		const date = new Date(dateStr)
 		if (isNaN(date.getTime())) return ''
-		return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+		return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 	} catch {
 		return ''
 	}
@@ -45,7 +45,8 @@ function ChatMain({
 	isMobileHidden = false,
 	onSelectFriend,
 }: Props) {
-	const { t } = useTranslation()
+	const { t, i18n } = useTranslation();
+	const locale = i18n.resolvedLanguage || i18n.language || 'en';
 	const navigate = useNavigate()
 	const messagesContainerRef = useRef<HTMLDivElement>(null)
 	const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -206,7 +207,7 @@ function ChatMain({
 							>
 								<div className={styles.messageBubble}>{msg.content}</div>
 								<div className={styles.messageTime}>
-									{formatMessageTime(msg.created_at)}
+									{formatMessageTime(msg.created_at, locale)}
 								</div>
 							</div>
 						))}

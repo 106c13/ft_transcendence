@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { User, RatingInfo } from '../utils/profileUtils';
 import type {
 	MatchRecord,
@@ -20,6 +21,9 @@ export function useRatingHistory(
 	username: string,
 	ratings?: User['ratings']
 ) {
+	const { i18n } = useTranslation();
+	const locale = i18n.resolvedLanguage || i18n.language || 'en';
+
 	return useMemo(() => {
 		const categories: RatingCategory[] = ['bullet', 'blitz', 'rapid']
 		const result = {} as Record<RatingCategory, ModeRatingHistory>
@@ -62,11 +66,11 @@ export function useRatingHistory(
 							id: m.id,
 							date: m.played_at,
 							timestamp: dateObj.getTime(),
-							displayDate: dateObj.toLocaleDateString(undefined, {
+							displayDate: dateObj.toLocaleDateString(locale, {
 								month: 'short',
 								day: 'numeric',
 							}),
-							fullDateTime: dateObj.toLocaleString(undefined, {
+							fullDateTime: dateObj.toLocaleString(locale, {
 								month: 'short',
 								day: 'numeric',
 								hour: '2-digit',
@@ -119,12 +123,12 @@ export function useRatingHistory(
 
 				last7Days.push({
 					date: targetDate.toISOString(),
-					fullDate: targetDate.toLocaleDateString(undefined, {
+					fullDate: targetDate.toLocaleDateString(locale, {
 						weekday: 'short',
 						month: 'short',
 						day: 'numeric',
 					}),
-					label: targetDate.toLocaleDateString(undefined, { weekday: 'short' }),
+					label: targetDate.toLocaleDateString(locale, { weekday: 'short' }),
 					rating: ratingOnDay,
 				})
 			}
@@ -148,6 +152,6 @@ export function useRatingHistory(
 		}
 
 		return result
-	}, [matches, username, ratings])
+	}, [matches, username, ratings, locale]);
 }
 

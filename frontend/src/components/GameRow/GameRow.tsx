@@ -21,7 +21,8 @@ function getAvatarUrl(avatar?: string | null) {
 }
 
 const GameRow = ({ match, username }: Props) => {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
+	const locale = i18n.resolvedLanguage || i18n.language || 'en';
 	const navigate = useNavigate();
 
 	const isListOwnerWhite = username === match.white?.username
@@ -43,15 +44,15 @@ const GameRow = ({ match, username }: Props) => {
 	let timeStr = ''
 	try {
 		const d = new Date(match.played_at)
-		dateStr = d.toLocaleDateString(undefined, {
+		dateStr = d.toLocaleDateString(locale, {
 			month: 'short',
 			day: 'numeric',
 			year: 'numeric',
-		})
-		timeStr = d.toLocaleTimeString(undefined, {
+		});
+		timeStr = d.toLocaleTimeString(locale, {
 			hour: '2-digit',
 			minute: '2-digit',
-		})
+		});
 	} catch {
 		// Fallback to raw date string
 	}

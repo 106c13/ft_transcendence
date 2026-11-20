@@ -41,7 +41,8 @@ const ProfileHeader = ({
     onLogout,
     onSettings,
 }: Props) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const locale = i18n.resolvedLanguage || i18n.language || 'en';
     const navigate = useNavigate();
 
     const handleMessageClick = () => {
@@ -114,7 +115,7 @@ const ProfileHeader = ({
                             <span>{t('joined')}:</span>
                             <span className={styles.joinedDate}>
                                 {user.created_at
-                                    ? new Date(user.created_at).toLocaleDateString()
+                                    ? new Date(user.created_at).toLocaleDateString(locale)
                                     : t('unknown')}
                             </span>
                         </div>

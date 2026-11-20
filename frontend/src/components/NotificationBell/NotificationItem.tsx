@@ -27,7 +27,8 @@ const NotificationItem = ({
     onDelete,
     onActionCompleted,
 }: Props) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const locale = i18n.resolvedLanguage || i18n.language || 'en';
     const { toast } = useToast();
     const [actionLoading, setActionLoading] = useState(false);
     const [actionFeedback, setActionFeedback] = useState<'accepted' | 'declined' | null>(null);
@@ -135,7 +136,7 @@ const NotificationItem = ({
                 )}
 
                 <div className={styles.notificationTime}>
-                    {formatRelativeTime(notification.created_at, t)}
+                    {formatRelativeTime(notification.created_at, t, locale)}
                 </div>
             </div>
 

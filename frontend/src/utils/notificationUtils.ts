@@ -62,7 +62,7 @@ export const renderNotificationMessage = (msg: string, t: TFunction): string => 
     return String(t(msg, msg));
 };
 
-export const formatRelativeTime = (dateStr: string, t: TFunction): string => {
+export const formatRelativeTime = (dateStr: string, t: TFunction, locale?: string): string => {
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return '';
 
@@ -78,5 +78,5 @@ export const formatRelativeTime = (dateStr: string, t: TFunction): string => {
     if (diffDays === 1) return t('yesterday');
     if (diffDays < 7) return t('days_ago', { count: diffDays });
 
-    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    return date.toLocaleDateString(locale || 'en', { month: 'short', day: 'numeric' });
 };

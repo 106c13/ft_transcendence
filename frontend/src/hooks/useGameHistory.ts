@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { downloadPgn, type MatchRecord } from '../utils/gameUtils';
 
 export function useGameHistory(username: string) {
-	const { t } = useTranslation()
+	const { t, i18n } = useTranslation();
+	const locale = i18n.resolvedLanguage || i18n.language || 'en';
 	const [matches, setMatches] = useState<MatchRecord[]>([])
 	const [loading, setLoading] = useState(true)
 
@@ -58,12 +59,12 @@ export function useGameHistory(username: string) {
 	const formatDate = (dateStr: string) => {
 		try {
 			const d = new Date(dateStr)
-			return d.toLocaleDateString(undefined, {
+			return d.toLocaleDateString(locale, {
 				month: 'short',
 				day: 'numeric',
 				hour: '2-digit',
 				minute: '2-digit',
-			})
+			});
 		} catch {
 			return dateStr
 		}
