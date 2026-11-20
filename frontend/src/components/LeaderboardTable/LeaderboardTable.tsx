@@ -15,7 +15,6 @@ interface LeaderboardTableProps {
 	order: 'asc' | 'desc';
 	onSort: (field: string) => void;
 	onPlayerClick: (username: string) => void;
-	onResetFilters: () => void;
 }
 
 const LeaderboardTable = ({
@@ -25,7 +24,6 @@ const LeaderboardTable = ({
 	order,
 	onSort,
 	onPlayerClick,
-	onResetFilters,
 }: LeaderboardTableProps) => {
 	const { t } = useTranslation();
 
@@ -52,13 +50,6 @@ const LeaderboardTable = ({
 					<p className={styles.emptyText}>
 						{t('no_players_filter_desc')}
 					</p>
-					<button
-						className={styles.resetBtn}
-						onClick={onResetFilters}
-						type="button"
-					>
-						{t('reset_filters')}
-					</button>
 				</div>
 			) : (
 				<div

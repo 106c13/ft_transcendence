@@ -145,13 +145,11 @@ const LeaderboardPage = () => {
 
 	const activeFilterCount = useMemo(() => {
 		let count = 0;
-		if (debouncedSearch) count++;
-		if (mode !== 'all') count++;
 		if (minWinRate > 0) count++;
 		if (status !== 'all') count++;
 		if (sortBy !== 'leaderboardRating' || order !== 'desc') count++;
 		return count;
-	}, [debouncedSearch, mode, minWinRate, status, sortBy, order]);
+	}, [minWinRate, status, sortBy, order]);
 
 	useEffect(() => {
 		const fetchTopChampions = async () => {
@@ -206,7 +204,6 @@ const LeaderboardPage = () => {
 				<LeaderboardToolbar
 					search={search}
 					onSearchChange={setSearch}
-					debouncedSearch={debouncedSearch}
 					mode={mode}
 					onModeChange={(newMode) => {
 						setMode(newMode);
@@ -245,7 +242,6 @@ const LeaderboardPage = () => {
 					order={order}
 					onSort={handleSort}
 					onPlayerClick={(username) => navigate(`/profile/${username}`)}
-					onResetFilters={handleResetFilters}
 				/>
 
 				<LeaderboardPagination

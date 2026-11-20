@@ -56,7 +56,7 @@ const CustomSelect = <T extends string = string>({
 				type="button"
 				className={`${styles.triggerButton} ${isOpen ? styles.triggerOpen : ''}`}
 				onClick={() => setIsOpen((prev) => !prev)}
-				style={minWidth ? { minWidth } : undefined}
+				style={minWidth !== undefined ? { minWidth } : undefined}
 				aria-haspopup="listbox"
 				aria-expanded={isOpen}
 			>

@@ -1,16 +1,15 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, X, SlidersHorizontal, ArrowDown, ArrowUp, Circle } from 'lucide-react';
+import { Search, X, SlidersHorizontal, ArrowDown, ArrowUp, Circle, RotateCcw } from 'lucide-react';
 import CustomSelect from '../CustomSelect/CustomSelect';
 import GameModeIcon from '../GameModeIcon/GameModeIcon';
 import type { SelectOption } from '../../utils/selectUtils';
-import styles from '../../pages/LeaderboardPage/LeaderboardPage.module.css';
+import styles from './LeaderboardToolbar.module.css';
 
 
 interface LeaderboardToolbarProps {
 	search: string;
 	onSearchChange: (value: string) => void;
-	debouncedSearch: string;
 	mode: 'all' | 'bullet' | 'blitz' | 'rapid';
 	onModeChange: (mode: 'all' | 'bullet' | 'blitz' | 'rapid') => void;
 	showFilters: boolean;
@@ -30,7 +29,6 @@ interface LeaderboardToolbarProps {
 const LeaderboardToolbar = ({
 	search,
 	onSearchChange,
-	debouncedSearch,
 	mode,
 	onModeChange,
 	showFilters,
@@ -47,6 +45,20 @@ const LeaderboardToolbar = ({
 	onResetFilters,
 }: LeaderboardToolbarProps) => {
 	const { t } = useTranslation();
+
+	const modeTabs: {
+		value: 'all' | 'bullet' | 'blitz' | 'rapid';
+		label: string;
+		icon?: boolean;
+	}[] = useMemo(
+		() => [
+			{ value: 'all', label: t('all_formats') },
+			{ value: 'bullet', label: t('bullet_rating'), icon: true },
+			{ value: 'blitz', label: t('blitz_rating'), icon: true },
+			{ value: 'rapid', label: t('rapid_rating'), icon: true },
+		],
+		[t]
+	);
 
 	const winRateOptions: SelectOption<string>[] = useMemo(
 		() => [
@@ -106,9 +118,11 @@ const LeaderboardToolbar = ({
 		[t]
 	);
 
+	const hasAnyActiveFilter = Boolean(search.trim()) || mode !== 'all' || activeFilterCount > 0;
+
 	return (
 		<div className={styles.toolbarCard}>
-			<div className={styles.primaryControlsRow}>
+			<div className={`${styles.primaryControlsRow} ${showFilters ? styles.primaryControlsRowOpen : ''}`}>
 				<div className={styles.searchBox}>
 					<Search size={16} className={styles.searchIcon} aria-hidden="true" />
 					<input
@@ -123,7 +137,7 @@ const LeaderboardToolbar = ({
 							className={styles.clearSearchBtn}
 							onClick={() => onSearchChange('')}
 							type="button"
-							aria-label="Clear search"
+							aria-label={t('clear')}
 						>
 							<X size={14} aria-hidden="true" />
 						</button>
@@ -131,55 +145,24 @@ const LeaderboardToolbar = ({
 				</div>
 
 				<div className={styles.modeButtonGroup}>
-					<button
-						className={`${styles.modeBtn} ${mode === 'all' ? styles.modeBtnActive : ''}`}
-						onClick={(e) => {
-							e.currentTarget.blur();
-							onModeChange('all');
-						}}
-						type="button"
-					>
-						<span>{t('all_formats')}</span>
-					</button>
-					<button
-						className={`${styles.modeBtn} ${mode === 'bullet' ? styles.modeBtnActive : ''}`}
-						onClick={(e) => {
-							e.currentTarget.blur();
-							onModeChange('bullet');
-						}}
-						type="button"
-					>
-						<span className={styles.modeBtnIcon}>
-							<GameModeIcon mode="bullet" size={14} />
-						</span>
-						<span>{t('bullet')}</span>
-					</button>
-					<button
-						className={`${styles.modeBtn} ${mode === 'blitz' ? styles.modeBtnActive : ''}`}
-						onClick={(e) => {
-							e.currentTarget.blur();
-							onModeChange('blitz');
-						}}
-						type="button"
-					>
-						<span className={styles.modeBtnIcon}>
-							<GameModeIcon mode="blitz" size={14} />
-						</span>
-						<span>{t('blitz')}</span>
-					</button>
-					<button
-						className={`${styles.modeBtn} ${mode === 'rapid' ? styles.modeBtnActive : ''}`}
-						onClick={(e) => {
-							e.currentTarget.blur();
-							onModeChange('rapid');
-						}}
-						type="button"
-					>
-						<span className={styles.modeBtnIcon}>
-							<GameModeIcon mode="rapid" size={14} />
-						</span>
-						<span>{t('rapid')}</span>
-					</button>
+					{modeTabs.map((tab) => (
+						<button
+							key={tab.value}
+							className={`${styles.modeBtn} ${mode === tab.value ? styles.modeBtnActive : ''}`}
+							onClick={(e) => {
+								e.currentTarget.blur();
+								onModeChange(tab.value);
+							}}
+							type="button"
+						>
+							{tab.icon && (
+								<span className={styles.modeBtnIcon}>
+									<GameModeIcon mode={tab.value} size={14} />
+								</span>
+							)}
+							<span>{tab.label}</span>
+						</button>
+					))}
 				</div>
 
 				<button
@@ -189,6 +172,7 @@ const LeaderboardToolbar = ({
 						onToggleFilters();
 					}}
 					type="button"
+					aria-expanded={showFilters}
 				>
 					<SlidersHorizontal size={14} aria-hidden="true" />
 					<span>{t('filters')}</span>
@@ -201,45 +185,53 @@ const LeaderboardToolbar = ({
 			<div className={`${styles.drawerWrapper} ${showFilters ? styles.drawerOpen : ''}`}>
 				<div className={styles.drawerInner}>
 					<div className={styles.advancedDrawer}>
-						<div className={styles.drawerRow}>
-							<div className={styles.drawerFiltersGroup}>
-								<div className={styles.filterField}>
-									<label className={styles.filterLabel}>{t('min_win_rate')}</label>
-									<CustomSelect<string>
-										value={String(minWinRate)}
-										options={winRateOptions}
-										onChange={(val) => onMinWinRateChange(Number(val))}
-									/>
-								</div>
-
-								<div className={styles.filterField}>
-									<label className={styles.filterLabel}>{t('status')}</label>
-									<CustomSelect<'all' | 'online' | 'ingame'>
-										value={status}
-										options={statusOptions}
-										onChange={onStatusChange}
-									/>
-								</div>
-
-								<div className={styles.filterField}>
-									<label className={styles.filterLabel}>{t('sort_by')}</label>
-									<CustomSelect<string>
-										value={sortBy}
-										options={sortOptions}
-										onChange={onSortByChange}
-									/>
-								</div>
-
-								<div className={styles.filterField}>
-									<label className={styles.filterLabel}>{t('sort_direction')}</label>
-									<CustomSelect<'asc' | 'desc'>
-										value={order}
-										options={orderOptions}
-										onChange={onOrderChange}
-									/>
-								</div>
+						<div className={styles.drawerFiltersGrid}>
+							<div className={styles.filterField}>
+								<label className={styles.filterLabel}>{t('min_win_rate')}</label>
+								<CustomSelect<string>
+									className={styles.filterSelect}
+									minWidth={0}
+									value={String(minWinRate)}
+									options={winRateOptions}
+									onChange={(val) => onMinWinRateChange(Number(val))}
+								/>
 							</div>
 
+							<div className={styles.filterField}>
+								<label className={styles.filterLabel}>{t('status')}</label>
+								<CustomSelect<'all' | 'online' | 'ingame'>
+									className={styles.filterSelect}
+									minWidth={0}
+									value={status}
+									options={statusOptions}
+									onChange={onStatusChange}
+								/>
+							</div>
+
+							<div className={styles.filterField}>
+								<label className={styles.filterLabel}>{t('sort_by')}</label>
+								<CustomSelect<string>
+									className={styles.filterSelect}
+									minWidth={0}
+									value={sortBy}
+									options={sortOptions}
+									onChange={onSortByChange}
+								/>
+							</div>
+
+							<div className={styles.filterField}>
+								<label className={styles.filterLabel}>{t('sort_direction')}</label>
+								<CustomSelect<'asc' | 'desc'>
+									className={styles.filterSelect}
+									minWidth={0}
+									value={order}
+									options={orderOptions}
+									onChange={onOrderChange}
+								/>
+							</div>
+						</div>
+
+						<div className={styles.drawerFooter}>
 							<button
 								className={styles.resetBtn}
 								onClick={(e) => {
@@ -247,98 +239,12 @@ const LeaderboardToolbar = ({
 									onResetFilters();
 								}}
 								type="button"
+								disabled={!hasAnyActiveFilter}
 							>
-								↺ {t('reset_all_filters')}
+								<RotateCcw size={14} aria-hidden="true" />
+								<span>{t('reset_all_filters')}</span>
 							</button>
 						</div>
-					</div>
-				</div>
-			</div>
-
-			<div className={`${styles.chipsWrapper} ${activeFilterCount > 0 ? styles.hasChips : ''}`}>
-				<div className={styles.chipsInner}>
-					<div className={styles.activeChipsRow}>
-						{debouncedSearch && (
-							<span className={styles.activeChip}>
-								User: {debouncedSearch}
-								<button
-									className={styles.chipCloseBtn}
-									onClick={(e) => {
-										e.currentTarget.blur();
-										onSearchChange('');
-									}}
-									type="button"
-									aria-label="Remove search filter"
-								>
-									<X size={12} aria-hidden="true" />
-								</button>
-							</span>
-						)}
-						{mode !== 'all' && (
-							<span className={styles.activeChip}>
-								Mode: {mode.toUpperCase()}
-								<button
-									className={styles.chipCloseBtn}
-									onClick={(e) => {
-										e.currentTarget.blur();
-										onModeChange('all');
-									}}
-									type="button"
-									aria-label="Remove mode filter"
-								>
-									<X size={12} aria-hidden="true" />
-								</button>
-							</span>
-						)}
-						{minWinRate > 0 && (
-							<span className={styles.activeChip}>
-								WR: ≥{minWinRate}%
-								<button
-									className={styles.chipCloseBtn}
-									onClick={(e) => {
-										e.currentTarget.blur();
-										onMinWinRateChange(0);
-									}}
-									type="button"
-									aria-label="Remove win rate filter"
-								>
-									<X size={12} aria-hidden="true" />
-								</button>
-							</span>
-						)}
-						{status !== 'all' && (
-							<span className={styles.activeChip}>
-								Status: {status}
-								<button
-									className={styles.chipCloseBtn}
-									onClick={(e) => {
-										e.currentTarget.blur();
-										onStatusChange('all');
-									}}
-									type="button"
-									aria-label="Remove status filter"
-								>
-									<X size={12} aria-hidden="true" />
-								</button>
-							</span>
-						)}
-						{(sortBy !== 'leaderboardRating' || order !== 'desc') && (
-							<span className={styles.activeChip}>
-								Sort: {sortBy === 'highestRating' ? 'Peak Elo' : sortBy} ({order})
-								<button
-									className={styles.chipCloseBtn}
-									onClick={(e) => {
-										e.currentTarget.blur();
-										onSortByChange('leaderboardRating');
-										onOrderChange('desc');
-									}}
-									type="button"
-									aria-label="Remove sort filter"
-								>
-									<X size={12} aria-hidden="true" />
-								</button>
-							</span>
-						)}
 					</div>
 				</div>
 			</div>
