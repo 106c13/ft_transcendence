@@ -115,7 +115,7 @@ export const DEVS: Record<DevKey, DevProfile> = {
 		statementKey: 'about_dev_hakob_statement',
 		mottoKey: 'about_dev_hakob_motto',
 		tacticalRoleKey: 'about_tactical_role_hakob',
-		tagKeys: ['tag_project_foundation', 'tag_jwt_2fa', 'tag_chat_i18n'],
+		tagKeys: ['tag_project_foundation', 'tag_jwt_auth', 'tag_chat_i18n'],
 		highlightKeys: [
 			'about_dev_hakob_highlight_1',
 			'about_dev_hakob_highlight_2',
