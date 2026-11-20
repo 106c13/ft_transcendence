@@ -1,12 +1,14 @@
 .customSelect {
 	position: relative;
 	display: inline-block;
+	max-width: 100%;
 	user-select: none;
+	box-sizing: border-box;
 }
 
 .selectOpen {
 	position: relative;
-	z-index: 100;
+	z-index: var(--z-dropdown);
 }
 
 .triggerButton {
@@ -14,79 +16,70 @@
 	align-items: center;
 	justify-content: center;
 	position: relative;
-	background: #0F172A;
-	border: 1px solid rgba(148, 163, 184, 0.22);
-	border-radius: 8px;
-	color: #F8FAFC;
-	padding: 6px 32px 6px 32px;
-	font-size: 12.5px;
+	max-width: 100%;
+	box-sizing: border-box;
+	background: var(--color-slate-900);
+	border: 1px solid color-mix(in srgb, var(--color-slate-400) 22%, transparent);
+	border-radius: var(--radius-lg);
+	color: var(--color-slate-50);
+	padding: var(--padding-sm) var(--padding-3xl);
+	font-size: var(--font-size-sm);
 	font-weight: 600;
 	cursor: pointer;
 	outline: none;
 	min-width: 125px;
-	transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	transition: border-color var(--transition-smooth), background var(--transition-smooth), box-shadow var(--transition-smooth);
 	line-height: 1;
 }
 
 .triggerButton:hover {
-	border-color: rgba(96, 165, 250, 0.45);
-	background: #152238;
+	border-color: color-mix(in srgb, var(--color-blue-400) 45%, transparent);
+	background: var(--color-bg-surface);
 }
 
+.triggerButton:focus-visible,
 .triggerOpen {
-	border-color: #3B82F6;
-	box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
-	background: #152238;
-}
-
-.triggerWithIcon {
-	padding: 6px 30px 6px 12px;
+	border-color: var(--color-blue-500);
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-blue-500) 25%, transparent);
+	background: var(--color-bg-surface);
 }
 
 .selectedContent {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 6px;
-	width: 100%;
-	text-align: center;
-	line-height: 1.2;
-}
-
-.selectedContentWithIcon {
-	justify-content: flex-start;
-	text-align: left;
 	gap: var(--gap-sm);
+	width: 100%;
+	min-width: 0;
+	min-height: 16px;
+	text-align: center;
+	line-height: 1.25;
 }
 
 .iconSlot {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 16px;
-	min-width: 16px;
 	height: 16px;
 	flex-shrink: 0;
-	color: var(--color-slate-400);
-	transition: color var(--transition-fast);
-}
-
-.optionIcon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 13px;
+	font-size: var(--font-size-base);
 	line-height: 1;
 	color: var(--color-slate-400);
 	transition: color var(--transition-fast);
 }
 
+.iconSlot svg {
+	display: block;
+	flex-shrink: 0;
+}
+
 .triggerButton:hover .iconSlot,
-.triggerButton:hover .optionIcon {
+.triggerOpen .iconSlot {
 	color: var(--color-slate-100);
 }
 
 .optionLabel {
+	min-width: 0;
 	white-space: nowrap;
 	font-weight: 600;
 	overflow: hidden;
@@ -95,48 +88,50 @@
 
 .chevron {
 	position: absolute;
-	right: 14px;
+	right: 12px;
 	top: 50%;
 	transform: translateY(-50%);
-	color: #94A3B8;
-	font-size: 11px;
+	color: var(--color-slate-400);
+	font-size: var(--font-size-xs);
 	pointer-events: none;
-	transition: transform 0.2s ease, color 0.2s ease;
+	transition: transform var(--transition-normal), color var(--transition-normal);
 	line-height: 1;
 }
 
 .chevronOpen {
 	transform: translateY(-50%) rotate(180deg);
-	color: #60A5FA;
+	color: var(--color-blue-400);
 }
 
 .dropdownMenu {
 	position: absolute;
-	top: calc(100% + 5px);
+	top: 100%;
 	left: 50%;
-	transform: translateX(-50%);
+	transform: translateX(-50%) translateY(4px);
 	min-width: 100%;
 	width: max-content;
-	background: #0F172A;
-	border: 1px solid rgba(148, 163, 184, 0.22);
-	border-radius: 8px;
-	padding: 4px;
-	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(148, 163, 184, 0.08);
-	z-index: 200;
+	max-width: 90vw;
+	box-sizing: border-box;
+	background: var(--color-slate-900);
+	border: 1px solid color-mix(in srgb, var(--color-slate-400) 22%, transparent);
+	border-radius: var(--radius-lg);
+	padding: var(--padding-xs);
+	box-shadow: var(--shadow-lg);
+	z-index: var(--z-sticky);
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
-	animation: popIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+	gap: var(--gap-xs);
+	animation: popIn var(--transition-fast);
 }
 
 @keyframes popIn {
 	from {
 		opacity: 0;
-		transform: translateX(-50%) translateY(-4px) scale(0.97);
+		transform: translateX(-50%) translateY(0) scale(0.97);
 	}
 	to {
 		opacity: 1;
-		transform: translateX(-50%) translateY(0) scale(1);
+		transform: translateX(-50%) translateY(4px) scale(1);
 	}
 }
 
@@ -144,44 +139,39 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 7px;
-	padding: 7px 14px;
-	border-radius: 6px;
+	gap: var(--gap-sm);
+	width: 100%;
+	min-width: 0;
+	min-height: 16px;
+	box-sizing: border-box;
+	padding: var(--padding-sm) var(--padding-md);
+	border-radius: var(--radius-md);
 	cursor: pointer;
 	text-align: center;
-	font-size: 12.5px;
+	font-size: var(--font-size-sm);
 	font-weight: 600;
-	color: #CBD5E1;
-	transition: all 0.15s ease;
+	color: var(--color-slate-300);
+	transition: background var(--transition-fast), color var(--transition-fast);
 	white-space: nowrap;
-	line-height: 1.2;
-}
-
-.menuItemWithIcon {
-	justify-content: flex-start;
-	text-align: left;
-	gap: var(--gap-sm);
-	padding: 7px 12px;
+	line-height: 1.25;
 }
 
 .menuItem:hover {
-	background: #1E293B;
-	color: #F8FAFC;
+	background: var(--color-slate-800);
+	color: var(--color-slate-50);
 }
 
-.menuItem:hover .iconSlot,
-.menuItem:hover .optionIcon {
+.menuItem:hover .iconSlot {
 	color: var(--color-slate-100);
 }
 
 .menuItemActive {
-	background: rgba(59, 130, 246, 0.15);
-	color: #60A5FA;
+	background: color-mix(in srgb, var(--color-blue-500) 15%, transparent);
+	color: var(--color-blue-400);
 	font-weight: 700;
 }
 
-.menuItemActive .iconSlot,
-.menuItemActive .optionIcon {
+.menuItemActive .iconSlot {
 	color: var(--color-blue-400);
 }
 
