@@ -106,19 +106,10 @@ const LeaderboardTable = ({
 								</th>
 								<th
 									className={`${styles.sortableHeader} ${styles.recordCol}`}
-									onClick={(e) => handleHeaderClick(e, 'wins')}
-								>
-									{t('record_wdl')}
-									{sortBy === 'wins' && (
-										<span className={styles.sortArrow}>{order === 'asc' ? '▲' : '▼'}</span>
-									)}
-								</th>
-								<th
-									className={styles.sortableHeader}
-									onClick={(e) => handleHeaderClick(e, 'winRate')}
+									onClick={(e) => handleHeaderClick(e, sortBy === 'wins' ? 'wins' : 'winRate')}
 								>
 									{t('winrate')}
-									{sortBy === 'winRate' && (
+									{(sortBy === 'winRate' || sortBy === 'wins') && (
 										<span className={styles.sortArrow}>{order === 'asc' ? '▲' : '▼'}</span>
 									)}
 								</th>
@@ -134,7 +125,7 @@ const LeaderboardTable = ({
 									<td className={styles.rankCell}>
 										{player.rank <= 3 ? (
 											<span className={styles.rankBadgePodium}>
-												<TopRankBadge rank={player.rank} size="md" />
+												<TopRankBadge rank={player.rank} size="md" tooltipAlign="left" />
 											</span>
 										) : (
 											<span className={styles.rankNumber}>#{player.rank}</span>
@@ -233,24 +224,33 @@ const LeaderboardTable = ({
 									</td>
 
 									<td className={styles.recordCell}>
-										<span className={styles.recordText}>
-											<span className={styles.winsCount}>{player.stats.wins}W</span>
-											<span className={styles.slashDivider}>/</span>
-											<span className={styles.drawsCount}>{player.stats.draws}D</span>
-											<span className={styles.slashDivider}>/</span>
-											<span className={styles.lossesCount}>{player.stats.losses}L</span>
-										</span>
-									</td>
-
-									<td>
-										<div className={styles.winRateWrapper}>
-											<span className={styles.winRateText}>{player.stats.winRate}%</span>
-											<div className={styles.winRateBarTrack}>
-												<div
-													className={styles.winRateBarFill}
-													style={{ width: `${Math.min(100, Math.max(0, player.stats.winRate))}%` }}
-												/>
-											</div>
+										<div className={styles.winrateCol}>
+											<span
+												className={`${styles.winrateValue} ${
+													player.stats.totalGames === 0 ? styles.winrateUnrated : ''
+												}`}
+											>
+												{player.stats.totalGames === 0 ? '—' : `${player.stats.winRate}%`}
+											</span>
+											{player.stats.totalGames > 0 && (
+												<div className={styles.recordSub}>
+													<span className={styles.winsCount}>
+														{player.stats.wins}{t('wins_short')}
+													</span>
+													<span>/</span>
+													{player.stats.draws > 0 && (
+														<>
+															<span className={styles.drawsCount}>
+																{player.stats.draws}{t('draws_short')}
+															</span>
+															<span>/</span>
+														</>
+													)}
+													<span className={styles.lossesCount}>
+														{player.stats.losses}{t('losses_short')}
+													</span>
+												</div>
+											)}
 										</div>
 									</td>
 								</tr>

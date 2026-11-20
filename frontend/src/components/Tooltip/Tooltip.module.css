@@ -13,7 +13,7 @@
 	position: absolute;
 	left: 50%;
 	background: var(--color-slate-900);
-	border: 1px solid rgba(148, 163, 184, 0.25);
+	border: 1px solid var(--color-slate-700);
 	color: var(--color-slate-50);
 	font-size: var(--font-size-sm);
 	font-weight: 600;
@@ -24,7 +24,7 @@
 	opacity: 0;
 	visibility: hidden;
 	transition: opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+	box-shadow: var(--shadow-lg);
 	z-index: var(--z-modal);
 }
 
@@ -38,31 +38,70 @@
 }
 
 .top {
-	bottom: calc(100% + 9px);
+	bottom: 100%;
+	margin-bottom: var(--margin-sm);
 	transform: translateX(-50%) translateY(4px);
 }
 
 .top::after {
 	bottom: -5px;
 	transform: translateX(-50%) rotate(45deg);
-	border-right: 1px solid rgba(148, 163, 184, 0.25);
-	border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+	border-right: 1px solid var(--color-slate-700);
+	border-bottom: 1px solid var(--color-slate-700);
 }
 
 .bottom {
-	top: calc(100% + 9px);
-	transform: translateX(-50%) translateY(-4px);
+	top: 100%;
+	transform: translateX(-50%) translateY(4px);
 }
 
 .bottom::after {
 	top: -5px;
 	transform: translateX(-50%) rotate(45deg);
-	border-left: 1px solid rgba(148, 163, 184, 0.25);
-	border-top: 1px solid rgba(148, 163, 184, 0.25);
+	border-left: 1px solid var(--color-slate-700);
+	border-top: 1px solid var(--color-slate-700);
 }
 
 .navbarOffset.bottom {
 	top: 64px;
+	transform: translateX(-50%) translateY(-4px);
+}
+
+.alignLeft {
+	left: 0;
+}
+
+.alignLeft::after {
+	left: 12px;
+}
+
+.alignLeft.top,
+.alignLeft.bottom {
+	transform: translateY(4px);
+}
+
+.alignLeft.navbarOffset.bottom {
+	transform: translateY(-4px);
+}
+
+.alignRight {
+	left: auto;
+	right: 0;
+}
+
+.alignRight::after {
+	left: auto;
+	right: 12px;
+	transform: translateX(50%) rotate(45deg);
+}
+
+.alignRight.top,
+.alignRight.bottom {
+	transform: translateY(4px);
+}
+
+.alignRight.navbarOffset.bottom {
+	transform: translateY(-4px);
 }
 
 .visible {
@@ -75,5 +114,32 @@
 }
 
 .visible.bottom {
+	transform: translateX(-50%) translateY(8px);
+}
+
+.visible.navbarOffset.bottom {
 	transform: translateX(-50%) translateY(0);
+}
+
+.visible.alignLeft.top,
+.visible.alignRight.top {
+	transform: translateY(0);
+}
+
+.visible.alignLeft.bottom,
+.visible.alignRight.bottom {
+	transform: translateY(8px);
+}
+
+.visible.alignLeft.navbarOffset.bottom,
+.visible.alignRight.navbarOffset.bottom {
+	transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+	.tooltipBubble {
+		max-width: 75vw;
+		white-space: normal;
+		text-align: center;
+	}
 }

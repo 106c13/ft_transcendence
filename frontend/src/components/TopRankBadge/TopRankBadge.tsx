@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import styles from './TopRankBadge.module.css';
 import Tooltip from '../Tooltip/Tooltip';
 
@@ -6,6 +7,7 @@ interface TopRankBadgeProps {
 	size?: 'sm' | 'md' | 'lg' | 'xl';
 	className?: string;
 	showTooltip?: boolean;
+	tooltipAlign?: 'center' | 'left' | 'right';
 }
 
 const TopRankBadge = ({
@@ -13,7 +15,10 @@ const TopRankBadge = ({
 	size = 'md',
 	className = '',
 	showTooltip = true,
+	tooltipAlign = 'center',
 }: TopRankBadgeProps) => {
+	const { t } = useTranslation();
+
 	if (rank < 1 || rank > 3) return null;
 
 	const sizeClass =
@@ -26,7 +31,7 @@ const TopRankBadge = ({
 			: styles.sizeMd;
 
 	const tooltipText =
-		rank === 1 ? '1st Place • Champion' : rank === 2 ? '2nd Place • Runner-Up' : '3rd Place • Bronze Master';
+		rank === 1 ? t('rank_badge_1') : rank === 2 ? t('rank_badge_2') : t('rank_badge_3');
 
 	const badgeTypeClass =
 		rank === 1 ? styles.goldBadge : rank === 2 ? styles.silverBadge : styles.bronzeBadge;
@@ -160,7 +165,7 @@ const TopRankBadge = ({
 	}
 
 	return (
-		<Tooltip content={tooltipText} position="top" inline>
+		<Tooltip content={tooltipText} position="top" align={tooltipAlign}>
 			{badge}
 		</Tooltip>
 	);

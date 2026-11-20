@@ -6,6 +6,7 @@ type TooltipProps = {
 	content: ReactNode;
 	children: ReactNode;
 	position?: 'top' | 'bottom';
+	align?: 'center' | 'left' | 'right';
 	disabled?: boolean;
 	className?: string;
 	inline?: boolean;
@@ -16,6 +17,7 @@ const Tooltip = ({
 	content,
 	children,
 	position = 'top',
+	align = 'center',
 	disabled = false,
 	className,
 	inline = false,
@@ -30,7 +32,11 @@ const Tooltip = ({
 		setIsOpen(false);
 	}
 
+	const effectiveIsOpen = !disabled && Boolean(content) && isOpen;
+
 	useEffect(() => {
+		if (!effectiveIsOpen) return;
+
 		const handleScroll = () => {
 			setIsOpen(false);
 		};
@@ -39,7 +45,7 @@ const Tooltip = ({
 		return () => {
 			window.removeEventListener('scroll', handleScroll, true);
 		};
-	}, []);
+	}, [effectiveIsOpen]);
 
 	const handleMouseEnter = () => {
 		if (!disabled && content) {
@@ -80,7 +86,8 @@ const Tooltip = ({
 		}
 	};
 
-	const effectiveIsOpen = !disabled && Boolean(content) && isOpen;
+	const alignClass =
+		align === 'left' ? styles.alignLeft : align === 'right' ? styles.alignRight : '';
 
 	return (
 		<span
@@ -97,7 +104,7 @@ const Tooltip = ({
 				<span
 					className={`${styles.tooltipBubble} ${position === 'bottom' ? styles.bottom : styles.top} ${
 						offset === 'navbar' ? styles.navbarOffset : ''
-					} ${effectiveIsOpen ? styles.visible : ''}`}
+					} ${alignClass} ${effectiveIsOpen ? styles.visible : ''}`}
 					role="tooltip"
 					aria-hidden={!effectiveIsOpen}
 				>

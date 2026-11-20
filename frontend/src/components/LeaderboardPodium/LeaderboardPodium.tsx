@@ -21,7 +21,7 @@ const LeaderboardPodium = ({
 	if (!podiumPlayers) return null;
 
 	return (
-		<section className={styles.podiumContainer} aria-label="Top 3 Champions">
+		<section className={styles.podiumContainer} aria-label={t('elite_podium')}>
 			<div
 				className={`${styles.podiumCard} ${styles.podiumSecond}`}
 				onClick={() => onPlayerClick(podiumPlayers.second.username)}
@@ -53,12 +53,6 @@ const LeaderboardPodium = ({
 				<div className={styles.podiumRatingRow}>
 					<span className={styles.podiumRating}>{podiumPlayers.second.leaderboardRating}</span>
 					<TopRankBadge rank={2} size="md" />
-				</div>
-				<div className={styles.podiumStatsRow}>
-					<span>{podiumPlayers.second.stats.totalGames} {t('matches')}</span>
-					<span className={styles.podiumStatHighlight}>
-						{podiumPlayers.second.stats.winRate}% {t('winrate')}
-					</span>
 				</div>
 			</div>
 
@@ -97,12 +91,6 @@ const LeaderboardPodium = ({
 					<span className={styles.podiumRating}>{podiumPlayers.first.leaderboardRating}</span>
 					<TopRankBadge rank={1} size="md" />
 				</div>
-				<div className={styles.podiumStatsRow}>
-					<span>{podiumPlayers.first.stats.totalGames} {t('matches')}</span>
-					<span className={styles.podiumStatHighlight}>
-						{podiumPlayers.first.stats.winRate}% {t('winrate')}
-					</span>
-				</div>
 			</div>
 
 			<div
@@ -135,13 +123,7 @@ const LeaderboardPodium = ({
 				<h3 className={styles.podiumUsername}>@{podiumPlayers.third.username}</h3>
 				<div className={styles.podiumRatingRow}>
 					<span className={styles.podiumRating}>{podiumPlayers.third.leaderboardRating}</span>
-					<TopRankBadge rank={3} size="md" />
-				</div>
-				<div className={styles.podiumStatsRow}>
-					<span>{podiumPlayers.third.stats.totalGames} {t('matches')}</span>
-					<span className={styles.podiumStatHighlight}>
-						{podiumPlayers.third.stats.winRate}% {t('winrate')}
-					</span>
+					<TopRankBadge rank={3} size="sm" />
 				</div>
 			</div>
 		</section>
